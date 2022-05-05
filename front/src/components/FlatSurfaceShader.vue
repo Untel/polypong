@@ -328,7 +328,7 @@ export default {
 </script>
 
 <style>
-  canvas {
-    filter: brightness(0.5);
+  canvas, svg {
+    filter: brightness(0.7);
   }
 </style>
