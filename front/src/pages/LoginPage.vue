@@ -2,9 +2,9 @@
   <flat-surface-shader
     type="canvas"
     style="height: 100vh; display: flex; justify-content: center; align-items: center;"
-    :light="{ambient: '#2d374c', diffuse: '#00babb', draw: true}"
-    :mesh="{ diffuse: '#2d374c',
-      segments: 20, slices: 20, width: 1.8, height: 1.8
+    :light="{ambient: '#2c3893', diffuse: '#407a3c', draw: false, zOffset: 50 }"
+    :mesh="{ diffuse: '#ffffff', ambiant: '#000b64', depth: 10,
+      segments: 12, slices: 12, width: 1.8, height: 1.8
     }">
     <q-form
       dark

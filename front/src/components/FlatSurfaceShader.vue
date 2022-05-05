@@ -127,7 +127,7 @@ export default {
           throwError(`Invalid renderer type - ${this.type}`);
       }
       this.renderer.setSize(container.offsetWidth, container.offsetHeight);
-      container.appendChild(this.renderer.element);
+      container.insertBefore(this.renderer.element, container.firstChild);
     },
 
     createMesh() {
@@ -328,4 +328,7 @@ export default {
 </script>
 
 <style>
+  canvas {
+    filter: brightness(0.5);
+  }
 </style>
