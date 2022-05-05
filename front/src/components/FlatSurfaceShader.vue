@@ -1,6 +1,8 @@
 <template>
-  <div ref="shader">
-    <slot></slot>
+  <div style="position: relative" ref="shader">
+    <div style="position: absolute">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
