@@ -57,6 +57,13 @@ const linksList = [
     link: '/game',
     to: 'game',
   },
+  {
+    title: 'Login',
+    caption: 'Pong game',
+    icon: 'game',
+    link: '/login',
+    to: 'login',
+  },
 ];
 
 export default defineComponent({

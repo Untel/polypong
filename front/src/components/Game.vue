@@ -1,6 +1,6 @@
 <template>
-  <div>
-    This is game
+  <div style="height: 100%; width: 100%">
+    HERE
   </div>
 </template>
 
@@ -9,5 +9,7 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'GameComponent',
+  components: {
+  },
 });
 </script>
