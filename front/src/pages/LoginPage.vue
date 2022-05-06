@@ -1,14 +1,26 @@
 <template setup>
-  <flat-surface-shader
-    type="canvas"
+  <!-- <flat-surface-shader
+    type="svg"
     style="height: 100vh; display: flex; justify-content: center; align-items: center;"
     :light="{
       ambient: '#2c3893', diffuse: '#407a3c',
       draw: false, zOffset: 60, maxDistance: 200, autopilot: false
     }"
-    :mesh="{ diffuse: '#ffffff', ambiant: '#000b64', depth: 10,
+    :mesh="{ diffuse: '#ffffff', ambient: '#000b64', depth: 10,
       segments: 14, slices: 9, width: 1.2, height: 1.2
-    }">
+    }"> -->
+  <flat-surface-shader
+    type="svg"
+    style="height: 100vh; display: flex; justify-content: center; align-items: center;"
+    :mesh="{
+      diffuse: '#1a41a0', ambient: '#040225', depth: 25,
+      segments: 16, slices: 8, width: 1.2, height: 1.2
+    }"
+    :light="{
+      ambient: '#00a07a', diffuse: '#8baf19', count: 3,
+      draw: true, zOffset: 100, autopilot: false
+    }"
+  >
   <!-- <flat-surface-shader
     type="canvas"
     style="height: 100vh; display: flex; justify-content: center; align-items: center;"
@@ -17,7 +29,7 @@
     }"
     :light="{
       ambient: '#0b3737', diffuse: '#5b691b', count: 3,
-      draw: false, zOffset: 33, maxDistance: 200, autopilot: false
+      draw: false, zOffset: 33, autopilot: false
     }"> -->
     <q-form
       ref="form"

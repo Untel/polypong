@@ -329,6 +329,6 @@ export default {
 
 <style>
   canvas, svg {
-    filter: brightness(0.7);
+    filter: contrast(.8)
   }
 </style>
