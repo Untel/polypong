@@ -7,8 +7,18 @@
       draw: false, zOffset: 60, maxDistance: 200, autopilot: false
     }"
     :mesh="{ diffuse: '#ffffff', ambiant: '#000b64', depth: 10,
-      segments: 15, slices: 15, width: 1.4, height: 1.8
+      segments: 14, slices: 9, width: 1.2, height: 1.2
     }">
+  <!-- <flat-surface-shader
+    type="canvas"
+    style="height: 100vh; display: flex; justify-content: center; align-items: center;"
+    :mesh="{ ambiant: '#343d82', diffuse: '#425021', depth: 13,
+      segments: 14, slices: 9, width: 1.2, height: 1.2
+    }"
+    :light="{
+      ambient: '#0b3737', diffuse: '#5b691b', count: 3,
+      draw: false, zOffset: 33, maxDistance: 200, autopilot: false
+    }"> -->
     <q-form
       ref="form"
       dark
