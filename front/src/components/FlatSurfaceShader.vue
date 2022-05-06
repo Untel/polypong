@@ -1,6 +1,6 @@
 <template>
   <div style="position: relative" ref="shader">
-    <div style="position: absolute">
+    <div class="inner-content">
       <slot></slot>
     </div>
   </div>
@@ -328,6 +328,12 @@ export default {
 </script>
 
 <style>
+  .inner-content {
+    position: absolute;
+    display: flex;
+    place-content: center;
+    width: 100%;
+  }
   canvas, svg {
     filter: contrast(.8)
   }

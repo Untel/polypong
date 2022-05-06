@@ -1,17 +1,22 @@
+<style lang="scss" scoped>
+  .login-background {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    width: min(400px, 60%);
+  }
+</style>
+
 <template setup>
-  <!-- <flat-surface-shader
-    type="svg"
-    style="height: 100vh; display: flex; justify-content: center; align-items: center;"
-    :light="{
-      ambient: '#2c3893', diffuse: '#407a3c',
-      draw: false, zOffset: 60, maxDistance: 200, autopilot: false
-    }"
-    :mesh="{ diffuse: '#ffffff', ambient: '#000b64', depth: 10,
-      segments: 14, slices: 9, width: 1.2, height: 1.2
-    }"> -->
   <flat-surface-shader
+    class="login-background"
     type="svg"
-    style="height: 100vh; display: flex; justify-content: center; align-items: center;"
     :mesh="{
       diffuse: '#1a41a0', ambient: '#040225', depth: 25,
       segments: 16, slices: 8, width: 1.2, height: 1.2
@@ -21,26 +26,15 @@
       draw: true, zOffset: 100, autopilot: false
     }"
   >
-  <!-- <flat-surface-shader
-    type="canvas"
-    style="height: 100vh; display: flex; justify-content: center; align-items: center;"
-    :mesh="{ ambiant: '#343d82', diffuse: '#425021', depth: 13,
-      segments: 14, slices: 9, width: 1.2, height: 1.2
-    }"
-    :light="{
-      ambient: '#0b3737', diffuse: '#5b691b', count: 3,
-      draw: false, zOffset: 33, autopilot: false
-    }"> -->
     <q-form
       ref="form"
-      dark
-      @submit="onSubmitForm"
+      dark center
       class="q-gutter-md login-form"
-      center
-      style="width: 400px"
+      @submit="onSubmitForm"
     >
       <img style="width:100px; justify-self: center;" src="src/assets/42_logo.svg"/>
       <q-input
+        v-model="login"
         class="full-width"
         filled
         dark
@@ -49,8 +43,8 @@
         lazy-rules
         :rules="[ val => val && val.length > 0 || 'Please type something']"
       />
-
       <q-input
+        v-model="password"
         class="full-width"
         filled
         dark
@@ -59,35 +53,28 @@
         lazy-rules
       />
       <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
-      <!-- <pre style="background-color: red">yo -> {{ form }}</pre> -->
     </q-form>
   </flat-surface-shader>
 </template>
 
-<style lang="scss">
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-</style>
-
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { ref } from '@vue/reactivity';
 import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const onSubmitForm = (form) => {
-  console.log('Submitting form', form);
-  useRouter().push('/');
-};
 
 export default defineComponent({
   name: 'LoginPage',
   components: { FlatSurfaceShader },
   setup() {
-    return { onSubmitForm };
+    const login = ref(''), password = ref('');
+    const router = useRouter();
+    const onSubmitForm = (form: Event) => {
+      console.log('Submitting form', form, login, password);
+      router.push('/');
+    };
+    return { onSubmitForm, login, password };
   },
 });
 </script>
