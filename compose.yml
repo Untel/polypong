@@ -1,0 +1,16 @@
+
+  
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      target: develop-stage
+    container_name: front
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./front/:/app
+    working_dir: /app
+    entrypoint: quasar dev
