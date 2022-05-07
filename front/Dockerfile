@@ -2,6 +2,7 @@
 FROM node:18 as develop-stage
 WORKDIR /app
 RUN yarn global add @quasar/cli
+RUN yarn
 
 # build stage
 FROM develop-stage as build-stage

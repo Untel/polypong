@@ -13,4 +13,5 @@ services:
     volumes:
       - ./front/:/app
     working_dir: /app
-    entrypoint: quasar dev
+    entrypoint: npm
+    command: run docker:dev

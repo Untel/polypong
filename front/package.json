@@ -6,6 +6,8 @@
   "author": "Adrien Fernandes <adrien@fernandes.bzh>",
   "private": true,
   "scripts": {
+    "docker:dev": "yarn && quasar dev",
+    "dev": "quasar dev",
     "lint": "eslint --ext .js,.ts,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "storybook": "start-storybook -p 6006",
