@@ -13,7 +13,7 @@
   }
 </style>
 
-<template setup>
+<template>
   <flat-surface-shader
     class="login-background"
     v-bind="loginShaders"
@@ -23,7 +23,9 @@
       dark center
       class="q-gutter-md login-form"
       @submit="onSubmitForm"
+      aria-autocomplete="off"
     >
+      <pre>Low perf: {{ settings.getIsLowPerf }}</pre>
       <img style="width:100px; justify-self: center;" src="src/assets/42_logo.svg"/>
       <q-input
         v-model="login"
@@ -40,39 +42,45 @@
         class="full-width"
         filled
         dark
-        type="password"
         label="Password"
+        :type="showPassword ? 'text' : 'password'"
         lazy-rules
-      />
+        :rules="[ val => val && val.length > 0 || 'Please type something']"
+      >
+        <template v-slot:append>
+          <q-icon
+            :name="showPassword ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="showPassword = !showPassword"
+          />
+        </template>
+      </q-input>
       <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
     </q-form>
+    <q-toggle
+      v-model="settings.isLowPerf"
+      color="green"
+    />
   </flat-surface-shader>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent } from 'vue';
 import { ref } from '@vue/reactivity';
 import { useRouter } from 'vue-router';
 
 import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
 import { useLoginShaders } from 'src/utils/shaders';
+import { useSettingsStore } from 'src/stores/settings';
 
-export default defineComponent({
-  name: 'LoginPage',
-  components: { FlatSurfaceShader },
-  setup() {
-    const login = ref(''), password = ref('');
-    const router = useRouter();
-    const onSubmitForm = (form: Event) => {
-      console.log('Submitting form', form, login, password);
-      router.push('/');
-    };
-    return {
-      onSubmitForm,
-      login,
-      password,
-      loginShaders: useLoginShaders()
-    };
-  },
-});
+const login = ref('');
+const password = ref('');
+const showPassword = ref(false);
+const loginShaders = useLoginShaders();
+const router = useRouter();
+const onSubmitForm = (form: Event) => {
+  console.log('Submitting form', form, login, password);
+  router.push('/');
+};
+const settings = useSettingsStore();
 </script>

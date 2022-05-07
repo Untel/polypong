@@ -17,6 +17,9 @@ const { FSS } = window;
 export default {
   name: 'flat-surface-shader',
   props: {
+    lowPerformance: {
+      type: Boolean,
+    },
     type: {
       type: String,
       default: 'svg',
