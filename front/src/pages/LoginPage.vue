@@ -15,15 +15,10 @@
 
 <template>
   <!-- <q-img :src="getFullUrl('/src/assets/background_login.jpg')"></q-img> -->
-  <component :is="!settings.getIsLowPerf ? FlatSurfaceShader : 'q-img'"
+  <FssFallback
     class="login-background"
-    v-bind="!settings.getIsLowPerf
-      ? loginShaders
-      : { style: `
-        background: url(${getFullUrl('/src/assets/background_login.jpg')});
-        background-size: cover;
-      ` }
-    "
+    :fss-settings="loginShaders"
+    fallback-url="/src/assets/background_login.jpg"
   >
     <q-form
       ref="form"
@@ -68,7 +63,7 @@
       v-model="settings.isLowPerf"
       color="green"
     />
-  </component>
+  </FssFallback>
 </template>
 
 <script lang="ts" setup>
@@ -77,8 +72,10 @@ import { ref } from '@vue/reactivity';
 import { useRouter } from 'vue-router';
 
 import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
+// import FssFallback from 'src/components/FlatSurfaceShader.vue';
 import { useLoginShaders } from 'src/utils/shaders';
-import { useSettingsStore } from 'src/stores/settings';
+import FssFallback from 'src/components/FssFallback.vue';
+  import { useSettingsStore } from 'src/stores/settings';
 
 const login = ref('');
 const password = ref('');
@@ -89,8 +86,6 @@ const onSubmitForm = (form: Event) => {
   console.log('Submitting form', form, login, password);
   router.push('/');
 };
-function getFullUrl(relativeUrl: string) {
-  return new URL(relativeUrl, import.meta.url).href
-}
-const settings = useSettingsStore();
+  const settings = useSettingsStore();
+
 </script>
