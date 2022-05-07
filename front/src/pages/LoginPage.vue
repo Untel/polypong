@@ -14,9 +14,16 @@
 </style>
 
 <template>
-  <flat-surface-shader
+  <!-- <q-img :src="getFullUrl('/src/assets/background_login.jpg')"></q-img> -->
+  <component :is="!settings.getIsLowPerf ? FlatSurfaceShader : 'q-img'"
     class="login-background"
-    v-bind="loginShaders"
+    v-bind="!settings.getIsLowPerf
+      ? loginShaders
+      : { style: `
+        background: url(${getFullUrl('/src/assets/background_login.jpg')});
+        background-size: cover;
+      ` }
+    "
   >
     <q-form
       ref="form"
@@ -25,7 +32,7 @@
       @submit="onSubmitForm"
       aria-autocomplete="off"
     >
-      <pre>Low perf: {{ settings.getIsLowPerf }}</pre>
+      <!-- <pre>Low perf: {{ settings.getIsLowPerf }}</pre> -->
       <img style="width:100px; justify-self: center;" src="src/assets/42_logo.svg"/>
       <q-input
         v-model="login"
@@ -61,11 +68,11 @@
       v-model="settings.isLowPerf"
       color="green"
     />
-  </flat-surface-shader>
+  </component>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent } from 'vue';
+
 import { ref } from '@vue/reactivity';
 import { useRouter } from 'vue-router';
 
@@ -82,5 +89,8 @@ const onSubmitForm = (form: Event) => {
   console.log('Submitting form', form, login, password);
   router.push('/');
 };
+function getFullUrl(relativeUrl: string) {
+  return new URL(relativeUrl, import.meta.url).href
+}
 const settings = useSettingsStore();
 </script>

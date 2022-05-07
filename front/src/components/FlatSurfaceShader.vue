@@ -1,5 +1,20 @@
+<style>
+  .wrapper {
+    position: relative;
+  }
+  .inner-content {
+    position: absolute;
+    display: flex;
+    place-content: center;
+    width: 100%;
+  }
+  canvas, svg {
+    filter: contrast(.8)
+  }
+</style>
+
 <template>
-  <div style="position: relative" ref="shader">
+  <div class="wrapper" ref="shader">
     <div class="inner-content">
       <slot></slot>
     </div>
@@ -17,9 +32,6 @@ const { FSS } = window;
 export default {
   name: 'flat-surface-shader',
   props: {
-    lowPerformance: {
-      type: Boolean,
-    },
     type: {
       type: String,
       default: 'svg',
@@ -47,11 +59,10 @@ export default {
   mounted() {
     this.initialize();
   },
-
-  setup() {
+  data() {
     return {
       start: Date.now(),
-      scene: new FSS.Scene(),
+      scene: null,
       renderer: null,
       meshIns: null,
       MESH: {
@@ -96,7 +107,16 @@ export default {
       svgRenderer: new FSS.SVGRenderer(),
       canvasRenderer: new FSS.CanvasRenderer(),
       webglRenderer: new FSS.WebGLRenderer(),
+      animationFrameId: null,
     };
+  },
+
+  beforeUnmount() {
+    this.removeEventListeners();
+    this.renderer.clear();
+    const container = this.$refs.shader;
+    container.removeChild(this.renderer.element);
+    window.cancelAnimationFrame(this.animationFrameId)
   },
 
   methods: {
@@ -201,7 +221,7 @@ export default {
     animate() {
       this.update();
       this.shaderRender();
-      requestAnimationFrame(this.animate);
+      this.animationFrameId = requestAnimationFrame(this.animate);
     },
 
     update() {
@@ -314,14 +334,21 @@ export default {
       window.addEventListener('resize', this.onWindowResize);
       container.addEventListener('mousemove', this.onMouseMove);
     },
+    removeEventListeners() {
+      const container = this.$refs.shader;
+      window.removeEventListener('resize', this.onWindowResize);
+      container.removeEventListener('mousemove', this.onMouseMove);
+    },
 
     onWindowResize() {
+      console.log("Resize");
       const container = this.$refs.shader;
       this.resize(container.offsetWidth, container.offsetHeight);
       this.shaderRender();
     },
 
     onMouseMove(event) {
+      console.log("Moving");
       FSS.Vector3.set(this.attractor, event.x, this.renderer.height - event.y);
       FSS.Vector3.subtract(this.attractor, this.center);
     },
@@ -329,15 +356,3 @@ export default {
 
 };
 </script>
-
-<style>
-  .inner-content {
-    position: absolute;
-    display: flex;
-    place-content: center;
-    width: 100%;
-  }
-  canvas, svg {
-    filter: contrast(.8)
-  }
-</style>

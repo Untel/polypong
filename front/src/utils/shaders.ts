@@ -1,5 +1,8 @@
-import { Coalition } from 'src/types';
 import { Light, Mesh, ShaderConfig } from 'src/types/shaders';
+import { useSettingsStore } from 'src/stores/settings';
+import { Coalition } from 'src/types';
+
+const settings = useSettingsStore();
 
 export const useLoginShaders = () => {
   const mesh: Mesh = {
@@ -21,7 +24,7 @@ export const useLoginShaders = () => {
     autopilot: false
   }
   return {
-    type: 'svg',
+    type: 'canvas',
     mesh,
     light
   } as ShaderConfig;;
