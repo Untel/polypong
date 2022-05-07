@@ -104,9 +104,6 @@ export default {
       material: new FSS.Material(),
       center: FSS.Vector3.create(),
       attractor: FSS.Vector3.create(),
-      svgRenderer: new FSS.SVGRenderer(),
-      canvasRenderer: new FSS.CanvasRenderer(),
-      webglRenderer: new FSS.WebGLRenderer(),
       animationFrameId: null,
     };
   },
@@ -138,13 +135,13 @@ export default {
       }
       switch (this.type) {
         case 'webgl':
-          this.renderer = this.webglRenderer;
+          this.renderer = new FSS.WebGLRenderer();
           break;
         case 'canvas':
-          this.renderer = this.canvasRenderer;
+          this.renderer = new FSS.CanvasRenderer();
           break;
         case 'svg':
-          this.renderer = this.svgRenderer;
+          this.renderer = new FSS.SVGRenderer();
           break;
         default:
           throwError(`Invalid renderer type - ${this.type}`);
@@ -341,14 +338,12 @@ export default {
     },
 
     onWindowResize() {
-      console.log("Resize");
       const container = this.$refs.shader;
       this.resize(container.offsetWidth, container.offsetHeight);
       this.shaderRender();
     },
 
     onMouseMove(event) {
-      console.log("Moving");
       FSS.Vector3.set(this.attractor, event.x, this.renderer.height - event.y);
       FSS.Vector3.subtract(this.attractor, this.center);
     },
