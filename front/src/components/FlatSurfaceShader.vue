@@ -1,4 +1,4 @@
-<style>
+<style scoped>
   .wrapper {
     position: relative;
   }
@@ -32,6 +32,9 @@ const { FSS } = window;
 export default {
   name: 'flat-surface-shader',
   props: {
+    filter: {
+      type: String,
+    },
     type: {
       type: String,
       default: 'svg',

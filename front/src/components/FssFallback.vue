@@ -25,7 +25,7 @@
     return new URL(relativeUrl, import.meta.url).href
   }
   const fallbackStyle = computed(() => {
-    return { background: `url(${getFullUrl(props.fallbackUrl || '')})` };
+    return { backgroundImage: `url(${getFullUrl(props.fallbackUrl || '')})` };
   })
   const settings = useSettingsStore();
 </script>
