@@ -5,7 +5,7 @@
 </style>
 
 <template>
-  <FlatSurfaceShader v-if="!settings.getIsLowPerf" :key="$q.dark.isActive" v-bind="{...props.fssSettings}">
+  <FlatSurfaceShader v-if="!settings.getIsLowPerf" v-bind="{...props.fssSettings}">
     <slot />
   </FlatSurfaceShader>
   <div v-else class="fallback" :style="fallbackStyle">

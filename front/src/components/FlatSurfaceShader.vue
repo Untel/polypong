@@ -131,15 +131,22 @@ export default {
     window.cancelAnimationFrame(this.animationFrameId)
   },
 
-  // watch: {
-  //   $props: {
-  //     handler() {
-  //       this.rendererthis.renderer.clear();
-  //     },
-  //     deep: true,
-  //     immediate: true,
-  //   },
-  // },
+  watch: {
+    light: {
+      handler() {
+        this.createLights();
+      },
+      deep: true,
+      immediate: false,
+    },
+    mesh: {
+      handler() {
+        this.createMesh();
+      },
+      deep: true,
+      immediate: false,
+    },
+  },
 
   methods: {
     initialize() {
