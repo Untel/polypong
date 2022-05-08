@@ -20,15 +20,21 @@
         checked-icon="mdi-speedometer"
         unchecked-icon="mdi-speedometer-slow"
         color="green"
-        icon-color="teal"
+        :true-value="false"
+        :false-value="true"
         v-model="settings.isLowPerf"
       />
       <q-toggle
         checked-icon="light_mode"
         unchecked-icon="dark_mode"
+        indeterminate-icon="settings_brightness"
         color="yellow"
+        indeterminate-value="auto"
+        toggle-indeterminate
+        :true-value="false"
+        :false-value="true"
         icon-color="orange"
-        :model-value="$q.dark.isActive"
+        :model-value="$q.dark.mode"
         @update:model-value="$q.dark.set"
       />
     </q-page-sticky>

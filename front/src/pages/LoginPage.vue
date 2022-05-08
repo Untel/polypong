@@ -17,7 +17,7 @@
   <q-page>
     <FssFallback
       class="login-background"
-      :fss-settings="loginShaders"
+      :fss-settings="$q.dark.isActive ? useLoginShaders() : useLoginLightShaders()"
       fallback-url="/src/assets/background_login.jpg"
     >
       <q-form
@@ -65,14 +65,13 @@
 
 import { ref } from '@vue/reactivity';
 import { useRouter } from 'vue-router';
-import { useLoginShaders } from 'src/utils/shaders';
+import { useLoginShaders, useLoginLightShaders } from 'src/utils/shaders';
 import FssFallback from 'src/components/FssFallback.vue';
 import Logo from 'src/components/Logo.vue';
 
 const login = ref('');
 const password = ref('');
 const showPassword = ref(false);
-const loginShaders = useLoginShaders();
 const router = useRouter();
 const onSubmitForm = (form: Event) => {
   console.log('Submitting form', form, login, password);

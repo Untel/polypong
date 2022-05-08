@@ -22,7 +22,7 @@
       />
       <q-fab-action v-if="props.linkedin" padding="5px" color="blue"
         icon="mdi-linkedin"
-        :to="`https://profile.intra.42.fr/users/${pro}`"
+        :to="`https://profile.intra.42.fr/users/${props.linkedin}`"
       />
       <q-fab-action v-if="props.github" padding="5px"
         icon="mdi-github" color="black"

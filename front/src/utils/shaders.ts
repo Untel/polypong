@@ -4,10 +4,12 @@ import { Coalition } from 'src/types';
 
 const settings = useSettingsStore();
 
+const type = 'canvas';
+
 export const useLoginShaders = () => {
   const mesh: Mesh = {
-    diffuse: '#1a41a0',
     ambient: '#040225',
+    diffuse: '#1a41a0',
     depth: 25,
     segments: 16,
     slices: 8,
@@ -24,7 +26,34 @@ export const useLoginShaders = () => {
     autopilot: false
   }
   return {
-    type: 'canvas',
+    type,
+    mesh,
+    light
+  } as ShaderConfig;;
+}
+
+
+export const useLoginLightShaders = () => {
+  const mesh: Mesh = {
+    ambient: '#616161',
+    diffuse: '#2560f0',
+    depth: 25,
+    segments: 16,
+    slices: 8,
+    width: 1.2,
+    height: 1.2
+  };
+
+  const light: Light = {
+    ambient: '#969696',
+    diffuse: '#676963',
+    count: 3,
+    draw: true,
+    zOffset: 100,
+    autopilot: false
+  }
+  return {
+    type,
     mesh,
     light
   } as ShaderConfig;;
@@ -50,7 +79,7 @@ export const useAllianceShaders = () => {
     autopilot: true
   }
   return {
-    type: 'svg',
+    type,
     mesh,
     light
   } as ShaderConfig;
@@ -76,7 +105,7 @@ export const useAssemblyShaders = () => {
     autopilot: true
   }
   return {
-    type: 'svg',
+    type,
     mesh,
     light
   } as ShaderConfig;
@@ -102,7 +131,7 @@ export const useFederationShaders = () => {
     autopilot: true
   }
   return {
-    type: 'svg',
+    type,
     mesh,
     light
   } as ShaderConfig;
@@ -128,7 +157,7 @@ export const useOrderShaders = () => {
     autopilot: true
   }
   return {
-    type: 'svg',
+    type,
     mesh,
     light
   } as ShaderConfig;

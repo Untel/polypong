@@ -1,4 +1,4 @@
-<style scoped>
+<style lang="scss">
   .wrapper {
     position: relative;
   }
@@ -8,9 +8,21 @@
     place-content: center;
     width: 100%;
   }
+  
+  .body--light {
+
+  }
   canvas, svg {
     filter: contrast(.8)
   }
+  // body.body--light {
+  //   .wrapper {
+  //     svg, canvas {
+  //       -webkit-filter: grayscale; /*sepia, hue-rotate, invert....*/
+  //       -webkit-filter: brightness(150%); 
+  //     }
+  //   }
+  // }
 </style>
 
 <template>
@@ -119,6 +131,16 @@ export default {
     window.cancelAnimationFrame(this.animationFrameId)
   },
 
+  // watch: {
+  //   $props: {
+  //     handler() {
+  //       this.rendererthis.renderer.clear();
+  //     },
+  //     deep: true,
+  //     immediate: true,
+  //   },
+  // },
+
   methods: {
     initialize() {
       const container = this.$refs.shader;
@@ -224,7 +246,13 @@ export default {
       this.animationFrameId = requestAnimationFrame(this.animate);
     },
 
+    updated() {
+      console.log('/// Props change', this.mesh.ambient);
+
+    },
+
     update() {
+      console.log('Props updated', this.mesh.ambient);
       this.MESH = Object.assign(this.MESH, this.mesh);
       this.LIGHT = Object.assign(this.LIGHT, this.light);
       const now = Date.now() - this.start;
