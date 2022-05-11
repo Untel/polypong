@@ -1,0 +1,11 @@
+{
+  "name": "polypong-shared",
+  "version": "1.0.0",
+  "description": "Shared code between front and api (Game & types)",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adrien Fernandes <adrien@fernandes.bzh>",
+  "license": "ISC"
+}
