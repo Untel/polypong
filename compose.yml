@@ -5,13 +5,30 @@ services:
     build:
       context: ./front
       dockerfile: Dockerfile
-      target: develop-stage
+      target: front-develop-stage
     container_name: front
     restart: always
     ports:
       - "9000:9000"
+    depends_on:
+      - api
     volumes:
       - ./front/:/app
+      - ./api/common/:/app/src/common
     working_dir: /app
-    entrypoint: npm
-    command: run docker:dev
+    entrypoint: yarn
+    command: docker:dev
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: api-develop-stage
+    container_name: api
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api/:/app
+    working_dir: /app
+    entrypoint: yarn
+    command: docker:dev

@@ -1,5 +1,5 @@
 # develop stage
-FROM node:18 as develop-stage
+FROM node:18 as front-develop-stage
 WORKDIR /app
 RUN yarn global add @quasar/cli
 RUN yarn
