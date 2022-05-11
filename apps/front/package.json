@@ -1,5 +1,5 @@
 {
-  "name": "polypong-front",
+  "name": "@polypong/front",
   "version": "0.0.1",
   "description": "Polygong, our implementation of the last 42's project: ft_transcendance",
   "productName": "Polypong",
