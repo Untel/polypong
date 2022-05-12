@@ -1,35 +1,65 @@
 
   
-version: '3',
+version: '3'
 services:
   front:
     build:
-      context: ./front
+      context: .
       dockerfile: Dockerfile
-      target: front-develop-stage
+      # target: front
+    image: polypong/apps
     container_name: front
-    restart: always
     ports:
       - "9000:9000"
-    depends_on:
-      - api
     volumes:
-      - ./front/:/app
-      - ./api/common/:/app/src/common
-    working_dir: /app
-    entrypoint: yarn
-    command: docker:dev
+      - "./:/polypong"
+    tty: true
+    working_dir: /polypong/apps/front
+    entrypoint: quasar dev
+
   api:
     build:
-      context: ./api
+      context: .
       dockerfile: Dockerfile
-      target: api-develop-stage
+      # target: api
+    image: polypong/apps
     container_name: api
-    restart: always
     ports:
-      - "3000:3000"
+      - "9000:9000"
     volumes:
-      - ./api/:/app
-    working_dir: /app
-    entrypoint: yarn
-    command: docker:dev
+      - "./:/polypong"
+    tty: true
+    working_dir: /polypong/apps/api
+    entrypoint: nest start
+
+  # front:
+  #   build:
+  #     context: ./front
+  #     dockerfile: Dockerfile
+  #     target: front-develop-stage
+  #   container_name: front
+  #   restart: always
+  #   ports:
+  #     - "9000:9000"
+  #   depends_on:
+  #     - api
+  #   volumes:
+  #     - ./front/:/app
+  #     - ./api/common/:/app/src/common
+  #   working_dir: /app
+  #   entrypoint: yarn
+  #   command: docker:dev
+  # api:
+  #   build:
+  #     context: ./api
+  #     dockerfile: Dockerfile
+  #     target: api-develop-stage
+  #   container_name: api
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./api/:/app
+  #   working_dir: /app
+  #   entrypoint: yarn
+  #   command: docker:dev
