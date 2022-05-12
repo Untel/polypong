@@ -3,10 +3,7 @@
 version: '3'
 services:
   front:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # target: front
+    build: .
     image: polypong/apps
     container_name: front
     ports:
@@ -18,19 +15,24 @@ services:
     entrypoint: quasar dev
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # target: api
+    build: .
     image: polypong/apps
     container_name: api
-    ports:
-      - "9000:9000"
     volumes:
       - "./:/polypong"
     tty: true
     working_dir: /polypong/apps/api
     entrypoint: nest start
+
+  common:
+    build: .
+    image: polypong/apps
+    container_name: common
+    volumes:
+      - "./:/polypong"
+    tty: true
+    working_dir: /polypong/libs/game
+    entrypoint: pnpm run start
 
   # front:
   #   build:
