@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { TwoVector, SimplePhysicsEngine, ServerEngine } from 'lance-gg';
+import { TwoVector, SimplePhysicsEngine, ServerEngine, GameEngine } from 'lance-gg';
 import { Ball, Paddle, PongGame, Wall } from ".";
 
 const PADDING = 10;
@@ -20,10 +20,10 @@ const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 
 export class PongServerEngine extends ServerEngine<SimplePhysicsEngine> {
-	constructor(io, PongGame, inputOptions) {
-		super(io, PongGame as PongGame, inputOptions);
+	constructor(io, gameEngine: PongGame, inputOptions) {
+		super(io, gameEngine, inputOptions);
 		// this.options.timeoutInterval = 0;
-		PongGame.on('goal', this.goal.bind(this));
+		this.gameEngine.on('goal', this.goal.bind(this));
 	}
 
 	start() {

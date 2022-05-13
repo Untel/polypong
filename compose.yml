@@ -14,7 +14,7 @@ services:
       - api
     volumes:
       - ./front/:/app
-      - ./api/common/:/app/src/common
+      - common:/app/common
     working_dir: /app
     entrypoint: yarn
     command: docker:dev
@@ -29,6 +29,22 @@ services:
       - "3000:3000"
     volumes:
       - ./api/:/app
+      - common:/app/common
     working_dir: /app
     entrypoint: yarn
     command: docker:dev
+  common:
+    build:
+      context: ./common
+      dockerfile: Dockerfile
+    container_name: common
+    restart: always
+    volumes:
+      - ./common/:/app
+      - common:/app/dist/
+    working_dir: /app
+    entrypoint: yarn
+    command: docker:dev
+
+volumes:
+  common:

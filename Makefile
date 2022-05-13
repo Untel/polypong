@@ -1,6 +1,7 @@
 COMPOSE=docker-compose
 FRONT=front
 API=api
+COMMON=common
 
 all:
 	$(COMPOSE) up
@@ -18,8 +19,9 @@ install:
 
 $(FRONT):
 	$(COMPOSE) exec $(FRONT) /bin/bash
-
 $(API):
 	$(COMPOSE) exec $(API) /bin/bash
+$(COMMON):
+	$(COMPOSE) exec $(COMMON) /bin/bash
 
-.PHONY: all build clear install $(FRONT) $(API)
+.PHONY: all build clear install $(FRONT) $(API) $(COMMON) 

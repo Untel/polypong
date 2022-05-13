@@ -1,7 +1,7 @@
 import querystring from 'query-string';
-import { PongGame } from './PongGame';
+import { PongGame } from '../PongGame';
 import { Lib, Renderer, ClientEngine } from 'lance-gg';
-import { PongClientEngine } from './PongClientEngine'
+import { PongClientEngine } from '../PongClientEngine'
 const qsOptions = querystring.parse(location.search);
 
 // default options, overwritten by query-string options

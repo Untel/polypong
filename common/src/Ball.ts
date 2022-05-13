@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { PongGame } from './PongGame';
+import { PongGame } from '.';
 export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 
-	lastPaddle: number;
+	lastPaddle: number = 0;
 
-	constructor(gameEngine, options, props) {
+	constructor(gameEngine: PongGame, options: any, props: any) {
 		super(gameEngine, options, props);
 		this.position = (props && props.position) || new TwoVector(0, 0);
 		this.width = 10;
@@ -38,37 +38,20 @@ export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 		};
 	}
 
-	collidesWith(other) {
+	collidesWith() {
 		return true;
 	}
 	bounce_side() {
-		// console.log('boing dx:', this.velocity.x);
-		// console.log('boing dy:', this.velocity.y);
-		// console.log("pos: ", this.position)
 		this.velocity.x = (this.velocity.x > 0) ? (this.velocity.x + 0.5) * -1 : (this.velocity.x - 0.5) * -1
-		// if (this.velocity.x > 0)
-		// 	this.velocity.x += 0.5;
-		// else
-		// 	this.velocity.x += 0.5;
-		// this.velocity.x *= -1;
-		// this.accelerate(2);
-		// this.position.x 
-		// this.velocity = new TwoVector(this.velocity.x * -1, this.velocity.y);
 	}
 	bounce_top() {
-		// console.log('boing dx:', this.velocity.x);
-		// console.log('boing dy:', this.velocity.y);
-		// this.velocity = new TwoVector(this.velocity.x, this.velocity.y * -1);
-		// console.log("pos: ", this.position)
 		this.velocity.y *= -1;
 	}
-	syncTo(other) {
+	syncTo(other: Ball) {
 		super.syncTo(other);
 		this.lastPaddle = other.lastPaddle;
-		// other.velocity = this.velocity;
 	}
 	launch() {
 		this.velocity = new TwoVector(2, 1)
-		// this.velocity = new TwoVector(Math.floor(Math.random() * 5), Math.floor(Math.random() * 5));
 	}
 }

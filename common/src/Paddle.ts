@@ -24,7 +24,7 @@ export class Paddle extends DynamicObject<PongGame, SimplePhysicsEngine> {
 
     score: number;
 
-    constructor(gameEngine, options, props) {
+    constructor(gameEngine: PongGame, options: any, props: any) {
         super(gameEngine, options, props);
         this.width = 10;
         this.height = 50;
@@ -63,7 +63,7 @@ export class Paddle extends DynamicObject<PongGame, SimplePhysicsEngine> {
         console.log(this);
     }
 
-    syncTo(other) {
+    syncTo(other: Paddle) {
         super.syncTo(other);
         this.score = other.score
         // console.log('-------------------------------------');
