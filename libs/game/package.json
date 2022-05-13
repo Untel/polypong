@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc-watch -p tsconfig.json"
+    "start": "tsc-watch -p tsconfig.json"
   },
   "author": "Adrien Fernandes <adrien@fernandes.bzh>",
   "license": "ISC",

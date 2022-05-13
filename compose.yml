@@ -20,6 +20,8 @@ services:
     container_name: api
     volumes:
       - "./:/polypong"
+    ports:
+      - "3000:3000"
     tty: true
     working_dir: /polypong/apps/api
     entrypoint: nest start
