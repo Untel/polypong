@@ -154,7 +154,7 @@ declare module 'lance-gg' {
      * and therefore clients must resolve server updates which conflict
      * with client-side predictions.
      */
-    export class GameEngine<PE extends PhysicsEngine> {
+    export class GameEngine<PE extends PhysicsEngine, WorldSettings> {
         options: GameEngineOptions;
 
         /**
@@ -169,7 +169,7 @@ declare module 'lance-gg' {
         * as width, height, depth, etc. such that all other classes
         * can reference these values.
         */
-        worldSettings: object;
+        worldSettings: WorldSettings;
 
         physicsEngine: PE;
 
@@ -197,7 +197,7 @@ declare module 'lance-gg' {
          */
         getPlayerGameOverResult(): object | void;
 
-        initWorld(worldSettings: object): void;
+        initWorld(worldSettings: WorldSettings): void;
 
         /**
          * Check if a given object is owned by the player on this client
@@ -344,9 +344,9 @@ declare module 'lance-gg' {
 
         applyIncrementalBending(stepDesc: any): void;
 
-        bendToCurrent(original: any, bending: any, worldSettings: any, isLocal: any, bendingIncrements: any): void;
+        bendToCurrent(original: any, bending: any, worldSettings: WorldSettings, isLocal: any, bendingIncrements: any): void;
 
-        bendToCurrentState(bending: any, worldSettings: any, isLocal: any, bendingIncrements: any): void;
+        bendToCurrentState(bending: any, worldSettings: GE.WorldSettings, isLocal: any, bendingIncrements: any): void;
 
         bendingToString(): string;
 
@@ -356,7 +356,7 @@ declare module 'lance-gg' {
 
         hasComponent(componentClass: any): any;
 
-        onAddToWorld(gameEngine: any): void;
+        onAddToWorld(gameEngine: GE): void;
 
         onRemoveFromWorld(gameEngine: any): void;
 
@@ -496,7 +496,7 @@ declare module 'lance-gg' {
         /// - bendingAngleDelta
         /// these can later be used to "bend" incrementally from the state described
         /// by "original" to the state described by "self"
-        bendToCurrent(original: any, percent: any, worldSettings: any, isLocal: any, increments: any): void;
+        bendToCurrent(original: any, percent: any, worldSettings: GE.WorldSettings, isLocal: any, increments: any): void;
 
         /**
          * Each object class can define its own bending overrides.

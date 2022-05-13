@@ -12,7 +12,6 @@
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
 import { Ball, PongGame } from '.';
-// import { Game } from './PongGameGame'
 
 const PADDING = 10;
 const WIDTH = 400;
@@ -80,8 +79,8 @@ export class Paddle extends DynamicObject<PongGame, SimplePhysicsEngine> {
     }
     moveDown() {
         this.position.y += 5;
-        if (this.position.y > this.gameEngine.height - PADDLE_HEIGHT)
-            this.position.y = this.gameEngine.height - PADDLE_HEIGHT;
+        if (this.position.y > this.gameEngine.worldSettings.height - PADDLE_HEIGHT)
+            this.position.y = this.gameEngine.worldSettings.height - PADDLE_HEIGHT;
     }
 
 }

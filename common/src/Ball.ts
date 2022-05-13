@@ -12,10 +12,9 @@
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
 import { PongGame } from '.';
+
 export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
-
 	lastPaddle: number = 0;
-
 	constructor(gameEngine: PongGame, options: any, props: any) {
 		super(gameEngine, options, props);
 		this.position = (props && props.position) || new TwoVector(0, 0);
@@ -24,7 +23,10 @@ export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 	}
 
 	reset() {
-		this.position = new TwoVector(this.gameEngine.width / 2, this.gameEngine.height / 2);
+		this.position = new TwoVector(
+			this.gameEngine.worldSettings.width / 2,
+			this.gameEngine.worldSettings.height / 2
+		);
 		this.velocity = new TwoVector(0, 0);
 	}
 

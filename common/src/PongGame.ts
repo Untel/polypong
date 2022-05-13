@@ -7,15 +7,24 @@ const HEIGHT = 400;
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 50;
 
-export class PongGame extends GameEngine<SimplePhysicsEngine> {
-
+export class ObjectSize {
 	width: number;
 	height: number;
+}
+
+export class PongSettings extends ObjectSize {
+
+}
+
+export class PongGame extends GameEngine<SimplePhysicsEngine, PongSettings> {
+
+	// width: number;
+	// height: number;
 
 	constructor(options: any) {
 		super(options);
-		this.width = 800;
-		this.height = 800;
+		this.worldSettings.width = 800;
+		this.worldSettings.height = 800;
 		this.on('collisionStart', this.ColisionEngine.bind(this));
 		this.on('postStep', this.test.bind(this));
 		this.physicsEngine = new SimplePhysicsEngine({
@@ -29,13 +38,13 @@ export class PongGame extends GameEngine<SimplePhysicsEngine> {
 		let ball = this.world.queryObject({ instanceType: Ball });
 		if (!ball)
 			return;
-		if (ball.position.x < 0 || ball.position.x > this.width) {
+		if (ball.position.x < 0 || ball.position.x > this.worldSettings.width) {
 			ball.bounce_side();
-			ball.position.x = (ball.position.x < 0) ? 0 : this.width;
+			ball.position.x = (ball.position.x < 0) ? 0 : this.worldSettings.width;
 		}
-		if (ball.position.y < 0 || ball.position.y > this.height) {
+		if (ball.position.y < 0 || ball.position.y > this.worldSettings.height) {
 			ball.bounce_top();
-			ball.position.y = (ball.position.y < 0) ? 0 : this.width;
+			ball.position.y = (ball.position.y < 0) ? 0 : this.worldSettings.width;
 		}
 	}
 
@@ -45,8 +54,8 @@ export class PongGame extends GameEngine<SimplePhysicsEngine> {
 
 	correct(event) {
 		let ball = this.world.queryObject({ instanceType: Ball });
-		if (ball.position.x > this.width)
-			ball.position.x = this.width - 1;
+		if (ball.position.x > this.worldSettings.width)
+			ball.position.x = this.worldSettings.width - 1;
 		if (ball.position.x < 0)
 			ball.position.x = 1;
 	}
@@ -75,7 +84,7 @@ export class PongGame extends GameEngine<SimplePhysicsEngine> {
 		if (ball && paddle) {
 			// console.log('ball' + ball.position);
 			// console.log('paddle' + paddle.position);
-			if (ball.position.x > this.width - PADDING) {
+			if (ball.position.x > this.worldSettings.width - PADDING) {
 				console.log("weird hit");
 				ball.bounce_top();
 			}
@@ -122,7 +131,7 @@ export class PongGame extends GameEngine<SimplePhysicsEngine> {
 		if (playerPaddle) {
 			if (inputData.input === 'up' && playerPaddle.position.y > 0)
 				playerPaddle.moveUp();
-			else if (inputData.input === 'down' && playerPaddle.position.y < this.height - PADDLE_HEIGHT)
+			else if (inputData.input === 'down' && playerPaddle.position.y < this.worldSettings.height - PADDLE_HEIGHT)
 				playerPaddle.moveDown();
 		}
 	}
