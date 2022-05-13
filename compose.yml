@@ -14,7 +14,9 @@ services:
       - api
     volumes:
       - ./front/:/app
-      - common:/app/common
+      - common:/common
+    depends_on:
+      - common
     working_dir: /app
     entrypoint: yarn
     command: docker:dev
@@ -29,7 +31,9 @@ services:
       - "3000:3000"
     volumes:
       - ./api/:/app
-      - common:/app/common
+      - common:/common
+    depends_on:
+      - common
     working_dir: /app
     entrypoint: yarn
     command: docker:dev

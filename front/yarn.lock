@@ -1536,7 +1536,7 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@polypong/common@link:src/common":
+"@polypong/common@link:../common":
   version "0.0.0"
   uid ""
 

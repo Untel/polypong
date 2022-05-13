@@ -22,6 +22,7 @@
     "docker:dev": "yarn && nest start --watch"
   },
   "dependencies": {
+    "@polypong/common": "link:../common",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",

@@ -14,7 +14,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@polypong/common": "link:/app/src/common",
+    "@polypong/common": "link:../common",
     "@quasar/extras": "^1.0.0",
     "@vueuse/core": "^8.4.2",
     "lance-gg": "^4.0.9",

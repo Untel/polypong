@@ -7,7 +7,7 @@
 <script lang="ts" setup>
 import io from "socket.io-client"
 import { defineComponent } from "vue";
-import { PongGame, PongClientEngine } from 'common';
+import { PongGame, PongClientEngine } from '@polypong/common';
 import { Lib } from 'lance-gg';
 
 const socket = io(`http://localhost:3000`)
