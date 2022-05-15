@@ -2,16 +2,16 @@
   
 version: '3'
 services:
-  # install:
-  #   build: .
-  #   image: polypong/stack
-  #   container_name: install
-  #   volumes:
-  #     - "./:/polypong"
-  #   tty: true
-  #   working_dir: /polypong
-  #   # entrypoint: pnpm run -r start
-  #   entrypoint: pnpm install -r
+  install:
+    build: .
+    image: polypong/stack
+    container_name: install
+    volumes:
+      - "./:/polypong"
+    tty: true
+    working_dir: /polypong
+    # entrypoint: pnpm run -r start
+    entrypoint: pnpm install -r
   # stack:
   #   image: polypong/stack
   #   container_name: stack
@@ -22,9 +22,9 @@ services:
   #     - "./:/polypong"
   #   tty: true
   #   working_dir: /polypong
-  #   depends_on:
-  #     install:
-  #       condition: service_completed_successfully
+    # depends_on:
+    #   install:
+    #     condition: service_completed_successfully
   #   # entrypoint: pnpm run -r start
   #   entrypoint: pnpm run -r start
   front:
@@ -37,7 +37,9 @@ services:
       - "./:/polypong"
     tty: true
     working_dir: /polypong/apps/front
-    entrypoint: quasar dev
+    entrypoint: pnpm start
+    depends_on:
+      - common
 
   api:
     build: .
@@ -49,7 +51,9 @@ services:
       - "3000:3000"
     tty: true
     working_dir: /polypong/apps/api
-    entrypoint: nest start
+    entrypoint: pnpm start
+    depends_on:
+      - common
 
   common:
     build: .
@@ -59,7 +63,10 @@ services:
       - "./:/polypong"
     tty: true
     working_dir: /polypong/libs/game
-    entrypoint: pnpm run start
+    entrypoint: pnpm start
+    depends_on:
+      install:
+        condition: service_completed_successfully
 
   # front:
   #   build:

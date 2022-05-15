@@ -2,11 +2,11 @@
   "name": "@polypong/game",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "tsc",
+    "start": "tsc --watch",
     "build": "tsc",
-    "dev": "tsc-watch -p tsconfig.json"
+    "dev": "tsc --watch"
   },
   "author": "Adrien Fernandes <adrien@fernandes.bzh>",
   "license": "ISC",
