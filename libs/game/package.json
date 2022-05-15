@@ -2,9 +2,11 @@
   "name": "@polypong/game",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist",
+  "browser": "dist/index.browser.js",
+  "type": "module",
   "scripts": {
-    "start": "tsc --watch",
+    "start": "tsc --watch --preserveWatchOutput",
     "build": "tsc",
     "dev": "tsc --watch"
   },
@@ -16,7 +18,7 @@
     "prettier": "^2.3.2",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.7.1-rc"
   },
   "dependencies": {
     "lance-gg": "^4.0.9"

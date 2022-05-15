@@ -1,5 +1,9 @@
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine, SimplePhysicsEngineOptions } from 'lance-gg';
-import { Ball, Wall, Paddle } from '.';
+// import { Ball, Wall, Paddle } from '.';
+
+import { Ball } from './Ball'
+import { Wall } from './Wall'
+import { Paddle } from './Paddle'
 
 const PADDING = 10;
 const WIDTH = 400;

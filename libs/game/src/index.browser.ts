@@ -4,4 +4,4 @@ export { Wall } from "./Wall";
 export { PongGame } from "./PongGame";
 export { PongRenderer } from "./PongRenderer";
 
-export { PongServerEngine } from "./PongServerEngine";
+export { PongClientEngine } from "./PongClientEngine";

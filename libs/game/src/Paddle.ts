@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { Ball, PongGame } from '.';
+import { PongGame } from './PongGame';
 
 const PADDING = 10;
 const WIDTH = 400;

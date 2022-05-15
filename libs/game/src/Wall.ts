@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { Paddle, PongGame } from '.';
+import { PongGame } from './PongGame';
 export class Wall extends DynamicObject<PongGame, SimplePhysicsEngine> {
 
     constructor(gameEngine, options, props) {

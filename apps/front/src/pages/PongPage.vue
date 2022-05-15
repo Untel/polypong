@@ -7,7 +7,8 @@
 <script lang="ts" setup>
 import io from "socket.io-client"
 import { defineComponent } from "vue";
-import { PongGame, PongClientEngine } from '@polypong/game';
+// import { PongGame } from '@polypong/game';
+import { PongGame } from '@polypong/game';
 
 const socket = io(`http://localhost:3000`)
 console.log('Socket', socket)
@@ -22,6 +23,7 @@ const options = {
         bendingIncrements: 6
     }
 }
-const gameEngine = new PongGame({options});
-const clientEngine = new PongClientEngine(gameEngine, options);
+console.log(PongGame)
+// const gameEngine = new PongGame({options});
+// const clientEngine = new PongClientEngine(gameEngine, options);
 </script>

@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 import { GameEngine, ClientEngine, Renderer, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { Ball, PongGame, PongRenderer } from '.'
+import { PongRenderer } from './PongRenderer';
+import { PongGame } from './PongGame';
 
 export class PongClientEngine extends ClientEngine<PongGame> {
 

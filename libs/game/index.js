@@ -1,0 +1,1 @@
+export { PongGame } from 'dist/PongGame'

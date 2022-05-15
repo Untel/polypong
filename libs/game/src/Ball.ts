@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { PongGame } from '.';
+import { PongGame } from './PongGame';
 
 export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 	lastPaddle: number = 0;
