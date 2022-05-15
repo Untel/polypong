@@ -11,7 +11,8 @@ import {
  import { PongGame, PongServerEngine } from "@polypong/game";
 
 @WebSocketGateway({
-  cors: { origin: '*', },
+  // cors: true,
+  // transports: ['websocket', 'polling'],
 })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;

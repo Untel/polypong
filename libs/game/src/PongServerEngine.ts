@@ -13,10 +13,10 @@
 import { TwoVector, SimplePhysicsEngine, ServerEngine, GameEngine } from 'lance-gg';
 // import { Ball, Paddle, PongGame, Wall } from ".";
 
-import { Ball } from "./src/Ball";
-import { Paddle } from "./src/Paddle";
-import { PongGame } from "./src/PongGame";
-import { Wall } from "./src/Wall";
+import { Ball } from "./Ball";
+import { Paddle } from "./Paddle";
+import { PongGame } from "./PongGame";
+import { Wall } from "./Wall";
 
 const PADDING = 10;
 const WIDTH = 400;

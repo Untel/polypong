@@ -79,8 +79,8 @@ export class Paddle extends DynamicObject<PongGame, SimplePhysicsEngine> {
     }
     moveDown() {
         this.position.y += 5;
-        if (this.position.y > this.gameEngine.worldSettings.height - PADDLE_HEIGHT)
-            this.position.y = this.gameEngine.worldSettings.height - PADDLE_HEIGHT;
+        if (this.position.y > this.gameEngine.height - PADDLE_HEIGHT)
+            this.position.y = this.gameEngine.height - PADDLE_HEIGHT;
     }
 
 }

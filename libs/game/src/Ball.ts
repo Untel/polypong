@@ -24,8 +24,8 @@ export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 
 	reset() {
 		this.position = new TwoVector(
-			this.gameEngine.worldSettings.width / 2,
-			this.gameEngine.worldSettings.height / 2
+			this.gameEngine.width / 2,
+			this.gameEngine.height / 2
 		);
 		this.velocity = new TwoVector(0, 0);
 	}
