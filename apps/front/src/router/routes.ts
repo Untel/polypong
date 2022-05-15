@@ -1,4 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
+import PongPage from 'pages/PongPage.vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -9,6 +10,8 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('pages/IndexPage.vue') },
       { name: 'game', path: 'game', component: () => import('components/Game.vue') },
       { name: 'coalitions', path: 'coalitions', component: () => import('pages/CoalitionsPage.vue') },
+      // { name: 'pong', path: 'pong', component: () => import('pages/PongPage.vue') },
+      { name: 'pong', path: 'pong', component: PongPage },
       ]
     }, {
       path: 'login',

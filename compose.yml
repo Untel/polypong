@@ -2,6 +2,31 @@
   
 version: '3'
 services:
+  # install:
+  #   build: .
+  #   image: polypong/stack
+  #   container_name: install
+  #   volumes:
+  #     - "./:/polypong"
+  #   tty: true
+  #   working_dir: /polypong
+  #   # entrypoint: pnpm run -r start
+  #   entrypoint: pnpm install -r
+  # stack:
+  #   image: polypong/stack
+  #   container_name: stack
+  #   ports:
+  #     - "9000:9000"
+  #     - "3000:3000"
+  #   volumes:
+  #     - "./:/polypong"
+  #   tty: true
+  #   working_dir: /polypong
+  #   depends_on:
+  #     install:
+  #       condition: service_completed_successfully
+  #   # entrypoint: pnpm run -r start
+  #   entrypoint: pnpm run -r start
   front:
     build: .
     image: polypong/apps

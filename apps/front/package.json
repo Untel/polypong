@@ -6,7 +6,7 @@
   "author": "Adrien Fernandes <adrien@fernandes.bzh>",
   "private": true,
   "scripts": {
-    "docker:dev": "yarn && quasar dev",
+    "start": "quasar dev",
     "dev": "quasar dev",
     "lint": "eslint --ext .js,.ts,.vue ./"
   },
@@ -14,9 +14,11 @@
     "lance-gg": "^4.0.9"
   },
   "dependencies": {
+    "@polypong/game": "workspace:^1.0.0",
     "@quasar/extras": "^1.0.0",
     "@vueuse/core": "^8.4.2",
     "@vue/reactivity": "^3.0.0",
+    "socket.io-client": "^4.5.0",
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",
     "vue": "^3.0.0",

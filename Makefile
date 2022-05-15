@@ -10,7 +10,7 @@ build:
 
 clear:
 	$(COMPOSE) down -v
-	docker system prune
+	docker system prune -f
 
 install:
 	$(COMPOSE) run --rm $(FRONT) yarn

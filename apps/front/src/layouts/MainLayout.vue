@@ -51,18 +51,20 @@ import EssentialLink from 'components/EssentialLink.vue';
 
 const linksList = [
   {
-    title: 'Game',
-    caption: 'Pong game',
-    icon: 'game',
-    link: '/game',
-    to: 'game',
-  },
-  {
     title: 'Login',
+    caption: 'Login page',
+    icon: 'game',
+    to: 'login',
+  },  {
+    title: 'Coalitions',
+    caption: 'Coalitions page',
+    icon: 'game',
+    to: 'coalitions',
+  },  {
+    title: 'Pong',
     caption: 'Pong game',
     icon: 'game',
-    link: '/login',
-    to: 'login',
+    to: 'pong',
   },
 ];
 
