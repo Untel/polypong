@@ -4,7 +4,6 @@
   "description": "A Node.js based real-time multiplayer game server",
   "main": "dist/package/serverExports.js",
   "browser": "dist/package/clientExports.js",
-  "type": "module",
   "scripts": {
     "start": "tsc --watch",
     "docs": "jsdoc -c jsdoc.conf.json",

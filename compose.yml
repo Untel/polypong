@@ -11,7 +11,7 @@ services:
     tty: true
     working_dir: /polypong
     # entrypoint: pnpm run -r start
-    entrypoint: pnpm install --recursive --force
+    entrypoint: pnpm install --recursive
   # stack:
   #   image: polypong/stack
   #   container_name: stack

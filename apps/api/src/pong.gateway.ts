@@ -24,7 +24,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   afterInit(server: Server) {
-   this.logger.log('Init');
+    const gameEngine = new PongGame({ traceLevel: null });
+    const serverEngine = new PongServerEngine(server, gameEngine, { debug: {}, updateRate: 6 });
+    this.logger.log('Init', serverEngine);
   }
 
   handleDisconnect(client: Socket) {

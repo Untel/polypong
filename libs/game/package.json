@@ -2,8 +2,8 @@
   "name": "@polypong/game",
   "version": "1.0.0",
   "description": "",
-  "main": "dist",
-  "type": "module",
+  "main": "dist/index.server.js",
+  "browser": "dist/index.js",
   "scripts": {
     "start": "tsc --watch --preserveWatchOutput",
     "build": "tsc",
@@ -18,8 +18,5 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.7.1-rc"
-  },
-  "dependencies": {
-    "lance-gg": "workspace:^4.1.0"
   }
 }
