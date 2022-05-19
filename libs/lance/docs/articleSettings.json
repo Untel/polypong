@@ -1,0 +1,92 @@
+{
+  "A_category_introduction": {
+    "title": "Introduction",
+    "order": 1,
+    "children": {
+      "introduction": {
+        "title": "Introduction"
+      },
+      "introduction_prologue": {
+        "title": "Prologue"
+      },
+      "introduction_community": {
+        "title": "Community"
+      },
+      "introduction_roadmap": {
+        "title": "Development Roadmap"
+      },
+      "introduction_faq": {
+        "title": "Frequently Asked Questions"
+      }
+    }
+  },
+  "B_category_overview": {
+    "title": "Overview",
+    "order": 2,
+    "children": {
+      "overview_architecture":{
+        "title": "Architecture of a Multiplayer Game"
+      },
+      "choosing_a_physics_engine":{
+        "title": "Choosing a Physics Engine"
+      },
+      "guide_gameengine":{
+        "title": "Game Engine"
+      },
+      "guide_serverengine": {
+        "title": "Server Engine"
+      },
+      "guide_clientengine": {
+          "title": "Client Engine"
+      },
+      "guide_renderer": {
+          "title": "Renderer"
+      },
+      "guide_gameworld": {
+          "title": "Game World and Game Objects"
+      },
+      "guide_serialization": {
+          "title": "Serialization and Communication"
+      }
+    }
+  },
+  "C_category_sync":{
+    "title": "Synchronization Methods",
+    "order": 30,
+    "children": {
+      "guide_syncinterpolation": {
+        "title": "Interpolation"
+      },
+      "guide_syncextrapolation": {
+        "title": "Extrapolation"
+      }
+    }
+  },
+  "D_category_tutorials": {
+    "title": "Tutorials",
+    "order": 50,
+    "children": {
+      "MyFirstGame":{
+        "title": "My First Game: Pong"
+      },
+      "spaceships": {
+        "title": "Spaaace"
+      }
+    }
+  },
+  "E_category_extras": {
+    "title": "Extras",
+    "order": 200,
+    "children": {
+      "guide_tuningdebugging": {
+        "title": "Fine Tuning and Debugging",
+        "order": 80
+      },
+      "furtherreading": {
+        "title": "Further Reading",
+        "order": 100
+      }
+    }
+  }
+
+}
