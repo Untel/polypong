@@ -14,6 +14,11 @@ import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, Simp
 import { PongGame } from './PongGame';
 export class Wall extends DynamicObject<PongGame, SimplePhysicsEngine> {
 
+    height: number;
+    width: number;
+    playerId: number;
+    position: TwoVector;
+
     constructor(gameEngine, options, props) {
         super(gameEngine, options, props);
         this.height = (props && props.height); //|| new TwoVector(0, 0);

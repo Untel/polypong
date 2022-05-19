@@ -10,15 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { GameEngine, ClientEngine, Renderer, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
-import { PongRenderer } from './PongRenderer';
-import { PongGame } from './PongGame';
+import { ClientEngine, KeyboardControls } from 'lance-gg';
+import { PongRenderer, PongGame } from '.';
 
 export class PongClientEngine extends ClientEngine<PongGame> {
 
 	controls: KeyboardControls;
 	gameEngine: PongGame;
-	constructor(gameEngine: PongGame, options) {
+	constructor(gameEngine: PongGame, options = {}) {
 
 
 		// this.options = Object.assign({

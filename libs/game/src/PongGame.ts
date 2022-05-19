@@ -1,9 +1,11 @@
-import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine, SimplePhysicsEngineOptions } from 'lance-gg';
+import { GameEngine, TwoVector, SimplePhysicsEngine } from 'lance-gg';
 // import { Ball, Wall, Paddle } from '.';
 
 import { Ball } from './Ball'
 import { Wall } from './Wall'
 import { Paddle } from './Paddle'
+
+console.log("I am the pong game");
 
 const PADDING = 10;
 const WIDTH = 400;
@@ -27,6 +29,10 @@ export class PongGame extends GameEngine<SimplePhysicsEngine, PongSettings> {
 
 	constructor(options: any) {
 		super(options);
+		this.worldSettings = {
+			height: 800,
+			width: 800,
+		};
 		this.width = 800;
 		this.height = 800;
 		this.on('collisionStart', this.ColisionEngine.bind(this));
@@ -86,8 +92,6 @@ export class PongGame extends GameEngine<SimplePhysicsEngine, PongSettings> {
 		let wall = collisionObjects.find(o => o instanceof Wall);
 
 		if (ball && paddle) {
-			// console.log('ball' + ball.position);
-			// console.log('paddle' + paddle.position);
 			if (ball.position.x > this.width - PADDING) {
 				console.log("weird hit");
 				ball.bounce_top();
@@ -99,15 +103,12 @@ export class PongGame extends GameEngine<SimplePhysicsEngine, PongSettings> {
 			else
 				ball.bounce_side();
 			ball.last_player = paddle.playerId;
-			// console.log(paddle);
 		}
 		else if (ball && wall) {
 			if (wall.playerId === -1) {
 				ball.bounce_top()
-				// this.io.sockets.emit('change', [this.gameEngine.world.objects[0].position, this.gameEngine.world.objects[0].velocity]);
 			}
 			else {
-				// this.p1_score++;
 				this.emit('goal', ball.last_player);
 				// console.log("Hitting wall id :",wall.playerId )
 				ball.bounce_side();
@@ -121,9 +122,6 @@ export class PongGame extends GameEngine<SimplePhysicsEngine, PongSettings> {
 			// console.log("Player input ", playerId);
 			return;
 		}
-		// else
-		// console.log("Server input ", playerId);
-		// get the player paddle tied to the player socket
 		let playerPaddle = this.world.queryObject({ instanceType: Paddle, playerId: playerId });
 		let ball = this.world.queryObject({ instanceType: Ball });
 		if (inputData.input === 'enter') {

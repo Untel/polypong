@@ -5,6 +5,7 @@
     "declaration": true,
     "outDir": "./dist",
 
+    "strict": false,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,

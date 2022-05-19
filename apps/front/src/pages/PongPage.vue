@@ -15,8 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { PongGame, PongClientEngine } from '@polypong/game';
-
+import { PongGame } from 'src/utils/game'
 const options = {
   traceLevel: null,
   delayInputCount: 3,
@@ -29,12 +28,14 @@ const options = {
   autoConnect: false,
   serverURL: 'localhost:3000',
 };
-const gameEngine = new PongGame({ options });
-const clientEngine = new PongClientEngine(gameEngine, options);
-console.log(gameEngine, clientEngine);
-clientEngine.connect({
-  transports: ['websocket'],
-  withCredentials: true,
-});
-clientEngine.start();
+console.log(PongGame);
+
+// const gameEngine = new PongGame({ options });
+// const clientEngine = new PongClientEngine(gameEngine, options);
+// console.log(gameEngine, clientEngine);
+// clientEngine.connect({
+//   transports: ['websocket'],
+//   withCredentials: true,
+// });
+// clientEngine.start();
 </script>

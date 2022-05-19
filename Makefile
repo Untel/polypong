@@ -11,6 +11,8 @@ build:
 
 clear:
 	$(COMPOSE) down -v
+	rm -rf **/node_modules
+	rm -rf .pnpm_store
 	docker system prune -f
 
 install:

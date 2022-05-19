@@ -11,9 +11,9 @@
     "lint": "eslint --ext .js,.ts,.vue ./"
   },
   "peerDependencies": {
-    "lance-gg": "^4.0.9"
   },
   "dependencies": {
+    "lance-gg": "workspace:^4.1.0",
     "@polypong/game": "workspace:^1.0.0",
     "@quasar/extras": "^1.0.0",
     "@vueuse/core": "^8.4.2",

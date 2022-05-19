@@ -2,10 +2,11 @@
   "name": "lance-gg",
   "version": "4.1.0",
   "description": "A Node.js based real-time multiplayer game server",
-  "main": "dist/server/lance-gg.js",
-  "browser": "dist/client/lance-gg.js",
-  "types": "dist/lance-gg.d.ts",
+  "main": "dist/package/serverExports.js",
+  "browser": "dist/package/clientExports.js",
+  "type": "module",
   "scripts": {
+    "start": "tsc --watch",
     "docs": "jsdoc -c jsdoc.conf.json",
     "build": "rollup --config rollup.config.js",
     "test-all": "mocha test/EndToEnd/",
@@ -39,6 +40,7 @@
     "p2": "^0.7.1",
     "socket.io": "^4.5.0",
     "socket.io-client": "^4.5.0",
+    "tsc": "^2.0.4",
     "utf-8-validate": "^5.0.2"
   },
   "files": [
@@ -66,8 +68,8 @@
     "@babel/register": "^7.0.0",
     "@rollup/plugin-babel": "^5.2.3",
     "@rollup/plugin-commonjs": "^17.1.0",
-    "@rollup/plugin-node-resolve": "^11.1.1",
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.1.1",
     "@rollup/plugin-typescript": "^8.1.1",
     "babel-plugin-module-resolver": "^3.2.0",
     "babel-preset-env": "^1.7.0",
@@ -79,6 +81,9 @@
     "mocha": "^5.2.0",
     "query-string": "^4.3.1",
     "rollup": "^2.38.5",
-    "should": "^11.0.0"
+    "should": "^11.0.0",
+    "ts-loader": "^9.2.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.7.1-rc"
   }
 }

@@ -53,3 +53,5 @@ yarn.lock
 deploy_key
 docmeta_temp
 docmeta_temp_deploy
+
+dist

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist",
-  "browser": "dist/index.browser.js",
   "type": "module",
   "scripts": {
     "start": "tsc --watch --preserveWatchOutput",
