@@ -1,5 +1,5 @@
 import PhysicsEngine from './PhysicsEngine';
-const CANNON = require('cannon');
+import * as CANNON from 'cannon';
 
 /**
  * CannonPhysicsEngine is a three-dimensional lightweight physics engine
