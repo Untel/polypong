@@ -1,17 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Ball.js                                            :+:      :+:    :+:   */
+/*   Ball.ts                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 22:24:39 by edal--ce          #+#    #+#             */
-/*   Updated: 2022/05/13 15:27:40 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/05/16 19:30:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { GameEngine, BaseTypes, TwoVector, DynamicObject, KeyboardControls, SimplePhysicsEngine } from 'lance-gg';
 import { PongGame } from './PongGame';
+
+console.log("Impors are", DynamicObject);
 
 export class Ball extends DynamicObject<PongGame, SimplePhysicsEngine> {
 	lastPaddle: number = 0;

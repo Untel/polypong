@@ -1,5 +1,5 @@
 
-  
+
 version: '3'
 services:
   install:
@@ -11,7 +11,7 @@ services:
     tty: true
     working_dir: /polypong
     # entrypoint: pnpm run -r start
-    entrypoint: pnpm install -r
+    entrypoint: pnpm install -r --filter=!"lance-gg"
   # stack:
   #   image: polypong/stack
   #   container_name: stack

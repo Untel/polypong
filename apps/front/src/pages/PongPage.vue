@@ -15,12 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-// import io from "socket.io-client";
 import { PongGame, PongClientEngine } from '@polypong/game';
-// import { Lib } from 'lance-gg';
-
-// const socket = io(`http://localhost:3000`)
-// console.log('Socket', socket)
 
 const options = {
   traceLevel: null,
@@ -31,14 +26,15 @@ const options = {
     remoteObjBending: 0.8,
     bendingIncrements: 6,
   },
-  worldSettings: {
-    width: 800,
-    height: 900,
-  },
+  autoConnect: false,
   serverURL: 'localhost:3000',
 };
 const gameEngine = new PongGame({ options });
 const clientEngine = new PongClientEngine(gameEngine, options);
 console.log(gameEngine, clientEngine);
+clientEngine.connect({
+  transports: ['websocket'],
+  withCredentials: true,
+});
 clientEngine.start();
 </script>
