@@ -55,18 +55,18 @@ services:
     depends_on:
       - common
 
-  common:
-    build: .
-    image: polypong/apps
-    container_name: common
-    volumes:
-      - "./:/polypong"
-    tty: true
-    working_dir: /polypong/libs/game
-    entrypoint: pnpm start
-    depends_on:
-      install:
-        condition: service_completed_successfully
+  # common:
+  #   build: .
+  #   image: polypong/apps
+  #   container_name: common
+  #   volumes:
+  #     - "./:/polypong"
+  #   tty: true
+  #   working_dir: /polypong/libs/game
+  #   entrypoint: pnpm start
+  #   depends_on:
+  #     install:
+  #       condition: service_completed_successfully
 
   # front:
   #   build:

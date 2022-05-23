@@ -13,8 +13,6 @@
   "peerDependencies": {
   },
   "dependencies": {
-    "lance-gg": "workspace:^4.1.0",
-    "@polypong/game": "workspace:^1.0.0",
     "@quasar/extras": "^1.0.0",
     "@vueuse/core": "^8.4.2",
     "@vue/reactivity": "^3.0.0",
