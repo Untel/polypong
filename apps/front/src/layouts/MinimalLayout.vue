@@ -12,7 +12,7 @@
           website="http://fernandes.bzh"
           github="untel" />
         <BgSocial login="lspiess" name="Lambert Spies" />
-        <BgSocial login="edal--ce" name="Enzo Dal Cerro" />
+        <BgSocial login="edal--ce" name="Enzo Dal Cerro" github="endcerro" linkedin="enzodalcerro"/>
         <BgSocial login="gozsertt" name="Guillaume Ozserttas" />
 
       </span>

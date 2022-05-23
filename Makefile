@@ -4,7 +4,7 @@ FRONT=front
 API=api
 
 all:
-	$(COMPOSE) up
+	$(COMPOSE) up -d
 
 build:
 	$(COMPOSE) up --build

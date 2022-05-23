@@ -24,6 +24,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.emit('msgToClient', payload);
   }
 
+  @SubscribeMessage('message')
+  send(client: Socket, payload: string): void {
+    this.logger.log(`Received ${payload} from client`);
+    // this.server.emit('msgToClient', payload);
+  }
+
   afterInit(server: Server) {
     // const gameEngine = new PongGame({ traceLevel: null });
     // const serverEngine = new PongServerEngine(server, gameEngine, { debug: {}, updateRate: 6 });

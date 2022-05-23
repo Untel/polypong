@@ -21,7 +21,7 @@ const sock = io('localhost:3000', {
   transports: ['websocket'],
   withCredentials: true,
 });
-sock.send('yolo');
+sock.emit('msgToServer', 'yolo');
 console.log('sock', sock);
 // import { PongGame, PongClientEngine } from '@polypong/game'
 // const options = {
