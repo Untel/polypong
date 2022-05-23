@@ -17,6 +17,7 @@ const routes: RouteRecordRaw[] = [
         { name: 'game', path: 'game', component: () => import('components/Game.vue') },
         { name: 'coalitions', path: 'coalitions', component: () => import('pages/CoalitionsPage.vue') },
         { name: 'pong', path: 'pong', component: () => import('pages/PongPage.vue') },
+        { name: 'profile', path: 'profile', component: () => import('pages/ProfilePage.vue') },
         // { name: 'pong', path: 'pong', component: PongPage },
       ],
     }],
