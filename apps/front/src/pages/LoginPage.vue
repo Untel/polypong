@@ -67,6 +67,7 @@ import { useRouter } from 'vue-router';
 import { useLoginShaders, useLoginLightShaders } from 'src/utils/shaders';
 import FssFallback from 'src/components/FssFallback.vue';
 import Logo from 'src/components/Logo.vue';
+import { defineComponent } from 'vue';
 
 const login = ref('');
 const password = ref('');

@@ -39,7 +39,8 @@ services:
     working_dir: /polypong/apps/front
     entrypoint: pnpm start
     depends_on:
-      - common
+      install:
+        condition: service_completed_successfully
 
   api:
     build: .
@@ -53,7 +54,8 @@ services:
     working_dir: /polypong/apps/api
     entrypoint: pnpm start
     depends_on:
-      - common
+      install:
+        condition: service_completed_successfully
 
   # common:
   #   build: .

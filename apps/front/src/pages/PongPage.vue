@@ -15,11 +15,18 @@
 </template>
 
 <script lang="ts" setup>
+import { io } from "socket.io-client";
+
+const sock = io('localhost:3000', {
+  transports: ['websocket'],
+  withCredentials: true,
+});
+sock.send('yolo');
+console.log('sock', sock);
 // import { PongGame, PongClientEngine } from '@polypong/game'
 // const options = {
 //   traceLevel: null,
-//   delayInputCount: 3,
-//   scheduler: 'render-schedule',
+//   delayInputCount: 3,s
 //   syncOptions: {
 //     sync: 'extrapolate',
 //     remoteObjBending: 0.8,
