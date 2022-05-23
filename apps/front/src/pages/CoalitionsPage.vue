@@ -7,43 +7,25 @@
 
 <template setup>
   <q-page>
-    <flat-surface-shader
+    <FssFallback
       v-for="coalition in coalitions"
       class="coalition-box"
-      v-bind="coalition.shaderConfig"
+      :fss-settings="coalition.shaderConfig"
+      :fallback-url="coalition.fssFallback"
     >
       <div>{{ coalition.name }}</div>
-    </flat-surface-shader>
+    </FssFallback>
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { ref } from '@vue/reactivity';
-import { Coalition } from 'src/types'
-import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
-import { useAllianceShaders, useAssemblyShaders, useFederationShaders, useOrderShaders } from 'src/utils/shaders';
+<script lang="ts" setup>
+import { CoalitionChoice, coalitions } from 'src/types'
+import FssFallback from 'src/components/FssFallback.vue';
+import { User } from 'src/types/user';
 
-export default defineComponent({
-  name: 'CoalitionPage',
-  components: { FlatSurfaceShader },
-  setup() {
-    const coalitions: Coalition[] = [{
-      name: 'The alliance',
-      shaderConfig: useAllianceShaders(),
-    }, {
-      name: 'The assembly',
-      shaderConfig: useAssemblyShaders(),
-    }, {
-      name: 'The federation',
-      shaderConfig: useFederationShaders(),
-    }, {
-      name: 'The order',
-      shaderConfig: useOrderShaders(),
-    }]
-    return {
-      coalitions,
-    };
-  },
-});
+const defaultUser: User = {
+  username: 'Untel',
+  coalition: CoalitionChoice.ALLIANCE
+};
+
 </script>

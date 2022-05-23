@@ -1,5 +1,6 @@
 <style scoped lang="scss">
   .fallback {
+    height: 100%;
     background-size: cover;
   }
 </style>
@@ -14,23 +15,29 @@
 </template>
 
 <script lang="ts" setup>
-  import { useSettingsStore } from 'src/stores/settings';
-  import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
-  import { computed } from '@vue/reactivity';
-  import { Dark } from 'quasar';
-  const props = defineProps({
-    fallbackUrl: String,
-    fssSettings: Object,
-  });
-  function getFullUrl(relativeUrl: string) {
-    return new URL(relativeUrl, import.meta.url).href
+import { useSettingsStore } from 'src/stores/settings';
+import FlatSurfaceShader from 'src/components/FlatSurfaceShader.vue';
+import { Dark } from 'quasar';
+import { PropType, computed } from 'vue';
+import { ShaderConfig } from 'src/types';
+const props = defineProps({
+  fallbackUrl: {
+    type: String,
+    default: '',
+  },
+  fssSettings: Object as PropType<ShaderConfig>,
+});
+function getFullUrl(relativeUrl: string) {
+  return new URL(relativeUrl, import.meta.url).href
+}
+const fallbackStyle = computed(() => {
+  const fallbackUrl = getFullUrl(props.fallbackUrl);
+  console.log('Getting fallback url', props.fallbackUrl, 'then', fallbackUrl);
+  const styles: any = { backgroundImage: `url(${fallbackUrl})` };
+  if (!Dark.isActive) {
+    styles.filter = 'brightness(2)';
   }
-  const fallbackStyle = computed(() => {
-    const styles: any = { backgroundImage: `url(${getFullUrl(props.fallbackUrl || '')})` };
-    if (!Dark.isActive) {
-      styles.filter = 'brightness(2)';
-    }
-    return styles;
-  })
-  const settings = useSettingsStore();
+  return styles;
+})
+const settings = useSettingsStore();
 </script>

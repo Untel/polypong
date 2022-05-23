@@ -1,12 +1,14 @@
 <style lang="scss">
   .wrapper {
     position: relative;
+    height: auto;
   }
   .inner-content {
     position: absolute;
-    display: flex;
-    place-content: center;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
   }
   
   .body--light {
@@ -15,14 +17,6 @@
   canvas, svg {
     filter: contrast(.8)
   }
-  // body.body--light {
-  //   .wrapper {
-  //     svg, canvas {
-  //       -webkit-filter: grayscale; /*sepia, hue-rotate, invert....*/
-  //       -webkit-filter: brightness(150%); 
-  //     }
-  //   }
-  // }
 </style>
 
 <template>

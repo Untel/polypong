@@ -1,6 +1,6 @@
 import { Light, Mesh, ShaderConfig } from 'src/types/shaders';
 import { useSettingsStore } from 'src/stores/settings';
-import { Coalition } from 'src/types';
+import { CoalitionChoice, Coalition } from 'src/types/coalition';
 
 const settings = useSettingsStore();
 
@@ -32,6 +32,12 @@ export const useLoginShaders = () => {
   } as ShaderConfig;;
 }
 
+const defaultCoalitionLight = {
+  count: 1,
+  draw: false,
+  zOffset: 100,
+  autopilot: true,
+};
 
 export const useLoginLightShaders = () => {
   const mesh: Mesh = {
@@ -47,10 +53,7 @@ export const useLoginLightShaders = () => {
   const light: Light = {
     ambient: '#969696',
     diffuse: '#676963',
-    count: 3,
-    draw: true,
-    zOffset: 100,
-    autopilot: false
+    ...defaultCoalitionLight,
   }
   return {
     type,
@@ -73,10 +76,7 @@ export const useAllianceShaders = () => {
   const light: Light = {
     ambient: '#0e1b0b',
     diffuse: '#ffceb3',
-    count: 3,
-    draw: false,
-    zOffset: 22,
-    autopilot: true
+    ...defaultCoalitionLight,
   }
   return {
     type,
@@ -99,10 +99,7 @@ export const useAssemblyShaders = () => {
   const light: Light = {
     ambient: '#a74685',
     diffuse: '#c768d4',
-    count: 3,
-    draw: false,
-    zOffset: 39,
-    autopilot: true
+    ...defaultCoalitionLight,
   }
   return {
     type,
@@ -125,10 +122,7 @@ export const useFederationShaders = () => {
   const light: Light = {
     ambient: '#284859',
     diffuse: '#845e4a',
-    count: 3,
-    draw: false,
-    zOffset: 39,
-    autopilot: true
+    ...defaultCoalitionLight,
   }
   return {
     type,
@@ -151,10 +145,7 @@ export const useOrderShaders = () => {
   const light: Light = {
     ambient: '#3e3020',
     diffuse: '#a48d86',
-    count: 3,
-    draw: false,
-    zOffset: 39,
-    autopilot: true
+    ...defaultCoalitionLight,
   }
   return {
     type,

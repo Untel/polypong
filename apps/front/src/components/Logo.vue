@@ -1,5 +1,5 @@
 <template>
-  <q-icon size="5rem">
+  <q-icon :size="size">
     <svg
       viewBox="0 0 137.6 96.599998">
     <g
@@ -23,6 +23,13 @@
 </template>
 
 <script setup>
+defineProps({
+  size: {
+    type: String,
+    default: '5rem',
+    required: false,
+  },
+});
 </script>
 
 <style>

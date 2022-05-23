@@ -11,6 +11,13 @@
     place-items: center;
     width: min(400px, 60%);
   }
+
+  .form-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+  }
 </style>
 
 <template>
@@ -20,43 +27,45 @@
       :fss-settings="$q.dark.isActive ? useLoginShaders() : useLoginLightShaders()"
       fallback-url="/src/assets/background_login.jpg"
     >
-      <q-form
-        ref="form"
-        center
-        class="q-gutter-md login-form"
-        @submit="onSubmitForm"
-        aria-autocomplete="off"
-      >
-        <!-- <pre>Low perf: {{ settings.getIsLowPerf }}</pre> -->
-        <Logo style="width:100px; justify-self: center;" />
-        <q-input
-          v-model="login"
-          class="full-width"
-          filled
-          label="Login"
-          hint="Username or email"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Please type something']"
-        />
-        <q-input
-          v-model="password"
-          class="full-width"
-          filled
-          label="Password"
-          :type="showPassword ? 'text' : 'password'"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Please type something']"
+      <div class="form-container">
+        <q-form
+          ref="form"
+          center
+          class="q-gutter-md login-form"
+          @submit="onSubmitForm"
+          aria-autocomplete="off"
         >
-          <template v-slot:append>
-            <q-icon
-              :name="showPassword ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="showPassword = !showPassword"
-            />
-          </template>
-        </q-input>
-        <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
-      </q-form>
+          <!-- <pre>Low perf: {{ settings.getIsLowPerf }}</pre> -->
+          <Logo size="100px" style="justify-self: center;" />
+          <q-input
+            v-model="login"
+            class="full-width"
+            filled
+            label="Login"
+            hint="Username or email"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          />
+          <q-input
+            v-model="password"
+            class="full-width"
+            filled
+            label="Password"
+            :type="showPassword ? 'text' : 'password'"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please type something']"
+          >
+            <template v-slot:append>
+              <q-icon
+                :name="showPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </q-input>
+          <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
+        </q-form>
+      </div>
     </FssFallback>
   </q-page>
 </template>
@@ -67,7 +76,6 @@ import { useRouter } from 'vue-router';
 import { useLoginShaders, useLoginLightShaders } from 'src/utils/shaders';
 import FssFallback from 'src/components/FssFallback.vue';
 import Logo from 'src/components/Logo.vue';
-import { defineComponent } from 'vue';
 
 const login = ref('');
 const password = ref('');
