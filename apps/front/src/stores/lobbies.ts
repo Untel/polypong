@@ -2,19 +2,18 @@ import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
 import { useAuthStore } from './auth';
+import { LoadingBar } from 'quasar';
 
 type Lobby = {
   roomId: string,
 };
 
 type LobbiesState = {
-  fetchingLobbies: boolean,
   lobbies: Lobby[],
 };
 
 export const useLobbiesStore = defineStore('lobbies', {
   state: () => ({
-    fetchingLobbies: false,
     lobbies: [],
   } as LobbiesState),
   getters: {
@@ -22,11 +21,12 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      this.fetchingLobbies = true;
-      const { data, error } = await useApi<Lobby[]>('pong/lobbies');
-      this.fetchingLobbies = false;
+      // LoadingBar.start();
+      const { data, error } = await useApi<Lobby[]>('pong/lobbies').get().json();
+      // LoadingBar.stop();
+      // this.fetchingLobbies = false;
+      console.log('Lobbies fetched', data.value, this.lobbies);
       this.lobbies = data.value || [];
-      console.log('Lobbies fetched', this.lobbies);
     },
     async createLobby() {
       const { socket, getIsConnected } = useAuthStore();

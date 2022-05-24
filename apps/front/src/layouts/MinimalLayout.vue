@@ -48,6 +48,5 @@ import BgSocial from 'src/components/BgSocial.vue';
 
 const settings = useSettingsStore();
 const auth = useAuthStore();
-
 auth.connectToSocket();
 </script>

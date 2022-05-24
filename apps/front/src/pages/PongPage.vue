@@ -1,12 +1,11 @@
 <template>
   <q-page padding>
-    <q-linear-progress v-if="fetchingLobbies" indeterminate />
-    <pre>Response: {{ getLobbies }}</pre>
-    <q-card v-for="lobby in getLobbies">
+    <pre>Response: {{ lobbies.getLobbies }}</pre>
+    <q-card v-for="lobby of lobbies.getLobbies">
       <pre>{{ lobby }}</pre>
     </q-card>
 
-    <q-btn @click="createLobby()">Create lobby</q-btn>
+    <q-btn @click="lobbies.createLobby()">Create lobby</q-btn>
   </q-page>
 </template>
 
@@ -14,8 +13,9 @@
 import { useApi } from 'src/utils/api';
 import { useLobbiesStore } from 'src/stores/lobbies';
 import { useAuthStore } from 'src/stores/auth';
-const { createLobby, fetchLobbies, fetchingLobbies, getLobbies } = useLobbiesStore();
+const lobbies = useLobbiesStore();
 const { socket } = useAuthStore();
-fetchLobbies();
-socket?.on('refreshedLobbies', () => fetchLobbies());
+lobbies.fetchLobbies();
+
+socket?.on('refreshedLobbies', lobbies.fetchLobbies);
 </script>
