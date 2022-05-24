@@ -1,13 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Delete } from '@nestjs/common';
 import Lobby from 'src/game/lobby.class';
 import { PongService } from './pong.service';
 
-@Controller()
+@Controller('pong')
 export class PongController {
   constructor(private readonly pongService: PongService) {}
 
-  @Get()
-  getLobbies(): Lobby[] {
+  @Get('lobbies')
+  lobbies(): Lobby[] {
     return this.pongService.getLobbies();
+  }
+
+  @Delete('lobbies')
+  clear() {
+    this.pongService.clearLobbies();
   }
 }

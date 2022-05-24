@@ -1,48 +1,21 @@
 <template>
   <q-page padding>
-    <!-- <div class="world">
-        <div class="leftWall"></div>
-        <div class="rightWall"></div>
-        <div class="topWall"></div>
-        <div class="bottomWall"></div>
-        <div class="paddle1"></div>
-        <div class="paddle2"></div>
-        <div class="ball"></div>
-        <div class="score1"></div>
-        <div class="score2"></div>
-    </div> -->
+    <q-linear-progress v-if="fetchingLobbies" indeterminate />
+    <pre>Response: {{ getLobbies }}</pre>
+    <q-card v-for="lobby in getLobbies">
+      <pre>{{ lobby }}</pre>
+    </q-card>
+
+    <q-btn @click="createLobby()">Create lobby</q-btn>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { io } from "socket.io-client";
-
-const sock = io('localhost:3000', {
-  transports: ['websocket'],
-  withCredentials: true,
-});
-sock.emit('msgToServer', 'yolo');
-console.log('sock', sock);
-// import { PongGame, PongClientEngine } from '@polypong/game'
-// const options = {
-//   traceLevel: null,
-//   delayInputCount: 3,s
-//   syncOptions: {
-//     sync: 'extrapolate',
-//     remoteObjBending: 0.8,
-//     bendingIncrements: 6,
-//   },
-//   autoConnect: false,
-//   serverURL: 'localhost:3000',
-// };
-// console.log(PongGame);
-
-// const gameEngine = new PongGame({ options });
-// const clientEngine = new PongClientEngine(gameEngine, options);
-// console.log(gameEngine, clientEngine);
-// clientEngine.connect({
-//   transports: ['websocket'],
-//   withCredentials: true,
-// });
-// clientEngine.start();
+import { useApi } from 'src/utils/api';
+import { useLobbiesStore } from 'src/stores/lobbies';
+import { useAuthStore } from 'src/stores/auth';
+const { createLobby, fetchLobbies, fetchingLobbies, getLobbies } = useLobbiesStore();
+const { socket } = useAuthStore();
+fetchLobbies();
+socket?.on('refreshedLobbies', () => fetchLobbies());
 </script>

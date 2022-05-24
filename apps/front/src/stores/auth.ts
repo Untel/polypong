@@ -1,15 +1,26 @@
 import { defineStore } from 'pinia';
 
+import { io, Socket,  } from "socket.io-client";
+
+type AuthState = {
+  socket?: Socket | null
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    isLowPerf: false,
-  }),
+    socket: null,
+  } as AuthState),
   getters: {
-    getIsLowPerf: (state) => state.isLowPerf,
+    getIsConnected: (state) => state.socket && state.socket.connected,
   },
   actions: {
-    toggleLowPerf() {
-      this.isLowPerf = !this.isLowPerf;
+    connectToSocket() {
+      this.socket = io('localhost:3000', {
+        transports: ['websocket'],
+        withCredentials: true,
+      });
+      console.log('Connecting to socket', this.socket);
+      this.socket.emit('msgToServer', 'yolo');
     },
   },
 });
