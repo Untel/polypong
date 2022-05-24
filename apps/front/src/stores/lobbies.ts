@@ -5,7 +5,12 @@ import { useAuthStore } from './auth';
 import { LoadingBar } from 'quasar';
 
 type Lobby = {
-  roomId: string,
+  id: number;
+  name: string;
+  players: Map<string, object>;
+  playersMax: number;
+  spectators: Array<any>;
+  spectatorsMax: number;
 };
 
 type LobbiesState = {
@@ -21,21 +26,28 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      // LoadingBar.start();
       const { data, error } = await useApi<Lobby[]>('pong/lobbies').get().json();
-      // LoadingBar.stop();
-      // this.fetchingLobbies = false;
       console.log('Lobbies fetched', data.value, this.lobbies);
       this.lobbies = data.value || [];
     },
-    async createLobby() {
+    async createLobby(lobbyName: string) {
       const { socket, getIsConnected } = useAuthStore();
       console.log('I will create a room');
       if (!getIsConnected) {
         console.log('Socket not connected', socket);
         return ;
       }
-      socket?.emit('createLobby');
+      socket?.emit('createLobby', { name: lobbyName });
+      console.log('Emited');
+    },
+    async joinLobby(lobbyId: number) {
+      const { socket, getIsConnected } = useAuthStore();
+      console.log('I will join room', lobbyId);
+      if (!getIsConnected) {
+        console.log('Socket not connected', socket);
+        return ;
+      }
+      socket?.emit('joinLobby', lobbyId);
       console.log('Emited');
     },
   },

@@ -9,6 +9,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { PongService } from './pong.service';
+import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 @WebSocketGateway({
   cors: true,
@@ -22,16 +23,16 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private logger: Logger = new Logger('PongGateway');
 
   @SubscribeMessage('createLobby')
-  handleMessage(socket: Socket, payload: string): void {
-    this.logger.log(`Create lobby ${payload} from client ${socket.id}`);
+  handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
+    this.logger.log(`Create lobby from client ${socket.id}`);
     // this.server.emit('msgToClient', payload);
-    this.pongService.addLobby(socket);
+    this.pongService.addLobby(socket, lobbyConfig);
   }
 
   @SubscribeMessage('joinLobby')
-  send(client: Socket, payload: string): void {
-    this.logger.log(`Received ${payload} from client`);
-    // this.server.emit('msgToClient', payload);
+  send(client: Socket, id: LobbyId): void {
+    this.logger.log(`Client ${client.id} is joining lobby ${id}`);
+    this.pongService.joinLobby(client, id);
   }
 
   afterInit(server: Server) {
@@ -45,6 +46,5 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
-    console.log('Args are');
   }
 }
