@@ -19,14 +19,16 @@
     >
       <q-fab-action v-if="props.website" padding="5px" color="red"
         icon="public"
+        :to="`/external?url=${props.website}`"
+      
       />
       <q-fab-action v-if="props.linkedin" padding="5px" color="blue"
-        icon="mdi-linkedin"
-        :to="`https://profile.intra.42.fr/users/${props.linkedin}`"
+        icon="fab fa-linkedin"
+        :to="`/external?url=https://profile.intra.42.fr/users/${props.linkedin}`"
       />
       <q-fab-action v-if="props.github" padding="5px"
-        icon="mdi-github" color="black"
-        :to="`https://github.com/${props.github}`"
+        icon="fab fa-github" color="black"
+        :to="`/external?url=https://github.com/${props.github}`"
       />
       <!-- <q-fab-action v-if="props.login" padding="0" red="black"
         :icon="`img:https://cdn.intra.42.fr/users/${login}.jpg`"

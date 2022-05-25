@@ -53,8 +53,4 @@ export default class Lobby implements ILobby, ILobbyConfig {
     if (opts.spectatorsMax)
       this.spectatorsMax = opts.spectatorsMax;
   }
-
-  toFront() {
-     
-  }
 }

@@ -43,20 +43,25 @@ import Logo from 'src/components/Logo.vue';
 
 const linksList = [
   {
+    title: 'Home',
+    caption: 'Home page',
+    icon: 'fas fa-igloo',
+    to: 'fas fa-igloo',
+  },  {
     title: 'Login',
     caption: 'Login page',
-    icon: 'home',
+    icon: 'fab fa-connectdevelop',
     to: 'login',
   },  {
     title: 'Coalitions',
     caption: 'Coalitions page',
-    icon: 'public',
+    icon: 'fas fa-group-arrows-rotate',
     to: 'coalitions',
   },  {
-    title: 'Pong',
-    caption: 'Pong game',
-    icon: 'game',
-    to: 'pong',
+    title: 'Lobbies',
+    caption: 'Find a lobby of ppl to play with',
+    icon: 'fab fa-forumbee',
+    to: 'lobbies',
   },
 ];
 
