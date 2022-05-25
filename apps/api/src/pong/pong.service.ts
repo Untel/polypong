@@ -10,15 +10,19 @@ export class PongService {
   connectedPlayer = new Map<string, Player>();
   id = 0;
 
-  constructor() {}
+  constructor() { }
 
   generateId() {
     return ++this.id;
   }
 
   getLobbies(): Lobby[] {
-    console.log("Getting lobbies");
+    console.log("Getting lobbies")
     return [...this.lobbies.values()];
+  }
+
+  getLobby(id: number): Lobby {
+    return this.lobbies.get(id);
   }
 
   clearLobbies() {
@@ -29,7 +33,7 @@ export class PongService {
   addConnectedPeople(player: Player) {
     if (this.connectedPlayer.has(player.socketId)) {
       console.log("Player is still connected");
-      return ;
+      return;
     }
     this.connectedPlayer.set(player.socketId, player);
   }

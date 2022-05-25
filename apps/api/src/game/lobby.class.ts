@@ -41,7 +41,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     player.inLobby = this.id;
   }
 
-  start() : Game {
+  start(): Game {
     return new Game(this);
   }
 

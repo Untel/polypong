@@ -18,7 +18,7 @@ const routes: RouteRecordRaw[] = [
         { name: 'coalitions', path: 'coalitions', component: () => import('pages/CoalitionsPage.vue') },
         { name: 'profile', path: 'profile', component: () => import('pages/ProfilePage.vue') },
         { name: 'lobbies', path: 'lobbies', component: () => import('pages/LobbiesPage.vue') },
-        { name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue') },
+        { name: 'lobby', path: 'lobby/:lobbyId', props: true, component: () => import('pages/LobbyPage.vue') },
       ],
     }],
   },
