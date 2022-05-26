@@ -1,23 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TypeOrmModuleOptions } from'@nestjs/typeorm';
 
-// DOCUMENTATION -> https://programmer.group/61a5d63a92801.html
-
-/*
-the dotenv module allows us to provide config values in a .env file
-*/
-require('dotenv').config();
-
-/*
-ConfigService is a singleton service that runs at startup before the
-server starts. It loads up the environment variables and provides them to
-the other modules.
-It validates their values and throws meaningful errors otherwise
-*/
 @Injectable()
 export class ConfigService {
 
-  logger = new Logger();
+  logger = new Logger('config');
 
   constructor(private env: { [k: string]: string | undefined }) { }
 
@@ -26,7 +13,6 @@ export class ConfigService {
     if (!value && throwOnMissing) {
       throw new Error(`MISSING ENV in ConfigService : env.${key} = ${value}`);
     }
-    console.log(`env[${key}] = ${this.env[key]}`);
     this.logger.log(`env[${key}] = ${this.env[key]}`);
     return value;
   }

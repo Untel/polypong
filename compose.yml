@@ -10,24 +10,8 @@ services:
       - "./:/polypong"
     tty: true
     working_dir: /polypong
-    stop_signal: SIGINT
-    # entrypoint: pnpm run -r start
     entrypoint: pnpm install --recursive
-  # stack:
-  #   image: polypong/stack
-  #   container_name: stack
-  #   ports:
-  #     - "9000:9000"
-  #     - "3000:3000"
-  #   volumes:
-  #     - "./:/polypong"
-  #   tty: true
-  #   working_dir: /polypong
-    # depends_on:
-    #   install:
-    #     condition: service_completed_successfully
-  #   # entrypoint: pnpm run -r start
-  #   entrypoint: pnpm run -r start
+
   front:
     build: .
     image: polypong/apps
@@ -39,11 +23,11 @@ services:
       - "./:/polypong"
     tty: true
     working_dir: /polypong/apps/front
-    stop_signal: SIGINT
     entrypoint: pnpm start
     depends_on:
       install:
         condition: service_completed_successfully
+    stop_signal: SIGINT
 
   api:
     build: .
@@ -53,82 +37,42 @@ services:
       - "./:/polypong"
     ports:
       - "3000:3000"
-    tty: true
+    env_file:
+      - .env
     working_dir: /polypong/apps/api
     entrypoint: pnpm start
     depends_on:
       install:
         condition: service_completed_successfully
+    tty: true
+    stop_signal: SIGINT
 
   db:
     container_name: postgres
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: polypong
-      POSTGRES_HOST: db
+      POSTGRES_HOST: ${POSTGRES_HOST}
     expose:
       - 5432
+    stop_signal: SIGINT
 
   pgadmin:
     container_name: pgadmin4
     image: dpage/pgadmin4
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: adrien@fernandes.bzh
-      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
+    stop_signal: SIGINT
 
 networks:
   database:
 
 volumes:
   database:
-
-  # common:
-  #   build: .
-  #   image: polypong/apps
-  #   container_name: common
-  #   volumes:
-  #     - "./:/polypong"
-  #   tty: true
-  #   working_dir: /polypong/libs/game
-  #   entrypoint: pnpm start
-  #   depends_on:
-  #     install:
-  #       condition: service_completed_successfully
-
-  # front:
-  #   build:
-  #     context: ./front
-  #     dockerfile: Dockerfile
-  #     target: front-develop-stage
-  #   container_name: front
-  #   restart: always
-  #   ports:
-  #     - "9000:9000"
-  #   depends_on:
-  #     - api
-  #   volumes:
-  #     - ./front/:/app
-  #     - ./api/common/:/app/src/common
-  #   working_dir: /app
-  #   entrypoint: yarn
-  #   command: docker:dev
-  # api:
-  #   build:
-  #     context: ./api
-  #     dockerfile: Dockerfile
-  #     target: api-develop-stage
-  #   container_name: api
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./api/:/app
-  #   working_dir: /app
-  #   entrypoint: yarn
-  #   command: docker:dev
