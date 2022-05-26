@@ -45,6 +45,8 @@
       />
     </template>
   </q-input>
+  <LogoCoalition />
+  <LogoBannerCoalition :show-banner="showPassword" />
   <q-input
     v-model="repeatPassword"
     class="full-width"
@@ -62,6 +64,7 @@
       />
     </template>
   </q-input>
+  
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN UP</q-btn>
 </q-form>
 </template>
@@ -69,6 +72,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import LogoCoalition from 'src/components/LogoCoalition.vue';
+import LogoBannerCoalition from 'src/components/LogoBannerCoalition.vue';
 const email           = ref(''),
       password        = ref(''),
       repeatPassword  = ref('')
