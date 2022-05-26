@@ -10,6 +10,7 @@ services:
       - "./:/polypong"
     tty: true
     working_dir: /polypong
+    stop_signal: SIGINT
     # entrypoint: pnpm run -r start
     entrypoint: pnpm install --recursive
   # stack:
@@ -31,12 +32,14 @@ services:
     build: .
     image: polypong/apps
     container_name: front
+    stop_signal: SIGINT
     ports:
       - "9000:9000"
     volumes:
       - "./:/polypong"
     tty: true
     working_dir: /polypong/apps/front
+    stop_signal: SIGINT
     entrypoint: pnpm start
     depends_on:
       install:
@@ -56,6 +59,34 @@ services:
     depends_on:
       install:
         condition: service_completed_successfully
+
+  db:
+    container_name: postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: polypong
+      POSTGRES_HOST: db
+    expose:
+      - 5432
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: adrien@fernandes.bzh
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+networks:
+  database:
+
+volumes:
+  database:
 
   # common:
   #   build: .
