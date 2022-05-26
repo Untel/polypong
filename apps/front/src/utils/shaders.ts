@@ -53,7 +53,10 @@ export const useLoginLightShaders = () => {
   const light: Light = {
     ambient: '#969696',
     diffuse: '#676963',
-    ...defaultCoalitionLight,
+    count: 3,
+    draw: true,
+    zOffset: 100,
+    autopilot: false
   }
   return {
     type,

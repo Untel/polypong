@@ -13,13 +13,17 @@
   center
   class="q-gutter-md login-form"
   @submit="onSubmitForm"
-  aria-autocomplete="off"
+  autocorrect="off"
+  autocapitalize="off"
+  autocomplete="off"
+  spellcheck="false"
+  autofocus
 >
   <q-input
-    v-model="login"
+    v-model="email"
     class="full-width"
     filled
-    label="Login"
+    label="Email"
     hint="Username or email"
     lazy-rules
     :rules="[ val => val && val.length > 0 || 'Please type something']"
@@ -41,20 +45,37 @@
       />
     </template>
   </q-input>
-  <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
+  <q-input
+    v-model="repeatPassword"
+    class="full-width"
+    filled
+    label="Repeat password"
+    :type="showPassword ? 'text' : 'password'"
+    lazy-rules
+    :rules="[ val => val && val.length > 0 || 'Please type something']"
+  >
+    <template v-slot:append>
+      <q-icon
+        :name="showPassword ? 'visibility_off' : 'visibility'"
+        class="cursor-pointer"
+        @click="showPassword = !showPassword"
+      />
+    </template>
+  </q-input>
+  <q-btn type="submit" size="large" color="primary" class="full-width">SIGN UP</q-btn>
 </q-form>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-const login = ref('');
-const password = ref('');
+const email           = ref(''),
+      password        = ref(''),
+      repeatPassword  = ref('')
+;
 const showPassword = ref(false);
 const router = useRouter();
 const onSubmitForm = (form: Event) => {
-  console.log('Submitting form', form, login, password);
   router.push('/');
 };
 </script>
