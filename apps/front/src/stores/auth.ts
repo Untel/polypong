@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useQuasar } from 'quasar';
 
 import { io, Socket, } from "socket.io-client";
 import { CoalitionChoice } from 'src/types';
@@ -29,13 +30,23 @@ export const useAuthStore = defineStore('auth', {
       console.log('Res is ', data.value, error.value);
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
-      const { data, error } = await useApi('auth/register').post({
-        name,
-        email,
-        password,
-        coalition,
-      });
-      console.log('Res is ', data.value, error.value);
+      console.log('Register');
+      try {
+        const { data, error, err } = await useApi('auth/register').post({
+          name,
+          email,
+          password,
+          coalition,
+        });
+        console.log('Register return', data, error);
+      } catch (error) {
+        console.log('Register error', error);
+        const $q = useQuasar();
+        $q.notify({
+          type: 'negative',
+          message: error.value.message.reduce((a: String, n: String) => `${a}\n${n}`, ''),
+        });
+      }
     },
   },
 });

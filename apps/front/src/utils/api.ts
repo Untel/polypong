@@ -1,5 +1,6 @@
 import { createFetch } from '@vueuse/core'
-import { LoadingBar } from 'quasar';
+import { parse } from 'path';
+import { LoadingBar, Notify } from 'quasar';
 export const useApi = createFetch({
   baseUrl: 'http://localhost:3000/api',
   options: {
@@ -15,6 +16,18 @@ export const useApi = createFetch({
       LoadingBar.stop();
       return ctx;
     },
+    async onFetchError(ctx) {
+      LoadingBar.stop();
+      const err = JSON.parse(ctx.data);
+      const messages = err?.message || [];
+      messages.length && Notify.create({
+        type: 'negative',
+        message: 'Oooops, something went wrong',
+        caption: messages
+          .reduce((prev: String, next: String) => `${prev}\n${next}`, ''),
+      });
+      return ctx;
+    }
   },
   fetchOptions: {
     mode: 'cors',

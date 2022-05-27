@@ -38,6 +38,7 @@ importers:
       eslint: ^8.0.1
       eslint-config-prettier: ^8.3.0
       eslint-plugin-prettier: ^4.0.0
+      express-session: ^1.17.3
       graphql: ^16.5.0
       gravatar: ^1.8.2
       jest: 28.0.3
@@ -85,6 +86,7 @@ importers:
       class-transformer: 0.5.1
       class-validator: 0.13.2
       connect-typeorm: 1.1.4_typeorm@0.3.6
+      express-session: 1.17.3
       graphql: 16.5.0
       gravatar: 1.8.2
       jsonwebtoken: 8.5.1
@@ -146,6 +148,7 @@ importers:
       eslint-config-airbnb-base: ^15.0.0
       eslint-plugin-import: ^2.20.1
       eslint-plugin-vue: ^8.5.0
+      mande: ^2.0.2
       pinia: ^2.0.11
       quasar: ^2.6.0
       socket.io-client: ^4.5.0
@@ -159,6 +162,7 @@ importers:
       '@quasar/extras': 1.13.6
       '@vue/reactivity': 3.2.33
       '@vueuse/core': 8.4.2_vue@3.2.33
+      mande: 2.0.2
       pinia: 2.0.14_ytvqwwdyss532bvoq2clv4ed5m
       quasar: 2.6.6
       socket.io-client: 4.5.0
@@ -5256,7 +5260,7 @@ packages:
     dev: true
 
   /cookie-signature/1.0.6:
-    resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
+    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
 
   /cookie/0.4.2:
     resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
@@ -8727,6 +8731,10 @@ packages:
     dependencies:
       tmpl: 1.0.5
     dev: true
+
+  /mande/2.0.2:
+    resolution: {integrity: sha512-HdWr3WJkld0MLjQb9GKYW49UkrcUgJr7w6fsHqz7XzFq8yv/GfMyoR/qxS4w9mjSQrdw5MXb2q9oJfALkzJ37Q==}
+    dev: false
 
   /markdown-it-anchor/8.6.4_2zb4u3vubltivolgu556vv4aom:
     resolution: {integrity: sha512-Ul4YVYZNxMJYALpKtu+ZRdrryYt/GlQ5CK+4l1bp/gWXOG2QWElt6AqF3Mih/wfUKdZbNAZVXGR73/n6U/8img==}
