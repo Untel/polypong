@@ -1,7 +1,7 @@
-COMPOSE=docker-compose
-COMMON=common
-FRONT=front
-API=api
+COMPOSE		=docker-compose
+
+FRONT		=front
+API			=api
 
 all:
 	$(COMPOSE) up
@@ -11,9 +11,8 @@ build:
 
 clear:
 	$(COMPOSE) down -v
-	rm -rf **/node_modules
-	rm -rf .pnpm_store
 	docker system prune -f
+	docker rmi $(shell docker image ls -qa)
 
 install:
 	$(COMPOSE) run --rm $(FRONT) yarn
@@ -24,8 +23,5 @@ $(FRONT):
 
 $(API):
 	$(COMPOSE) exec $(API) /bin/bash
-
-$(COMMON):
-	$(COMPOSE) exec $(COMMON) /bin/bash
 
 .PHONY: all build clear install $(FRONT) $(API) $(COMMON)

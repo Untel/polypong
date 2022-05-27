@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useApi } from 'src/utils/api';
 import { useLobbiesStore } from 'src/stores/lobbies';
 import { useAuthStore } from 'src/stores/auth';
 import { ref } from 'vue';
 const lobbies = useLobbiesStore();
-const { socket } = useAuthStore();
 lobbies.fetchLobbies();
 const lobbyName = ref('');
+const { socket } = useAuthStore();
 socket?.on('refreshedLobbies', lobbies.fetchLobbies);
 </script>

@@ -1,0 +1,72 @@
+import {
+	Controller, Logger, Patch, UseGuards, UsePipes, ValidationPipe,
+	Request, Body, Post, UseInterceptors, UploadedFile, Get, Param, Res
+} from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express/multer';
+import { diskStorage } from 'multer';
+import { extname } from  'path';
+import { UpdateNameDto } from 'src/auth/dtos/update-name.dto';
+import { LoggedInGuard } from 'src/guards/logged-in.guard';
+import { UserService } from './user.service';
+
+@Controller('user')
+export class UserController {
+	constructor(
+		private readonly userService: UserService,
+	) {}
+	logger = new Logger('UserController');
+
+   /**
+	* Set nickname of an user.
+	* @param {Request} req : The request object.
+	* @param {UpdateNicknameDto} body : new nickname
+	* @returns
+	*/
+	@UseGuards(LoggedInGuard)
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@Post('name')
+	async setName(
+		@Request() req,
+		@Body() body: UpdateNameDto,
+	 ) {
+		 this.logger.log(`In setName, calling updateUser(${req.user.email}, ${body.name})`)
+		 return await this.userService.setNickname(
+			 req.user, body.name,
+		 );
+	 }
+
+   /**
+	* Set avatar of an user.
+	* @param {Request} req : The request object.
+	* @param {UpdateAvatarDto} body : new avatar
+	* @returns
+	*/
+	@UseGuards(LoggedInGuard)
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@Post('uploadAvatar')
+	@UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
+	async uploadAvatar(
+		@Request() req,
+		@UploadedFile() avatar: Express.Multer.File
+	) {
+		this.logger.log(`in uploadAvatar, user.email : (${req.user.email})`);
+		this.logger.log(`in uploadAvatar, avatar.path = ${avatar.path})`);
+		return await this.userService.setAvatar(
+			req.user, `https://localhost/backend/user/${avatar.path}`
+		);
+	}
+
+	/**
+	* Get avatar of the current user.
+	* @param {Request} req : The request object.
+	* @returns
+	*/
+	@UseGuards(LoggedInGuard)
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@Get('avatars/:fileId')
+	async serveAvatar(@Param('fileId') fileId, @Res() res): Promise<any> {
+		this.logger.log(`in serveAvatar, fileId = ${fileId}`);
+		res.sendFile(fileId, { root: './avatars'});
+	}
+
+}
