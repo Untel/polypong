@@ -46,7 +46,7 @@ const linksList = [
     title: 'Home',
     caption: 'Home page',
     icon: 'fas fa-igloo',
-    to: 'fas fa-igloo',
+    to: 'home',
   },  {
     title: 'Login',
     caption: 'Login page',

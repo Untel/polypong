@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, defineEmits, onBeforeUnmount } from 'vue';
+import { ref, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
