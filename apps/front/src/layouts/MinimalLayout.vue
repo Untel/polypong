@@ -43,10 +43,7 @@
 
 <script lang="ts" setup>
 import { useSettingsStore } from 'src/stores/settings';
-import { useAuthStore } from 'src/stores/auth';
 import BgSocial from 'src/components/BgSocial.vue';
 
 const settings = useSettingsStore();
-const auth = useAuthStore();
-auth.connectToSocket();
 </script>

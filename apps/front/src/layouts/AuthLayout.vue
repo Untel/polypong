@@ -56,18 +56,11 @@ const defaultBackgroundParams = {
 const backgroundParams = ref(defaultBackgroundParams);
 
 const changeBackground = (coalition: CoalitionChoice) => {
-  console.log('BACKGROUND IS CHANCHING', coalition);
   if (!coalition)
     backgroundParams.value = defaultBackgroundParams;
   else {
     backgroundParams.value = {
-      fssSettings: {
-          ...coalitions[coalition].shaderConfig,
-          light: {
-            ...coalitions[coalition].shaderConfig.light,
-            // ...defaultLoginLight,
-          }
-      },
+      fssSettings: coalitions[coalition].shaderConfig,
       fallbackUrl: coalitions[coalition].fssFallback,
     };
   }

@@ -47,7 +47,7 @@
     lazy-rules
     :rules="[
       val => !!val || 'Password cannot be empty',
-      val => val.length < 6 || 'Password must be stronger',
+      val => val.length > 6 || 'Password must be stronger',
     ]"
   >
     <template v-slot:append>
@@ -75,7 +75,13 @@
       />
     </template>
   </q-input>
-  <CoalitionSelector v-model="coalition" />
+
+  <CoalitionSelector
+    label="Choose your coalition"
+    v-model="coalition"
+    lazy-rules
+    :rules="[val => !!val && val.length || 'You must choose a coalition']"
+  />
 
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN UP</q-btn>
 </q-form>
@@ -89,16 +95,15 @@ import CoalitionSelector from 'src/components/CoalitionSelector.vue';
 import { useAuthStore } from 'src/stores/auth';
 import { ValidationRule } from 'quasar';
 
-
 const email           = ref<String>(''),
       name            = ref<String>(''),
       password        = ref<String>(''),
       repeatPassword  = ref<String>(''),
-      coalition       = ref<String>('')
-;
-const showPassword = ref(false);
-const router = useRouter();
-const auth = useAuthStore();
+      coalition       = ref<String>(''),
+      
+      showPassword    = ref(false),
+      router          = useRouter(),
+      auth            = useAuthStore();
 
 const onSubmitForm = async (form: Event) => {
   const res = await auth.register(

@@ -40,6 +40,7 @@
 import { defineComponent, ref } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
 import Logo from 'src/components/Logo.vue';
+import { useAuthStore } from 'src/stores/auth';
 
 const linksList = [
   {
@@ -66,4 +67,6 @@ const linksList = [
 ];
 
 const miniState = ref(true);
+const auth = useAuthStore();
+auth.connectToSocket();
 </script>

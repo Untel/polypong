@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <svg v-if="bannerVisible" viewBox="0 0 68 104" :style="`fill: ${colors[coalition]}`">
+    <svg v-if="showBanner" viewBox="0 0 68 104" :style="`fill: ${colors[coalition]}`">
         <polygon points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
     </svg>
     <LogoCoalition class="logo" :coalition="coalition" :color="showBanner ? 'white' : colors[coalition]"/>
@@ -8,10 +8,15 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, computed } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { CoalitionChoice } from "src/types/coalition";
 import LogoCoalition from "./LogoCoalition.vue";
-import { morph } from 'quasar'
+
+defineComponent({
+  components: {
+    LogoCoalition
+  }
+})
 
 const props = defineProps({
   coalition: {
@@ -31,10 +36,6 @@ const colors = {
   [CoalitionChoice.FEDERATION]: 'var(--clr-federation)',
   [CoalitionChoice.ORDER]: 'var(--clr-order)',
 };
-const bannerVisible = computed(() => {
-  console.log(props.showBanner);
-  return props.showBanner;
-});
 </script>
 
 

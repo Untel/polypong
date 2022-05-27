@@ -1,5 +1,7 @@
 <template>
-  <q-field dense label="Choose your coalition" borderless class="wrapper full-width">
+  <q-field
+    :model-value="modelValue"
+    borderless class="wrapper full-width">
     <!-- <div slot="label">Choose your faction</div> -->
     <LogoBannerCoalition
       v-for="coalition in CoalitionChoice"

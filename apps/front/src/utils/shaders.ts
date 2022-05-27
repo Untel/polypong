@@ -4,7 +4,7 @@ import { CoalitionChoice, Coalition } from 'src/types/coalition';
 
 const settings = useSettingsStore();
 
-const type = 'svg';
+const type = 'canvas';
 
 export const defaultCoalitionLight = {
   count: 1,
