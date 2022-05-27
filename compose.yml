@@ -70,6 +70,8 @@ services:
     ports:
       - "5050:80"
     stop_signal: SIGINT
+    logging:
+      driver: none
 
 networks:
   database:

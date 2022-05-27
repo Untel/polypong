@@ -42,13 +42,19 @@
     </template>
   </q-input>
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
-  <q-btn type="submit" size="large" color="secondary" class="full-width">Connect with 42</q-btn>
+  <q-separator size="2px" class="full-width" />
+  <q-btn @click="connectWith42" size="large" color="secondary" class="full-width">
+    Connect with &nbsp;<q-icon name="img:src/assets/42_logo.svg"/>
+  </q-btn>
 </q-form>
 </template>
 
 <script lang="ts" setup>
+import { useAuthStore } from 'src/stores/auth';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+
+const auth = useAuthStore();
 
 const login = ref('');
 const password = ref('');
@@ -57,5 +63,8 @@ const router = useRouter();
 const onSubmitForm = (form: Event) => {
   console.log('Submitting form', form, login, password);
   router.push('/');
+};
+
+const connectWith42 = (form: Event) => {
 };
 </script>

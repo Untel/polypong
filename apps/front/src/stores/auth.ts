@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
 import { io, Socket, } from "socket.io-client";
+import { CoalitionChoice } from 'src/types';
 import { useApi } from 'src/utils/api';
 
 type AuthState = {
@@ -26,6 +27,15 @@ export const useAuthStore = defineStore('auth', {
     async login(email: string, password: string) {
       const { data, error } = await useApi('auth/login');
       console.log('Res is ', data.value, error.value);
-    }
+    },
+    async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
+      const { data, error } = await useApi('auth/register').post({
+        name,
+        email,
+        password,
+        coalition,
+      });
+      console.log('Res is ', data.value, error.value);
+    },
   },
 });

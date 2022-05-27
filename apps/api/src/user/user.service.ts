@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/UserInterface';
 import { User } from './user.entity';
 import * as gravatar from 'gravatar';
@@ -19,8 +19,8 @@ export class UserService {
 		return this.userRepository.findOne({ where: { id: +id } });
 	}
 
-	async find(options: any, withPassword = false): Promise<User> | null {
-		const user = await this.userRepository.findOne(options);
+	async find(where: FindOptionsWhere<User>, withPassword = false): Promise<User> | null {
+		const user = await this.userRepository.findOne({ where });
 		if (!user) {
 		  return;
 		}

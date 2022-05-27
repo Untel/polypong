@@ -24,11 +24,17 @@
     class="full-width"
     filled
     label="Email"
-    hint="Username or email"
     lazy-rules
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   />
-
+  <q-input
+    v-model="name"
+    class="full-width"
+    filled
+    label="Username"
+    lazy-rules
+    :rules="[ val => val && val.length > 0 || 'Please type something']"
+  />
   <q-input
     v-model="password"
     class="full-width"
@@ -74,16 +80,26 @@ import { ref, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
+import { useAuthStore } from 'src/stores/auth';
 
-const email           = ref(null),
-      password        = ref(null),
-      repeatPassword  = ref(null),
-      coalition       = ref(null)
+
+const email           = ref<String>(''),
+      name            = ref<String>(''),
+      password        = ref<String>(''),
+      repeatPassword  = ref<String>(''),
+      coalition       = ref<String>('')
 ;
 const showPassword = ref(false);
 const router = useRouter();
-const onSubmitForm = (form: Event) => {
+const auth = useAuthStore();
 
+const onSubmitForm = async (form: Event) => {
+  const res = await auth.register(
+    name.value,
+    email.value,
+    password.value,
+    coalition.value,
+  );
 };
 const emit = defineEmits(['changeBackground']);
 watch(coalition, (coa) => {

@@ -38,20 +38,46 @@ export class AuthController {
 	@UsePipes(new ValidationPipe({ transform: true }))
 	async registerUser(
 		@Body() registerUserDto: RegisterUserDto,
-		@Request() req
+		@Req() req,
+		@Res() res
 	) {
 		this.logger.log("@Post('register')");
 		const result = await this.authService.registerUser(registerUserDto);
 		if (result.user) {
 			this.logger.log(`about to call req.login`);
-			req.login(result.user, function (err) {
-				if (err) {
-					throw new Error(
-						'Sorry, somethin went wrong. We could register but sign you in.',
-					);
-				}
-				return req.session;
-			});
+			console.log("req is", req);
+			const user = result.user;
+			const accessCookie = this.authService.getCookieWithJwtToken(user.id);
+			const {
+				cookie: refreshTokenCookie,
+				token: refreshToken,
+			} = this.authService.getCookieWithJwtRefreshToken(user.id);
+	
+			await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+	
+			res.setHeader(
+				'Set-Cookie', [accessCookie, refreshTokenCookie]
+			);
+	
+			// if 2fa is enabled, don't return user info yet
+			// if (user.isTwoFactorAuthenticationEnabled) {
+			// 	return res.send({
+			// 		isTwoFactorAuthenticationEnabled: true,
+			// 		accessCookie: accessCookie,
+			// 		refreshTokenCookie: refreshTokenCookie,
+			// 	});
+			// }
+	
+			this.logger.log(`@Post(Register), returning user`);
+			return res.send(user);
+			// req.login(result.user, function (err) {
+			// 	if (err) {
+			// 		throw new Error(
+			// 			'Sorry, somethin went wrong. We could register but sign you in.',
+			// 		);
+			// 	}
+			// 	return req.session;
+			// });
 		}
 	}
 

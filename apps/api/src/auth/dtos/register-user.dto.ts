@@ -9,4 +9,7 @@ export class RegisterUserDto {
 
   @IsNotEmpty()
   password: string;
+
+  @IsNotEmpty()
+  coalition: string;
 }
