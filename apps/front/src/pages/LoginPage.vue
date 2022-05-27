@@ -42,6 +42,7 @@
     </template>
   </q-input>
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
+  <q-btn type="submit" size="large" color="secondary" class="full-width">Connect with 42</q-btn>
 </q-form>
 </template>
 

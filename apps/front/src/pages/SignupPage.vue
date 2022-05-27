@@ -83,7 +83,7 @@ const email           = ref(null),
 const showPassword = ref(false);
 const router = useRouter();
 const onSubmitForm = (form: Event) => {
-  router.push('/');
+
 };
 const emit = defineEmits(['changeBackground']);
 watch(coalition, (coa) => {
