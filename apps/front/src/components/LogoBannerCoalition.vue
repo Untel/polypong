@@ -12,12 +12,6 @@ import { defineComponent, PropType, ref } from "vue";
 import { CoalitionChoice } from "src/types/coalition";
 import LogoCoalition from "./LogoCoalition.vue";
 
-defineComponent({
-  components: {
-    LogoCoalition
-  }
-})
-
 const props = defineProps({
   coalition: {
     type: String as PropType<CoalitionChoice>,

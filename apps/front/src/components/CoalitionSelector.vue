@@ -34,7 +34,7 @@ const updateValue = (coalition: CoalitionChoice) => {
 
 <style lang="scss" scoped>
   .wrapper {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     margin-top: 20px;
     // display: flex;
 

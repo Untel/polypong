@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     place-items: center;
-    width: min(400px);
+    width: min(400px, 80%);
   }
 </style>
 
@@ -21,6 +21,7 @@
 >
   <q-input
     v-model="email"
+    dense
     class="full-width"
     filled
     label="Email"
@@ -32,6 +33,7 @@
   />
   <q-input
     v-model="name"
+    dense
     class="full-width"
     filled
     label="Username"
@@ -42,6 +44,7 @@
     v-model="password"
     class="full-width"
     filled
+    dense
     label="Password"
     :type="showPassword ? 'text' : 'password'"
     lazy-rules
@@ -61,7 +64,8 @@
   <q-input
     v-model="repeatPassword"
     class="full-width"
-    filled                                                                                                                                                                                  
+    dense
+    filled
     label="Repeat password"
     :type="showPassword ? 'text' : 'password'"
     lazy-rules
@@ -120,11 +124,9 @@ const isValidEmail = (val: string): any => {
 
 const emit = defineEmits(['changeBackground']);
 watch(coalition, (coa) => {
-  console.log('Watching it ?', coalition);
   emit('changeBackground', coa);
 });
 onBeforeUnmount(() => {
-  console.log('Destroy it ?', coalition);
   emit('changeBackground', null);
 })
 </script>
