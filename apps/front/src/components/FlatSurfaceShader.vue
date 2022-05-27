@@ -10,10 +10,6 @@
     width: 100%;
     height: 100%;
   }
-
-  canvas, svg {
-    filter: contrast(.8)
-  }
 </style>
 
 <template>
@@ -59,6 +55,10 @@ export default {
     },
     height: {
       type: Number,
+    },
+    shouldAnimate: {
+      type: Boolean,
+      default: true,
     },
   },
 
@@ -115,24 +115,32 @@ export default {
   },
 
   beforeUnmount() {
-    this.removeEventListeners();
-    this.renderer.clear();
-    const container = this.$refs.shader;
-    container.removeChild(this.renderer.element);
-    window.cancelAnimationFrame(this.animationFrameId)
+    this.clearAll();
   },
 
   watch: {
     light: {
       handler() {
+        // this.LIGHT = Object.assign(this.LIGHT, this.light);
         this.createLights();
+        this.animate();
       },
       deep: true,
       immediate: false,
     },
     mesh: {
       handler() {
+        // this.MESH = Object.assign(this.MESH, this.mesh);
         this.createMesh();
+        this.animate();
+      },
+      deep: true,
+      immediate: false,
+    },
+    shouldAnimate: {
+      handler() {
+        // this.MESH = Object.assign(this.MESH, this.mesh);
+        this.animate();
       },
       deep: true,
       immediate: false,
@@ -149,6 +157,14 @@ export default {
       this.addEventListeners();
       this.resize(container.offsetWidth, container.offsetHeight);
       this.animate();
+    },
+
+    clearAll() {
+      this.removeEventListeners();
+      this.renderer.clear();
+      const container = this.$refs.shader;
+      container.removeChild(this.renderer.element);
+      window.cancelAnimationFrame(this.animationFrameId);
     },
 
     setRenderer() {
@@ -219,16 +235,16 @@ export default {
         light.force = FSS.Vector3.create();
 
         // Ring SVG Circle
-        light.ring = document.createElementNS(FSS.SVGNS, 'circle');
-        light.ring.setAttributeNS(null, 'stroke', light.ambientHex);
-        light.ring.setAttributeNS(null, 'stroke-width', '0.5');
-        light.ring.setAttributeNS(null, 'fill', 'none');
-        light.ring.setAttributeNS(null, 'r', '10');
+        // light.ring = document.createElementNS(FSS.SVGNS, 'circle');
+        // light.ring.setAttributeNS(null, 'stroke', light.ambientHex);
+        // light.ring.setAttributeNS(null, 'stroke-width', '0.5');
+        // light.ring.setAttributeNS(null, 'fill', 'none');
+        // light.ring.setAttributeNS(null, 'r', '10');
 
         // Core SVG Circle
-        light.core = document.createElementNS(FSS.SVGNS, 'circle');
-        light.core.setAttributeNS(null, 'fill', light.diffuseHex);
-        light.core.setAttributeNS(null, 'r', '4');
+        // light.core = document.createElementNS(FSS.SVGNS, 'circle');
+        // light.core.setAttributeNS(null, 'fill', light.diffuseHex);
+        // light.core.setAttributeNS(null, 'r', '4');
       }
     },
 
@@ -239,17 +255,20 @@ export default {
     },
 
     animate() {
-      this.update();
+      window.cancelAnimationFrame(this.animationFrameId);
+      this.tick();
       this.shaderRender();
-      this.animationFrameId = requestAnimationFrame(this.animate);
+      if (this.shouldAnimate) {
+        this.animationFrameId = requestAnimationFrame(this.animate);
+      }
     },
 
     updated() {
       console.log('/// Props change', this.mesh.ambient);
-
+      this.tick();
     },
 
-    update() {
+    tick() {
       console.log('Props updated', this.mesh.ambient);
       this.MESH = Object.assign(this.MESH, this.mesh);
       this.LIGHT = Object.assign(this.LIGHT, this.light);
@@ -319,7 +338,7 @@ export default {
       this.LIGHT = Object.assign(this.LIGHT, this.light);
       this.renderer.render(this.scene);
       // Draw Lights
-      if (this.LIGHT.draw) {
+      if (this.LIGHT.draw && this.shouldAnimate) {
         for (let l = this.scene.lights.length - 1; l >= 0; l -= 1) {
           const light = this.scene.lights[l];
           let lx = light.position[0]; let

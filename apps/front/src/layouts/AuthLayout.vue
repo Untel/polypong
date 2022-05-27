@@ -19,8 +19,7 @@
   <q-page>
     <FssFallback
       class="login-background"
-      :fss-settings="$q.dark.isActive ? useLoginShaders() : useLoginLightShaders()"
-      fallback-url="/src/assets/background_login.jpg"
+      v-bind="backgroundParams"
     >
       <div class="form-container">
         <Logo size="100px" style="justify-self: center;" />
@@ -36,7 +35,7 @@
             label="Sign up"
           />
         </q-tabs>
-        <router-view />
+        <router-view @changeBackground="changeBackground"/>
       </div>
     </FssFallback>
   </q-page>
@@ -44,7 +43,33 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { useLoginShaders, useLoginLightShaders } from 'src/utils/shaders';
 import FssFallback from 'src/components/FssFallback.vue';
+import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
+import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';
 import Logo from 'src/components/Logo.vue';
+import { ref, Ref } from 'vue';
+
+const defaultBackgroundParams = {
+  fssSettings: useLoginShaders(),
+  fallbackUrl: '/src/assets/background_login.jpg',
+};
+const backgroundParams = ref(defaultBackgroundParams);
+
+const changeBackground = (coalition: CoalitionChoice) => {
+  console.log('BACKGROUND IS CHANCHING', coalition);
+  if (!coalition)
+    backgroundParams.value = defaultBackgroundParams;
+  else {
+    backgroundParams.value = {
+      fssSettings: {
+          ...coalitions[coalition].shaderConfig,
+          light: {
+            ...coalitions[coalition].shaderConfig.light,
+            // ...defaultLoginLight,
+          }
+      },
+      fallbackUrl: coalitions[coalition].fssFallback,
+    };
+  }
+}
 </script>

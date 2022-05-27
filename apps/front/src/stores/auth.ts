@@ -4,7 +4,7 @@ import { io, Socket, } from "socket.io-client";
 import { useApi } from 'src/utils/api';
 
 type AuthState = {
-  socket?: Socket | null
+  socket?: Socket | null,
 }
 
 export const useAuthStore = defineStore('auth', {
