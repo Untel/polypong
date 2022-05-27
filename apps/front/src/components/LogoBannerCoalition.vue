@@ -1,14 +1,8 @@
 <template>
   <div class="wrapper">
-    <transition
-      appear
-      enter-active-class="animated slide-down"
-      leave-active-class="animated slide-up"
-    >
-    <svg v-if="showBanner" viewBox="0 0 68 104" :style="`fill: ${colors[coalition]}`">
+    <svg v-if="bannerVisible" viewBox="0 0 68 104" :style="`fill: ${colors[coalition]}`">
         <polygon points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
     </svg>
-    </transition>
     <LogoCoalition class="logo" :coalition="coalition" :color="showBanner ? 'white' : colors[coalition]"/>
   </div>
 </template>
@@ -17,6 +11,7 @@
 import { PropType, ref, computed } from "vue";
 import { CoalitionChoice } from "src/types/coalition";
 import LogoCoalition from "./LogoCoalition.vue";
+import { morph } from 'quasar'
 
 const props = defineProps({
   coalition: {
@@ -31,11 +26,17 @@ const props = defineProps({
 const val = ref(false);
 const colors = {
   [CoalitionChoice.ALLIANCE]: 'var(--clr-alliance)',
+  [CoalitionChoice.ALLIANCE]: 'var(--clr-alliance)',
   [CoalitionChoice.ASSEMBLY]: 'var(--clr-assembly)',
   [CoalitionChoice.FEDERATION]: 'var(--clr-federation)',
   [CoalitionChoice.ORDER]: 'var(--clr-order)',
 };
+const bannerVisible = computed(() => {
+  console.log(props.showBanner);
+  return props.showBanner;
+});
 </script>
+
 
 <style lang="scss" scoped>
 

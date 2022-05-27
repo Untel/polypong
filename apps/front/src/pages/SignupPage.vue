@@ -28,6 +28,7 @@
     lazy-rules
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   />
+
   <q-input
     v-model="password"
     class="full-width"
@@ -45,8 +46,6 @@
       />
     </template>
   </q-input>
-  <LogoCoalition />
-  <LogoBannerCoalition :show-banner="showPassword" />
   <q-input
     v-model="repeatPassword"
     class="full-width"
@@ -64,23 +63,35 @@
       />
     </template>
   </q-input>
-  
+  <CoalitionSelector v-model="coalition" />
+
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN UP</q-btn>
 </q-form>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch, defineEmits, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
-import LogoBannerCoalition from 'src/components/LogoBannerCoalition.vue';
-const email           = ref(''),
-      password        = ref(''),
-      repeatPassword  = ref('')
+import CoalitionSelector from 'src/components/CoalitionSelector.vue';
+
+const email           = ref(null),
+      password        = ref(null),
+      repeatPassword  = ref(null),
+      coalition       = ref(null)
 ;
 const showPassword = ref(false);
 const router = useRouter();
 const onSubmitForm = (form: Event) => {
   router.push('/');
 };
+const emit = defineEmits(['changeBackground']);
+watch(coalition, (coa) => {
+  console.log('Watching it ?', coalition);
+  emit('changeBackground', coa);
+});
+onBeforeUnmount(() => {
+  console.log('Destroy it ?', coalition);
+  emit('changeBackground', null);
+})
 </script>
