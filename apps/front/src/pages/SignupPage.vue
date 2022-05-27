@@ -81,7 +81,7 @@
   </q-input>
 
   <CoalitionSelector
-    label="Choose your coalition"
+    label="Coalition"
     v-model="coalition"
     lazy-rules
     :rules="[val => !!val && val.length || 'You must choose a coalition']"
@@ -117,16 +117,19 @@ const onSubmitForm = async (form: Event) => {
     coalition.value,
   );
 };
+
 const isValidEmail = (val: string): any => {
   const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
   return emailPattern.test(val) || 'Seems to be an incorrect email';
 }
 
 const emit = defineEmits(['changeBackground']);
+
 watch(coalition, (coa) => {
   emit('changeBackground', coa);
 });
+
 onBeforeUnmount(() => {
   emit('changeBackground', null);
-})
+});
 </script>

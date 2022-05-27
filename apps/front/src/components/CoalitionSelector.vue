@@ -2,7 +2,6 @@
   <q-field
     :model-value="modelValue"
     borderless class="wrapper full-width">
-    <!-- <div slot="label">Choose your faction</div> -->
     <LogoBannerCoalition
       v-for="coalition in CoalitionChoice"
       class="coalition_choice"
