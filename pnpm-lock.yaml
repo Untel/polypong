@@ -143,12 +143,12 @@ importers:
       '@vue/reactivity': ^3.0.0
       '@vueuse/core': ^8.4.2
       autoprefixer: ^10.4.2
+      axios: ^0.27.2
       babel-loader: ^8.2.5
       eslint: ^8.10.0
       eslint-config-airbnb-base: ^15.0.0
       eslint-plugin-import: ^2.20.1
       eslint-plugin-vue: ^8.5.0
-      mande: ^2.0.2
       pinia: ^2.0.11
       quasar: ^2.6.0
       socket.io-client: ^4.5.0
@@ -162,7 +162,7 @@ importers:
       '@quasar/extras': 1.13.6
       '@vue/reactivity': 3.2.33
       '@vueuse/core': 8.4.2_vue@3.2.33
-      mande: 2.0.2
+      axios: 0.27.2
       pinia: 2.0.14_ytvqwwdyss532bvoq2clv4ed5m
       quasar: 2.6.6
       socket.io-client: 4.5.0
@@ -5494,7 +5494,7 @@ packages:
     dev: false
 
   /delayed-stream/1.0.0:
-    resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}
+    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
   /delegates/1.0.0:
@@ -8731,10 +8731,6 @@ packages:
     dependencies:
       tmpl: 1.0.5
     dev: true
-
-  /mande/2.0.2:
-    resolution: {integrity: sha512-HdWr3WJkld0MLjQb9GKYW49UkrcUgJr7w6fsHqz7XzFq8yv/GfMyoR/qxS4w9mjSQrdw5MXb2q9oJfALkzJ37Q==}
-    dev: false
 
   /markdown-it-anchor/8.6.4_2zb4u3vubltivolgu556vv4aom:
     resolution: {integrity: sha512-Ul4YVYZNxMJYALpKtu+ZRdrryYt/GlQ5CK+4l1bp/gWXOG2QWElt6AqF3Mih/wfUKdZbNAZVXGR73/n6U/8img==}
