@@ -1,10 +1,17 @@
 COMPOSE		=docker-compose
 
-FRONT		=front
-API			=api
+C			=
+
+FRONT		= front
+API			= api
+DB			= db
+NGINX		= nginx
 
 all:
 	$(COMPOSE) up
+
+detach:
+	$(COMPOSE) up -d
 
 build:
 	$(COMPOSE) up --build
@@ -17,10 +24,9 @@ clear:
 install:
 	$(COMPOSE) run --rm install
 
-$(FRONT):
-	$(COMPOSE) exec $(FRONT) /bin/bash
+enter:
+	$(COMPOSE) exec $(C) /bin/bash
+run:
+	$(COMPOSE) run $(C)
 
-$(API):
-	$(COMPOSE) exec $(API) /bin/bash
-
-.PHONY: all build clear install $(FRONT) $(API) $(COMMON)
+.PHONY: all build clear install $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

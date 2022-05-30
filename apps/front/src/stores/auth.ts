@@ -16,15 +16,15 @@ import { useQuasar, Notify } from 'quasar';
 import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
 import { mande, defaults } from 'mande';
-import { useStorage } from '@vueuse/core';
+import { RemovableRef, useStorage } from '@vueuse/core';
 import axios from 'axios';
 
-process.env.API_URL = 'http://localhost:3000';
+process.env.API_URL = 'http://localhost:8080/api';
 export const authApi = mande(`${process.env.API_URL}/api/auth`);
 
 type AuthState = {
   socket?: Socket | null,
-  token: string,
+  token: RemovableRef<null>,
   user: unknown,
 }
 defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
@@ -40,24 +40,23 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     connectToSocket() {
-      this.socket = io('localhost:3000', {
-        transports: ['websocket'],
-        withCredentials: true,
-      });
-      // this.socket.emit('msgToServer', 'yolo');
+      // this.socket = 'localhost:3000', {
+      //   transports: ['websocket'],
+      //   withCredentials: true,
+      // });
+      // this.io(socket.emit('msgToServer', 'yolo');
     },
     async login(email: string, password: string) {
       try {
-        // const res = await authApi.post<any>('login', { email, password });
+        const res = await authApi.post<any>('login', { email, password });
         // defaults.headers.Authorization = `Bearer ${token}`;
-        await axios.post(
-          `${process.env.API_URL}/auth/login`,
+        const resp = await axios.post(
+          `${process.env.API_URL}/api/auth/login`,
           { email, password },
-          { withCredentials: true },
         );
+        console.log('resp');
         await axios.get(
-          `${process.env.API_URL}/auth/user`,
-          { withCredentials: true },
+          `${process.env.API_URL}/api/auth/user`,
         );
         return (token);
       } catch (error) {
@@ -71,7 +70,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
       try {
-        const { data, error } = await authApi.post('register', {
+        await authApi.post('register', {
           name,
           email,
           password,
@@ -86,12 +85,8 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async whoAmI() {
-      try {
-        const resp = await authApi.get('user');
-        console.log('Resp', resp);
-      } catch (error) {
-        console.log('Resp', error);
-      }
+      const resp = await authApi.get('user');
+      console.log('Resp', resp);
     },
   },
 });

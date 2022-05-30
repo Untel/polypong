@@ -1,0 +1,24 @@
+FROM node:18 as prod_install
+
+WORKDIR /polypong
+ENV NODE_ENV = 'production'
+RUN yarn global add pnpm
+COPY . .
+
+FROM prod_install as front_build
+WORKDIR /polypong/apps/front
+RUN yarn
+RUN yarn add @quasar/cli
+RUN npx quasar build
+
+FROM prod_install as api_build
+WORKDIR /polypong/apps/api
+RUN yarn
+RUN yarn add @nestjs/cli
+RUN npx nest build
+RUN ls dist
+
+FROM node:18
+COPY --from=api_build /polypong/apps/api/dist /polypong
+COPY --from=front_build /polypong/apps/front/dist/spa /polypong/static
+ENTRYPOINT [ "node", "/polypong/main.js" ]

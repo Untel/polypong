@@ -11,9 +11,9 @@ export default async (
   try {
     await auth.whoAmI();
     await auth.connectToSocket();
-    // next();
+    next();
   } catch (error) {
     console.log('Auth guard fail');
-    // next({ name: 'auth' });
+    next({ name: 'login' });
   }
 };

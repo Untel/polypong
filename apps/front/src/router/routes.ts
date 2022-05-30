@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router';
 // import PongPage from 'pages/PongPage.vue';
-import AuthGuard from './Auth.guard';
+import AuthGuard from './auth.guard';
 
 const routes: RouteRecordRaw[] = [
   {
