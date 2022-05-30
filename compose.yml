@@ -22,7 +22,7 @@ services:
 
   install:
     build: .
-    image: polypong/stack
+    image: polypong/apps
     container_name: install
     volumes:
       - "./:/polypong"
