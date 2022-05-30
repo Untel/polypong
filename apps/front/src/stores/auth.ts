@@ -1,17 +1,39 @@
-import { defineStore } from 'pinia';
-import { useQuasar } from 'quasar';
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   auth.ts                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/05/28 23:26:54 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-import { io, Socket, } from "socket.io-client";
+import { defineStore } from 'pinia';
+import { useQuasar, Notify } from 'quasar';
+
+import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
-import { useApi } from 'src/utils/api';
+import { mande, defaults } from 'mande';
+import { useStorage } from '@vueuse/core';
+import axios from 'axios';
+
+process.env.API_URL = 'http://localhost:3000';
+export const authApi = mande(`${process.env.API_URL}/api/auth`);
 
 type AuthState = {
   socket?: Socket | null,
+  token: string,
+  user: unknown,
 }
+defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
+    user: null,
     socket: null,
+    token: useStorage('token', null),
   } as AuthState),
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
@@ -22,30 +44,53 @@ export const useAuthStore = defineStore('auth', {
         transports: ['websocket'],
         withCredentials: true,
       });
-      console.log('Connecting to socket', this.socket);
-      this.socket.emit('msgToServer', 'yolo');
+      // this.socket.emit('msgToServer', 'yolo');
     },
     async login(email: string, password: string) {
-      const { data, error } = await useApi('auth/login');
-      console.log('Res is ', data.value, error.value);
+      try {
+        // const res = await authApi.post<any>('login', { email, password });
+        // defaults.headers.Authorization = `Bearer ${token}`;
+        await axios.post(
+          `${process.env.API_URL}/auth/login`,
+          { email, password },
+          { withCredentials: true },
+        );
+        await axios.get(
+          `${process.env.API_URL}/auth/user`,
+          { withCredentials: true },
+        );
+        return (token);
+      } catch (error) {
+        console.log('Error is', error);
+        Notify.create({
+          type: 'negative',
+          message: 'Cannot connect',
+        });
+        return false;
+      }
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
-      console.log('Register');
       try {
-        const { data, error, err } = await useApi('auth/register').post({
+        const { data, error } = await authApi.post('register', {
           name,
           email,
           password,
           coalition,
         });
-        console.log('Register return', data, error);
-      } catch (error) {
-        console.log('Register error', error);
-        const $q = useQuasar();
-        $q.notify({
+      } catch (error: any) {
+        console.error('Register error', error);
+        Notify.create({
           type: 'negative',
-          message: error.value.message.reduce((a: String, n: String) => `${a}\n${n}`, ''),
+          message: error.value.message.reduce((a: string, n: string) => `${a}\n${n}`, ''),
         });
+      }
+    },
+    async whoAmI() {
+      try {
+        const resp = await authApi.get('user');
+        console.log('Resp', resp);
+      } catch (error) {
+        console.log('Resp', error);
       }
     },
   },

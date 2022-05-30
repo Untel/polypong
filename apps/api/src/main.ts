@@ -13,7 +13,6 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
@@ -24,7 +23,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
   // Enable sessions for authentication purposes.
   // Sessions are stored in the database.
   const SESSION_SECRET = configService.getValue('SESSION_SECRET');
@@ -41,7 +39,6 @@ async function bootstrap() {
       },
     }),
   );
-
   // Initliaze passport & passport session support.
   app.use(passport.initialize());
   app.use(passport.session());

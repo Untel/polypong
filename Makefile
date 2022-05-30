@@ -15,8 +15,7 @@ clear:
 	docker rmi $(shell docker image ls -qa)
 
 install:
-	$(COMPOSE) run --rm $(FRONT) yarn
-	$(COMPOSE) run --rm $(API) yarn
+	$(COMPOSE) run --rm install
 
 $(FRONT):
 	$(COMPOSE) exec $(FRONT) /bin/bash

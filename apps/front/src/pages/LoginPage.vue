@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     place-items: center;
-    width: min(400px);
+    width: min(400px, 80%);
   }
 </style>
 
@@ -12,7 +12,7 @@
   ref="form"
   center
   class="q-gutter-md login-form"
-  @submit="onSubmitForm"
+  @submit="connectWithLocal"
   aria-autocomplete="off"
 >
   <q-input
@@ -60,9 +60,9 @@ const login = ref('');
 const password = ref('');
 const showPassword = ref(false);
 const router = useRouter();
-const onSubmitForm = (form: Event) => {
-  console.log('Submitting form', form, login, password);
-  router.push('/');
+const connectWithLocal = async (form: Event) => {
+  await auth.login(login.value, password.value);
+  await auth.whoAmI();
 };
 
 const connectWith42 = (form: Event) => {
