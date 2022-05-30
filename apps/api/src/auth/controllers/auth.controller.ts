@@ -124,8 +124,8 @@ export class AuthController {
   * @param {Request} req : The request object.
   * @returns
   */
-    @UseGuards(JwtTwoFactorGuard)
-//	@UseGuards(LoggedInGuard)
+    // @UseGuards(JwtTwoFactorGuard)
+	@UseGuards(LoggedInGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
     delete req.user.password;

@@ -19,7 +19,7 @@ import { mande, defaults } from 'mande';
 import { RemovableRef, useStorage } from '@vueuse/core';
 import axios from 'axios';
 
-process.env.API_URL = 'http://localhost:8080/api';
+process.env.API_URL = 'http://localhost:9999';
 export const authApi = mande(`${process.env.API_URL}/api/auth`);
 
 type AuthState = {
@@ -49,15 +49,6 @@ export const useAuthStore = defineStore('auth', {
     async login(email: string, password: string) {
       try {
         const res = await authApi.post<any>('login', { email, password });
-        // defaults.headers.Authorization = `Bearer ${token}`;
-        const resp = await axios.post(
-          `${process.env.API_URL}/api/auth/login`,
-          { email, password },
-        );
-        console.log('resp');
-        await axios.get(
-          `${process.env.API_URL}/api/auth/user`,
-        );
         return (token);
       } catch (error) {
         console.log('Error is', error);

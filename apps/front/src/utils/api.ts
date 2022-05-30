@@ -3,7 +3,7 @@ import { LoadingBar, Notify } from 'quasar';
 import { useRouter } from 'vue-router';
 
 export const useApi = createFetch({
-  baseUrl: 'http://localhost:3000/api',
+  baseUrl: 'http://localhost:9999/api',
   options: {
     async beforeFetch({ options }) {
       //

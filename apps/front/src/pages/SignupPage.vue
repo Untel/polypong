@@ -103,7 +103,7 @@ const email           = ref<String>(''),
       name            = ref<String>(''),
       password        = ref<String>(''),
       repeatPassword  = ref<String>(''),
-      coalition       = ref<String>(''),
+      coalition       = ref<String>('alliance'),
       
       showPassword    = ref(false),
       router          = useRouter(),
