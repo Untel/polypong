@@ -1,0 +1,54 @@
+version: '3'
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    image: polypong/apps
+    container_name: apps
+    ports:
+      - "9000:80"
+    env_file:
+      - .env
+    working_dir: /polypong
+    entrypoint: node /polypong/main.js
+    tty: true
+    networks:
+      - database
+    stop_signal: SIGINT
+
+  # db:
+  #   container_name: postgres
+  #   image: postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: polypong
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #   expose:
+  #     - 5432
+  #   networks:
+  #     - database
+  #   stop_signal: SIGINT
+
+  # pgadmin:
+  #   container_name: pgadmin4
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - "5050:80"
+  #   stop_signal: SIGINT
+  #   networks:
+  #     - database
+  #   logging:
+  #     driver: none
+
+networks:
+  database:
+
+volumes:
+  database:

@@ -93,12 +93,26 @@ module.exports = configure((/* ctx */) => ({
         include: path.resolve(__dirname, './src/i18n/**'),
       }],
     ],
+    publicPath: '/',
+    forceDevPublicPath: true,
   },
 
   // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
   devServer: {
     // https: true
-    open: true, // opens browser window automatically
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:8080/api',
+    //     changeOrigin: true,
+    //     pathRewrite: {
+    //       '^/api': ''
+    //     }
+    //   }
+    // }
+    publicPath: '/',
+    historyApiFallback: true,
+    // public: 'https://dev.host.to/$project',
+    // port: 9999,
   },
 
   // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

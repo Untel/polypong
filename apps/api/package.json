@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:dev": "yarn && nest start --watch"
   },
+  "strict-peer-dependencies": false,
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/apollo": "^10.0.12",

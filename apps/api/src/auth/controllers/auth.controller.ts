@@ -57,7 +57,7 @@ export class AuthController {
   }
 
   /**
-  * Log user in 
+  * Log user in
   * @param {Request} req : The request object.
   * @returns User
   */
@@ -90,7 +90,7 @@ export class AuthController {
     }
 
     this.logger.log(`@Post(login), returning user`);
-     return res.send(user);
+    return res.send(user);
   }
 
 //	@UseGuards(LoggedInGuard)
@@ -114,7 +114,7 @@ export class AuthController {
   @Get('refresh')
   refresh(@Req() request: RequestWithUser) {
     const accessTokenCookie = this.authService.getCookieWithJwtToken(request.user.id);
-   
+
     request.res.setHeader('Set-Cookie', accessTokenCookie);
     return request.user;
   }
@@ -124,8 +124,8 @@ export class AuthController {
   * @param {Request} req : The request object.
   * @returns
   */
-    @UseGuards(JwtTwoFactorGuard)
-//	@UseGuards(LoggedInGuard)
+    // @UseGuards(JwtTwoFactorGuard)
+	@UseGuards(LoggedInGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
     delete req.user.password;
@@ -169,7 +169,7 @@ export class AuthController {
     this.logger.log(`in email/verify/:token`);
     return this.authService.verifyEmail(params.token);
   }
- 
+
    /**
   * Update password of a user.
   * @param {Request} req : The request object.
@@ -188,7 +188,7 @@ export class AuthController {
       req.user, body.oldPassword, body.newPassword,
     );
   }
- 
+
    /**
   * Send email to user with a reset password link.
   * @param {ForgotPasswordDto} body
