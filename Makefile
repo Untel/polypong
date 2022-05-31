@@ -26,7 +26,8 @@ install:
 
 enter:
 	$(COMPOSE) exec $(C) /bin/bash
-run:
-	$(COMPOSE) run $(C)
+rerun:
+	$(COMPOSE) down $(C)
+	$(COMPOSE) run $(C) -d
 
 .PHONY: all build clear install $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

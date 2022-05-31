@@ -36,6 +36,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     connectToSocket() {
       this.socket = io('localhost:9999', {
+        path: '/socket',
         transports: ['websocket'],
         withCredentials: true,
       });
