@@ -103,8 +103,8 @@ const email           = ref<String>(''),
       name            = ref<String>(''),
       password        = ref<String>(''),
       repeatPassword  = ref<String>(''),
-      coalition       = ref<String>('alliance'),
-      
+      coalition       = ref<String>(''),
+
       showPassword    = ref(false),
       router          = useRouter(),
       auth            = useAuthStore();

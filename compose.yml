@@ -107,38 +107,9 @@ services:
     stop_signal: SIGINT
     volumes: [ 'database:/var/lib/postgresql/data' ]
 
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    depends_on:
-      db:
-        condition: service_healthy
-    expose:
-      - 80
-    stop_signal: SIGINT
-    networks:
-      - database
-      - proxy
-    logging:
-      driver: none
-    volumes: [ 'pgadmin:/var/lib/pgadmin' ]
-
 networks:
   database:
   proxy:
 
 volumes:
   database:
-  pgadmin:
-    # driver_opts:
-    #   type: none
-    #   o: bind
-    #   device: "${PWD}/volumes/database"
-    # driver_opts:
-    #   type: none
-    #   o: bind
-    #   device: "${PWD}/volumes/pgadmin"

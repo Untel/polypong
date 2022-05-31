@@ -1,11 +1,8 @@
-COMPOSE		=docker-compose
+CMP		        = docker-compose -f compose.yml
+COMPOSE       = ${CMP} -f compose.tools.yml
 
-C			=
-
-FRONT		= front
-API			= api
-DB			= db
-NGINX		= nginx
+# c = Container name; change it when calling enter/rerun
+c			        =
 
 all:
 	$(COMPOSE) up
@@ -26,6 +23,7 @@ install:
 
 enter:
 	$(COMPOSE) exec $(C) /bin/bash
+
 rerun:
 	$(COMPOSE) down $(C)
 	$(COMPOSE) run $(C) -d

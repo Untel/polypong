@@ -9,15 +9,6 @@ server {
   # ssl_certificate_key /etc/nginx/certs/key.pem;
   # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
 
-  # doc : https://www.pgadmin.org/docs/pgadmin4/development/container_deployment.html
-  location /pgadmin/ {
-    proxy_set_header X-Script-Name /pgadmin;
-    proxy_set_header X-Scheme $scheme;
-    proxy_set_header Host $host;
-    proxy_pass http://pgadmin/;
-    proxy_redirect off;
-  }
-
   ## socket.io
   #location	/api/socket.io/ {
   #    proxy_set_header Upgrade $http_upgrade;
