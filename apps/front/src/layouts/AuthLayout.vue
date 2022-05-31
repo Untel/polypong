@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
 import FssFallback from 'src/components/FssFallback.vue';
 import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
 import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';

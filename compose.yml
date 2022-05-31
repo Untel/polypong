@@ -1,5 +1,7 @@
 version: '3'
 services:
+
+  ### NGINX REVERSE PROXY
   nginx:
     image: nginx
     container_name: nginx
@@ -38,8 +40,8 @@ services:
     build: .
     image: polypong/apps
     depends_on:
-      install:
-        condition: service_completed_successfully
+      - install
+        # condition: service_completed_successfully
     container_name: front
     stop_signal: SIGINT
     expose:
@@ -50,6 +52,8 @@ services:
       - install
     networks:
       - proxy
+    env_file:
+      - .env
     tty: true
     working_dir: /polypong/apps/front
     entrypoint: pnpm start
@@ -62,10 +66,10 @@ services:
     networks:
       - proxy
     depends_on:
-      install:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
+      - install
+        # condition: service_completed_successfully
+      - db
+        # condition: service_healthy
     volumes_from:
       - install
     expose:

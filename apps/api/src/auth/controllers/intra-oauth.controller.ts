@@ -24,7 +24,7 @@ export class IntraOAuthController {
   ) {
 	  this.logger.log(`@Get() auth/intra/callback`);
     this.logger.log(
-      `process.env.FRONTEND_URL/dashboard = ${process.env.FRONTEND_URL}/dashboard`
+      `process.env.FRONTEND_URL/dashboard = ${process.env.FRONTEND_URL}/`
     );
 
     const { user } = req;
@@ -33,6 +33,6 @@ export class IntraOAuthController {
 		res.setHeader('Set-Cookie', accessCookie);
 		user.password = undefined;
 
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    res.redirect(`${process.env.FRONTEND_URL}/`);
   }
 }

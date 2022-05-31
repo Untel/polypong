@@ -3,7 +3,14 @@
     <svg v-if="showBanner" viewBox="0 0 68 104" :style="`fill: ${colors[coalition]}`">
         <polygon points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
     </svg>
-    <LogoCoalition :class="`logo-${coalition}`" class="logo" :coalition="coalition" :color="showBanner ? 'white' : colors[coalition]"/>
+    <LogoCoalition
+      :class="{
+        'logo': true,
+        'selected': showBanner,
+        [`logo-${coalition}`]: true
+      }"
+      :coalition="coalition"
+      :color="showBanner ? 'white' : colors[coalition]"/>
   </div>
 </template>
 
@@ -56,9 +63,9 @@ const colors = {
     display: flex;
     width: 75%;
     align-self: center;
-    transition: transform .7s ease-in-out;
+    transition: transform .5s ease-in-out;
     transform-origin: center;
-    &:hover {
+    &:hover, .selected {
       transform: rotate(360deg);
     }
   }

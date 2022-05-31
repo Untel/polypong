@@ -87,6 +87,8 @@ const configService = new ConfigService(process.env).ensureValues([
     'POSTGRES_PASSWORD',
     'POSTGRES_DB',
 
+    'FRONTEND_URL',
+
     'TWO_FACTOR_AUTHENTICATION_APP_NAME',
   ]
 );

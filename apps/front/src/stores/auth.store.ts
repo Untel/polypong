@@ -15,49 +15,33 @@ import { useQuasar, Notify } from 'quasar';
 
 import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
-import { mande, defaults } from 'mande';
-import { RemovableRef, useStorage } from '@vueuse/core';
-import axios from 'axios';
+import { mande, defaults, MandeError } from 'mande';
+import { useApi } from 'src/utils/api';
 
-process.env.API_URL = 'http://localhost:9999';
-export const authApi = mande(`${process.env.API_URL}/api/auth`);
+export const authApi = mande(`/api/auth`);
 
 type AuthState = {
   socket?: Socket | null,
-  token: RemovableRef<null>,
   user: unknown,
 }
-defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     socket: null,
-    token: useStorage('token', null),
   } as AuthState),
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
   },
   actions: {
     connectToSocket() {
-      // this.socket = 'localhost:3000', {
-      //   transports: ['websocket'],
-      //   withCredentials: true,
-      // });
-      // this.io(socket.emit('msgToServer', 'yolo');
+      this.socket = io('localhost:9999', {
+        transports: ['websocket'],
+        withCredentials: true,
+      });
     },
-    async login(email: string, password: string) {
-      try {
-        const res = await authApi.post<any>('login', { email, password });
-        return (token);
-      } catch (error) {
-        console.log('Error is', error);
-        Notify.create({
-          type: 'negative',
-          message: 'Cannot connect',
-        });
-        return false;
-      }
+    login(email: string, password: string): MandeError | any {
+      return authApi.post('login', { email, password });
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
       try {
@@ -74,10 +58,10 @@ export const useAuthStore = defineStore('auth', {
           message: error.value.message.reduce((a: string, n: string) => `${a}\n${n}`, ''),
         });
       }
+      return Promise.resolve();
     },
-    async whoAmI() {
-      const resp = await authApi.get('user');
-      console.log('Resp', resp);
+    async whoAmI(callback) {
+      this.user = await authApi.get('user', callback);
     },
   },
 });

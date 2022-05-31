@@ -50,19 +50,33 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { Notify } from 'quasar';
 
 const auth = useAuthStore();
 
-const login = ref('');
-const password = ref('');
-const showPassword = ref(false);
-const router = useRouter();
+const login         = ref('');
+const isLogging    = ref(false);
+const password      = ref('');
+const showPassword  = ref(false);
+const router        = useRouter();
+const route         = useRoute();
+
 const connectWithLocal = async (form: Event) => {
-  await auth.login(login.value, password.value);
-  await auth.whoAmI();
+  try {
+    await auth.login(login.value, password.value);
+    const redirect = route.query.redirect
+      ? JSON.parse(route.query.redirect)
+      : { name: 'home' }
+    router.push(redirect);
+  } catch ({ response }) {
+    Notify.create({
+      type: 'negative',
+      message: response.message || response.error,
+    });
+  }
 };
 
 const connectWith42 = (form: Event) => {

@@ -96,7 +96,7 @@ import { ref, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 import { ValidationRule } from 'quasar';
 
 const email           = ref<String>(''),

@@ -1,19 +1,23 @@
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
 export default async (
-  from: RouteLocationNormalized,
   to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-  console.log(from, to, next);
-  const auth = useAuthStore();
+  console.log("Ah ?", from, to);
   try {
+    const auth = useAuthStore();
     await auth.whoAmI();
     await auth.connectToSocket();
     next();
   } catch (error) {
-    console.log('Auth guard fail');
-    next({ name: 'login' });
+    console.log('Auth guard fail', error, to.name);
+    const redirect = JSON.stringify({
+      name: to.name,
+      query: to.query,
+    });
+    next({ name: 'login', query: { redirect } });
   }
 };

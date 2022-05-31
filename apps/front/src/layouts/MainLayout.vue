@@ -40,7 +40,7 @@
 import { ref } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
 import Logo from 'src/components/Logo.vue';
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 
 const linksList = [{
   title: 'Home',

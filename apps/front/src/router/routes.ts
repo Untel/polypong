@@ -5,6 +5,7 @@ import AuthGuard from './auth.guard';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'base',
     component: () => import('layouts/MinimalLayout.vue'),
     children: [{
       path: 'auth',
@@ -17,6 +18,7 @@ const routes: RouteRecordRaw[] = [
     }, {
       path: '',
       beforeEnter: AuthGuard,
+      name: 'logged',
       component: () => import('layouts/MainLayout.vue'),
       children: [
         { name: 'home', path: '', component: () => import('pages/IndexPage.vue') },
@@ -34,9 +36,11 @@ const routes: RouteRecordRaw[] = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
+    name: '404',
     component: () => import('pages/ErrorNotFound.vue'),
   }, {
     path: '/external',
+    name: 'external',
     component: () => import('pages/LoginPage.vue'),
     beforeEnter(to, from, next) {
       const url: string = to.query.url as string;
