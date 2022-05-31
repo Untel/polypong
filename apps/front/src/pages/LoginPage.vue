@@ -43,7 +43,7 @@
   </q-input>
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
   <q-separator size="2px" class="full-width" />
-  <q-btn @click="connectWith42" size="large" color="secondary" class="full-width">
+  <q-btn href="/api/auth/intra" size="large" color="secondary" class="full-width">
     Connect with &nbsp;<q-icon name="img:src/assets/42_logo.svg"/>
   </q-btn>
 </q-form>
@@ -59,7 +59,7 @@ import { mande, defaults, MandeError } from 'mande';
 const auth = useAuthStore();
 
 const login         = ref('');
-const isLogging    = ref(false);
+const isLogging     = ref(false);
 const password      = ref('');
 const showPassword  = ref(false);
 const router        = useRouter();
@@ -78,8 +78,5 @@ const connectWithLocal = async (form: Event) => {
       message: error.message || error.error,
     });
   }
-};
-
-const connectWith42 = (form: Event) => {
 };
 </script>

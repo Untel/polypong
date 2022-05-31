@@ -1,12 +1,13 @@
 import { RouteRecordRaw } from 'vue-router';
 // import PongPage from 'pages/PongPage.vue';
 import AuthGuard from './auth.guard';
+import MinimalLayout from 'src/layouts/MinimalLayout.vue';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'base',
-    component: () => import('layouts/MinimalLayout.vue'),
+    component: MinimalLayout,
     children: [{
       path: 'auth',
       name: 'auth',
@@ -30,15 +31,16 @@ const routes: RouteRecordRaw[] = [
           name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'),
         },
       ],
-    }],
+    }, {
+      path: '/:catchAll(.*)*',
+      name: '404',
+      component: () => import('pages/ErrorNotFound.vue'),
+    },
+  ],
   },
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    name: '404',
-    component: () => import('pages/ErrorNotFound.vue'),
-  }, {
     path: '/external',
     name: 'external',
     component: () => import('pages/LoginPage.vue'),

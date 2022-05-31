@@ -56,7 +56,7 @@ const backgroundParams = ref(defaultBackgroundParams);
 
 const changeBackground = (coalition: CoalitionChoice) => {
   if (!coalition)
-    backgroundParams.value = defaultBackgroundParams;
+    backgroundParams.value = null;
   else {
     backgroundParams.value = {
       fssSettings: coalitions[coalition].shaderConfig,
