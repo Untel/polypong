@@ -37,33 +37,32 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
 import Logo from 'src/components/Logo.vue';
+import { useAuthStore } from 'src/stores/auth.store';
 
-const linksList = [
-  {
-    title: 'Home',
-    caption: 'Home page',
-    icon: 'fas fa-igloo',
-    to: 'fas fa-igloo',
-  },  {
-    title: 'Login',
-    caption: 'Login page',
-    icon: 'fab fa-connectdevelop',
-    to: 'login',
-  },  {
-    title: 'Coalitions',
-    caption: 'Coalitions page',
-    icon: 'fas fa-group-arrows-rotate',
-    to: 'coalitions',
-  },  {
-    title: 'Lobbies',
-    caption: 'Find a lobby of ppl to play with',
-    icon: 'fab fa-forumbee',
-    to: 'lobbies',
-  },
-];
+const linksList = [{
+  title: 'Home',
+  caption: 'Home page',
+  icon: 'fas fa-igloo',
+  to: 'home',
+}, {
+  title: 'Login',
+  caption: 'Login page',
+  icon: 'fab fa-connectdevelop',
+  to: 'login',
+}, {
+  title: 'Coalitions',
+  caption: 'Coalitions page',
+  icon: 'fas fa-group-arrows-rotate',
+  to: 'coalitions',
+}, {
+  title: 'Lobbies',
+  caption: 'Find a lobby of ppl to play with',
+  icon: 'fab fa-forumbee',
+  to: 'lobbies',
+}];
 
 const miniState = ref(true);
 </script>

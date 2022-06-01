@@ -1,10 +1,14 @@
-COMPOSE		=docker-compose
+CMP		        = docker-compose -f compose.yml
+COMPOSE       = ${CMP} -f compose.tools.yml
 
-FRONT		=front
-API			=api
+# c = Container name; change it when calling enter/rerun
+c			        =
 
 all:
 	$(COMPOSE) up
+
+detach:
+	$(COMPOSE) up -d
 
 build:
 	$(COMPOSE) up --build
@@ -15,13 +19,13 @@ clear:
 	docker rmi $(shell docker image ls -qa)
 
 install:
-	$(COMPOSE) run --rm $(FRONT) yarn
-	$(COMPOSE) run --rm $(API) yarn
+	$(COMPOSE) run --rm install
 
-$(FRONT):
-	$(COMPOSE) exec $(FRONT) /bin/bash
+enter:
+	$(COMPOSE) exec $(C) /bin/bash
 
-$(API):
-	$(COMPOSE) exec $(API) /bin/bash
+rerun:
+	$(COMPOSE) down $(C)
+	$(COMPOSE) run $(C) -d
 
-.PHONY: all build clear install $(FRONT) $(API) $(COMMON)
+.PHONY: all build clear install $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

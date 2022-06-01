@@ -264,12 +264,10 @@ export default {
     },
 
     updated() {
-      console.log('/// Props change', this.mesh.ambient);
-      this.tick();
+      this.animate();
     },
 
     tick() {
-      console.log('Props updated', this.mesh.ambient);
       this.MESH = Object.assign(this.MESH, this.mesh);
       this.LIGHT = Object.assign(this.LIGHT, this.light);
       const now = Date.now() - this.start;
@@ -388,7 +386,7 @@ export default {
     onWindowResize() {
       const container = this.$refs.shader;
       this.resize(container.offsetWidth, container.offsetHeight);
-      this.shaderRender();
+      this.animate();
     },
 
     onMouseMove(event) {

@@ -1,13 +1,37 @@
-
-
 version: '3'
 services:
+
+  ### NGINX REVERSE PROXY
+  nginx:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - "./compose/nginx/templates:/etc/nginx/templates"
+      - "./compose/nginx/snippets:/etc/nginx/snippets"
+    tty: true
+    ports:
+      - "9999:80"
+      - "8443:443"
+    environment:
+      - NGINX_PORT=80
+      - NGINX_SSL_PORT=443
+    networks:
+      - proxy
+    depends_on:
+      - front
+      - api
+      - pgadmin
+
   install:
     build: .
-    image: polypong/stack
+    image: polypong/apps
     container_name: install
     volumes:
       - "./:/polypong"
+      - "/polypong/apps/api/node_modules"
+      - "/polypong/apps/front/node_modules"
+      - "/polypong/node_modules"
+      - "/polypong/.pnpm-store"
     tty: true
     working_dir: /polypong
     entrypoint: pnpm install --recursive
@@ -15,36 +39,51 @@ services:
   front:
     build: .
     image: polypong/apps
+    depends_on:
+      - install
+        # condition: service_completed_successfully
     container_name: front
     stop_signal: SIGINT
+    expose:
+      - 9000
     ports:
       - "9000:9000"
-    volumes:
-      - "./:/polypong"
+    volumes_from:
+      - install
+    networks:
+      - proxy
+    env_file:
+      - .env
     tty: true
     working_dir: /polypong/apps/front
     entrypoint: pnpm start
-    depends_on:
-      install:
-        condition: service_completed_successfully
     stop_signal: SIGINT
 
   api:
     build: .
     image: polypong/apps
     container_name: api
-    volumes:
-      - "./:/polypong"
+    networks:
+      - proxy
+    depends_on:
+      - install
+        # condition: service_completed_successfully
+      - db
+        # condition: service_healthy
+    volumes_from:
+      - install
+    expose:
+      - 3000
     ports:
-      - "3000:3000"
+      - 3000:3000
     env_file:
       - .env
     working_dir: /polypong/apps/api
     entrypoint: pnpm start
-    depends_on:
-      install:
-        condition: service_completed_successfully
     tty: true
+    networks:
+      - database
+      - proxy
     stop_signal: SIGINT
 
   db:
@@ -58,21 +97,19 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
     expose:
       - 5432
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     stop_signal: SIGINT
-
-  pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5050:80"
-    stop_signal: SIGINT
+    volumes: [ 'database:/var/lib/postgresql/data' ]
 
 networks:
   database:
+  proxy:
 
 volumes:
   database:

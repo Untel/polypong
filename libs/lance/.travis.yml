@@ -1,9 +1,0 @@
-language: node_js
-node_js:
-  - "6"
-env:
-  global:
-  - ENCRYPTION_LABEL: "d436d79ac9c9"
-  - COMMIT_AUTHOR_EMAIL: "opherv@gmail.com"
-after_script:
-  - bash ./deploydocs.sh

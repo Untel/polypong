@@ -6,10 +6,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { PongService } from './pong.service';
 import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+
+import { LoggedInGuard } from 'src/guards/logged-in.guard';
+
 
 @WebSocketGateway({
   cors: true,
@@ -22,6 +25,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
 
+	// @UseGuards(LoggedInGuard)
   @SubscribeMessage('createLobby')
   handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
     this.logger.log(`Create lobby from client ${socket.id}`);

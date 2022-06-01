@@ -42,7 +42,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
 import FssFallback from 'src/components/FssFallback.vue';
 import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
 import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';
@@ -56,18 +55,11 @@ const defaultBackgroundParams = {
 const backgroundParams = ref(defaultBackgroundParams);
 
 const changeBackground = (coalition: CoalitionChoice) => {
-  console.log('BACKGROUND IS CHANCHING', coalition);
   if (!coalition)
-    backgroundParams.value = defaultBackgroundParams;
+    backgroundParams.value = null;
   else {
     backgroundParams.value = {
-      fssSettings: {
-          ...coalitions[coalition].shaderConfig,
-          light: {
-            ...coalitions[coalition].shaderConfig.light,
-            // ...defaultLoginLight,
-          }
-      },
+      fssSettings: coalitions[coalition].shaderConfig,
       fallbackUrl: coalitions[coalition].fssFallback,
     };
   }

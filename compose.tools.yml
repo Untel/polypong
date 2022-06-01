@@ -1,0 +1,26 @@
+version: '3'
+services:
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    stop_signal: SIGINT
+    networks:
+      - database
+    logging:
+      driver: none
+    volumes: [ 'pgadmin:/var/lib/pgadmin' ]
+
+volumes:
+  pgadmin:

@@ -1,31 +1,41 @@
+<style lang="scss" scoped>
+  .error-page {
+    min-height: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .inner {
+  }
+</style>
+
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
-    <div>
-      <div style="font-size: 30vh">
-        404
-      </div>
+  <q-page>
+    <FssFallback class="error-page">
+      <div class="inner">
+        <div style="font-size: 30vh">
+          404
+        </div>
 
-      <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
-      </div>
+        <div class="text-h2" style="opacity:.4">
+          Oops. Nothing here...
+        </div>
 
-      <q-btn
-        class="q-mt-xl"
-        color="white"
-        text-color="blue"
-        unelevated
-        to="/"
-        label="Go Home"
-        no-caps
-      />
-    </div>
-  </div>
+        <q-btn
+          class="q-mt-xl"
+          color="white"
+          text-color="primary"
+          to="/"
+          label="Go Home"
+        />
+      </div>
+    </FssFallback>
+  </q-page>
+
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import FssFallback from 'src/components/FssFallback.vue';
 
-export default defineComponent({
-  name: 'ErrorNotFound',
-});
 </script>

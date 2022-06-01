@@ -1,6 +1,7 @@
 <template>
-  <q-field dense label="Choose your coalition" borderless class="wrapper full-width">
-    <!-- <div slot="label">Choose your faction</div> -->
+  <q-field
+    :model-value="modelValue"
+    borderless class="wrapper full-width">
     <LogoBannerCoalition
       v-for="coalition in CoalitionChoice"
       class="coalition_choice"
@@ -32,7 +33,7 @@ const updateValue = (coalition: CoalitionChoice) => {
 
 <style lang="scss" scoped>
   .wrapper {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     margin-top: 20px;
     // display: flex;
 

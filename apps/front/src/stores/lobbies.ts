@@ -1,7 +1,7 @@
 import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
-import { useAuthStore } from './auth';
+import { useAuthStore } from './auth.store';
 import { LoadingBar } from 'quasar';
 
 type Lobby = {

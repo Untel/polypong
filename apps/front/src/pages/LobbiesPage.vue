@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { useApi } from 'src/utils/api';
 import { useLobbiesStore } from 'src/stores/lobbies';
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 import { ref } from 'vue';
 const lobbies = useLobbiesStore();
 const { socket } = useAuthStore();

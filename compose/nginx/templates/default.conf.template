@@ -1,0 +1,88 @@
+# Need to be named default.conf.template, to override the default.conf
+
+server {
+  # listen 443 ssl;
+  # listen [::]:443 ssl;
+  listen 80;
+  listen [::]:80;
+  # ssl_certificate /etc/nginx/certs/cert.pem;
+  # ssl_certificate_key /etc/nginx/certs/key.pem;
+  # ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+  ## socket.io
+  #location	/api/socket.io/ {
+  #    proxy_set_header Upgrade $http_upgrade;
+  #    proxy_set_header Connection 'upgrade';
+  #    proxy_set_header Host $host;
+  #    # dont redirect to cached responses
+  #    proxy_cache_bypass $http_upgrade;
+  #    proxy_pass http://api:3000/socket.io/;
+  #}
+
+
+  # swagger
+  location /api/ {
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header Host $host;
+    proxy_pass http://api:3000/api/;
+  }
+
+  # mailhog
+  # location /mailhog/ {
+  #   chunked_transfer_encoding on;
+  #   proxy_set_header X-NginX-Proxy true;
+  #   proxy_set_header Upgrade $http_upgrade;
+  #   proxy_set_header Connection "upgrade";
+  #   proxy_http_version 1.1;
+  #   proxy_redirect off;
+  #   proxy_buffering off;
+  #   proxy_set_header host $host;
+  #   proxy_pass http://mailhog:1025/;
+  # }
+  # location /mailhog_webui/ {
+  #   chunked_transfer_encoding on;
+  #   proxy_set_header X-NginX-Proxy true;
+  #   proxy_set_header Upgrade $http_upgrade;
+  #   proxy_set_header Connection "upgrade";
+  #   proxy_http_version 1.1;
+  #   proxy_redirect off;
+  #   proxy_buffering off;
+  #   proxy_set_header Host $host;
+  #   proxy_pass http://mailhog:8025/;
+  # }
+
+  # front
+  include /etc/nginx/snippets/quasar.conf;
+  location /sockjs-node {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_pass http://front:9000;
+  }
+
+  location /socket/ {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy false;
+
+    proxy_pass http://api:3000/socket.io/;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+
+  # serve quasar dev server at https://dev.host.to/$project/
+  location / {
+    access_log        off;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $host;
+    proxy_pass http://front:9000/;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}

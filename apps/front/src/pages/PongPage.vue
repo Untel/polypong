@@ -14,8 +14,9 @@
 
 <script lang="ts" setup>
 import { useLobbiesStore } from 'src/stores/lobbies';
-import { useAuthStore } from 'src/stores/auth';
+import { useAuthStore } from 'src/stores/auth.store';
 import { ref } from 'vue';
+
 const lobbies = useLobbiesStore();
 lobbies.fetchLobbies();
 const lobbyName = ref('');

@@ -8,7 +8,14 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 // import Message from 'src/chat/entities/message.entity';
-  
+
+export enum CoalitionChoice {
+	ALLIANCE = 'alliance',
+	ORDER = 'order',
+	FEDERATION = 'federation',
+	ASSEMBLY = 'assembly',
+}
+
 @Entity()
 export class User {
 	@PrimaryGeneratedColumn()
@@ -30,8 +37,15 @@ export class User {
 	@Column({ type: 'text', nullable: true })
 	status: string;
 
-	@Column()
+	@Column({ unique: true })
 	email: string;
+
+  @Column({
+    type: 'enum',
+    enum: CoalitionChoice,
+    default: null
+  })
+	alliance: CoalitionChoice;
  
 	@Column()
 	password?: string;
