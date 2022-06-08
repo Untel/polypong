@@ -22,10 +22,10 @@ install:
 	$(COMPOSE) run --rm install
 
 enter:
-	$(COMPOSE) exec $(C) /bin/bash
+	$(COMPOSE) exec $(c) /bin/bash
 
 rerun:
-	$(COMPOSE) down $(C)
-	$(COMPOSE) run $(C) -d
+	$(COMPOSE) down $(c)
+	$(COMPOSE) run $(c) -d
 
 .PHONY: all build clear install $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

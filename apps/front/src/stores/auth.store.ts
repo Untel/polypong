@@ -25,6 +25,8 @@ type AuthState = {
   user: unknown,
 }
 
+const socketBaseUrl = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -35,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     connectToSocket() {
-      this.socket = io('localhost:9999', {
+      this.socket = io(socketBaseUrl, {
         path: '/socket',
         transports: ['websocket'],
         withCredentials: true,
