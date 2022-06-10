@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import Game from 'src/game/game.class';
 import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
@@ -9,8 +10,14 @@ export class PongService {
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
+  tmpGame = null
 
-  constructor() {}
+  constructor() {
+    setTimeout(() => {
+      console.log('In constrcutor service', this.socketServer);
+      this.tmpGame = new Game(this.socketServer, new Lobby(0, new Player(0)));
+    }, 3000);
+  }
 
   generateId() {
     return ++this.id;
@@ -29,7 +36,7 @@ export class PongService {
   addConnectedPeople(player: Player) {
     if (this.connectedPlayer.has(player.socketId)) {
       console.log("Player is still connected");
-      return ;
+      return;
     }
     this.connectedPlayer.set(player.socketId, player);
   }
