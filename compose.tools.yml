@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
     ports:
       - "${PGADMIN_PORT:-5050}:80"
@@ -25,7 +25,7 @@ services:
   # Add mailhog webui available
   mailhog:
     ports:
-      - 8025:8025
+      - ${MAILHOG_PORT:-8025}:8025
 
 volumes:
   pgadmin:
