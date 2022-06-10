@@ -66,10 +66,10 @@ services:
     networks:
       - proxy
     depends_on:
-      - install
-        # condition: service_completed_successfully
-      - db
-        # condition: service_healthy
+      install:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     volumes_from:
       - install
     expose:
@@ -84,6 +84,7 @@ services:
     networks:
       - database
       - proxy
+      - mailer
     stop_signal: SIGINT
 
   db:
@@ -107,9 +108,25 @@ services:
     stop_signal: SIGINT
     volumes: [ 'database:/var/lib/postgresql/data' ]
 
+  mailhog:
+    depends_on:
+      - db
+      - pgadmin
+      - backend
+      - frontend
+    networks:
+      - mailer
+    image: mailhog/mailhog
+    container_name: mailhog
+    restart: always
+    stop_signal: SIGINT
+    expose:
+      - 1025
+
 networks:
   database:
   proxy:
+  mailer:
 
 volumes:
   database:

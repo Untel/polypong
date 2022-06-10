@@ -1,6 +1,8 @@
 <style lang="scss" scoped>
   .login-background {
-    min-height: inherit;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
     display: flex;
     justify-content: center;
     align-items: center;

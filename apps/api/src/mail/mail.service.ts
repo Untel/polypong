@@ -12,7 +12,7 @@ export class MailService {
 	async sendUserConfirmation(
 		user: User, app_name: string, url: string
 	) {
-    	this.logger.log("in sendUserConfirmation");
+    this.logger.log("in sendUserConfirmation");
 
 		await this.mailerService.sendMail({
 			to: user.email,
@@ -28,9 +28,9 @@ export class MailService {
 
 	async sendResetPasswordLink(email: string, url: string)
 	{
-    	this.logger.log("in sendResetPasswordLink");
-    	this.logger.log(`mailhog host : ${process.env.MAIL_HOST}`);
-    	this.logger.log(`mailhog port : ${process.env.MAIL_PORT}`);
+    this.logger.log("in sendResetPasswordLink");
+    this.logger.log(`mailhog host : ${process.env.MAIL_HOST}`);
+    this.logger.log(`mailhog port : ${process.env.MAIL_PORT}`);
 
 		await this.mailerService.sendMail({
 			to: email,

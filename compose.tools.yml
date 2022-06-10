@@ -22,5 +22,10 @@ services:
       driver: none
     volumes: [ 'pgadmin:/var/lib/pgadmin' ]
 
+  # Add mailhog webui available
+  mailhog:
+    ports:
+      - 8025:8025
+
 volumes:
   pgadmin:
