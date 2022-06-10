@@ -20,7 +20,7 @@ export enum CoalitionChoice {
 export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
-	
+
 	@Column({ nullable: true })
 	@Exclude()
 	public currentHashedRefreshToken?: string;
@@ -30,7 +30,7 @@ export class User {
 
 	@Column({ default: false })
 	public isTwoFactorAuthenticationEnabled: boolean;
- 
+
 	@Column({ type: 'text', unique: true })
 	name: string;
 
@@ -45,29 +45,29 @@ export class User {
     enum: CoalitionChoice,
     default: null
   })
-	alliance: CoalitionChoice;
- 
+	coalition: CoalitionChoice;
+
 	@Column()
 	password?: string;
- 
+
 	@Column({ default: true })
 	isActive: boolean;
- 
+
 	@Column({ default: false })
 	email_verified: boolean;
- 
+
 	@Column({ default: false })
 	require_email_verification: boolean;
- 
+
 	@Column({ nullable: true })
 	social_channel: string;
- 
+
 	@Column({ nullable: true })
 	avatar: string;
- 
+
 	@CreateDateColumn()
 	created_at: Date;
- 
+
 	@UpdateDateColumn()
 	updated_at: Date;
 

@@ -2,7 +2,7 @@ import { AuthService } from '../services/auth.service';
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
 import {
   Body, Controller, Get, HttpCode, Logger, Param, Patch, Post, Req,
-  Request,Res,UseGuards, UsePipes, ValidationPipe,
+  Request,Res,UseGuards, UsePipes, ValidationPipe, Query
 } from '@nestjs/common';
 import { LocalGuard } from 'src/guards/local.guard';
 import { UserService } from 'src/user/user.service';
@@ -13,8 +13,6 @@ import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { UpdatePasswordDto } from '../dtos/update-password.dto';
 import { VerifyEmailTokenDto } from '../dtos/verify-email-token.dto';
 import { PasswordService } from '../services/password-auth.service';
-import { response } from 'express';
-import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import JwtRefreshGuard from 'src/guards/jwt-refresh.guard';
 import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
@@ -68,29 +66,30 @@ export class AuthController {
   {
     this.logger.log(`@Post(login), req.session = ${JSON.stringify(req.session)}`);
     const user = req.user;
-    const accessCookie = this.authService.getCookieWithJwtToken(user.id);
-    const {
-      cookie: refreshTokenCookie,
-      token: refreshToken,
-    } = this.authService.getCookieWithJwtRefreshToken(user.id);
-
-    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
-
+    // const accessCookie = this.authService.getCookieWithJwtToken(user.id);
+    const token = this.authService.getToken({ ...user });
+    const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`
     res.setHeader(
-      'Set-Cookie', [accessCookie, refreshTokenCookie]
+      'Set-Cookie', [cookie]
     );
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {
       return res.send({
         isTwoFactorAuthenticationEnabled: true,
-        accessCookie: accessCookie,
-        refreshTokenCookie: refreshTokenCookie,
+        accessCookie: cookie,
       });
     }
 
     this.logger.log(`@Post(login), returning user`);
-    return res.send(user);
+    return res.send({ ...user, token });
+  }
+
+  @Get('verifyToken')
+  async verifyToken(@Req() req, @Query('token') token: string) {
+    console.log("Provided token before", token);
+    console.log("Provided token before", req.query);
+    return this.authService.verifyToken(token);
   }
 
 //	@UseGuards(LoggedInGuard)
@@ -129,7 +128,12 @@ export class AuthController {
   @Get('user')
   async getUser(@Request() req): Promise<any> {
     delete req.user.password;
-    return req.user;
+
+    // Ici on ajoute le jwt token au payload car on en aura besoin pour authentifier le websocket
+    return {
+      ...req.user,
+      token: this.authService.getToken({ ...req.user }),
+    };
   }
 
   // verify JWT and return user data, so the browser can check the validity
@@ -170,31 +174,31 @@ export class AuthController {
     return this.authService.verifyEmail(params.token);
   }
 
-   /**
+  /**
   * Update password of a user.
   * @param {Request} req : The request object.
   * @param {UpdatePasswordDto} body : Information about the new password.
   * @returns
   */
 //   @UseGuards(LoggedInGuard)
-   @UseGuards(JwtTwoFactorGuard)
-   @UsePipes(new ValidationPipe({ transform: true }))
-   @Patch('password/update')
-   async updatePassword(
-     @Request() req,
-     @Body() body: UpdatePasswordDto
-  ) {
-    return await this.passwordService.changePassword(
-      req.user, body.oldPassword, body.newPassword,
-    );
-  }
+  @UseGuards(JwtTwoFactorGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Patch('password/update')
+  async updatePassword(
+    @Request() req,
+    @Body() body: UpdatePasswordDto
+) {
+  return await this.passwordService.changePassword(
+    req.user, body.oldPassword, body.newPassword,
+  );
+}
 
-   /**
+  /**
   * Send email to user with a reset password link.
   * @param {ForgotPasswordDto} body
   */
-   @Post('password/forgotlink')
-   async sendForgotPasswordLink(@Body() body: ForgotPasswordDto) {
+  @Post('password/forgotlink')
+  async sendForgotPasswordLink(@Body() body: ForgotPasswordDto) {
     this.logger.log("auth/password/forgotlink");
     this.passwordService.sendForgotPasswordLink(body.email);
   }

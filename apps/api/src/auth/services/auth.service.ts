@@ -19,31 +19,11 @@ export class AuthService {
 	) {}
 
 	logger = new Logger('AuthService');
-//	/**
-//	* Register a new user.
-//	* @param {object} user : data (name, email, password) of the new user.
-//	* @returns {object} : The new user.
-//	*/
-//	async registerUser(user: RegisterUserDto) {
-//		this.logger.log("in AuthService - registerUser")
-//		// check if user already exists in the database
-//		const existingUser = await this.userService.find({ email: user.email });
-//		if (existingUser) {
-//			throw new ConflictException('Email already taken');
-//		}
-//		const hashedPassword = await bcrypt.hash(user.password, 8);
-//		// if not, add the user to the database
-//		const res = await this.userService.createUser({
-//			name: user.name, email: user.email, password: hashedPassword,
-//		});
-//		// remove the password from the response
-//		delete res.password;
-//	
-//		// and send the email verification link
-//		this.sendEmailVerificationMail(res);
-//	
-//		return { user: res };
-//	}
+
+  async verifyToken(token: string) {
+    return this.jwtService.verify(token);
+  }
+
 	async registerUser(creds: RegisterUserDto) {
 		this.logger.log("registerUser")
 
@@ -108,7 +88,7 @@ export class AuthService {
 	*   The user whom we want to confirm the email address of
 	*/
 	sendEmailVerificationMail(user: User): void {
-		// Create a session JWT that holds the users' email 
+		// Create a session JWT that holds the users' email
 		// as payload and expires in 14 days.
 		const token = jwt.sign({ ...user }, process.env.JWT_SECRET, {
 			expiresIn: 60 * 60 * 24 * 14,
@@ -116,7 +96,7 @@ export class AuthService {
 
 		// the email confirmation url the user can click on
 		const url = `${process.env.FRONTEND_URL}/verifyemail/token=${token}`;
-	
+
 		// Use the mailService to send the mail.
 		this.mailService.sendUserConfirmation(user, 'BlaBla', url);
 	}
@@ -134,7 +114,7 @@ export class AuthService {
 		} catch (error) {
 			throw new BadRequestException('Invalid token');
 		}
-	
+
 		// Update email verification status.
 		const updatedUser = await this.userService.updateUser(
 			userFromTokenPayload.id,
@@ -145,16 +125,21 @@ export class AuthService {
 		return updatedUser;
 	}
 
+  public getToken(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_EXPIRATION + 's',
+    });
+  }
+
 	// The is2fa property distinguishes bewteen tokens created with
 	// or without two-factor authentication
 	public getCookieWithJwtToken(userId: number, is2fa: boolean = false) {
-		const payload: TokenPayload = { userId, is2fa };
-		const token = this.jwtService.sign(payload, {
-			secret: process.env.JWT_SECRET,
-			expiresIn: process.env.JWT_EXPIRATION + 's',
-		});
-		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`;
-	  }
+    const payload: TokenPayload = { userId, is2fa };
+    const token = this.getToken(payload);
+    this.logger.log('Auth Token is ' + token);
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`;
+  }
 
 	public getCookieWithJwtRefreshToken(userId: number, is2fa: boolean = false) {
 		const payload: TokenPayload = { userId };
@@ -164,7 +149,7 @@ export class AuthService {
 		});
 		const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME}`;
 		return { cookie, token };
-	  }
+  }
 
 	// Since jwt are stateless, we can't just make a token invalid.
 	// So in order to log an user out, we just remove the token from

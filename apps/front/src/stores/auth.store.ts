@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   auth.ts                                            :+:      :+:    :+:   */
+/*   auth.store.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/05/28 23:26:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/10 21:25:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ type AuthState = {
   user: unknown,
 }
 
-const socketBaseUrl = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
+const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -37,10 +37,13 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     connectToSocket() {
-      this.socket = io(socketBaseUrl, {
+      this.socket = io(SOCKET_BASE_URL, {
         path: '/socket',
         transports: ['websocket'],
         withCredentials: true,
+        extraHeaders: {
+          Authorization: `Bearer ${this.user.token}`
+        }
       });
     },
     login(email: string, password: string): MandeError | any {

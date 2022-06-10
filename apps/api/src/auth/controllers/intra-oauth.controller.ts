@@ -23,16 +23,11 @@ export class IntraOAuthController {
     @Request() req: RequestWithUser, @Res() res
   ) {
 	  this.logger.log(`@Get() auth/intra/callback`);
-    this.logger.log(
-      `process.env.FRONTEND_URL/dashboard = ${process.env.FRONTEND_URL}/`
-    );
-
     const { user } = req;
-
+	  console.log("Gotten user is", user);
 		const accessCookie = this.authService.getCookieWithJwtToken(user.id);
 		res.setHeader('Set-Cookie', accessCookie);
 		user.password = undefined;
-
-    res.redirect(`${process.env.FRONTEND_URL}/`);
+    res.redirect(`/`);
   }
 }
