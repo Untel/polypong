@@ -1,11 +1,22 @@
-import { Module } from '@nestjs/common';
+
+import { Inject, Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import * as RedisStore from 'connect-redis';
+import * as session from 'express-session';
+// import { session as passportSession, initialize as passportInitialize } from 'passport';
+import * as passport from 'passport';
+
+import { REDIS, RedisModule } from 'src/redis';
+
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
+
+
 import { AuthController } from './controllers/auth.controller';
 import { UserModule } from 'src/user/user.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from 'src/mail/mail.module';
-import { JwtModule } from '@nestjs/jwt';
 import { ForgotPasswordToken } from './entities/forgot-password-token.entity';
-import { PassportModule } from '@nestjs/passport';
 import { AuthSerializer } from 'src/providers/serialization.provider';
 import { AuthService } from './services/auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -15,7 +26,6 @@ import { OAuthService } from './services/oauth.service';
 import { IntraStrategy } from './strategies/intra.strategy';
 import { IntraOAuthController } from './controllers/intra-oauth.controller';
 import { PasswordService } from './services/password-auth.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { TwoFactorAuthenticationController } from './controllers/two-factor-authentication.controller';
 import { TwoFactorAuthenticationService } from './services/twoFactorAuthentication.service';
 import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
@@ -27,6 +37,7 @@ import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
     JwtTwoFactorStrategy, AuthSerializer, PasswordService,
   ],
   imports: [
+    RedisModule,
     UserModule,
     PassportModule.register({
       session: true,
@@ -46,4 +57,25 @@ import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
     TwoFactorAuthenticationController,
   ],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  constructor(@Inject(REDIS) private readonly redis: any) {}
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        session({
+          store: new (RedisStore(session))({ client: this.redis, logErrors: true }),
+          secret: 'sup3rs3cr3t',
+          saveUninitialized: false,
+          resave: false,
+          cookie: {
+            sameSite: false,
+            httpOnly: true,
+            maxAge: 60000,
+          },
+        }),
+        passport.initialize(),
+        passport.session(),
+      )
+      .forRoutes('*');
+  }
+}
