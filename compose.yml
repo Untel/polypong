@@ -23,25 +23,26 @@ services:
       - pgadmin
 
   # Install step
-  install:
-    build: .
-    image: polypong/apps
-    container_name: install
-    volumes:
-      - "./:/polypong"
-      - "/polypong/apps/api/node_modules"
-      - "/polypong/apps/front/node_modules"
-      - "/polypong/node_modules"
-      - "/polypong/.pnpm-store"
-    tty: true
-    working_dir: /polypong
-    entrypoint: pnpm install --recursive
+  # install:
+  #   build: .
+  #   image: polypong/apps
+  #   container_name: install
+  #   volumes:
+  #     - "./:/polypong"
+  #     - "/polypong/apps/api/node_modules"
+  #     - "/polypong/apps/front/node_modules"
+  #     - "/polypong/node_modules"
+  #     - "/polypong/.pnpm-store"
+  #   tty: true
+  #   working_dir: /polypong
+  #   entrypoint: pnpm install --recursive
 
   front:
-    build: .
-    image: polypong/apps
-    depends_on:
-      - install
+    build:
+      context: apps/front
+    image: polypong/front
+    # depends_on:
+    #   - install
         # condition: service_completed_successfully
     container_name: front
     stop_signal: SIGINT
@@ -49,36 +50,42 @@ services:
       - 9000
     ports:
       - "9000:9000"
-    volumes_from:
-      - install
+    # volumes_from:
+    #   - install
+    volumes:
+      - ./apps/front:/app/
+      - "/app/node_modules"
+
     networks:
       - proxy
     env_file:
       - .env
+    working_dir: /app
+    entrypoint: yarn start
     tty: true
-    working_dir: /polypong/apps/front
-    entrypoint: pnpm start
     stop_signal: SIGINT
 
   api:
-    build: .
-    image: polypong/apps
+    build:
+      context: apps/api
+    image: polypong/api
     container_name: api
+    volumes:
+      - ./apps/api:/app/
+      - "/app/node_modules"
     networks:
       - proxy
-    depends_on:
-      install:
-        condition: service_completed_successfully
-      postgres:
-        condition: service_healthy
-    volumes_from:
-      - install
+    # depends_on:
+      # install:
+      #   condition: service_completed_successfully
+      # postgres:
+      #   condition: service_healthy
     expose:
       - 3000
     env_file:
       - .env
-    working_dir: /polypong/apps/api
-    entrypoint: pnpm start
+    working_dir: /app
+    entrypoint: yarn start
     tty: true
     networks:
       - database

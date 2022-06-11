@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/10 21:25:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/10 21:28:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,10 @@ export const useAuthStore = defineStore('auth', {
       this.socket = io(SOCKET_BASE_URL, {
         path: '/socket',
         transports: ['websocket'],
-        withCredentials: true,
+        // withCredentials: true,
         extraHeaders: {
-          Authorization: `Bearer ${this.user.token}`
+          'Authorization': `Bearer ${this.user.token}`,
+          'yolo': 'ahah'
         }
       });
     },

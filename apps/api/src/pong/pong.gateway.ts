@@ -12,6 +12,8 @@ import { PongService } from './pong.service';
 import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
+import { JwtLoggedGuard } from 'src/guards/jwt-logged.guard';
+
 
 
 @WebSocketGateway({
@@ -25,7 +27,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
 
-	// @UseGuards(LoggedInGuard)
+	@UseGuards(JwtLoggedGuard)
   @SubscribeMessage('createLobby')
   handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
     this.logger.log(`Create lobby from client ${socket.id}`);

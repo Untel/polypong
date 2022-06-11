@@ -1,5 +1,5 @@
 # develop stage
-FROM node:18 as api-develop-stage
+FROM node:18
+COPY package.json /app/package.json
 WORKDIR /app
-RUN yarn global add @nestjs/cli
 RUN yarn
