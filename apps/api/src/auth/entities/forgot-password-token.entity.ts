@@ -18,8 +18,8 @@ export class ForgotPasswordToken {
   token: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAtt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }

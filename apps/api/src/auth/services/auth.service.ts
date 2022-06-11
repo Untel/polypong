@@ -60,7 +60,7 @@ export class AuthService {
 		this.logger.log(`in validateUser, user.name = ${user.name}`);
 
 		// Accounts that are registered via oAuth should not be accessible via local signin.
-		if (user.social_channel) {
+		if (user.socialChannel) {
 			this.logger.log(`accounts registered with oauth are not accessible via local login`);
 			throw new UnauthorizedException('Email or password incorrect.');
 		}
@@ -114,9 +114,9 @@ export class AuthService {
 		// Update email verification status.
 		const updatedUser = await this.userService.updateUser(
 			userFromTokenPayload.id,
-			{ email_verified: true },
+			{ emailVerified: true },
 		);
-		this.logger.log(`returning updatedUser, name ${updatedUser.name}, email_verified ${updatedUser.email_verified}`);
+		this.logger.log(`returning updatedUser, name ${updatedUser.name}, emailVerified ${updatedUser.emailVerified}`);
 
 		return updatedUser;
 	}

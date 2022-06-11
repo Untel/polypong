@@ -54,22 +54,22 @@ export class User {
 	isActive: boolean;
 
 	@Column({ default: false })
-	email_verified: boolean;
+	emailVerified: boolean;
 
 	@Column({ default: false })
-	require_email_verification: boolean;
+	requireEmailVerification: boolean;
 
 	@Column({ nullable: true })
-	social_channel: string;
+	socialChannel: string;
 
 	@Column({ nullable: true })
 	avatar: string;
 
 	@CreateDateColumn()
-	created_at: Date;
+	createdAtt: Date;
 
 	@UpdateDateColumn()
-	updated_at: Date;
+	updatedAt: Date;
 
 	// @OneToMany(() => Message, message => message.author)
 	// public message: Message;

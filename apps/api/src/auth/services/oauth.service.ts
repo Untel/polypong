@@ -26,8 +26,8 @@ export class OAuthService {
     // otherwise create an user entity and return it
     const newUser = await this.userService.createUser({
       ...req.user,
-      social_channel: req.socialChannel,
-      email_verified: true,
+      socialChannel: req.socialChannel,
+      emailVerified: true,
     });
     return { user: newUser, };
   }

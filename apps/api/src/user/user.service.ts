@@ -83,7 +83,7 @@ export class UserService {
 	async createUser(user: UserInterface): Promise<User> {
 		const {
 			name, email, password, coalition,
-			avatar, social_channel, email_verified
+			avatar, socialChannel, emailVerified
 		} = user;
 
 		const newUser = await this.userRepository.create({
@@ -92,8 +92,8 @@ export class UserService {
       coalition,
 			password: password,
 			avatar: avatar || gravatar.url(email, { s: '100', r: 'x', d: 'retro' }, true),
-			social_channel: social_channel,
-			email_verified: email_verified || false,
+			socialChannel: socialChannel,
+			emailVerified: emailVerified || false,
 		});
 		const result = await this.userRepository.save(newUser);
 		return result;
