@@ -17,6 +17,7 @@ export default async (
     const redirect = JSON.stringify({
       name: to.name,
       query: to.query,
+      params: to.params,
     });
     next({ name: 'login', query: { redirect } });
   }

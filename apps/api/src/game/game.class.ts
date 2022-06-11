@@ -41,6 +41,9 @@ export default class Game {
     }
   }
 
+  updatePositionPaddles({ y }) {
+    this.paddle1.y = y;
+  }
 
   tick() {
     this.socket.emit('gameUpdate', { ball: this.ball, paddle1: this.paddle1, paddle2: this.paddle2 });

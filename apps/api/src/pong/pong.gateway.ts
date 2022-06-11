@@ -44,6 +44,11 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.pongService.updatePaddles(client, evt)
   }
 
+  @SubscribeMessage('paddleMouseUpdate')
+  paddleMouseUpdate(client: Socket, evt: any) {
+    this.pongService.updatePositionPaddles(client, evt)
+  }
+
   afterInit(server: Server) {
     this.pongService.socketServer = server;
     this.logger.log(`Gateway initialized`);

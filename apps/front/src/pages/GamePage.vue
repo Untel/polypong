@@ -45,11 +45,13 @@ const props = defineProps({
 });
 
 const onKeyDown = (evt: KeyboardEvent) => {
-  socket?.emit('paddleUpdate', evt.key)
+  socket?.emit('paddleUpdate', evt.key);
 }
 
-const onMouseMove = (evt: MouseEvent) => {
-  // console.log("mouse move", evt);
+const onMouseMove = (e: MouseEvent) => {
+  var rect = e.target.getBoundingClientRect();
+  var y = e.clientY - rect.top;  //y position within the element.
+  socket?.emit('paddleMouseUpdate', { y });
 }
 
 const update = (evt: any) => {

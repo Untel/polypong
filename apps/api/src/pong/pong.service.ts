@@ -66,4 +66,8 @@ export class PongService {
   updatePaddles(client: Socket, evt: any) {
     this.tmpGame.updatePaddle(evt);
   }
+
+  updatePositionPaddles(client: Socket, evt: any) {
+    this.tmpGame.updatePositionPaddles(evt);
+  }
 }
