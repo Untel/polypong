@@ -62,4 +62,8 @@ export class PongService {
     console.log('Joined', this.lobbies);
     this.socketServer.emit('refreshedLobbies');
   }
+
+  updatePaddles(client: Socket, evt: any) {
+    this.tmpGame.updatePaddle(evt);
+  }
 }

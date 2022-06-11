@@ -36,9 +36,14 @@ export default class Game {
 
     // this.paddle2.x = 0;
     // this.paddle2.y = 0;
+    // this.socket.on('PaddleUpdate', this.updatePaddle);
+
     setInterval(() => this.tick(), 1000 / 60);
   }
 
+  updatePaddle(evt) {
+    console.log(evt);
+  }
 
   tick() {
     // console.log('TIck', this.socket);

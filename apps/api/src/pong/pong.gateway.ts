@@ -9,6 +9,7 @@ import {
 import { Logger, UseGuards } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { PongService } from './pong.service';
+// import { Game } from '../game/game.class'
 import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
@@ -20,12 +21,12 @@ import { LoggedInGuard } from 'src/guards/logged-in.guard';
 })
 export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-  constructor(private readonly pongService: PongService) {}
+  constructor(private readonly pongService: PongService) { }
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
 
-	// @UseGuards(LoggedInGuard)
+  // @UseGuards(LoggedInGuard)
   @SubscribeMessage('createLobby')
   handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
     this.logger.log(`Create lobby from client ${socket.id}`);
@@ -37,6 +38,12 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   send(client: Socket, id: LobbyId): void {
     this.logger.log(`Client ${client.id} is joining lobby ${id}`);
     this.pongService.joinLobby(client, id);
+  }
+
+  @SubscribeMessage('paddleUpdate')
+  handleUpdate(client: Socket, evt: any) {
+    this.logger.log("WE GOT UPDATES", evt)
+    this.pongService.updatePaddles(client, evt)
   }
 
   afterInit(server: Server) {
