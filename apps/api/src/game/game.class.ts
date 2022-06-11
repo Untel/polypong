@@ -16,39 +16,33 @@ export default class Game {
     x: number,
     y: number
   };
-
+  speed: number = 10;
   constructor(socket: Server, lobby: Lobby) {
 
     this.lobby = lobby;
     this.socket = socket;
-    // console.log(' Game constr', this.socket);
-
-    // console.log("gamelogic");
-    // this.tick();
 
     this.ball = { x: 0, y: 0 };
     // this.ball.y = 0;
     this.paddle1 = { x: 0, y: 0 };
     this.paddle2 = { x: 0, y: 0 };
 
-    // this.paddle1.x = 0;
-    // this.paddle1.y = 0;
-
-    // this.paddle2.x = 0;
-    // this.paddle2.y = 0;
     // this.socket.on('PaddleUpdate', this.updatePaddle);
 
     setInterval(() => this.tick(), 1000 / 60);
   }
 
-  updatePaddle(evt) {
-    console.log(evt);
+  updatePaddle(evt: string) {
+    if (evt === 'ArrowUp' && this.paddle1.y > 0) {
+      this.paddle1.y -= this.speed;
+    }
+    else if (evt === 'ArrowDown' && this.paddle1.y < 400) {
+      this.paddle1.y += this.speed;
+    }
   }
 
+
   tick() {
-    // console.log('TIck', this.socket);
-    // there is game logic
-    // console.log("update")
     this.socket.emit('gameUpdate', { ball: this.ball, paddle1: this.paddle1, paddle2: this.paddle2 });
   }
 }

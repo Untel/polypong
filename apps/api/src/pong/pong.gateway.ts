@@ -9,7 +9,6 @@ import {
 import { Logger, UseGuards } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { PongService } from './pong.service';
-// import { Game } from '../game/game.class'
 import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
@@ -42,7 +41,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('paddleUpdate')
   handleUpdate(client: Socket, evt: any) {
-    this.logger.log("WE GOT UPDATES", evt)
     this.pongService.updatePaddles(client, evt)
   }
 
