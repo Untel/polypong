@@ -60,13 +60,16 @@ import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
 export class AuthModule implements NestModule {
   constructor(@Inject(REDIS) private readonly redis: any) {}
   configure(consumer: MiddlewareConsumer) {
+    // console.log("Redis store", this.redis);
+    const store = new (RedisStore(session))({ client: this.redis, logErrors: true });
+    console.log("Store?", store);
     consumer
       .apply(
         session({
-          store: new (RedisStore(session))({ client: this.redis, logErrors: true }),
+          store,
           secret: 'sup3rs3cr3t',
-          saveUninitialized: false,
-          resave: false,
+          saveUninitialized: true,
+          resave: true,
           cookie: {
             sameSite: false,
             httpOnly: true,

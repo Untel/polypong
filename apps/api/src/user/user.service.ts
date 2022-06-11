@@ -44,12 +44,12 @@ export class UserService {
 		refreshToken: string, userId: number
 	) {
 		const user = await this.findById(userId);
-	 
+
 		const isRefreshTokenMatching = await bcrypt.compare(
 		  refreshToken,
 		  user.currentHashedRefreshToken
 		);
-	 
+
 		if (isRefreshTokenMatching) { return user; }
 	}
 	// clear refresh tokens from the db
@@ -82,35 +82,32 @@ export class UserService {
 	 */
 	async createUser(user: UserInterface): Promise<User> {
 		const {
-			name, email, password,
+			name, email, password, coalition,
 			avatar, social_channel, email_verified
 		} = user;
-	
-		// Create default avatar.
-		const userAvatar = avatar
-		|| gravatar.url(email, { s: '100', r: 'x', d: 'retro' }, true);
-	
+
 		const newUser = await this.userRepository.create({
 			name,
 			email,
-			password: password || '',
-			avatar: userAvatar || '',
-			social_channel: social_channel || '',
+      coalition,
+			password: password,
+			avatar: avatar || gravatar.url(email, { s: '100', r: 'x', d: 'retro' }, true),
+			social_channel: social_channel,
 			email_verified: email_verified || false,
 		});
 		const result = await this.userRepository.save(newUser);
 		return result;
 	}
-	
+
 	async updateUser(id: string | number, properties: any) {
 		const user = await this.findById(id);
 		this.logger.log(`in updateUser, user.name = ${user.name}`);
 		this.logger.log(`in updateUser, properties = ${properties}`);
-	
+
 		if (!user) {
 			throw new BadRequestException('User not found');
 		}
-	
+
 		try {
 			const updatedUser = await this.userRepository.save({
 				...user,

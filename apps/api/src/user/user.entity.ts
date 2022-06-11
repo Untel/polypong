@@ -43,12 +43,12 @@ export class User {
   @Column({
     type: 'enum',
     enum: CoalitionChoice,
-    default: null
+    default: CoalitionChoice.ALLIANCE,
   })
 	coalition: CoalitionChoice;
 
-	@Column()
-	password?: string;
+	@Column({ nullable: true })
+	password: string;
 
 	@Column({ default: true })
 	isActive: boolean;

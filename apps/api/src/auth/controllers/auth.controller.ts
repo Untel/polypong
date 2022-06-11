@@ -36,21 +36,23 @@ export class AuthController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async registerUser(
     @Body() registerUserDto: RegisterUserDto,
-    @Request() req,
+    @Req() req,
+    @Res() res,
   ) {
     this.logger.log("@Post('register')");
+    console.log("registerUserDto", registerUserDto);
     const result = await this.authService.registerUser(registerUserDto);
     if (result.user) {
-      this.logger.log(`about to call req.login`);
-      console.log("req is", req);
-      req.login(result.user, function (err) {
-        if (err) {
-          throw new Error(
-            'Sorry, somethin went wrong. We could register but sign you in.',
-          );
-        }
-        return req.session;
+
+      // call req.logIn from passport (Done by LocalGuard in .login()) to generate the session
+      await new Promise((resolve, reject) => {
+        req.login(result.user, (err) => {
+          if (err) throw new Error('Sorry, somethin went wrong. We could register but sign you in.');
+          resolve(req.session);
+        });
       });
+      // then call the login controller to set the cookie
+      return this.login(req, res);
     }
   }
 

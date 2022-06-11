@@ -16,13 +16,18 @@ build:
 clear:
 	$(COMPOSE) down -v
 	docker system prune -f
-	docker rmi $(shell docker image ls -qa)
+  # docker rmi $(shell docker image ls -qa)
+	# docker network rm $(shell docker network ls -qa)
+	# docker volume rm $(shell docker volume ls -qa)
 
 install:
 	$(COMPOSE) run --rm install
 
 enter:
 	$(COMPOSE) exec $(c) /bin/bash
+
+log:
+	$(COMPOSE) logs $(c) -f
 
 rerun:
 	$(COMPOSE) down $(c)

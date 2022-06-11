@@ -26,24 +26,20 @@ export class AuthService {
 
 	async registerUser(creds: RegisterUserDto) {
 		this.logger.log("registerUser")
-
-		// check if user already exists in the database
-		const existingUser = await this.userService.find({ email: creds.email });
-		if (existingUser) {
-			throw new ConflictException('Email already taken');
-		}
+    console.log("Add user", creds);
+		if (await this.userService.find({ email: creds.email }))
+			throw new ConflictException(`Email ${creds.email} is already taken`);
+    if (await this.userService.find({ name: creds.name }))
+			throw new ConflictException(`Name ${creds.name} is already taken`);
 		const hashedPassword = await bcrypt.hash(creds.password, 8);
-
 		try {
 			const res = await this.userService.createUser({
-				name: creds.name, email: creds.email, password: hashedPassword,
+				...creds, password: hashedPassword,
 			});
-			// remove the password from the response
-			delete res.password;
-			// and send the email verification link
 			this.sendEmailVerificationMail(res);
 			return { user: res };
 		} catch (error) {
+      console.log()
 			throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

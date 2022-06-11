@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, } from 'class-validator';
+import { CoalitionChoice } from 'src/user/user.entity';
 
 export class RegisterUserDto {
   @IsEmail()
@@ -11,5 +12,5 @@ export class RegisterUserDto {
   password: string;
 
   @IsNotEmpty()
-  coalition: string;
+  coalition: CoalitionChoice;
 }

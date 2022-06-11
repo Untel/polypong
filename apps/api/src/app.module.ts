@@ -23,7 +23,6 @@ import { PongModule } from './pong/pong.module';
     //   autoSchemaFile: 'graphql/schema.gql',
     // }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    PassportModule,
     UserModule,
     MailModule,
     AuthModule,

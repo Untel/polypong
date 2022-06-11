@@ -12,7 +12,7 @@
   ref="form"
   center
   class="q-gutter-md login-form"
-  @submit="onSubmitForm"
+  @submit="onSignUp"
   autocorrect="off"
   autocapitalize="off"
   autocomplete="off"
@@ -92,30 +92,45 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch, onBeforeUnmount, defineEmits } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { ValidationRule } from 'quasar';
+import { Notify } from 'quasar';
+import { mande, defaults, MandeError } from 'mande';
 
-const email           = ref<String>(''),
-      name            = ref<String>(''),
-      password        = ref<String>(''),
-      repeatPassword  = ref<String>(''),
-      coalition       = ref<String>(''),
+
+const email           = ref<String>(),
+      name            = ref<String>(),
+      password        = ref<String>(),
+      repeatPassword  = ref<String>(),
+      coalition       = ref<String>(),
 
       showPassword    = ref(false),
       router          = useRouter(),
+      route           = useRoute(),
       auth            = useAuthStore();
 
-const onSubmitForm = async (form: Event) => {
-  const res = await auth.register(
-    name.value,
-    email.value,
-    password.value,
-    coalition.value,
-  );
+const onSignUp = async (form: Event) => {
+  try {
+    await auth.register(
+      name.value,
+      email.value,
+      password.value,
+      coalition.value,
+    );
+    const redirect = route.query.redirect
+      ? JSON.parse(route.query.redirect)
+      : { name: 'home' }
+    router.push(redirect);
+  } catch({ response, body }) {
+    Notify.create({
+      type: 'negative',
+      message: body.message,
+    });
+  }
 };
 
 const isValidEmail = (val: string): any => {

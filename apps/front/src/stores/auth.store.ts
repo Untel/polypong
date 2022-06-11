@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/10 21:28:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/12 00:55:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,21 +51,12 @@ export const useAuthStore = defineStore('auth', {
       return authApi.post('login', { email, password });
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
-      try {
-        await authApi.post('register', {
-          name,
-          email,
-          password,
-          coalition,
-        });
-      } catch (error: any) {
-        console.error('Register error', error);
-        Notify.create({
-          type: 'negative',
-          message: error.value.message.reduce((a: string, n: string) => `${a}\n${n}`, ''),
-        });
-      }
-      return Promise.resolve();
+      return await authApi.post('register', {
+        name,
+        email,
+        password,
+        coalition,
+      });
     },
     async whoAmI(callback) {
       this.user = await authApi.get('user', callback);
