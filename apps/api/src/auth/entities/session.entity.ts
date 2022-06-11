@@ -1,5 +1,5 @@
 import { ISession } from 'connect-typeorm';
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn, getRepository } from 'typeorm';
 
 @Entity({ name: 'sessions' })
 export class TypeORMSession implements ISession {
@@ -12,4 +12,8 @@ export class TypeORMSession implements ISession {
 
   @Column('text')
   json: string;
+}
+
+export function getSessionRepository() {
+  return getRepository(TypeORMSession);
 }

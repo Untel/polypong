@@ -8,7 +8,6 @@ services:
     volumes:
       - "./compose/nginx/templates:/etc/nginx/templates"
       - "./compose/nginx/snippets:/etc/nginx/snippets"
-    tty: true
     ports:
       - "${PORT:-9999}:80"
       - "${SSL_PORT:-9998}:443"
@@ -22,47 +21,24 @@ services:
       - api
       - pgadmin
 
-  # Install step
-  # install:
-  #   build: .
-  #   image: polypong/apps
-  #   container_name: install
-  #   volumes:
-  #     - "./:/polypong"
-  #     - "/polypong/apps/api/node_modules"
-  #     - "/polypong/apps/front/node_modules"
-  #     - "/polypong/node_modules"
-  #     - "/polypong/.pnpm-store"
-  #   tty: true
-  #   working_dir: /polypong
-  #   entrypoint: pnpm install --recursive
-
   front:
     build:
       context: apps/front
     image: polypong/front
-    # depends_on:
-    #   - install
-        # condition: service_completed_successfully
     container_name: front
-    stop_signal: SIGINT
     expose:
       - 9000
     ports:
       - "9000:9000"
-    # volumes_from:
-    #   - install
     volumes:
       - ./apps/front:/app/
       - "/app/node_modules"
-
     networks:
       - proxy
     env_file:
       - .env
     working_dir: /app
     entrypoint: yarn start
-    tty: true
     stop_signal: SIGINT
 
   api:
@@ -73,25 +49,19 @@ services:
     volumes:
       - ./apps/api:/app/
       - "/app/node_modules"
-    networks:
-      - proxy
-    # depends_on:
-      # install:
-      #   condition: service_completed_successfully
-      # postgres:
-      #   condition: service_healthy
     expose:
       - 3000
     env_file:
       - .env
     working_dir: /app
     entrypoint: yarn start
-    tty: true
     networks:
       - database
       - redis
       - proxy
       - mailer
+    depends_on:
+      - postgres
     stop_signal: SIGINT
 
   postgres:

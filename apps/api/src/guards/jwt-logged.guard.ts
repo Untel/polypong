@@ -3,7 +3,7 @@ import { AuthService } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class JwtLoggedGuard implements CanActivate {
-  constructor(private authService: AuthService) {}
+  // constructor(private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // const bearerToken = context.args[0].handshake.headers.authorization.split(' ')[1];
