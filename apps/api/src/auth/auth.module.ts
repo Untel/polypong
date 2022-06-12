@@ -2,16 +2,12 @@
 import { Inject, Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import * as RedisStore from 'connect-redis';
 import * as session from 'express-session';
-// import { session as passportSession, initialize as passportInitialize } from 'passport';
 import * as passport from 'passport';
-
-import { REDIS, RedisModule } from 'src/redis';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-
 
 import { AuthController } from './controllers/auth.controller';
 import { UserModule } from 'src/user/user.module';
@@ -30,6 +26,8 @@ import { TwoFactorAuthenticationController } from './controllers/two-factor-auth
 import { TwoFactorAuthenticationService } from './services/twoFactorAuthentication.service';
 import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
 import { ConfigService } from '@nestjs/config';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 @Module({
   providers: [
@@ -38,7 +36,7 @@ import { ConfigService } from '@nestjs/config';
     JwtTwoFactorStrategy, AuthSerializer, PasswordService,
   ],
   imports: [
-    RedisModule,
+    // RedisModule,
     UserModule,
     MailModule,
     JwtModule.registerAsync({
@@ -49,10 +47,6 @@ import { ConfigService } from '@nestjs/config';
       useFactory: (config: ConfigService) => config.get('passport'),
       inject: [ConfigService],
     }),
-    // PassportModule.register({
-    //   session: true,
-    //   defaultStrategy: 'jwt',
-    // }),
     TypeOrmModule.forFeature([ForgotPasswordToken]),
   ],
   exports: [
@@ -65,12 +59,11 @@ import { ConfigService } from '@nestjs/config';
 })
 export class AuthModule implements NestModule {
   constructor(
-    @Inject(REDIS) private readonly redis: any,
+    @InjectRedis() private readonly client: Redis,
     private readonly configService: ConfigService
   ) {}
     configure(consumer: MiddlewareConsumer) {
-      // console.log("Redis store", this.redis);
-      const store = new (RedisStore(session))({ client: this.redis, logErrors: true });
+      const store = new (RedisStore(session))({ client: this.client, logErrors: true });
       const passportConfig = this.configService.get('passport');
       console.log("PPConfig", passportConfig);
       consumer

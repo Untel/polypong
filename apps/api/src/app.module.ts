@@ -14,29 +14,28 @@ import passportConfig from 'src/config/passport.config';
 
 import { PongModule } from './pong/pong.module';
 import { PassportModule } from '@nestjs/passport';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
+import redisConfig from './config/redis.config';
+
+const asyncConfig = (moduleName) => ({
+    useFactory: (configService: ConfigService) => configService.get(moduleName),         // or use async method
+    inject:[ConfigService]
+});
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [typeormConfig, passportConfig]
+    ConfigModule.forRoot({ isGlobal: true, load: [typeormConfig, passportConfig, redisConfig] }),
+    RedisModule.forRootAsync(asyncConfig('redis')),
+    TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
+    PassportModule.registerAsync(asyncConfig('passport')),
+    MulterModule.register({
+      dest: './avatars',
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => configService.get('typeorm'),
-      inject: [ConfigService],
-    }),
-    PassportModule.registerAsync({
-      useFactory: (config: ConfigService) => config.get('passport'),
-      inject: [ConfigService],
-    }),
+
     UserModule,
     MailModule,
     AuthModule,
     PongModule,
-    MulterModule.register({
-      dest: './avatars',
-    }),
   ],
   controllers: [AppController],
   providers: [AppService],

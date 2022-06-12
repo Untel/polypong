@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
+// import { RedisService } from 'nestjs-redis';
 
 @Injectable()
 export class PongService {
@@ -9,8 +10,15 @@ export class PongService {
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
+  store = null;
 
-  constructor() {}
+
+  constructor(
+    // private readonly redisService: RedisService
+  ) {
+    // const redisInstance = this.redisService.getClient('sessions');
+    // this.store = new (RedisStore())({ client: this.redis, logErrors: true })
+  }
 
   generateId() {
     return ++this.id;

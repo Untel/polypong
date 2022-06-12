@@ -27,6 +27,13 @@ export class AuthService {
     return jwt.verify(token, secret);
   }
 
+  async decodeTokenFromCookie(cookie: string) {
+    const reg = /(?<=Authentication=)[^;]*/gi; // REGEX MADE BY ANDY OLALA
+    const token = reg.exec(cookie)[0];
+    const decoded: any = await this.verifyToken(token);
+    return decoded;
+  }
+
 	async registerUser(creds: RegisterUserDto) {
 		this.logger.log("registerUser")
 		if (await this.userService.find({ email: creds.email }))

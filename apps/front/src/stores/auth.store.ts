@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/12 03:39:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/12 22:50:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,16 @@ export const authApi = mande(`/api/auth`);
 
 type AuthState = {
   socket?: Socket | null,
-  user: unknown,
+  user: {
+    token: string,
+  },
 }
 
 const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
+    user: {},
     socket: null,
   } as AuthState),
   getters: {
@@ -62,9 +64,9 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('token', this.user.token);
       return this.user;
     },
-    async whoAmI(callback) {
+    async whoAmI() {
       defaults.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
-      this.user = await authApi.get('user', callback);
+      this.user = await authApi.get('user');
     },
   },
 });

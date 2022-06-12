@@ -1,6 +1,17 @@
 import { useAuthStore } from 'src/stores/auth.store';
 import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
+function buildRedirectObject(to: RouteLocationNormalized): any {
+  if (to.name === 'home')
+    return {};
+  const redirect: any = { name: to.name };
+  if (to.query)
+    redirect.query = to.query;
+  if (to.params)
+    redirect.params = to.params;
+  return { redirect: JSON.stringify(redirect) };
+}
+
 export default async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
@@ -14,10 +25,6 @@ export default async (
     next();
   } catch (error) {
     console.log('Auth guard fail', error, to.name);
-    const redirect = JSON.stringify({
-      name: to.name,
-      query: to.query,
-    });
-    next({ name: 'login', query: { redirect } });
+    next({ name: 'login', ...buildRedirectObject(to) });
   }
 };

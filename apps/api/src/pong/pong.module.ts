@@ -3,9 +3,10 @@ import { PongController } from './pong.controller';
 import { PongService } from './pong.service';
 import { PongGateway } from './pong.gateway';
 import { AuthModule } from 'src/auth/auth.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, UserModule],
   controllers: [PongController],
   providers: [PongService, PongGateway],
 })
