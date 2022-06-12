@@ -36,7 +36,6 @@ import Redis from 'ioredis';
     JwtTwoFactorStrategy, AuthSerializer, PasswordService,
   ],
   imports: [
-    // RedisModule,
     UserModule,
     MailModule,
     JwtModule.registerAsync({

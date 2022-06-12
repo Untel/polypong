@@ -2,7 +2,9 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
-// import { RedisService } from 'nestjs-redis';
+
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class PongService {
@@ -10,15 +12,10 @@ export class PongService {
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
-  store = null;
-
 
   constructor(
-    // private readonly redisService: RedisService
-  ) {
-    // const redisInstance = this.redisService.getClient('sessions');
-    // this.store = new (RedisStore())({ client: this.redis, logErrors: true })
-  }
+    @InjectRedis() private readonly redis: Redis,
+  ) {}
 
   generateId() {
     return ++this.id;
@@ -50,7 +47,6 @@ export class PongService {
       console.log('Setting lobby config', lobbyConfig);
       lobby.configure(lobbyConfig);
     }
-    this.lobbies.set(lobby.id, lobby);
     client.join(`lobby-${lobby.id}`);
     this.socketServer.emit('refreshedLobbies');
   }

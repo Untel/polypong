@@ -1,4 +1,6 @@
-export {default as jwtConfig} from "./jwt.config";
-export {default as passportConfig} from "./passport.config";
-export {default as redisConfig} from "./redis.config";
-export {default as typeormConfig} from "./typeorm.config";
+// created from 'create-ts-index'
+
+export * from './jwt.config';
+export * from './passport.config';
+export * from './redis.config';
+export * from './typeorm.config';
