@@ -33,6 +33,19 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     return data;
   }
 
+  async getUserCoalition(userId: number, accessToken: any) {
+    this.logger.log(`validate - getUserProfile`);
+    const { data } = await axios.get(
+      `https://api.intra.42.fr/v2/users/${userId}/coalitions`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      },
+    );
+    return data;
+  }
+
   async validate(
     accessToken: string,
     refreshToken: string,
@@ -44,13 +57,24 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     const data = await this.getUserProfile(accessToken);
     this.logger.log(`data = ${data}`);
     this.logger.log(`email = ${data.email}`);
-    const { email, first_name, last_name, image_url } = data;
-    this.logger.log(`image_url = ${data.image_url}`);
+    const { email, first_name, last_name, image_url, login, id, cursus } = data;
+    // console.log("LOGIN DATA", Object.keys(data), data.patroned, data.patroning, data.roles);
+    this.logger.log(JSON.stringify(data));
+
+    const dataCoa = await this.getUserCoalition(+id, accessToken);
+    const coalition = dataCoa.reduce((acc, next) => acc
+      || (next.name === "The Alliance" && 'alliance')
+      || (next.name === "The Federation" && 'federation')
+      || (next.name === "The Order" && 'order')
+      || (next.name === "The Assembly" && 'assembly')
+    , null);
+    console.log("Has coa", coalition);
     const user = await this.OAuthService.socialLogin({
       user: {
         email: email,
-        name: `${first_name} ${last_name}`,
+        name: login,
         avatar: image_url,
+        coalition
       },
       socialChannel: 'intra',
     });
