@@ -9,16 +9,17 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 
-import typeormConfig from 'src/config/typeorm.config';
-import passportConfig from 'src/config/passport.config';
 
 import { PongModule } from './pong/pong.module';
 import { PassportModule } from '@nestjs/passport';
+
 import { RedisModule } from '@liaoliaots/nestjs-redis';
-import redisConfig from './config/redis.config';
+
+// CONFIGS
+import { typeormConfig, passportConfig, redisConfig } from 'src/config';
 
 const asyncConfig = (moduleName) => ({
-    useFactory: (configService: ConfigService) => configService.get(moduleName),         // or use async method
+    useFactory: (configService: ConfigService) => configService.get(moduleName),
     inject:[ConfigService]
 });
 
