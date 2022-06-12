@@ -29,6 +29,7 @@ import { PasswordService } from './services/password-auth.service';
 import { TwoFactorAuthenticationController } from './controllers/two-factor-authentication.controller';
 import { TwoFactorAuthenticationService } from './services/twoFactorAuthentication.service';
 import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   providers: [
@@ -58,22 +59,24 @@ import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
   ],
 })
 export class AuthModule implements NestModule {
-  constructor(@Inject(REDIS) private readonly redis: any) {}
+  constructor(
+    @Inject(REDIS) private readonly redis: any,
+    private readonly configService: ConfigService
+  ) {}
   configure(consumer: MiddlewareConsumer) {
     // console.log("Redis store", this.redis);
     const store = new (RedisStore(session))({ client: this.redis, logErrors: true });
-    console.log("Store?", store);
     consumer
       .apply(
         session({
           store,
-          secret: 'sup3rs3cr3t',
+          secret: this.configService.get('SESSION_SECRET'),
           saveUninitialized: true,
           resave: true,
           cookie: {
             sameSite: false,
             httpOnly: true,
-            maxAge: 60000,
+            maxAge: this.configService.get('JWT_EXPIRATION', 6000),
           },
         }),
         passport.initialize(),
