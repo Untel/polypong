@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, forwardRef, HttpException, HttpStatus, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
@@ -13,15 +14,17 @@ import { authenticator } from 'otplib';
 @Injectable()
 export class AuthService {
 	constructor(
-		private userService: UserService,
-		private mailService: MailService,
-		private jwtService: JwtService,
+		private readonly userService: UserService,
+		private readonly mailService: MailService,
+		private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
 	) {}
 
 	logger = new Logger('AuthService');
 
-  async verifyToken(token: string) {
-    return this.jwtService.verify(token);
+  verifyToken(token: string) {
+    const secret = this.configService.get("JWT_SECRET");
+    return jwt.verify(token, secret);
   }
 
 	async registerUser(creds: RegisterUserDto) {

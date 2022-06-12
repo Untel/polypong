@@ -13,8 +13,7 @@ import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
 import { JwtLoggedGuard } from 'src/guards/jwt-logged.guard';
-
-
+import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 
 @WebSocketGateway({
   cors: true,
@@ -31,9 +30,9 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('createLobby')
   handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
     this.logger.log(`Create lobby from client ${socket.id}`);
-    // this.server.emit('msgToClient', payload);
     this.pongService.addLobby(socket, lobbyConfig);
   }
+
 
   @SubscribeMessage('joinLobby')
   send(client: Socket, id: LobbyId): void {
@@ -50,6 +49,7 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
+  @UseGuards(JwtAuthenticationGuard)
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
