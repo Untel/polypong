@@ -18,6 +18,7 @@ export class AuthSerializer extends PassportSerializer {
   ) {
     console.log("Deserializing" , payload);
     const user = await this.userService.findById(payload.id);
+    console.log("After??" , user);
     done(null, user);
   }
 }

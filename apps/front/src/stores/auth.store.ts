@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/12 00:55:53 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/12 03:39:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,18 +47,23 @@ export const useAuthStore = defineStore('auth', {
         }
       });
     },
-    login(email: string, password: string): MandeError | any {
-      return authApi.post('login', { email, password });
+    async login(email: string, password: string) {
+      this.user = await authApi.post('login', { email, password });
+      localStorage.setItem('token', this.user.token);
+      return this.user;
     },
     async register(name: string, email: string, password: string, coalition: CoalitionChoice) {
-      return await authApi.post('register', {
+      this.user = await authApi.post('register', {
         name,
         email,
         password,
         coalition,
       });
+      localStorage.setItem('token', this.user.token);
+      return this.user;
     },
     async whoAmI(callback) {
+      defaults.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
       this.user = await authApi.get('user', callback);
     },
   },

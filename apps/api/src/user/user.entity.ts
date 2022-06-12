@@ -43,7 +43,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: CoalitionChoice,
-    default: CoalitionChoice.ALLIANCE,
+    default: null
   })
 	coalition: CoalitionChoice;
 
@@ -66,7 +66,7 @@ export class User {
 	avatar: string;
 
 	@CreateDateColumn()
-	createdAtt: Date;
+	createdAt: Date;
 
 	@UpdateDateColumn()
 	updatedAt: Date;

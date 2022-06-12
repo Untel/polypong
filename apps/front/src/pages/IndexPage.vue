@@ -8,12 +8,14 @@
 <template>
   <q-page class="row">
     <div class="wrapper">
-      <UserBanner />
+      <UserBanner :user="auth.user"/>
     </div>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-  import UserBanner from 'src/components/UserBanner.vue';
+import { useAuthStore } from 'src/stores/auth.store';
+import UserBanner from 'src/components/UserBanner.vue';
 
+const auth = useAuthStore();
 </script>

@@ -16,7 +16,10 @@ export class UserService {
 	logger = new Logger(`UserService`);
 
 	async findById(id: string | number): Promise<User> {
-		return this.userRepository.findOne({ where: { id: +id } });
+    if (id) {
+      return this.userRepository.findOne({ where: { id: +id } });
+    }
+    return null;
 	}
 
 	async find(where: FindOptionsWhere<User>, withPassword = false): Promise<User> | null {

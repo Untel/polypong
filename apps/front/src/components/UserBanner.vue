@@ -8,13 +8,15 @@
 <template>
   <div class="wrapper">
     <FssFallback
-      :fss-settings="coalitions[coalition].shaderConfig"
-      :fallback-url="coalitions[coalition].fssFallback"
+      :fss-settings="coalitions[user.coalition || 'alliance'].shaderConfig"
+      :fallback-url="coalitions[user.coalition || 'alliance'].fssFallback"
     >
       <div>
         <q-avatar>
-          <img src="https://cdn.quasar.dev/img/avatar.png">
+          <img :src="user.avatar">
         </q-avatar>
+        {{ user.name }}
+        {{ user.email }}
       </div>
     </FssFallback>
   </div>
@@ -28,10 +30,6 @@ import { PropType } from "vue";
 import { User } from "src/types/user";
 
 const props = defineProps({
-  coalition: {
-    type: String as PropType<CoalitionChoice>,
-    default: CoalitionChoice.ALLIANCE
-  },
   user: {
     type: Object as PropType<User>,
     default: null,

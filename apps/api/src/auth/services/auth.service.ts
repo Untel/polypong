@@ -26,7 +26,6 @@ export class AuthService {
 
 	async registerUser(creds: RegisterUserDto) {
 		this.logger.log("registerUser")
-    console.log("Add user", creds);
 		if (await this.userService.find({ email: creds.email }))
 			throw new ConflictException(`Email ${creds.email} is already taken`);
     if (await this.userService.find({ name: creds.name }))
@@ -114,9 +113,9 @@ export class AuthService {
 		// Update email verification status.
 		const updatedUser = await this.userService.updateUser(
 			userFromTokenPayload.id,
-			{ emailVerified: true },
+			{ email_verified: true },
 		);
-		this.logger.log(`returning updatedUser, name ${updatedUser.name}, emailVerified ${updatedUser.emailVerified}`);
+		this.logger.log(`returning updatedUser, name ${updatedUser.name}, email_verified ${updatedUser.email_verified}`);
 
 		return updatedUser;
 	}

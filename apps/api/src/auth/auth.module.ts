@@ -40,18 +40,23 @@ import { ConfigService } from '@nestjs/config';
   imports: [
     RedisModule,
     UserModule,
-    PassportModule.register({
-      session: true,
-    }),
     MailModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION },
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => config.get('jwt'),
+      inject: [ConfigService],
     }),
+    PassportModule.registerAsync({
+      useFactory: (config: ConfigService) => config.get('passport'),
+      inject: [ConfigService],
+    }),
+    // PassportModule.register({
+    //   session: true,
+    //   defaultStrategy: 'jwt',
+    // }),
     TypeOrmModule.forFeature([ForgotPasswordToken]),
   ],
   exports: [
-    AuthService, PasswordService,
+    AuthService, PasswordService, JwtStrategy,
   ],
   controllers: [
     AuthController, GoogleOAuthController, IntraOAuthController,
@@ -63,25 +68,20 @@ export class AuthModule implements NestModule {
     @Inject(REDIS) private readonly redis: any,
     private readonly configService: ConfigService
   ) {}
-  configure(consumer: MiddlewareConsumer) {
-    // console.log("Redis store", this.redis);
-    const store = new (RedisStore(session))({ client: this.redis, logErrors: true });
-    consumer
-      .apply(
-        session({
-          store,
-          secret: this.configService.get('SESSION_SECRET'),
-          saveUninitialized: true,
-          resave: true,
-          cookie: {
-            sameSite: false,
-            httpOnly: true,
-            maxAge: this.configService.get('JWT_EXPIRATION', 6000),
-          },
-        }),
-        passport.initialize(),
-        passport.session(),
-      )
-      .forRoutes('*');
+    configure(consumer: MiddlewareConsumer) {
+      // console.log("Redis store", this.redis);
+      const store = new (RedisStore(session))({ client: this.redis, logErrors: true });
+      const passportConfig = this.configService.get('passport');
+      console.log("PPConfig", passportConfig);
+      consumer
+        .apply(
+          session({
+            store,
+            ...passportConfig,
+          }),
+          passport.initialize(),
+          passport.session(),
+        )
+        .forRoutes('*');
   }
 }

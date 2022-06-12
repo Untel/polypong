@@ -4,7 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import TokenPayload from '../interfaces/tokenPayload.interface';
- 
+import { ConfigService } from '@nestjs/config';
+
 // this strategy extends the default passport JWT strategy.
 // this strategy reads the token from the cookie when the user
 // requests data. Upon successfully accessing the token, we use
@@ -14,16 +15,19 @@ import TokenPayload from '../interfaces/tokenPayload.interface';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        return request?.cookies?.Authentication;
-      }]),
-      secretOrKey: process.env.JWT_SECRET,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+      //   return request?.cookies?.Authentication;
+      // }]),
+      secretOrKey: configService.get('JWT_SECRET'),
     });
   }
- 
+
   async validate(payload: TokenPayload) {
-    return this.userService.findById(payload.userId);
+    console.log("Validating", payload);
+    return await this.userService.findById(payload.userId);
   }
 }

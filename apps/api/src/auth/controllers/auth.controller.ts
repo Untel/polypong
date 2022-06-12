@@ -16,6 +16,8 @@ import { PasswordService } from '../services/password-auth.service';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import JwtRefreshGuard from 'src/guards/jwt-refresh.guard';
 import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
+import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -70,16 +72,16 @@ export class AuthController {
     const user = req.user;
     // const accessCookie = this.authService.getCookieWithJwtToken(user.id);
     const token = this.authService.getToken({ ...user });
-    const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`
-    res.setHeader(
-      'Set-Cookie', [cookie]
-    );
+    // const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`
+    // res.setHeader(
+    //   'Set-Cookie', [cookie]
+    // );
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {
       return res.send({
         isTwoFactorAuthenticationEnabled: true,
-        accessCookie: cookie,
+        accessCookie: token,
       });
     }
 
@@ -126,6 +128,7 @@ export class AuthController {
   * @returns
   */
     // @UseGuards(JwtTwoFactorGuard)
+	// @UseGuards(new JwtAuthenticationGuard())
 	@UseGuards(LoggedInGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
