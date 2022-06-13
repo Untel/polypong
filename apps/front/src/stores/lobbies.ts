@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lobbies.ts                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/06/13 03:00:07 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
@@ -26,7 +38,7 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      const { data, error } = await useApi<Lobby[]>('pong/lobbies').get().json();
+      const { data } = await useApi<Lobby[]>('pong/lobbies').get().json();
       console.log('Lobbies fetched', data.value, this.lobbies);
       this.lobbies = data.value || [];
     },
@@ -35,7 +47,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       console.log('I will create a room');
       if (!getIsConnected) {
         console.log('Socket not connected', socket);
-        return ;
+        return;
       }
       socket?.emit('createLobby', { name: lobbyName });
       console.log('Emited');
@@ -45,7 +57,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       console.log('I will join room', lobbyId);
       if (!getIsConnected) {
         console.log('Socket not connected', socket);
-        return ;
+        return;
       }
       socket?.emit('joinLobby', lobbyId);
       console.log('Emited');

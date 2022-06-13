@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pong.service.ts                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/06/13 02:58:12 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
@@ -20,8 +32,12 @@ export class PongService {
   }
 
   getLobbies(): Lobby[] {
-    console.log('Getting lobbies');
+    console.log("Getting lobbies")
     return [...this.lobbies.values()];
+  }
+
+  getLobby(id: number): Lobby {
+    return this.lobbies.get(id);
   }
 
   clearLobbies() {
@@ -31,7 +47,7 @@ export class PongService {
 
   addConnectedPeople(player: Player) {
     if (this.connectedPlayer.has(player.socketId)) {
-      console.log('Player is still connected');
+      console.log("Player is still connected");
       return;
     }
     this.connectedPlayer.set(player.socketId, player);

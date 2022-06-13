@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routes.ts                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/06/13 03:00:14 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { RouteRecordRaw } from 'vue-router';
 // import PongPage from 'pages/PongPage.vue';
 import AuthGuard from './auth.guard';
@@ -36,7 +48,7 @@ const routes: RouteRecordRaw[] = [
       name: '404',
       component: () => import('pages/ErrorNotFound.vue'),
     },
-  ],
+    ],
   },
   // Always leave this as last one,
   // but you can also remove it
