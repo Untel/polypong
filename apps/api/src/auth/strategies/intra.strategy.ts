@@ -22,14 +22,11 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
 
   async getUserProfile(accessToken: any) {
     this.logger.log(`validate - getUserProfile`);
-    const { data } = await axios.get(
-      `https://api.intra.42.fr/v2/me`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        }
+    const { data } = await axios.get(`https://api.intra.42.fr/v2/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+    });
     return data;
   }
 
@@ -40,7 +37,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-        }
+        },
       },
     );
     return data;
@@ -52,7 +49,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-
     this.logger.log(`validate`);
     const data = await this.getUserProfile(accessToken);
     this.logger.log(`data = ${data}`);
@@ -62,19 +58,22 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     this.logger.log(JSON.stringify(data));
 
     const dataCoa = await this.getUserCoalition(+id, accessToken);
-    const coalition = dataCoa.reduce((acc, next) => acc
-      || (next.name === "The Alliance" && 'alliance')
-      || (next.name === "The Federation" && 'federation')
-      || (next.name === "The Order" && 'order')
-      || (next.name === "The Assembly" && 'assembly')
-    , null);
-    console.log("Has coa", coalition);
+    const coalition = dataCoa.reduce(
+      (acc, next) =>
+        acc ||
+        (next.name === 'The Alliance' && 'alliance') ||
+        (next.name === 'The Federation' && 'federation') ||
+        (next.name === 'The Order' && 'order') ||
+        (next.name === 'The Assembly' && 'assembly'),
+      null,
+    );
+    console.log('Has coa', coalition);
     const user = await this.OAuthService.socialLogin({
       user: {
         email: email,
         name: login,
         avatar: image_url,
-        coalition
+        coalition,
       },
       socialChannel: 'intra',
     });

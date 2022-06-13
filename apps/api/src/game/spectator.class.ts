@@ -1,3 +1,1 @@
-export default class Spectator {
-
-}
+export default class Spectator {}

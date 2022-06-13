@@ -1,4 +1,4 @@
-import Lobby, { LobbyId } from "./lobby.class";
+import Lobby, { LobbyId } from './lobby.class';
 
 export default class Player {
   socketId: string;

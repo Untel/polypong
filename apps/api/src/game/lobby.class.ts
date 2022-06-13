@@ -1,6 +1,6 @@
-import Game from "./game.class";
-import Player from "./player.class";
-import Spectator from "./spectator.class";
+import Game from './game.class';
+import Player from './player.class';
+import Spectator from './spectator.class';
 
 export type LobbyId = number;
 
@@ -41,16 +41,13 @@ export default class Lobby implements ILobby, ILobbyConfig {
     player.inLobby = this.id;
   }
 
-  start() : Game {
+  start(): Game {
     return new Game(this);
   }
 
   configure(opts: ILobbyConfig) {
-    if (opts.name)
-      this.name = opts.name;
-    if (opts.playerMax)
-      this.playerMax = opts.playerMax;
-    if (opts.spectatorsMax)
-      this.spectatorsMax = opts.spectatorsMax;
+    if (opts.name) this.name = opts.name;
+    if (opts.playerMax) this.playerMax = opts.playerMax;
+    if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
   }
 }

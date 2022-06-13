@@ -1,5 +1,3 @@
-import Player from "./player.class";
+import Player from './player.class';
 
-export default class Bot extends Player {
-  
-}
+export default class Bot extends Player {}

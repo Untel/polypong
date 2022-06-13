@@ -1,5 +1,4 @@
-// created from 'create-ts-index'
+// created from 'create-ts-index' 2022-06-13 02:12
 
-export * from './templates';
 export * from './mail.module';
 export * from './mail.service';

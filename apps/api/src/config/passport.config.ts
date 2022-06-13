@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-export default registerAs('passport', () => ({
+export const PassportConfig = registerAs('passport', () => ({
   session: true,
   property: 'user',
   defaultStrategy: 'jwt',

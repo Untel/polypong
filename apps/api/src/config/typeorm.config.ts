@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-export default registerAs('typeorm', () => ({
+export const TypeormConfig = registerAs('typeorm', () => ({
   type: 'postgres',
   host: process.env['POSTGRES_HOST'],
   port: process.env['POSTGRES_PORT'],

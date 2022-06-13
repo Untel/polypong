@@ -1,4 +1,4 @@
-import { CoalitionChoice } from "../user.entity";
+import { CoalitionChoice } from '../user.entity';
 
 export interface UserInterface {
   name: string;

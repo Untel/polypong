@@ -1,5 +1,10 @@
-// created from 'create-ts-index'
+// created from 'create-ts-index' 2022-06-13 02:12
 
+export * from './app.controller.spec';
+export * from './app.controller';
+export * from './app.module';
+export * from './app.service';
+export * from './main';
 export * from './.redis';
 export * from './auth';
 export * from './config';
@@ -9,8 +14,3 @@ export * from './mail';
 export * from './pong';
 export * from './providers';
 export * from './user';
-export * from './app.controller.spec';
-export * from './app.controller';
-export * from './app.module';
-export * from './app.service';
-export * from './main';

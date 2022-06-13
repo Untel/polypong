@@ -1,4 +1,4 @@
-import Lobby from "./lobby.class";
+import Lobby from './lobby.class';
 
 export default class Game {
   lobby: Lobby;

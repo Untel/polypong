@@ -24,7 +24,7 @@ export class PasswordService {
     private forgotPasswordRepository: Repository<ForgotPasswordToken>,
   ) {}
 
-	logger = new Logger();
+  logger = new Logger();
 
   /**
    * Update the password of a user.
@@ -68,7 +68,7 @@ export class PasswordService {
    * @returns
    */
   async sendForgotPasswordLink(email: string) {
-    this.logger.log("in sendForgotPasswordLink");
+    this.logger.log('in sendForgotPasswordLink');
     const user = await this.userService.find({ email });
     // For security issues we won't throw an error if there is no user with the
     // provided email address.
@@ -77,13 +77,15 @@ export class PasswordService {
       return;
     }
 
-    this.logger.log("in sendForgotPasswordLink, sign token");
+    this.logger.log('in sendForgotPasswordLink, sign token');
     // Sign a token that will expire in 5 minutes.
     const token = await jwt.sign({ email }, process.env.JWT_SECRET, {
       expiresIn: 60 * 5,
     });
 
-    this.logger.log("in sendForgotPasswordLink, create entry in forgotPassword table");
+    this.logger.log(
+      'in sendForgotPasswordLink, create entry in forgotPassword table',
+    );
     // Create an entry in the Forgot Password table.
     const forgotPasswordEntry = await this.forgotPasswordRepository.create({
       email,
@@ -91,7 +93,7 @@ export class PasswordService {
     });
     await this.forgotPasswordRepository.save(forgotPasswordEntry);
 
-    this.logger.log("in sendForgotPasswordLink, send the email");
+    this.logger.log('in sendForgotPasswordLink, send the email');
     // Send email with the reset password link.
     const url = `${process.env.FRONTEND_URL}/resetPassword/token=${token}`;
     await this.mailService.sendResetPasswordLink(email, url);
@@ -105,7 +107,9 @@ export class PasswordService {
    */
   async resetPassword(token: string, password: string) {
     // Load the entry from DB with the given token.
-    const forgotToken = await this.forgotPasswordRepository.findOne({ where: { token } });
+    const forgotToken = await this.forgotPasswordRepository.findOne({
+      where: { token },
+    });
     if (!forgotToken) {
       throw new BadRequestException('Invalid token');
     }

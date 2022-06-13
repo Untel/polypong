@@ -1,6 +1,6 @@
 interface TokenPayload {
-	userId: number;
-	is2fa?: boolean;
+  userId: number;
+  is2fa?: boolean;
 }
-  
+
 export default TokenPayload;

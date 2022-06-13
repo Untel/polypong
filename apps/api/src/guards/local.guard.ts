@@ -7,7 +7,9 @@ export class LocalGuard extends AuthGuard('local') {
     console.log(`in LocalGuard, in canActivate`);
     console.log(`in LocalGuard, in canActivate, context = ${context}`);
     const result = (await super.canActivate(context)) as boolean;
-    console.log(`in LocalGuard, result of super.canActivate(context) = ${result}`);
+    console.log(
+      `in LocalGuard, result of super.canActivate(context) = ${result}`,
+    );
     const req = await super.logIn(context.switchToHttp().getRequest());
     console.log(`in LocalGuard, super.logIn(...) = ${req}`);
     return result;

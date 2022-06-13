@@ -10,4 +10,4 @@ import { UserModule } from 'src/user/user.module';
   controllers: [PongController],
   providers: [PongService, PongGateway],
 })
-export class PongModule { }
+export class PongModule {}

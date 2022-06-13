@@ -9,23 +9,25 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 
-
 import { PongModule } from './pong/pong.module';
 import { PassportModule } from '@nestjs/passport';
 
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 // CONFIGS
-import { typeormConfig, passportConfig, redisConfig } from 'src/config';
+import { JwtConfig, TypeormConfig, PassportConfig, RedisConfig } from 'src/config';
 
 const asyncConfig = (moduleName) => ({
-    useFactory: (configService: ConfigService) => configService.get(moduleName),
-    inject:[ConfigService]
+  useFactory: (configService: ConfigService) => configService.get(moduleName),
+  inject: [ConfigService],
 });
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [typeormConfig, passportConfig, redisConfig] }),
+  ConfigModule.forRoot({
+      isGlobal: true,
+      load: [JwtConfig, TypeormConfig, PassportConfig, RedisConfig],
+    }),
     RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
     PassportModule.registerAsync(asyncConfig('passport')),

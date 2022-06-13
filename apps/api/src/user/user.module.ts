@@ -9,6 +9,8 @@ import { UserService } from './user.service';
   providers: [UserService],
   exports: [UserService],
   imports: [TypeOrmModule.forFeature([User, ForgotPasswordToken])],
-  controllers: [/**UserController**/],
+  controllers: [
+    /**UserController**/
+  ],
 })
 export class UserModule {}

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
+import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
@@ -13,16 +13,14 @@ export class PongService {
   connectedPlayer = new Map<string, Player>();
   id = 0;
 
-  constructor(
-    @InjectRedis() private readonly redis: Redis,
-  ) {}
+  constructor(@InjectRedis() private readonly redis: Redis) {}
 
   generateId() {
     return ++this.id;
   }
 
   getLobbies(): Lobby[] {
-    console.log("Getting lobbies");
+    console.log('Getting lobbies');
     return [...this.lobbies.values()];
   }
 
@@ -33,8 +31,8 @@ export class PongService {
 
   addConnectedPeople(player: Player) {
     if (this.connectedPlayer.has(player.socketId)) {
-      console.log("Player is still connected");
-      return ;
+      console.log('Player is still connected');
+      return;
     }
     this.connectedPlayer.set(player.socketId, player);
   }

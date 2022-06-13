@@ -28,7 +28,7 @@ import { MailService } from './mail.service';
         options: {
           strict: true,
         },
-      }
+      },
     }),
   ],
   providers: [MailService],

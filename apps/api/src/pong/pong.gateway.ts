@@ -20,8 +20,9 @@ import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
   cors: true,
   transports: ['websocket'],
 })
-export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-
+export class PongGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private readonly pongService: PongService) {}
 
   @WebSocketServer() server: Server;
@@ -32,7 +33,6 @@ export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.logger.log(`Create lobby from client ${socket.id}`);
     this.pongService.addLobby(socket, lobbyConfig);
   }
-
 
   @SubscribeMessage('joinLobby')
   send(client: Socket, id: LobbyId): void {
