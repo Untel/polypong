@@ -4,18 +4,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { MailModule } from './mail/mail.module';
+import { AppService, AuthModule, UserModule, MailModule, PongModule } from '.';
 
-import { PongModule } from './pong/pong.module';
 import { PassportModule } from '@nestjs/passport';
 
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 // CONFIGS
-import { JwtConfig, TypeormConfig, PassportConfig, RedisConfig } from 'src/config';
+import {
+  JwtConfig,
+  TypeormConfig,
+  PassportConfig,
+  RedisConfig,
+} from 'src/config';
 
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
@@ -24,7 +25,7 @@ const asyncConfig = (moduleName) => ({
 
 @Module({
   imports: [
-  ConfigModule.forRoot({
+    ConfigModule.forRoot({
       isGlobal: true,
       load: [JwtConfig, TypeormConfig, PassportConfig, RedisConfig],
     }),

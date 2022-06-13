@@ -161,14 +161,14 @@ export class AuthService {
 
   // The is2fa property distinguishes bewteen tokens created with
   // or without two-factor authentication
-  public getCookieWithJwtToken(userId: number, is2fa: boolean = false) {
+  public getCookieWithJwtToken(userId: number, is2fa = false) {
     const payload: TokenPayload = { userId, is2fa };
     const token = this.getToken(payload);
     this.logger.log('Auth Token is ' + token);
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`;
   }
 
-  public getCookieWithJwtRefreshToken(userId: number, is2fa: boolean = false) {
+  public getCookieWithJwtRefreshToken(userId: number, is2fa = false) {
     const payload: TokenPayload = { userId };
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET,

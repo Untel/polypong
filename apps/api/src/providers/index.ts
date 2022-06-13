@@ -1,3 +1,3 @@
-// created from 'create-ts-index' 2022-06-13 02:12
+// created from 'create-ts-index'
 
 export * from './serialization.provider';

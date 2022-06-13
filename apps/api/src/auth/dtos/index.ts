@@ -1,4 +1,4 @@
-// created from 'create-ts-index' 2022-06-13 02:12
+// created from 'create-ts-index'
 
 export * from './email-verification.dto';
 export * from './forgot-password.dto';
