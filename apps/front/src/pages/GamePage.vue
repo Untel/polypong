@@ -5,20 +5,28 @@
   width: 20px;
   height: 100px;
 }
+
+.ball {
+  background-color: red;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  position: absolute;
+}
 </style>
 <template>
   <q-page padding>
     <div style="display: flex; justify-content: center; align-items: center;">
       <div style="background-color:white ; width: 500px; height: 500px; position: relative;" ref="world"
         @mousemove="onMouseMove">
-        <div style="background-color: red; width: 20px; height: 20px; display: inline-block; position:absolute;"
-          ref=" ball">a</div>
+        <div class="ball" :style="ballStyle" ref="ball">a</div>
         <div class="paddle" :style="paddle1Style" ref="paddle1">b</div>
         <!-- <div style="position:absolute; background-color: blue; width: 20px; height: 100px;" ref="paddle2">c</div> -->
       </div>
     </div>
     <pre style="background-color: aquamarine;">
-      {{ paddle1Style }}
+      Paddle : {{ paddle1Style }}
+      Ball : {{ ballStyle }}
     </pre>
   </q-page>
 </template>
@@ -30,16 +38,17 @@ import { compileScript } from 'vue/compiler-sfc';
 import CoalitionSelectorVue from 'src/components/CoalitionSelector.vue';
 const { socket } = useAuthStore();
 
-const world = ref<HTMLElement>(),
-  ball_ref = ref<HTMLElement>(),
-  paddle1_ref = ref<HTMLElement>(),
-  paddle2_ref = ref<HTMLElement>();
+// const world = ref<HTMLElement>(),
+//   ball_ref = ref<HTMLElement>(),
+//   paddle1_ref = ref<HTMLElement>(),
+//   paddle2_ref = ref<HTMLElement>();
 
 let ball: any;
 let paddle1: any;
 let paddle2: any;
 
 const paddle1Style = ref<StyleValue>();
+const ballStyle = ref<StyleValue>();
 const props = defineProps({
   lobbyId: Number,
 });
@@ -49,8 +58,16 @@ const onKeyDown = (evt: KeyboardEvent) => {
 }
 
 const onMouseMove = (e: MouseEvent) => {
+
   var rect = e.target.getBoundingClientRect();
-  var y = e.clientY - rect.top;  //y position within the element.
+  console.log(rect)
+
+  console.log(e.clientY);
+  var y = e.clientY - rect.top - 50;  //y position within the element.
+  console.log("y = ", y)
+  y = (y < 0) ? 0 : y;
+  y = (y > 400) ? 400 : y;
+
   socket?.emit('paddleMouseUpdate', { y });
 }
 
@@ -58,13 +75,12 @@ const update = (evt: any) => {
   ball = evt.ball;
   paddle1 = evt.paddle1;
   paddle2 = evt.paddle2;
-
   paddle1Style.value = { top: paddle1.y + 'px', left: paddle1.x + 'px ' }
+  ballStyle.value = { top: ball.y + 'px', left: ball.x + 'px' }
 }
 
 onMounted(() => {
-  console.log(ball_ref.value, world.value, paddle1_ref.value, paddle2_ref.value);
-  // this.socket.subscribe
+  // console.log(ball_ref.value, world.value, paddle1_ref.value, paddle2_ref.value);
   window.addEventListener('keydown', onKeyDown);
 });
 
