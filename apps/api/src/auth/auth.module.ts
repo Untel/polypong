@@ -14,22 +14,20 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 
+import * as strategies from 'src/auth/strategies';
+
 import { AuthController } from './controllers/auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { MailModule } from 'src/mail/mail.module';
 import { ForgotPasswordToken } from './entities/forgot-password-token.entity';
 import { AuthSerializer } from 'src/providers/serialization.provider';
 import { AuthService } from './services/auth.service';
-import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleOAuthController } from './controllers/google-oauth.controller';
-import { GoogleStrategy } from './strategies/google.strategy';
 import { OAuthService } from './services/oauth.service';
-import { IntraStrategy } from './strategies/intra.strategy';
 import { IntraOAuthController } from './controllers/intra-oauth.controller';
 import { PasswordService } from './services/password-auth.service';
 import { TwoFactorAuthenticationController } from './controllers/two-factor-authentication.controller';
 import { TwoFactorAuthenticationService } from './services/twoFactorAuthentication.service';
-import { JwtTwoFactorStrategy } from './strategies/jwt-two-factor.strategy';
 import { ConfigService } from '@nestjs/config';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
@@ -39,13 +37,10 @@ import Redis from 'ioredis';
     AuthService,
     OAuthService,
     TwoFactorAuthenticationService,
-    LocalStrategy,
     JwtStrategy,
-    GoogleStrategy,
-    IntraStrategy,
-    JwtTwoFactorStrategy,
     AuthSerializer,
     PasswordService,
+    ...Object.values(strategies),
   ],
   imports: [
     UserModule,

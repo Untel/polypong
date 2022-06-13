@@ -10,14 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 
-// CONFIGS
-import {
-  JwtConfig,
-  TypeormConfig,
-  PassportConfig,
-  RedisConfig,
-} from 'src/config';
-
+import * as configs from 'src/config';
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],
@@ -27,7 +20,7 @@ const asyncConfig = (moduleName) => ({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [JwtConfig, TypeormConfig, PassportConfig, RedisConfig],
+      load: [...Object.values(configs)],
     }),
     RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
@@ -35,7 +28,6 @@ const asyncConfig = (moduleName) => ({
     MulterModule.register({
       dest: './avatars',
     }),
-
     UserModule,
     MailModule,
     AuthModule,
@@ -44,6 +36,4 @@ const asyncConfig = (moduleName) => ({
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor() {}
-}
+export class AppModule {}
