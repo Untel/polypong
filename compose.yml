@@ -1,7 +1,8 @@
 version: '3'
 services:
 
-  ### NGINX REVERSE PROXY
+  ### Nginx reverse proxy
+  # Also, allow us to fake a same origin API/FRONT, to be closer of production environment
   nginx:
     image: nginx
     container_name: nginx
@@ -21,6 +22,8 @@ services:
       - api
       - pgadmin
 
+  # Front end server for development, should not exist in production version
+  # Built on top of Quasar
   front:
     build:
       context: apps/front
@@ -41,6 +44,7 @@ services:
     entrypoint: yarn start
     stop_signal: SIGINT
 
+  # Api, built on top of NestJS
   api:
     build:
       context: apps/api
@@ -64,6 +68,7 @@ services:
       - postgres
     stop_signal: SIGINT
 
+  # Cold data (user infos, accounts etc) database
   postgres:
     container_name: database
     image: postgres
@@ -85,6 +90,7 @@ services:
     stop_signal: SIGINT
     volumes: [ 'database:/var/lib/postgresql/data' ]
 
+  # Hot data (passport session, pong game state, caching) database
   redis:
     container_name: redis
     image: redis
@@ -96,12 +102,8 @@ services:
     volumes: [ 'redis:/data' ]
     stop_signal: SIGINT
 
+  # Smtp with UI, to see all emails sent across our stack
   mailhog:
-    depends_on:
-      - postgres
-      - pgadmin
-      - backend
-      - frontend
     image: mailhog/mailhog
     networks:
       - mailer
