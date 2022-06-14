@@ -5,7 +5,7 @@ export const RedisConfig = registerAs('redis', () => ({
   config: {
     host: 'redis',
     onClientCreated(client) {
-      console.log('Redis client created', client);
+      // console.log('Redis client created', client);
       client.on('error', (err) => {
         console.log('Redis error', err);
       });

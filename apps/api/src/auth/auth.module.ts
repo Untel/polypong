@@ -1,6 +1,4 @@
 import {
-  Inject,
-  Logger,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -74,7 +72,6 @@ export class AuthModule implements NestModule {
       logErrors: true,
     });
     const passportConfig = this.configService.get('passport');
-    console.log('PPConfig', passportConfig);
     consumer
       .apply(
         session({

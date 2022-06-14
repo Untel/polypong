@@ -20,7 +20,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     });
   }
 
-  async getUserProfile(accessToken: any) {
+  async getUserProfile(accessToken: string) {
     this.logger.log(`validate - getUserProfile`);
     const { data } = await axios.get(`https://api.intra.42.fr/v2/me`, {
       headers: {
@@ -30,7 +30,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     return data;
   }
 
-  async getUserCoalition(userId: number, accessToken: any) {
+  async getUserCoalition(userId: number, accessToken: string) {
     this.logger.log(`validate - getUserProfile`);
     const { data } = await axios.get(
       `https://api.intra.42.fr/v2/users/${userId}/coalitions`,
