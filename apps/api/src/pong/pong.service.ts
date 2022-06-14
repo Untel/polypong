@@ -6,13 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/13 02:58:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/14 11:11:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+import Game from 'src/game/game.class';
+import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
@@ -24,15 +25,20 @@ export class PongService {
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
+  tmpGame = null
 
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  constructor(@InjectRedis() private readonly redis: Redis) {
+    setTimeout(() => {
+      // console.log('In constrcutor service', this.socketServer);
+      this.tmpGame = new Game(this.socketServer, new Lobby(0, new Player(0)));
+    }, 3000);
+  }
 
   generateId() {
     return ++this.id;
   }
 
   getLobbies(): Lobby[] {
-    console.log("Getting lobbies")
     return [...this.lobbies.values()];
   }
 
@@ -72,5 +78,13 @@ export class PongService {
     client.join(`lobby-${id}`);
     console.log('Joined', this.lobbies);
     this.socketServer.emit('refreshedLobbies');
+  }
+
+  updatePaddles(client: Socket, evt: any) {
+    this.tmpGame.updatePaddle(evt);
+  }
+
+  updatePositionPaddles(client: Socket, evt: any) {
+    this.tmpGame.updatePositionPaddles(evt);
   }
 }

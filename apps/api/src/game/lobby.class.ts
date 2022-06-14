@@ -24,6 +24,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   players: Map<string, Player>;
   spectatorsMax: number;
   spectators: Spectator[];
+  game: Game | null;
 
   constructor(id: LobbyId, host: Player) {
     this.id = id;
@@ -42,7 +43,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
   }
 
   start(): Game {
-    return new Game(this);
+    // this.game = new Game(this);
+    return this.game;
   }
 
   configure(opts: ILobbyConfig) {
