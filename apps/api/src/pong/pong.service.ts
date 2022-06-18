@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/14 11:16:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/18 23:49:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,28 @@ import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
+import Store from 'redis-json';
 
 @Injectable()
 export class PongService {
+  store;
   socketServer: Server = null;
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
-  tmpGame = null
+  tmpGame: Game = null
 
   constructor(@InjectRedis() private readonly redis: Redis) {
+    this.store = new Store<typeof Game>(redis, { prefix: 'game:' });
     setTimeout(() => {
       // console.log('In constrcutor service', this.socketServer);
-      this.tmpGame = new Game(this.socketServer, new Lobby(0, new Player(0)));
+      this.tmpGame = new Game(
+        this.socketServer,
+        this.store,
+        new Lobby(0,
+            new Player(0)
+        )
+      );
     }, 3000);
   }
 

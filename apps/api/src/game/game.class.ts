@@ -6,25 +6,39 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/14 11:13:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/19 01:51:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Server, Socket } from 'socket.io';
+import Redis from 'ioredis';
+import RedisBridge from './redis.bridge';
+import Store from 'redis-json';
 
-
-class Ball {
+class Position {
   x: number;
   y: number;
+  w: number;
+  h: number;
+
+  constructor(x: number, y: number, w: number, h: number) {
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+  }
+}
+
+class Ball {
+  pos: Position;
   velocity: {
     x: number;
     y: number;
   };
   constructor() {
-    this.x = 0;
-    this.y = 0;
     // console.log(this)
+    this.pos = new Position(0, 0, 10, 10);
     this.velocity = { x: 1.5, y: 1 };
     // this.velocity.y = 0;
   }
@@ -36,58 +50,92 @@ class Ball {
   }
 }
 class Paddle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  pos: Position;
+  constructor() {
+    this.pos = new Position(0, 0, 5, 100);
+  }
 }
+
 export default class Game {
   lobby: Lobby;
   socket: Server;
+  store: Store;
 
-  ball: Ball;
-  paddle1: Paddle;
-  paddle2: Paddle;
+  balls: Ball[] = [];
+  paddles: Paddle[] = [];
   speed: number = 10;
-  constructor(socket: Server, lobby: Lobby) {
+
+  interval: NodeJS.Timer;
+
+  constructor(socket: Server, store: Store, lobby: Lobby) {
 
     this.lobby = lobby;
     this.socket = socket;
+    this.store = store;
 
-    this.ball = new Ball();
-    //   x: 0, y: 0, velocity: { x: 1, y: 1 }
-    // }
-    // this.ball.y = 0;
-    this.paddle1 = new Paddle();
-    this.paddle2 = new Paddle();
+    this.balls[0] = new Ball();
+    this.paddles[0] = new Paddle();
+    this.paddles[1] = new Paddle();
 
+    this.unpause();
     // this.socket.on('PaddleUpdate', this.updatePaddle);
+  }
 
-    setInterval(() => this.tick(), 1000 / 60);
+  unpause() {
+    this.interval = setInterval(async () => await this.tick(), 1000 / 60);
+  }
+  pause() {
+    clearInterval(this.interval);
+    this.interval = null;
+  }
+  public get isPaused() {
+    return !this.interval;
   }
 
   updatePaddle(evt: string) {
-    if (evt === 'ArrowUp' && this.paddle1.y > 0) {
-      this.paddle1.y -= this.speed;
-    } else if (evt === 'ArrowDown' && this.paddle1.y < 400) {
-      this.paddle1.y += this.speed;
+    if (evt === 'ArrowUp' && this.paddles[0].pos.y > 0) {
+      this.paddles[0].pos.y -= this.speed;
+    } else if (evt === 'ArrowDown' && this.paddles[0].pos.y < 400) {
+      this.paddles[0].pos.y += this.speed;
     }
   }
 
   updatePositionPaddles({ y }) {
-    this.paddle1.y = y;
+    this.paddles[0].pos.y = y;
   }
-  run_physics() {
+
+  async run_physics() {
     // console.log("ball is : ", this.ball)
-    this.ball.x += this.ball.velocity.x;
-    this.ball.y += this.ball.velocity.y;
-    if (this.ball.x >= 500 - 20 || this.ball.x <= 0)
-      this.ball.bounceSide();
-    if (this.ball.y >= 500 - 20 || this.ball.y <= 0)
-      this.ball.bounceTop();
+    this.balls.forEach(ball => {
+      ball.pos.x += ball.velocity.x;
+      ball.pos.y += ball.velocity.y;
+      if (ball.pos.x >= 500 - 20 || ball.pos.x <= 0)
+        ball.bounceSide();
+      else if (ball.pos.y >= 500 - 20 || ball.pos.y <= 0)
+        ball.bounceTop();
+    })
   }
-  tick() {
+
+  public get state() {
+    return {
+      balls: this.balls,
+      paddles: this.paddles,
+    };
+  }
+
+  public get id() {
+    return `${this.lobby.id}`;
+  }
+
+  async tick() {
+    // const game = await this.store.get(this.id);
+
     this.run_physics();
-    this.socket.emit('gameUpdate', { ball: { x: this.ball.x, y: this.ball.y }, paddle1: this.paddle1, paddle2: this.paddle2 });
+
+    await Promise.all([
+      // this.store.set(this.id, this.state),
+      this.socket.emit('gameUpdate', this.state),
+    ]);
+
   }
 }

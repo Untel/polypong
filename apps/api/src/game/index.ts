@@ -4,4 +4,5 @@ export * from './bot.class';
 export * from './game.class';
 export * from './lobby.class';
 export * from './player.class';
+export * from './redis.bridge';
 export * from './spectator.class';

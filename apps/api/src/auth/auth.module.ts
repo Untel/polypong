@@ -3,9 +3,9 @@ import {
   Module,
   NestModule,
 } from '@nestjs/common';
-import * as RedisStore from 'connect-redis';
-import * as session from 'express-session';
-import * as passport from 'passport';
+import RedisStore from 'connect-redis';
+import session from 'express-session';
+import passport from 'passport';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
