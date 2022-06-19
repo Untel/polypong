@@ -30,9 +30,13 @@
         <!-- <div style="position:absolute; background-color: blue; width: 20px; height: 100px;" ref="paddle2">c</div> -->
       </div>
     </div>
-    <pre style="background-color: aquamarine;">
+    <q-btn :icon="isPaused ? 'unpause' : 'play'" @click="togglePause()">
+      {{ isPaused ? 'play' : 'pause' }}
+    </q-btn>
+    <pre style="background-color: grey;">
       Paddle : {{ paddle1Style }}
       Ball : {{ ballStyle }}
+      Pause : {{ isPaused }}
     </pre>
   </q-page>
 </template>
@@ -40,6 +44,7 @@
 <script lang="ts" setup>
 import { defineProps, ref, onMounted, StyleValue, Ref } from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
+import { useApi } from 'src/utils/api';
 const { socket } = useAuthStore();
 
 let ball: any;
@@ -127,5 +132,10 @@ onMounted(() => {
 
 socket?.on('gameUpdate', update);
 
+const {
+  data: isPaused,
+  isFetching,
+  execute: togglePause,
+} = useApi('pong/pause', { immediate: false });
 
 </script>

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/19 01:51:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/19 02:14:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,14 @@ export default class Game {
     this.paddles[0] = new Paddle();
     this.paddles[1] = new Paddle();
 
-    this.unpause();
+    // this.run();
     // this.socket.on('PaddleUpdate', this.updatePaddle);
   }
 
-  unpause() {
+  run() {
     this.interval = setInterval(async () => await this.tick(), 1000 / 60);
   }
-  pause() {
+  stop() {
     clearInterval(this.interval);
     this.interval = null;
   }
@@ -120,6 +120,7 @@ export default class Game {
     return {
       balls: this.balls,
       paddles: this.paddles,
+      isPaused: this.isPaused
     };
   }
 
@@ -131,7 +132,7 @@ export default class Game {
     // const game = await this.store.get(this.id);
 
     this.run_physics();
-
+    console.log(this.state);
     await Promise.all([
       // this.store.set(this.id, this.state),
       this.socket.emit('gameUpdate', this.state),
