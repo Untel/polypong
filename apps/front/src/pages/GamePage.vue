@@ -29,6 +29,7 @@
         </div>
         <!-- <div style="position:absolute; background-color: blue; width: 20px; height: 100px;" ref="paddle2">c</div> -->
       </div>
+      <PolygonMap :verticles="verticles">lol</PolygonMap>
     </div>
     <q-btn :icon="isPaused ? 'unpause' : 'play'" @click="togglePause()">
       {{ isPaused ? 'play' : 'pause' }}
@@ -45,6 +46,7 @@
 import { defineProps, ref, onMounted, StyleValue, Ref } from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
+import PolygonMap from 'src/components/PolygonMap.vue';
 const { socket } = useAuthStore();
 
 let ball: any;
@@ -101,18 +103,18 @@ function formatBallStyle(ball: Ball): StyleValue {
     ...formatPositionStyle(ball.pos),
     backgroundColor: 'red',
   };
-  console.log('Style', style);
+  // console.log('Style', style);
   return style;
 }
 
 const onMouseMove = (e: MouseEvent) => {
 
   var rect = e.target.getBoundingClientRect();
-  console.log(rect)
+  // console.log(rect)
 
-  console.log(e.clientY);
+  // console.log(e.clientY);
   var y = e.clientY - rect.top - 50;  //y position within the element.
-  console.log("y = ", y)
+  // console.log("y = ", y)
   y = (y < 0) ? 0 : y;
   y = (y > 400) ? 400 : y;
 
@@ -120,7 +122,7 @@ const onMouseMove = (e: MouseEvent) => {
 }
 
 const update = (evt: any) => {
-  console.log('Event', evt);
+  // console.log('Event', evt);
   balls.value = evt.balls;
   paddles.value = evt.paddles;
 }
@@ -130,7 +132,14 @@ onMounted(() => {
   window.addEventListener('keydown', onKeyDown);
 });
 
+const verticles = ref([]);
+const mapChange = (res) => {
+  console.log("Change map", res);
+  verticles.value = res.edges;
+};
+
 socket?.on('gameUpdate', update);
+socket?.on('mapChange', mapChange);
 
 const {
   data: isPaused,

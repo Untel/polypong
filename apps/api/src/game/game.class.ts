@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/19 02:14:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/19 19:26:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@ import { Server, Socket } from 'socket.io';
 import Redis from 'ioredis';
 import RedisBridge from './redis.bridge';
 import Store from 'redis-json';
+import { polygonRegular } from 'geometric';
+import Polygon from 'polygon';
+import MyPolygon from './polygon.class';
 
 class Position {
   x: number;
@@ -64,6 +67,8 @@ export default class Game {
   balls: Ball[] = [];
   paddles: Paddle[] = [];
   speed: number = 10;
+  edges: any;
+  map: Polygon;
 
   interval: NodeJS.Timer;
 
@@ -73,6 +78,18 @@ export default class Game {
     this.socket = socket;
     this.store = store;
 
+    const nPlayers = 3//lobby.players.size;
+    const nEdges = nPlayers > 2 && nPlayers || 4;
+
+
+    console.log('Edges', this.edges);
+    this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
+    console.log('poly', this.edges);
+    // console.log('poly 2', this.edges.offset(1));
+    this.edges = new MyPolygon(3).verticles;
+    this.map = new MyPolygon(3);
+    console.log("Edges", this.map);
+    this.socket.emit('mapChange', { edges: this.map.verticles } ),
     this.balls[0] = new Ball();
     this.paddles[0] = new Paddle();
     this.paddles[1] = new Paddle();
@@ -82,15 +99,16 @@ export default class Game {
   }
 
   run() {
+    this.map = new MyPolygon(getRandomArbitrary(3, 9));
+    this.socket.emit('mapChange', this.networkMap),
+
     this.interval = setInterval(async () => await this.tick(), 1000 / 60);
   }
   stop() {
     clearInterval(this.interval);
     this.interval = null;
   }
-  public get isPaused() {
-    return !this.interval;
-  }
+
 
   updatePaddle(evt: string) {
     if (evt === 'ArrowUp' && this.paddles[0].pos.y > 0) {
@@ -116,11 +134,19 @@ export default class Game {
     })
   }
 
-  public get state() {
+  // Getters
+  public get isPaused() {
+    return !this.interval;
+  }
+  public get networkState() {
     return {
       balls: this.balls,
       paddles: this.paddles,
-      isPaused: this.isPaused
+    };
+  }
+  public get networkMap() {
+    return {
+      edges: this.map.verticles,
     };
   }
 
@@ -132,11 +158,15 @@ export default class Game {
     // const game = await this.store.get(this.id);
 
     this.run_physics();
-    console.log(this.state);
+    // console.log(this.state);
     await Promise.all([
       // this.store.set(this.id, this.state),
-      this.socket.emit('gameUpdate', this.state),
+      this.socket.emit('gameUpdate', this.networkState),
     ]);
 
   }
+}
+
+function getRandomArbitrary(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }
