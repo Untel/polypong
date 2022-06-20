@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/20 20:47:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/20 20:59:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class Ball {
   constructor() {
     // console.log(this)
     this.pos = new Position(0, 0, 10, 10);
-    this.velocity = { x: 1.5, y: 1 };
+    this.velocity = { x: .5, y: .5 };
     // this.velocity.y = 0;
   }
   bounceTop() {
@@ -50,6 +50,14 @@ class Ball {
   };
   bounceSide() {
     this.velocity.x = -this.velocity.y
+  }
+  reset() {
+    this.pos.x = 0;
+    this.pos.y = 0;
+    this.velocity = {
+      x: getRandomFloatArbitrary(-1, 2),
+      y: getRandomFloatArbitrary(-1, 2),
+    }
   }
 }
 class Paddle {
@@ -105,7 +113,7 @@ export default class Game {
   run() {
     this.generateMap();
     this.socket.emit('mapChange', this.networkMap),
-    this.interval = setInterval(async () => await this.tick(), 1000 / 60);
+    this.interval = setInterval(() => this.tick(), 1000 / 60);
   }
   stop() {
     clearInterval(this.interval);
@@ -148,7 +156,7 @@ export default class Game {
   }
 
 
-  async run_physics() {
+  run_physics() {
     // console.log("ball is : ", this.ball)
     this.balls.forEach(ball => {
       const { x, y } = ball.pos;
@@ -169,8 +177,7 @@ export default class Game {
           }
         }
 
-        ball.pos.x = 0;
-        ball.pos.y = 0;
+        ball.reset();
       }
       ball.pos.x += ball.velocity.x;
       ball.pos.y += ball.velocity.y;
@@ -197,19 +204,15 @@ export default class Game {
     return `${this.lobby.id}`;
   }
 
-  async tick() {
-    // const game = await this.store.get(this.id);
-
+  tick() {
     this.run_physics();
-    // console.log(this.state);
-    await Promise.all([
-      // this.store.set(this.id, this.state),
-      this.socket.emit('gameUpdate', this.networkState),
-    ]);
-
+    this.socket.emit('gameUpdate', this.networkState);
   }
 }
 
 function getRandomArbitrary(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
+}
+function getRandomFloatArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
 }
