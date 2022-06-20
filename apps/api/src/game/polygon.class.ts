@@ -6,6 +6,7 @@ export default class Polygon {
   verticles = [];
   edges = [];
   angles = [];
+  edgeWidth: number = 0;
 
   constructor(npoints, x = 0, y = 0, radius = 50) {
     let angle = TWO_PI / npoints;
@@ -16,10 +17,12 @@ export default class Polygon {
       this.angles.push(angleToDegrees(a));
     }
 
-    for (let i = 0; i < this.verticles.length; i++) {
+    for (let i = 0; i < this.verticles.length - 1; i++) {
       const next = i === this.verticles.length - 1 ? 0 : i + 1;
       const line = [this.verticles[i], this.verticles[next]];
       this.edges[i] = line;
     }
+
+    this.edgeWidth = radius;
   }
 }
