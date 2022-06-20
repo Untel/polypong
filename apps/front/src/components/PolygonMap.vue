@@ -18,7 +18,7 @@
         v-for="paddle in paddles"
         v-bind="formatPaddlePoints(paddle)"
       />
-      <circle fill="green" r="10"
+      <circle fill="green" r="3"
         v-for="ball in balls"
         v-bind="formatBallPosition(ball)"
       />

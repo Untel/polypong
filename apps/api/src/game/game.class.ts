@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/20 20:19:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/20 20:47:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@ import { Server, Socket } from 'socket.io';
 import Redis from 'ioredis';
 import RedisBridge from './redis.bridge';
 import Store from 'redis-json';
-import { lineInterpolate, polygonRegular, lineAngle, angleToDegrees, Line, pointInPolygon } from 'geometric';
+import { lineInterpolate, polygonRegular, lineAngle, angleToDegrees, pointOnLine, Line, pointInPolygon, angleReflect, Point } from 'geometric';
 import Polygon from 'polygon';
 import MyPolygon from './polygon.class';
 
@@ -152,12 +152,25 @@ export default class Game {
     // console.log("ball is : ", this.ball)
     this.balls.forEach(ball => {
       const { x, y } = ball.pos;
-      const pip = pointInPolygon([x, y], this.map.verticles);
+      const point: Point = [x, y];
+      const pip = pointInPolygon(point, this.map.verticles);
 
       if (!pip) {
         console.log("Ball not in polygon");
-        ball.velocity.x = -ball.velocity.x;
-        ball.velocity.y = -ball.velocity.y;
+        // ball.velocity.x = -ball.velocity.x;
+        // ball.velocity.y = -ball.velocity.y;
+
+        for (let i = 0; i < this.paddles.length; i++) {
+          // Not good to handle the hit point
+          if (pointOnLine(point, this.paddles[i].line)) {
+            console.log(`Paddle ${i} has been hitten`);
+            // use it https://observablehq.com/@harrystevens/geometric-anglereflect to reflect the ball
+            return ;
+          }
+        }
+
+        ball.pos.x = 0;
+        ball.pos.y = 0;
       }
       ball.pos.x += ball.velocity.x;
       ball.pos.y += ball.velocity.y;
