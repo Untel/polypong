@@ -21,11 +21,7 @@
 <template>
   <q-page padding>
     <div style="display: flex; justify-content: center; align-items: center;">
-      <PolygonMap class="map" ref="mapEl"
-        :verticles="verticles"
-        :paddles="paddles"
-        :balls="balls"
-      >
+      <PolygonMap class="map" ref="mapEl" :verticles="verticles" :paddles="paddles" :balls="balls">
         <!-- <div class="ball"
            v-for="ball in balls"
           :style="formatBallStyle(ball)">a</div>
@@ -108,7 +104,7 @@ watch(elementX, (x: number) => {
 const update = (evt: any) => {
   // console.log('Event', evt);
   balls.value = [...evt.balls];
-  console.log("Paddles", evt.paddles);
+  // console.log("Paddles", evt.paddles);
   paddles.value = [...evt.paddles];
 }
 
@@ -121,6 +117,7 @@ const verticles = ref([]);
 const mapChange = (res) => {
   console.log("Change map", res);
   verticles.value = res.edges;
+  console.log("new verticles", verticles.value)
 };
 
 socket?.on('gameUpdate', update);

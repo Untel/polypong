@@ -1,4 +1,3 @@
-const TWO_PI = Math.PI * 2;
 import { polygonRegular, lineAngle, Line, Point, angleToDegrees } from 'geometric';
 // import Polygon from 'polygon';
 
@@ -9,11 +8,12 @@ export default class Polygon {
   edgeWidth: number = 0;
 
   constructor(npoints, x = 0, y = 0, radius = 50) {
-    let angle = TWO_PI / npoints;
-    for (let a = 0; a <= TWO_PI; a += angle) {
+    let angle = Math.PI * 2 / npoints;
+    for (let a = Math.PI; a <= Math.PI * 3; a += angle) {
       let sx = x + Math.cos(a) * radius;
       let sy = y + Math.sin(a) * radius;
       this.verticles.push([sx, sy]);
+      console.log("sx, sy ", [sx, sy]);
       this.angles.push(angleToDegrees(a));
     }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/21 18:10:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/22 01:44:44 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ export default class Game {
     const nPlayers = getRandomArbitrary(3, 9)//lobby.players.size;
     const nEdges = nPlayers > 2 && nPlayers || 4;
 
-    console.log('Edges', this.edges);
+    // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap(nEdges);
     this.balls[0] = new Ball();
@@ -168,7 +168,7 @@ export default class Game {
   run() {
     this.generateMap();
     this.socket.emit('mapChange', this.networkMap),
-    this.interval = setInterval(() => this.tick(), 1000 / 60);
+      this.interval = setInterval(() => this.tick(), 1000 / 60);
   }
   stop() {
     clearInterval(this.interval);
@@ -192,9 +192,15 @@ export default class Game {
     this.paddles.forEach(paddle => {
       paddle.updatePercentOnAxis(percent);
     });
+    this.paddles[0].updatePercentOnAxis(percent);
   }
 
-
+  crossProduct(a: Vector, b: Vector) {
+    return a.x * b.y - b.x * a.y;
+  }
+  sqDist(a: Vector, b: Vector) {
+    return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+  }
   run_physics() {
     // console.log("ball is : ", this.ball)
     this.balls.forEach(ball => {
@@ -207,8 +213,8 @@ export default class Game {
         console.log("Ball not in polygon");
         // ball.velocity.x = -ball.velocity.x;
         // ball.velocity.y = -ball.velocity.y;
-        ball.reset(new Vector(0, 0));
-        return ;
+        // ball.reset(new Vector(0, 0));
+        return;
         // for (let i = 0; i < this.paddles.length; i++) {
         //   // Not good to handle the hit point
         //   if (pointOnLine(point, this.paddles[i].line)) {
