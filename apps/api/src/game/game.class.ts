@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/21 12:21:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/21 16:51:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,62 +15,106 @@ import { Server, Socket } from 'socket.io';
 import Redis from 'ioredis';
 import RedisBridge from './redis.bridge';
 import Store from 'redis-json';
-import { lineInterpolate, polygonRegular, lineAngle, angleToDegrees, pointOnLine, Line, pointInPolygon, angleReflect, Point } from 'geometric';
+import {
+  lineInterpolate,
+  polygonRegular,
+  lineAngle,
+  angleToDegrees,
+  pointOnLine,
+  Line,
+  pointInPolygon,
+  angleReflect,
+  Point,
+  polygonCentroid,
+  lineLength,
+} from 'geometric';
+
+import {
+  Box,
+  Circle,
+  Polygon,
+  Collider2d,
+  Vector,
+} from 'collider2d';
+
 import { polygonOffset } from 'polygon';
-import MyPolygon from './polygon.class';
+import PolygonMap from './polygon.class';
+class Ball extends Circle {
+  speed: number = 1;
+  direction: Vector;
 
-class Position {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-
-  constructor(x: number, y: number, w: number, h: number) {
-    this.x = x;
-    this.y = y;
-    this.h = h;
-    this.w = w;
+  constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
+    super(startPos, radius)
+    this.setAngle(0);
+    // console.log("11", this.position);
+    this.move();
+    // console.log("11", this.position);
   }
-}
 
-class Ball {
-  pos: Position;
-  speed: number;
-  angle: number;
-  direction: any;
-  lastHitten: any;
-
-  constructor() {
-    // console.log(this)
-    this.pos = new Position(0, 0, 10, 10);
-    this.angle = 0;
-    this.speed = 1;
-    // this.velocity.y = 0;
+  setAngle(angle: number) {
+    const x = Math.sin(angle) * this.speed;
+    const y = Math.cos(angle) * this.speed;
+    console.log("Setting angle", x, y);
+    this.direction = new Vector(x, y);
   }
 
   move() {
-    this.pos.x += Math.sin(this.angle) * this.speed;
-    this.pos.y += Math.cos(this.angle) * this.speed;
+    this.position.x = this.position.x + this.direction.x;
+    this.position.y = this.position.y + this.direction.y;
   }
 
-  reset() {
-    this.pos.x = 0;
-    this.pos.y = 0;
-    this.angle = getRandomFloatArbitrary(0, Math.PI * 2);
+  reset(position: Vector = new Vector(0, 0)) {
+    this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
+    this.position.x = position.x;
+    this.position.y = position.y;
+  }
+
+  public get netScheme() {
+    return {
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      radius: this.radius,
+    }
   }
 }
 class Paddle {
   line: Line;
-  interpolate: Function;
+  interpolationStart: Function;
+  interpolationEnd: Function;
+  width: number;
 
-  constructor(axis: Line) {
-    this.interpolate = lineInterpolate(axis)
+  constructor(axis: Line, width: number = .2) {
+    this.width = width;
+    const lw = lineLength(axis);
+    const pw = lw * width;
+
+    console.log("Lw", lw, "pw", pw);
+    // On cree un sous line sur laquelle le paddle va pouvoir glisser
+    // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
+    const preInterpolate = lineInterpolate(axis);
+    const effectiveAxisStart: Line = [
+      axis[0],
+      preInterpolate(1 - this.width),
+    ];
+
+    const effectiveAxisEnd: Line = [
+      preInterpolate(this.width),
+      axis[1],
+    ];
+
+    this.interpolationStart = lineInterpolate(effectiveAxisStart);
+    this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
+    // this.interpolate2 = lineInterpolate(effectiveAxis);
     this.updatePercentOnAxis(.5);
   }
 
   updatePercentOnAxis(ratio: number) {
-    const newPos = this.interpolate(ratio);
-    const newPosEnd = this.interpolate(ratio + .2);
+    // ratio 0 -> 1
+
+    const newPos = this.interpolationStart(ratio);
+    const newPosEnd = this.interpolationEnd(ratio);
     this.line = [
       newPos,
       newPosEnd,
@@ -87,7 +131,7 @@ export default class Game {
   paddles: Paddle[] = [];
   speed: number = 10;
   edges: any;
-  map: Polygon;
+  map: PolygonMap;
 
   interval: NodeJS.Timer;
 
@@ -107,11 +151,11 @@ export default class Game {
 
     console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
-    this.map = new MyPolygon(nPlayers);
+    this.map = new PolygonMap(nEdges);
     this.balls[0] = new Ball();
     this.paddles = this.map.edges.map((line, idx) => {
       console.log("Paddle", line);
-      return new Paddle(line);
+      return new Paddle(line, .4);
     });
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
@@ -150,30 +194,28 @@ export default class Game {
   run_physics() {
     // console.log("ball is : ", this.ball)
     this.balls.forEach(ball => {
-      const { x, y } = ball.pos;
+      const { x, y } = ball.position;
       const point: Point = [x, y];
-
-      for (let i = 0; i < this.paddles.length; i++) {
-        // Not good to handle the hit point
-        if (pointOnLine(point, this.paddles[i].line)) {
-          console.log(`Paddle ${i} has been hitten`);
-          // use it https://observablehq.com/@harrystevens/geometric-anglereflect to reflect the ball
-          return ;
-        }
-      }
 
       const pip = pointInPolygon(point, this.map.verticles);
 
       if (!pip) {
-        // console.log("Ball not in polygon");
+        console.log("Ball not in polygon");
         // ball.velocity.x = -ball.velocity.x;
         // ball.velocity.y = -ball.velocity.y;
-
-
-        ball.reset();
+        ball.reset(new Vector(0, 0));
+        return ;
+        // for (let i = 0; i < this.paddles.length; i++) {
+        //   // Not good to handle the hit point
+        //   if (pointOnLine(point, this.paddles[i].line)) {
+        //     console.log(`Paddle ${i} has been hitten`);
+        //     // use it https://observablehq.com/@harrystevens/geometric-anglereflect to reflect the ball
+        //     return ;
+        //   }
+        // }
       }
       ball.move();
-    })
+    });
   }
 
   // Getters
@@ -182,7 +224,7 @@ export default class Game {
   }
   public get networkState() {
     return {
-      balls: this.balls,
+      balls: this.balls.map(b => b.netScheme),
       paddles: this.paddles,
     };
   }

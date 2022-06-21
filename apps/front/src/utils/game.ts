@@ -12,5 +12,5 @@ export class Paddle {
 }
 
 export class Ball {
-  pos: Position = { x: 0, y: 0, w: 0, h: 0 };
+  position: Position = { x: 0, y: 0, w: 0, h: 0 };
 }

@@ -73,8 +73,8 @@ function formatPaddlePoints(paddle: Paddle) {
 
 function formatBallPosition(ball: Ball) {
   return {
-    cx: ball.pos.x,
-    cy: ball.pos.y,
+    cx: ball.position.x,
+    cy: ball.position.y,
   }
 }
 function formatPaddleStyle(paddle: Paddle): StyleValue {

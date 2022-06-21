@@ -1443,6 +1443,11 @@ cluster-key-slot@^1.1.0:
   resolved "https://registry.yarnpkg.com/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz#30474b2a981fb12172695833052bc0d01336d10d"
   integrity sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==
 
+collider2d@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/collider2d/-/collider2d-1.1.1.tgz#d103553404162b6033ff912fcab6780ef41257a5"
+  integrity sha512-dm9TjFSWivV2vzP+TIRHODr/NZOG5BpSt3zYNYWqz+GWQ0+tYuMr4psns/ID84Sm7ng2OgGT2tEIXYQ5BHIJXw==
+
 color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.3.tgz#bb71850690e1f136567de629d2d5471deda4c1e8"
