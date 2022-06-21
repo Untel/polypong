@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/21 16:51:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/21 18:10:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,12 +98,10 @@ class Paddle {
       axis[0],
       preInterpolate(1 - this.width),
     ];
-
     const effectiveAxisEnd: Line = [
       preInterpolate(this.width),
       axis[1],
     ];
-
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
     // this.interpolate2 = lineInterpolate(effectiveAxis);
@@ -119,6 +117,12 @@ class Paddle {
       newPos,
       newPosEnd,
     ];
+  }
+
+  public get netScheme() {
+    return {
+      line: this.line,
+    }
   }
 }
 
@@ -225,7 +229,7 @@ export default class Game {
   public get networkState() {
     return {
       balls: this.balls.map(b => b.netScheme),
-      paddles: this.paddles,
+      paddles: this.paddles.map(p => p.netScheme),
     };
   }
   public get networkMap() {
