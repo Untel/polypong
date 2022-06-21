@@ -65,7 +65,8 @@ services:
       - proxy
       - mailer
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     stop_signal: SIGINT
 
   # Cold data (user infos, accounts etc) database
