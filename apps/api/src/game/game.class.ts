@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 03:28:33 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/22 04:32:46 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,29 +174,26 @@ export default class Game {
     clearInterval(this.interval);
     this.interval = null;
   }
-  isInside(points: any) {
+
+  //En sah de sah je sais que ca rentre en moins de lignes 
+  isInside(points: any, id = 0) {
 
 
-    let ball = this.balls[0];
-    console.log("is Inside function", ball)
-    console.log(points)
+    let ball = this.balls[id];
     let x: number, y: number;
     x = ball.position.x;
     y = ball.position.y
-    let p1 = new Vector(points[points.length - 1].x - points[0].x, points[points.length - 1].y - points[0].y)
-    let p2 = new Vector(points[1].x - points[0].x, points[1].y - points[0].y)
-    let pq = new Vector(x - points[0].x, y - points[0].y)
-    console.log("p1 p2 pq", p1, p2, pq)
+    let p1: Vector = new Vector(points[points.length - 1][0] - points[0][0], points[points.length - 1][1] - points[0][1])
+    let p2: Vector = new Vector(points[1][0] - points[0][0], points[1][1] - points[0][1])
+    let pq: Vector = new Vector(x - points[0][0], y - points[0][1])
     if (!(this.crossProduct(p1, pq) <= 0 && this.crossProduct(p2, pq) >= 0))
       return false;
 
     let l: number = 0, r: number = points.length;
-    // l = 0;
-    // r = points.length;
+
     while (r - l > 1) {
-      let mid: number = (l + r) / 2;
-      let cur = new Vector(points[mid].x - points[0].x, points[mid].y - points[0].y)
-      // cur = { x: points[mid].x - points[0].x, y: points[mid].y - points[0].y };
+      let mid: number = Math.floor((l + r) / 2);
+      let cur: Vector = new Vector(points[mid][0] - points[0][0], points[mid][1] - points[0][1])
       if (this.crossProduct(cur, pq) < 0) {
         r = mid;
       } else {
@@ -207,8 +204,8 @@ export default class Game {
     if (l == points.length - 1) {
       return this.sqDist(points[0], new Vector(x, y)) <= this.sqDist(points[0], points[l]);
     } else {
-      let l_l1 = new Vector(points[l + 1].x - points[l].x, points[l + 1].y - points[l].y);
-      let lq = new Vector(x - points[l].x, y - points[l].y);
+      let l_l1: Vector = new Vector(points[l + 1][0] - points[l][0], points[l + 1][1] - points[l][1]);
+      let lq: Vector = new Vector(x - points[l][0], y - points[l][1]);
       return (this.crossProduct(l_l1, lq) >= 0);
     }
   }
@@ -240,21 +237,23 @@ export default class Game {
   sqDist(a: Vector, b: Vector) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
   }
-  run_physics() {
+  runPhysics() {
     // console.log("ball is : ", this.ball)
     this.balls.forEach(ball => {
       const { x, y } = ball.position;
       const point: Point = [x, y];
 
-      const pip = pointInPolygon(point, this.map.verticles);
-      // console.log(this.isInside(this.map.verticles))
+      // const pip = pointInPolygon(point, this.map.verticles);
+      const pip = this.isInside(this.map.verticles);
       // let pip = true
       if (!pip) {
-        console.log("Ball not in polygon");
-        // ball.velocity.x = -ball.velocity.x;
-        // ball.velocity.y = -ball.velocity.y;
+        //   console.log("Ball not in polygon");
+        ball.direction.x = -ball.direction.x;
+        ball.direction.y = -ball.direction.y;
+        // ball.move();
+
         // ball.reset(new Vector(0, 0));
-        return;
+        // return;
         // for (let i = 0; i < this.paddles.length; i++) {
         //   // Not good to handle the hit point
         //   if (pointOnLine(point, this.paddles[i].line)) {
@@ -289,7 +288,7 @@ export default class Game {
   }
 
   tick() {
-    this.run_physics();
+    this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }
 }
