@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 04:32:46 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/22 14:57:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,22 +29,24 @@ import {
   lineLength,
 } from 'geometric';
 
-import {
-  Box,
-  Circle,
-  Polygon,
-  Collider2d,
-  Vector,
-} from 'collider2d';
+import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
 import { polygonOffset } from 'polygon';
 import PolygonMap from './polygon.class';
+
+function crossProduct(a: Vector, b: Vector) {
+  return a.x * b.y - b.x * a.y;
+}
+function sqDist(a: Vector, b: Vector) {
+  return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}
+
 class Ball extends Circle {
-  speed: number = 1;
+  speed = 1;
   direction: Vector;
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
-    super(startPos, radius)
+    super(startPos, radius);
     this.setAngle(0);
     // console.log("11", this.position);
     this.move();
@@ -54,7 +56,7 @@ class Ball extends Circle {
   setAngle(angle: number) {
     const x = Math.sin(angle) * this.speed;
     const y = Math.cos(angle) * this.speed;
-    console.log("Setting angle", x, y);
+    console.log('Setting angle', x, y);
     this.direction = new Vector(x, y);
   }
 
@@ -69,6 +71,50 @@ class Ball extends Circle {
     this.position.y = position.y;
   }
 
+  //En sah de sah je sais que ca rentre en moins de lignes
+  isInside(points: any) {
+    const { x, y } = this.position;
+    const p1: Vector = new Vector(
+      points[points.length - 1][0] - points[0][0],
+      points[points.length - 1][1] - points[0][1],
+    );
+    const p2: Vector = new Vector(
+      points[1][0] - points[0][0],
+      points[1][1] - points[0][1],
+    );
+    const pq: Vector = new Vector(x - points[0][0], y - points[0][1]);
+    if (!(crossProduct(p1, pq) <= 0 && crossProduct(p2, pq) >= 0)) return false;
+
+    let l = 0,
+      r: number = points.length;
+
+    while (r - l > 1) {
+      const mid: number = Math.floor((l + r) / 2);
+      const cur: Vector = new Vector(
+        points[mid][0] - points[0][0],
+        points[mid][1] - points[0][1],
+      );
+      if (crossProduct(cur, pq) < 0) {
+        r = mid;
+      } else {
+        l = mid;
+      }
+    }
+
+    if (l == points.length - 1) {
+      return (
+        sqDist(points[0], new Vector(x, y)) <= sqDist(points[0], points[l])
+      );
+    } else {
+      const l_l1: Vector = new Vector(
+        points[l + 1][0] - points[l][0],
+        points[l + 1][1] - points[l][1],
+      );
+      const lq: Vector = new Vector(x - points[l][0], y - points[l][1]);
+      return crossProduct(l_l1, lq) >= 0;
+    }
+  }
+
   public get netScheme() {
     return {
       position: {
@@ -76,7 +122,7 @@ class Ball extends Circle {
         y: this.position.y,
       },
       radius: this.radius,
-    }
+    };
   }
 }
 class Paddle {
@@ -85,27 +131,21 @@ class Paddle {
   interpolationEnd: Function;
   width: number;
 
-  constructor(axis: Line, width: number = .2) {
+  constructor(axis: Line, width = 0.2) {
     this.width = width;
     const lw = lineLength(axis);
     const pw = lw * width;
 
-    console.log("Lw", lw, "pw", pw);
+    console.log('Lw', lw, 'pw', pw);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(axis);
-    const effectiveAxisStart: Line = [
-      axis[0],
-      preInterpolate(1 - this.width),
-    ];
-    const effectiveAxisEnd: Line = [
-      preInterpolate(this.width),
-      axis[1],
-    ];
+    const effectiveAxisStart: Line = [axis[0], preInterpolate(1 - this.width)];
+    const effectiveAxisEnd: Line = [preInterpolate(this.width), axis[1]];
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
     // this.interpolate2 = lineInterpolate(effectiveAxis);
-    this.updatePercentOnAxis(.5);
+    this.updatePercentOnAxis(0.5);
   }
 
   updatePercentOnAxis(ratio: number) {
@@ -113,16 +153,13 @@ class Paddle {
 
     const newPos = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
-    this.line = [
-      newPos,
-      newPosEnd,
-    ];
+    this.line = [newPos, newPosEnd];
   }
 
   public get netScheme() {
     return {
       line: this.line,
-    }
+    };
   }
 }
 
@@ -133,14 +170,13 @@ export default class Game {
 
   balls: Ball[] = [];
   paddles: Paddle[] = [];
-  speed: number = 10;
+  speed = 10;
   edges: any;
   map: PolygonMap;
 
   interval: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
-
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
@@ -150,16 +186,15 @@ export default class Game {
   }
 
   generateMap() {
-    const nPlayers = getRandomArbitrary(3, 9)//lobby.players.size;
-    const nEdges = nPlayers > 2 && nPlayers || 4;
+    const nPlayers = getRandomArbitrary(3, 9); //lobby.players.size;
+    const nEdges = (nPlayers > 2 && nPlayers) || 4;
 
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap(nEdges);
     this.balls[0] = new Ball();
     this.paddles = this.map.edges.map((line, idx) => {
-      console.log("Paddle", line);
-      return new Paddle(line, .4);
+      return new Paddle(line, 0.4);
     });
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
@@ -167,50 +202,13 @@ export default class Game {
 
   run() {
     this.generateMap();
-    this.socket.emit('mapChange', this.networkMap),
-      this.interval = setInterval(() => this.tick(), 1000 / 60);
+    this.socket.emit('mapChange', this.networkMap);
+    this.interval = setInterval(() => this.tick(), 1000 / 60);
   }
   stop() {
     clearInterval(this.interval);
     this.interval = null;
   }
-
-  //En sah de sah je sais que ca rentre en moins de lignes 
-  isInside(points: any, id = 0) {
-
-
-    let ball = this.balls[id];
-    let x: number, y: number;
-    x = ball.position.x;
-    y = ball.position.y
-    let p1: Vector = new Vector(points[points.length - 1][0] - points[0][0], points[points.length - 1][1] - points[0][1])
-    let p2: Vector = new Vector(points[1][0] - points[0][0], points[1][1] - points[0][1])
-    let pq: Vector = new Vector(x - points[0][0], y - points[0][1])
-    if (!(this.crossProduct(p1, pq) <= 0 && this.crossProduct(p2, pq) >= 0))
-      return false;
-
-    let l: number = 0, r: number = points.length;
-
-    while (r - l > 1) {
-      let mid: number = Math.floor((l + r) / 2);
-      let cur: Vector = new Vector(points[mid][0] - points[0][0], points[mid][1] - points[0][1])
-      if (this.crossProduct(cur, pq) < 0) {
-        r = mid;
-      } else {
-        l = mid;
-      }
-    }
-
-    if (l == points.length - 1) {
-      return this.sqDist(points[0], new Vector(x, y)) <= this.sqDist(points[0], points[l]);
-    } else {
-      let l_l1: Vector = new Vector(points[l + 1][0] - points[l][0], points[l + 1][1] - points[l][1]);
-      let lq: Vector = new Vector(x - points[l][0], y - points[l][1]);
-      return (this.crossProduct(l_l1, lq) >= 0);
-    }
-  }
-
-
 
   updatePaddle(evt: string) {
     // if (evt === 'ArrowUp' && this.paddles[0].pos.y > 0) {
@@ -225,26 +223,17 @@ export default class Game {
   }
 
   updatePaddlePercent(percent: number) {
-    this.paddles.forEach(paddle => {
+    this.paddles.forEach((paddle) => {
       paddle.updatePercentOnAxis(percent);
     });
     this.paddles[0].updatePercentOnAxis(percent);
   }
 
-  crossProduct(a: Vector, b: Vector) {
-    return a.x * b.y - b.x * a.y;
-  }
-  sqDist(a: Vector, b: Vector) {
-    return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
-  }
   runPhysics() {
     // console.log("ball is : ", this.ball)
-    this.balls.forEach(ball => {
-      const { x, y } = ball.position;
-      const point: Point = [x, y];
-
+    this.balls.forEach((ball) => {
       // const pip = pointInPolygon(point, this.map.verticles);
-      const pip = this.isInside(this.map.verticles);
+      const pip = ball.isInside(this.map.verticles);
       // let pip = true
       if (!pip) {
         //   console.log("Ball not in polygon");
@@ -273,8 +262,8 @@ export default class Game {
   }
   public get networkState() {
     return {
-      balls: this.balls.map(b => b.netScheme),
-      paddles: this.paddles.map(p => p.netScheme),
+      balls: this.balls.map((b) => b.netScheme),
+      paddles: this.paddles.map((p) => p.netScheme),
     };
   }
   public get networkMap() {

@@ -13,7 +13,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
-import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
+import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
@@ -27,7 +27,7 @@ export class PongService {
   lobbies = new Map<number, Lobby>();
   connectedPlayer = new Map<string, Player>();
   id = 0;
-  tmpGame: Game = null
+  tmpGame: Game = null;
 
   constructor(@InjectRedis() private readonly redis: Redis) {
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });
@@ -36,9 +36,7 @@ export class PongService {
       this.tmpGame = new Game(
         this.socketServer,
         this.store,
-        new Lobby(0,
-            new Player(0)
-        )
+        new Lobby(0, new Player(0)),
       );
     }, 3000);
   }
@@ -62,7 +60,7 @@ export class PongService {
 
   addConnectedPeople(player: Player) {
     if (this.connectedPlayer.has(player.socketId)) {
-      console.log("Player is still connected");
+      console.log('Player is still connected');
       return;
     }
     this.connectedPlayer.set(player.socketId, player);
@@ -102,9 +100,7 @@ export class PongService {
   }
 
   togglePause() {
-    this.tmpGame.isPaused ?
-      this.tmpGame.run() :
-      this.tmpGame.stop();
+    this.tmpGame.isPaused ? this.tmpGame.run() : this.tmpGame.stop();
     return this.tmpGame.isPaused;
   }
 }

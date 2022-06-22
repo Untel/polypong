@@ -20,9 +20,10 @@ import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
   cors: true,
   transports: ['websocket'],
 })
-export class PongGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-
-  constructor(private readonly pongService: PongService) { }
+export class PongGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly pongService: PongService) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');

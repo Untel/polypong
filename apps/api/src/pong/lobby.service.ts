@@ -13,7 +13,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
-import Lobby, { ILobbyConfig, LobbyId, } from 'src/game/lobby.class';
+import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
@@ -21,7 +21,6 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class LobbyService {
-
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   async getLobbies(): Promise<any> {
