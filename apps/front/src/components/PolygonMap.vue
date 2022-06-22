@@ -2,16 +2,22 @@
   .wrapper {
     width: 300px;
     position: relative;
+
+    svg {
+
+    }
   }
 </style>
 
 <template>
   <div class="wrapper">
     <svg viewBox="-50 -50 100 100">
+
       <polygon
         :points="verticlesToPoint"
-        fill="white" stroke="none">
+        fill="yellow" stroke="gray">
       </polygon>
+
       <line
         stroke="blue"
         stroke-width="2px"
@@ -20,8 +26,28 @@
       />
       <circle fill="green" r="3"
         v-for="ball in balls"
-        v-bind="formatBallPosition(ball)"
-      />
+        v-bind="formatBallPosition(ball.position)"
+      >yo</circle>
+      <circle fill="red" r="3"
+        v-for="ball in balls.filter((b: any) => b.target?.hit)"
+        v-bind="formatBallPosition(ball.target.hit)"
+      >
+        yo
+      </circle>
+      <text
+        v-for="vertex in verticles"
+        :x="vertex[0]" :y="vertex[1]"
+        fill="green" font-size="5"
+      >
+        {{ vertex[0].toFixed(1) }},{{ vertex[1].toFixed(1) }}
+      </text>
+      <text
+        v-for="ball in balls.filter((b: any) => b.target?.hit)"
+        :x="ball.target.hit.x" :y="ball.target.hit.y"
+        fill="green" font-size="5"
+      >
+        {{ ball.target.hit.x.toFixed(1) }},{{ ball.target.hit.y.toFixed(1) }}
+      </text>
     </svg>
     <slot />
     <!-- <pre v-if="paddles && paddles[0]">
@@ -39,7 +65,7 @@ import { Position, Paddle, Ball } from 'src/utils/game';
 
 const props = defineProps({
   verticles: {
-    type: Array as PropType<Array<Array<number>>>,
+    type: Array as PropType<number[][]>,
     default: () => [],
   },
   paddles: {
@@ -71,10 +97,10 @@ function formatPaddlePoints(paddle: Paddle) {
   }
 }
 
-function formatBallPosition(ball: Ball) {
+function formatBallPosition(position: Position) {
   return {
-    cx: ball.position.x,
-    cy: ball.position.y,
+    cx: position.x,
+    cy: position.y,
   }
 }
 function formatPaddleStyle(paddle: Paddle): StyleValue {

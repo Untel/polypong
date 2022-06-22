@@ -21,7 +21,11 @@
 <template>
   <q-page padding>
     <div style="display: flex; justify-content: center; align-items: center;">
-      <PolygonMap class="map" ref="mapEl" :verticles="verticles" :paddles="paddles" :balls="balls">
+      <PolygonMap class="map" ref="mapEl"
+        :verticles="verticles"
+        :paddles="paddles"
+        :balls="balls"
+        >
         <!-- <div class="ball"
            v-for="ball in balls"
           :style="formatBallStyle(ball)">a</div>
@@ -31,14 +35,23 @@
         >b</div> -->
       </PolygonMap>
     </div>
-    <q-btn :icon="isPaused ? 'unpause' : 'play'" @click="togglePause()">
-      {{ isPaused ? 'play' : 'pause' }}
+    <!-- :icon="isPaused ? 'unpause' : 'play'" -->
+    <q-btn
+      :label="isPaused ? 'play' : 'pause'"
+      @click="togglePause()">
     </q-btn>
+    <q-btn dense @click="tick()">
+      tick
+    </q-btn>
+    <!-- <pre>
+      {{ tickValue }}
+    </pre> -->
     <pre style="background-color: grey;">
-      El x {{ elementX }}
-      Paddle : {{ paddles }}
+      <!-- El x {{ elementX }} -->
+      <!-- Paddle : {{ paddles }} -->
       Ball : {{ balls }}
-      Pause : {{ isPaused }}
+      Info : {{ info }}
+      <!-- Pause : {{ isPaused }} -->
     </pre>
   </q-page>
 </template>
@@ -56,6 +69,7 @@ const { socket } = useAuthStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
+const info: Ref<any> = ref(null);
 
 const props = defineProps({
   lobbyId: Number,
@@ -102,10 +116,12 @@ watch(elementX, (x: number) => {
 })
 
 const update = (evt: any) => {
-  // console.log('Event', evt);
-  balls.value = [...evt.balls];
+  const { balls: b, paddles: p, ...rest } = evt;
+  console.log('Event', evt);
+  balls.value = [...b];
   // console.log("Paddles", evt.paddles);
-  paddles.value = [...evt.paddles];
+  paddles.value = [...p];
+  info.value = rest;
 }
 
 onMounted(() => {
@@ -125,8 +141,12 @@ socket?.on('mapChange', mapChange);
 
 const {
   data: isPaused,
-  isFetching,
   execute: togglePause,
 } = useApi('pong/pause', { immediate: false });
+
+const {
+  data: tickValue,
+  execute: tick,
+} = useApi('pong/tick', { immediate: false }).json();
 
 </script>

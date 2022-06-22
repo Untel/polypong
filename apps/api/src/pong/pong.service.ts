@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/20 18:56:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/22 17:55:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,5 +102,10 @@ export class PongService {
   togglePause() {
     this.tmpGame.isPaused ? this.tmpGame.run() : this.tmpGame.stop();
     return this.tmpGame.isPaused;
+  }
+
+  tick() {
+    this.tmpGame.tick();
+    return this.tmpGame.devTick;
   }
 }
