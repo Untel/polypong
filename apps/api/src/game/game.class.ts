@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 01:44:44 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/22 03:28:33 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,45 @@ export default class Game {
     clearInterval(this.interval);
     this.interval = null;
   }
+  isInside(points: any) {
+
+
+    let ball = this.balls[0];
+    console.log("is Inside function", ball)
+    console.log(points)
+    let x: number, y: number;
+    x = ball.position.x;
+    y = ball.position.y
+    let p1 = new Vector(points[points.length - 1].x - points[0].x, points[points.length - 1].y - points[0].y)
+    let p2 = new Vector(points[1].x - points[0].x, points[1].y - points[0].y)
+    let pq = new Vector(x - points[0].x, y - points[0].y)
+    console.log("p1 p2 pq", p1, p2, pq)
+    if (!(this.crossProduct(p1, pq) <= 0 && this.crossProduct(p2, pq) >= 0))
+      return false;
+
+    let l: number = 0, r: number = points.length;
+    // l = 0;
+    // r = points.length;
+    while (r - l > 1) {
+      let mid: number = (l + r) / 2;
+      let cur = new Vector(points[mid].x - points[0].x, points[mid].y - points[0].y)
+      // cur = { x: points[mid].x - points[0].x, y: points[mid].y - points[0].y };
+      if (this.crossProduct(cur, pq) < 0) {
+        r = mid;
+      } else {
+        l = mid;
+      }
+    }
+
+    if (l == points.length - 1) {
+      return this.sqDist(points[0], new Vector(x, y)) <= this.sqDist(points[0], points[l]);
+    } else {
+      let l_l1 = new Vector(points[l + 1].x - points[l].x, points[l + 1].y - points[l].y);
+      let lq = new Vector(x - points[l].x, y - points[l].y);
+      return (this.crossProduct(l_l1, lq) >= 0);
+    }
+  }
+
 
 
   updatePaddle(evt: string) {
@@ -208,7 +247,8 @@ export default class Game {
       const point: Point = [x, y];
 
       const pip = pointInPolygon(point, this.map.verticles);
-
+      // console.log(this.isInside(this.map.verticles))
+      // let pip = true
       if (!pip) {
         console.log("Ball not in polygon");
         // ball.velocity.x = -ball.velocity.x;
