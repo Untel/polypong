@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 14:57:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/22 15:11:55 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,6 @@ import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 import { polygonOffset } from 'polygon';
 import PolygonMap from './polygon.class';
 
-function crossProduct(a: Vector, b: Vector) {
-  return a.x * b.y - b.x * a.y;
-}
 function sqDist(a: Vector, b: Vector) {
   return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
@@ -83,7 +80,7 @@ class Ball extends Circle {
       points[1][1] - points[0][1],
     );
     const pq: Vector = new Vector(x - points[0][0], y - points[0][1]);
-    if (!(crossProduct(p1, pq) <= 0 && crossProduct(p2, pq) >= 0)) return false;
+    if (!(p1.dot(pq) <= 0 && p2.dot(pq) >= 0)) return false;
 
     let l = 0,
       r: number = points.length;
@@ -94,7 +91,7 @@ class Ball extends Circle {
         points[mid][0] - points[0][0],
         points[mid][1] - points[0][1],
       );
-      if (crossProduct(cur, pq) < 0) {
+      if (cur.dot(pq) < 0) {
         r = mid;
       } else {
         l = mid;
@@ -111,7 +108,7 @@ class Ball extends Circle {
         points[l + 1][1] - points[l][1],
       );
       const lq: Vector = new Vector(x - points[l][0], y - points[l][1]);
-      return crossProduct(l_l1, lq) >= 0;
+      return l_l1.dot(lq) >= 0;
     }
   }
 
@@ -144,7 +141,6 @@ class Paddle {
     const effectiveAxisEnd: Line = [preInterpolate(this.width), axis[1]];
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
-    // this.interpolate2 = lineInterpolate(effectiveAxis);
     this.updatePercentOnAxis(0.5);
   }
 
