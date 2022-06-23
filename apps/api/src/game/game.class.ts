@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 18:41:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 18:43:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -321,15 +321,15 @@ export default class Game {
           ball.setAngle(newAngle);
           ball.findTarget(this.map.edges);
         } else {
+          // en 1v1 il y a deux murs en plus, c'est un trick pour pas que ca bug mais c'est moche, a rework
           const idx =
             this.nPlayers === 2 && ball.target.index === 2
               ? 1
               : ball.target.index;
           const paddle = this.paddles[idx];
-          const boundSegment = paddle.line;
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.target.hit,
-            boundSegment,
+            paddle.line,
             1,
           );
           if (paddleTouchTheBall) {
@@ -337,12 +337,12 @@ export default class Game {
             const surfaceAngleDeg = paddle.angle; //paddle.angle;
             const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
             const newAngle = angleToRadians(newDegree);
-            ball.speed *= 1.1;
             /**
-             * @TODO Ajouter a cet angle un %age suivant ou on tape sur a raquette
+             * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
              * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
              * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
              */
+            ball.speed *= 1.1;
             ball.setAngle(newAngle);
             ball.findTarget(this.map.edges);
           } else {
