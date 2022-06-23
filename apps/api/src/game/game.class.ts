@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 03:41:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 04:27:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ class Ball extends Circle {
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
     super(startPos, radius);
-    // this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
     // console.log("11", this.position);
     // this.move();
     // this.reset();
@@ -162,8 +161,8 @@ class Ball extends Circle {
   }
 
   reset(position: Vector = new Vector(0, 0)) {
-    // this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
-    this.setAngle(Math.PI / 3);
+    this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
+    // this.setAngle(Math.PI / 3);
     this.position.x = position.x;
     this.position.y = position.y;
   }
@@ -252,6 +251,7 @@ export default class Game {
   store: Store;
 
   balls: Ball[] = [];
+  nPlayers: number;
   paddles: Paddle[] = [];
   speed = 10;
   edges: any;
@@ -265,20 +265,24 @@ export default class Game {
     this.store = store;
     // this.run();
     // this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.generateMap();
+    this.nPlayers = 2;
+    this.generateMap(this.nPlayers);
   }
 
-  generateMap() {
-    const nPlayers = getRandomArbitrary(3, 9); //lobby.players.size;
+  generateMap(nPlayers: number) {
+    console.log('Generating a new map');
     const nEdges = (nPlayers > 2 && nPlayers) || 4;
 
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap(nEdges);
     this.balls[0] = new Ball();
+    this.balls[0].setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
     this.balls[0].findTarget(this.map.edges);
 
-    this.paddles = this.map.edges.map((line, idx) => {
+    const playerEdges =
+      nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
+    this.paddles = playerEdges.map((line, idx) => {
       return new Paddle(line, idx, 0.4);
     });
     this.socket.emit('mapChange', this.networkMap);
@@ -286,7 +290,7 @@ export default class Game {
   }
 
   run() {
-    this.generateMap();
+    // this.generateMap(this.nPlayers);
     this.socket.emit('mapChange', this.networkMap);
     this.interval = setInterval(() => this.tick(), 1000 / 30);
   }
@@ -316,33 +320,39 @@ export default class Game {
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
-        const paddle = this.paddles[ball.target.index];
-        const edge = this.map.edges[ball.target.index];
-        const boundSegment = paddle.line;
-        const paddleTouchTheBall = (pointOnLine as any)(
-          ball.target.hit,
-          boundSegment,
-          1,
-        );
-        console.log(
-          'Hitted side ',
-          ball.target.index,
-          ball.target.hit,
-          paddleTouchTheBall,
-        );
-        console.log('Bound segment', boundSegment);
-        if (paddleTouchTheBall) {
+        // If there is 2 players, bound on empty walls
+        if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
-          const surfaceAngleDeg = paddle.angle; //paddle.angle;
+          const edge = this.map.edges[ball.target.index];
+          const surfaceAngleDeg = lineAngle(edge); //paddle.angle;
           const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
           const newAngle = angleToRadians(newDegree);
           ball.setAngle(newAngle);
           ball.findTarget(this.map.edges);
-
-          // ball.setAngle(ball.angle - Math.PI);
         } else {
-          ball.reset();
-          ball.findTarget(this.map.edges);
+          const idx =
+            this.nPlayers === 2 && ball.target.index === 2
+              ? 1
+              : ball.target.index;
+          const paddle = this.paddles[idx];
+          const boundSegment = paddle.line;
+          const paddleTouchTheBall = (pointOnLine as any)(
+            ball.target.hit,
+            boundSegment,
+            1,
+          );
+          if (paddleTouchTheBall) {
+            const incidenceAngleDeg = angleToDegrees(ball.angle);
+            const surfaceAngleDeg = paddle.angle; //paddle.angle;
+            const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+            const newAngle = angleToRadians(newDegree);
+            ball.setAngle(newAngle);
+            ball.findTarget(this.map.edges);
+          } else {
+            this.nPlayers -= 1;
+            if (this.nPlayers < 2) this.nPlayers = 2;
+            this.generateMap(this.nPlayers);
+          }
         }
       }
       ball.move();
