@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 05:17:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 18:41:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,36 +34,11 @@ import {
 
 import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
-import { polygonOffset } from 'polygon';
 import PolygonMap from './polygon.class';
-
-function crossProduct(a: Vector, b: Vector) {
-  return a.x * b.y - b.x * a.y;
-}
-function sqDist(a: Vector, b: Vector) {
-  return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
-}
 
 const FRAME_RATE = 30;
 
-const collider = new Collider2d();
-
-function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
-  const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-  if (denom == 0) {
-    return null;
-  }
-  const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-  const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
-  return {
-    x: x1 + ua * (x2 - x1),
-    y: y1 + ua * (y2 - y1),
-    seg1: ua >= 0 && ua <= 1,
-    seg2: ub >= 0 && ub <= 1,
-  };
-}
-
-function line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
+function lineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
   const s1_x = p1_x - p0_x;
   const s1_y = p1_y - p0_y;
   const s2_x = p3_x - p2_x;
@@ -99,10 +74,6 @@ class Ball extends Circle {
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
     super(startPos, radius);
-    // console.log("11", this.position);
-    // this.move();
-    // this.reset();
-    // console.log("11", this.position);
   }
 
   public get speed() {
@@ -131,6 +102,12 @@ class Ball extends Circle {
     this.direction = new Vector(x, y);
   }
 
+  /**
+   * Sert a predire la prochaine fois ou la balle devrait rebondir
+   * Permet nottament de ne pas tester 60 * par secondes si la balle collide avec un des N cotes du polygon, ou un des N paddle.
+   * Une fois qu'on a le prochain point d'impact, il suffit calculer la distance entre la balle et la Target
+   * @see public get targetDistance()
+   */
   findTarget(edges: Array<Line>) {
     const fakeBall = this.clone();
     for (let i = 0; i < 100; i++) fakeBall.move();
@@ -146,7 +123,7 @@ class Ball extends Circle {
       const edge: Line = edges[i];
 
       const [[x3, y3], [x4, y4]] = edge;
-      const intersection = line_intersection(x1, y1, x2, y2, x3, y3, x4, y4);
+      const intersection = lineIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
 
       if (intersection) {
         this.target = {
@@ -173,11 +150,14 @@ class Ball extends Circle {
 
   reset(position: Vector = new Vector(0, 0)) {
     this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
-    // this.setAngle(Math.PI / 3);
     this.position.x = position.x;
     this.position.y = position.y;
   }
 
+  /**
+   * Distance entre la balle et son prochain point d'impact
+   * @see public get findTarget()
+   */
   public get targetDistance() {
     const length = lineLength([
       [this.position.x, this.position.y],
@@ -189,7 +169,6 @@ class Ball extends Circle {
   public get point(): Point {
     return [this.position.x, this.position.y];
   }
-
   public get netScheme() {
     return {
       position: {
@@ -224,8 +203,6 @@ class Paddle {
     this.width = width;
     this.index = index;
     this.color = colors[index % colors.length];
-    const lw = lineLength(axis);
-    const pw = lw * width;
     this.angle = lineAngle(axis);
 
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
@@ -239,18 +216,16 @@ class Paddle {
   }
 
   updatePercentOnAxis(ratio: number) {
-    // ratio 0 -> 1
-
-    const newPos = this.interpolationStart(ratio);
+    const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
-    this.line = [newPos, newPosEnd];
+    this.line = [newPosStart, newPosEnd];
   }
 
   public get netScheme() {
     return {
       line: this.line,
       color: this.color,
-      angle: this.angle,
+      // angle: this.angle,
     };
   }
 }
@@ -336,7 +311,7 @@ export default class Game {
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
-        // If there is 2 players, bound on empty walls
+
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
           const edge = this.map.edges[ball.target.index];
@@ -363,6 +338,11 @@ export default class Game {
             const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
             const newAngle = angleToRadians(newDegree);
             ball.speed *= 1.1;
+            /**
+             * @TODO Ajouter a cet angle un %age suivant ou on tape sur a raquette
+             * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
+             * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
+             */
             ball.setAngle(newAngle);
             ball.findTarget(this.map.edges);
           } else {
