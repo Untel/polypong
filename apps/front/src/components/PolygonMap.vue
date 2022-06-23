@@ -28,7 +28,7 @@
         v-for="ball in balls"
         v-bind="formatBallPosition(ball.position)"
       />
-      <circle fill="red" r="3"
+      <circle fill="red" r="1"
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
         v-bind="formatBallPosition(ball.target.hit)"
       />

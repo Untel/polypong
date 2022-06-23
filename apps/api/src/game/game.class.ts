@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 04:54:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 04:58:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,7 +265,7 @@ export default class Game {
     this.store = store;
     // this.run();
     // this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 3;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
 
