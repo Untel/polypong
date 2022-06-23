@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 04:27:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 04:54:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,6 @@ class Ball extends Circle {
       const [[x3, y3], [x4, y4]] = edge;
       const intersection = line_intersection(x1, y1, x2, y2, x3, y3, x4, y4);
 
-      console.log('Intersec is', intersection);
       if (intersection) {
         this.target = {
           hit: [intersection.x, intersection.y],
@@ -217,7 +216,6 @@ class Paddle {
     const pw = lw * width;
     this.angle = lineAngle(axis);
 
-    console.log('Lw', lw, 'pw', pw);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(axis);
@@ -257,6 +255,8 @@ export default class Game {
   edges: any;
   map: PolygonMap;
 
+  framePerSeconds = 30;
+  timeElapsed = 0;
   interval: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
@@ -265,26 +265,31 @@ export default class Game {
     this.store = store;
     // this.run();
     // this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 2;
+    this.nPlayers = 3;
     this.generateMap(this.nPlayers);
   }
 
+  addBall() {
+    const ball = new Ball();
+    ball.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.findTarget(this.map.edges);
+    this.balls.push(ball);
+  }
+
   generateMap(nPlayers: number) {
+    this.balls = [];
+    this.timeElapsed = 0;
     console.log('Generating a new map');
     const nEdges = (nPlayers > 2 && nPlayers) || 4;
-
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap(nEdges);
-    this.balls[0] = new Ball();
-    this.balls[0].setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
-    this.balls[0].findTarget(this.map.edges);
-
     const playerEdges =
       nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
     this.paddles = playerEdges.map((line, idx) => {
       return new Paddle(line, idx, 0.4);
     });
+    this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
   }
@@ -292,7 +297,7 @@ export default class Game {
   run() {
     // this.generateMap(this.nPlayers);
     this.socket.emit('mapChange', this.networkMap);
-    this.interval = setInterval(() => this.tick(), 1000 / 30);
+    this.interval = setInterval(() => this.tick(), 1000 / this.framePerSeconds);
   }
   stop() {
     clearInterval(this.interval);
@@ -346,6 +351,7 @@ export default class Game {
             const surfaceAngleDeg = paddle.angle; //paddle.angle;
             const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
             const newAngle = angleToRadians(newDegree);
+            ball.speed *= 1.1;
             ball.setAngle(newAngle);
             ball.findTarget(this.map.edges);
           } else {
@@ -389,6 +395,9 @@ export default class Game {
   }
 
   public tick() {
+    this.timeElapsed += 1 / this.framePerSeconds;
+    // console.log(this.timeElapsed);
+    if (this.timeElapsed > 5 * this.balls.length) this.addBall();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }
