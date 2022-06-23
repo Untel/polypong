@@ -19,21 +19,26 @@
       </polygon>
 
       <line
-        stroke="blue"
-        stroke-width="2px"
         v-for="paddle in paddles"
+        :stroke="paddle.color"
+        stroke-width="2px"
         v-bind="formatPaddlePoints(paddle)"
       />
       <circle fill="green" r="3"
         v-for="ball in balls"
         v-bind="formatBallPosition(ball.position)"
-      >yo</circle>
+      />
       <circle fill="red" r="3"
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
         v-bind="formatBallPosition(ball.target.hit)"
-      >
-        yo
-      </circle>
+      />
+      <line
+        stroke="red"
+        stroke-width="0.5px"
+        stroke-dasharray="2"
+        v-for="ball in balls"
+        v-bind="formatBallTrajectoryPoints(ball)"
+      />
       <text
         v-for="vertex in verticles"
         :x="vertex[0]" :y="vertex[1]"
@@ -47,6 +52,21 @@
         fill="green" font-size="5"
       >
         {{ ball.target.hit.x.toFixed(1) }},{{ ball.target.hit.y.toFixed(1) }}
+      </text>
+
+      <text
+        v-for="paddle in paddles"
+        :x="paddle.line[0][0]" :y="paddle.line[0][1]"
+        fill="orange" font-size="5"
+      >
+        {{ paddle.name }} - {{ paddle.line[0][0].toFixed(1) }}, {{paddle.line[0][1].toFixed(1) }}
+      </text>
+      <text
+        v-for="paddle in paddles"
+        :x="paddle.line[1][0]" :y="paddle.line[1][1]"
+        fill="orange" font-size="5"
+      >
+        {{ paddle.name }} - {{ paddle.line[1][0].toFixed(1) }}, {{paddle.line[1][1].toFixed(1) }}
       </text>
     </svg>
     <slot />
@@ -86,6 +106,15 @@ function formatPositionStyle(position: Position) {
     width: `${w}%`,
     height: `${h}%`,
   };
+}
+
+function formatBallTrajectoryPoints(ball: Ball) {
+  return {
+    x1: ball.position.x,
+    x2: ball.target.hit.x,
+    y1: ball.position.y,
+    y2: ball.target.hit.y,
+  }
 }
 
 function formatPaddlePoints(paddle: Paddle) {

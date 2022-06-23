@@ -48,8 +48,8 @@
     </pre> -->
     <pre style="background-color: grey;">
       <!-- El x {{ elementX }} -->
-      <!-- Paddle : {{ paddles }} -->
       Ball : {{ balls }}
+      Paddle : {{ paddles }}
       Info : {{ info }}
       <!-- Pause : {{ isPaused }} -->
     </pre>

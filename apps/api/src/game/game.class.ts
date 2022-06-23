@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 23:30:22 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 02:04:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ import {
   polygonCentroid,
   lineLength,
   lineIntersectsLine,
+  angleToRadians,
 } from 'geometric';
 
 import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
@@ -64,10 +65,11 @@ class Ball extends Circle {
   speed = 1;
   direction: Vector;
   angle: number;
-  target: {
-    hit: Point,
-    index: number,
-  };
+  // target: {
+  //   hit: Point,
+  //   index: number,
+  // };
+  target: any;
   targetInfo: any;
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
@@ -77,6 +79,12 @@ class Ball extends Circle {
     // this.move();
     this.reset();
     // console.log("11", this.position);
+  }
+
+  clone() {
+    const newBall = new Ball(new Vector(this.position.x, this.position.y), this.radius);
+    newBall.setAngle(this.angle);
+    return newBall;
   }
 
   setAngle(angle: number) {
@@ -89,11 +97,17 @@ class Ball extends Circle {
   findTarget(edges: Array<Line>) {
     const tx = Math.cos(this.angle) * 100;
     const ty = Math.sin(this.angle) * 100;
-    const trajectory = new Vector(tx, ty);
+    // const trajectory = new Vector(tx, ty);
+
+    const fakeBall = this.clone();
+    for (let i = 0; i < 50; i++) fakeBall.move();
+
     const line: Line = [
       [this.position.x, this.position.y],
-      [trajectory.x, trajectory.y],
+      [fakeBall.position.x, fakeBall.position.y],
+      // [tx, ty],
     ];
+
     const [[x1, y1], [x2, y2]] = line;
 
     for (let i = 0; i < edges.length; i++) {
@@ -102,13 +116,16 @@ class Ball extends Circle {
       const [[x3, y3], [x4, y4]] = edge;
       const intersection = line_intersect(x1, y1, x2, y2, x3, y3, x4, y4);
 
-      if (intersection && (intersection.seg2) && (intersection.seg1)) {
+      console.log("Intersec is", intersection);
+      if (intersection && intersection.seg1 && intersection.seg2) {
         this.target = {
           hit: [intersection.x, intersection.y],
+          edge,
           index: i,
         };
         this.targetInfo = {
           edgeIndex: i,
+          edge,
           ...intersection
         };
         break ;
@@ -124,7 +141,8 @@ class Ball extends Circle {
   }
 
   reset(position: Vector = new Vector(0, 0)) {
-    this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
+    // this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
+    this.setAngle(Math.PI / 4 * 3);
     this.position.x = position.x;
     this.position.y = position.y;
   }
@@ -160,15 +178,21 @@ class Ball extends Circle {
     };
   }
 }
+
+const colors = ['red', 'blue', 'magenta', 'purple', 'green'];
 class Paddle {
+  color: string;
   line: Line;
   interpolationStart: Function;
   interpolationEnd: Function;
   width: number;
   angle: number;
+  index: number;
 
-  constructor(axis: Line, width = 0.2) {
+  constructor(axis: Line, index: number, width = 0.2) {
     this.width = width;
+    this.index = index;
+    this.color = colors[index % colors.length];
     const lw = lineLength(axis);
     const pw = lw * width;
     this.angle = lineAngle(axis);
@@ -195,6 +219,7 @@ class Paddle {
   public get netScheme() {
     return {
       line: this.line,
+      color: this.color,
     };
   }
 }
@@ -227,12 +252,12 @@ export default class Game {
 
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
-    this.map = new PolygonMap(nEdges);
+    this.map = new PolygonMap(4);
     this.balls[0] = new Ball();
     this.balls[0].findTarget(this.map.edges);
 
     this.paddles = this.map.edges.map((line, idx) => {
-      return new Paddle(line, 0.4);
+      return new Paddle(line, idx, 0.4);
     });
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
@@ -267,66 +292,34 @@ export default class Game {
   }
 
   runPhysics() {
-    // console.log("ball is : ", this.ball)
     this.balls.forEach((ball) => {
-      // const pip = pointInPolygon(point, this.map.verticles);
-
-      // const collider = new Collider2d();
-      // const poly = new Polygon(new Vector(0, 0), this.map.edges);
-      // const lol: any = collider.testCirclePolygon(ball, poly, true);
-      // console.log("Lol", lol);
       if (ball.targetDistance <= ball.radius) {
-        // pointOnLine();
-        ball.setAngle(ball.angle + Math.PI);
-        ball.findTarget(this.map.edges);
+        const paddle = this.paddles[ball.target.index];
+        const edge = this.map.edges[ball.target.index];
+        const boundSegment = paddle.line;
+        const paddleTouchTheBall = (pointOnLine as any)(ball.target.hit, boundSegment, 1);
+        console.log("Hitted side ", ball.target.index, ball.target.hit, paddleTouchTheBall);
+        console.log("Bound segment", boundSegment);
+        if (paddleTouchTheBall) {
+          const incidenceAngle = angleToDegrees(ball.angle);
+          console.log("🚀 ~ file: game.class.ts ~ line 304 ~ Game ~ this.balls.forEach ~ incidenceAngle", incidenceAngle)
+          const surfaceAngle = lineAngle(boundSegment) ;//paddle.angle;
+          console.log("🚀 ~ file: game.class.ts ~ line 306 ~ Game ~ this.balls.forEach ~ surfaceAngle", surfaceAngle)
+          const newDegree = angleReflect(incidenceAngle, surfaceAngle);
+          console.log("🚀 ~ file: game.class.ts ~ line 308 ~ Game ~ this.balls.forEach ~ newDegree", newDegree)
+          const newAngle = angleToRadians(newDegree);
+          console.log("🚀 ~ file: game.class.ts ~ line 310 ~ Game ~ this.balls.forEach ~ newAngle", newAngle)
+          console.log("Reflected by user", ball.target.index, incidenceAngle, surfaceAngle);
+          console.log("Degree", newDegree, "became", newAngle);
+          ball.setAngle(newAngle);
+          ball.findTarget(this.map.edges);
+
+          // ball.setAngle(ball.angle - Math.PI);
+        } else {
+          ball.reset();
+          ball.findTarget(this.map.edges);
+        }
       }
-
-      // for (let i = 0; i < this.map.edges.length; i++) {
-      //   const edge: Line = this.map.edges[i];
-      //   const isOn = (pointOnLine as any)(ball.point, edge, 100);
-      //   if (isOn) {
-      //     console.log("Hitted");
-      //     const paddle = this.paddles[i];
-      //     if ((pointOnLine as any)(ball.point, paddle.line, 100)) {
-      //       // const ballDeg = angleToDegrees(ball.angle);
-      //       // const paddleDeg = angleToDegrees(paddle.angle)
-      //       // console.log("Ball deg", ballDeg, "radian", ball.angle);
-      //       // console.log("Paddle deg", paddleDeg, "radian", paddle.angle);
-      //       // const newAngle = angleReflect(ballDeg, paddleDeg);
-      //       ball.setAngle(ball.angle + Math.PI);
-      //       ball.findTarget(this.map.edges);
-
-      //       // ball.direction.x = -ball.direction.x;
-      //       // ball.direction.y = -ball.direction.y;
-      //     } else {
-      //       // Should kill user index i;
-      //       ball.reset();
-      //       ball.findTarget(this.map.edges);
-      //     }
-      //     break ;
-        // }
-      // }
-
-
-      // const pip = ball.isInside(this.map.verticles);
-      // // let pip = true
-      // if (!pip) {
-      //   //   console.log("Ball not in polygon");
-      //   ball.direction.x = -ball.direction.x;
-      //   ball.direction.y = -ball.direction.y;
-      //   // ball.move();
-
-      //   // ball.reset(new Vector(0, 0));
-      //   // return;
-      //   // for (let i = 0; i < this.paddles.length; i++) {
-      //   //   // Not good to handle the hit point
-      //   //   if (pointOnLine(point, this.paddles[i].line)) {
-      //   //     console.log(`Paddle ${i} has been hitten`);
-      //   //     // use it https://observablehq.com/@harrystevens/geometric-anglereflect to reflect the ball
-      //   //     return ;
-      //   //   }
-      //   // }
-      // }
       ball.move();
     });
   }
@@ -339,7 +332,7 @@ export default class Game {
     return {
       edges: this.map.edges,
       balls: this.balls.map((b) => b.netScheme),
-      paddles: this.paddles.map((p) => p.netScheme),
+      paddles: this.paddles.map((p, i) => ({ name: i, ...p.netScheme })),
     };
   }
   public get networkMap() {
