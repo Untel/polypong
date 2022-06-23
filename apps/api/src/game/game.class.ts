@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 04:58:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 05:17:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ function crossProduct(a: Vector, b: Vector) {
 function sqDist(a: Vector, b: Vector) {
   return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
+
+const FRAME_RATE = 30;
 
 const collider = new Collider2d();
 
@@ -85,7 +87,7 @@ function line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
 }
 
 class Ball extends Circle {
-  speed = 1;
+  _speed = 1;
   direction: Vector;
   angle: number;
   // target: {
@@ -101,6 +103,16 @@ class Ball extends Circle {
     // this.move();
     // this.reset();
     // console.log("11", this.position);
+  }
+
+  public get speed() {
+    return this._speed;
+  }
+
+  public set speed(value: number) {
+    // this._speed = FRAME_RATE / value * 100;
+    // Do somethings with framerate here to have same value if we are in 60 or 30 fps
+    this._speed = value;
   }
 
   clone() {
@@ -255,7 +267,6 @@ export default class Game {
   edges: any;
   map: PolygonMap;
 
-  framePerSeconds = 30;
   timeElapsed = 0;
   interval: NodeJS.Timer;
 
@@ -297,7 +308,7 @@ export default class Game {
   run() {
     // this.generateMap(this.nPlayers);
     this.socket.emit('mapChange', this.networkMap);
-    this.interval = setInterval(() => this.tick(), 1000 / this.framePerSeconds);
+    this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
   }
   stop() {
     clearInterval(this.interval);
@@ -395,7 +406,7 @@ export default class Game {
   }
 
   public tick() {
-    this.timeElapsed += 1 / this.framePerSeconds;
+    this.timeElapsed += 1 / FRAME_RATE;
     // console.log(this.timeElapsed);
     if (this.timeElapsed > 5 * this.balls.length) this.addBall();
     this.runPhysics();
