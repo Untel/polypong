@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 17:50:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 02:45:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ export class PongController {
 
   @Get('tick')
   tick() {
-    return this.pongService.tick();
+    this.pongService.updatePaddlePercent(null, 0.5);
+    return JSON.parse(JSON.stringify(this.pongService.tick()));
   }
 
   @Delete('lobbies')

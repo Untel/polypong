@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 02:04:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/23 03:41:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,21 +46,44 @@ function sqDist(a: Vector, b: Vector) {
 
 const collider = new Collider2d();
 
-function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4)
-{
-    var ua, ub, denom = (y4 - y3)*(x2 - x1) - (x4 - x3)*(y2 - y1);
-    if (denom == 0) {
-        return null;
-    }
-    ua = ((x4 - x3)*(y1 - y3) - (y4 - y3)*(x1 - x3))/denom;
-    ub = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3))/denom;
-    return {
-        x: x1 + ua * (x2 - x1),
-        y: y1 + ua * (y2 - y1),
-        seg1: ua >= 0 && ua <= 1,
-        seg2: ub >= 0 && ub <= 1
-    };
+function line_intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+  const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+  if (denom == 0) {
+    return null;
+  }
+  const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+  const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+  return {
+    x: x1 + ua * (x2 - x1),
+    y: y1 + ua * (y2 - y1),
+    seg1: ua >= 0 && ua <= 1,
+    seg2: ub >= 0 && ub <= 1,
+  };
 }
+
+function line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
+  const s1_x = p1_x - p0_x;
+  const s1_y = p1_y - p0_y;
+  const s2_x = p3_x - p2_x;
+  const s2_y = p3_y - p2_y;
+
+  const s =
+    (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) /
+    (-s2_x * s1_y + s1_x * s2_y);
+  const t =
+    (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) /
+    (-s2_x * s1_y + s1_x * s2_y);
+
+  if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+    return {
+      x: p0_x + t * s1_x,
+      y: p0_y + t * s1_y,
+    };
+  }
+
+  return null; // No collision
+}
+
 class Ball extends Circle {
   speed = 1;
   direction: Vector;
@@ -74,50 +97,48 @@ class Ball extends Circle {
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
     super(startPos, radius);
-    // this.setAngle(0);
+    // this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
     // console.log("11", this.position);
     // this.move();
-    this.reset();
+    // this.reset();
     // console.log("11", this.position);
   }
 
   clone() {
-    const newBall = new Ball(new Vector(this.position.x, this.position.y), this.radius);
+    const newBall = new Ball(
+      new Vector(this.position.x, this.position.y),
+      this.radius,
+    );
     newBall.setAngle(this.angle);
     return newBall;
   }
 
   setAngle(angle: number) {
-    this.angle = angle % (Math.PI * 2);
+    this.angle = angle;
     const x = Math.cos(angle) * this.speed;
     const y = Math.sin(angle) * this.speed;
     this.direction = new Vector(x, y);
   }
 
   findTarget(edges: Array<Line>) {
-    const tx = Math.cos(this.angle) * 100;
-    const ty = Math.sin(this.angle) * 100;
-    // const trajectory = new Vector(tx, ty);
-
     const fakeBall = this.clone();
-    for (let i = 0; i < 50; i++) fakeBall.move();
+    for (let i = 0; i < 100; i++) fakeBall.move();
 
     const line: Line = [
-      [this.position.x, this.position.y],
       [fakeBall.position.x, fakeBall.position.y],
       // [tx, ty],
+      [this.position.x, this.position.y],
     ];
 
     const [[x1, y1], [x2, y2]] = line;
-
     for (let i = 0; i < edges.length; i++) {
       const edge: Line = edges[i];
 
       const [[x3, y3], [x4, y4]] = edge;
-      const intersection = line_intersect(x1, y1, x2, y2, x3, y3, x4, y4);
+      const intersection = line_intersection(x1, y1, x2, y2, x3, y3, x4, y4);
 
-      console.log("Intersec is", intersection);
-      if (intersection && intersection.seg1 && intersection.seg2) {
+      console.log('Intersec is', intersection);
+      if (intersection) {
         this.target = {
           hit: [intersection.x, intersection.y],
           edge,
@@ -126,9 +147,9 @@ class Ball extends Circle {
         this.targetInfo = {
           edgeIndex: i,
           edge,
-          ...intersection
+          ...intersection,
         };
-        break ;
+        break;
       }
       this.target = { hit: [0, 0], index: 0 };
       this.targetInfo = null;
@@ -142,7 +163,7 @@ class Ball extends Circle {
 
   reset(position: Vector = new Vector(0, 0)) {
     // this.setAngle(getRandomFloatArbitrary(0, Math.PI * 2));
-    this.setAngle(Math.PI / 4 * 3);
+    this.setAngle(Math.PI / 3);
     this.position.x = position.x;
     this.position.y = position.y;
   }
@@ -220,6 +241,7 @@ class Paddle {
     return {
       line: this.line,
       color: this.color,
+      angle: this.angle,
     };
   }
 }
@@ -252,7 +274,7 @@ export default class Game {
 
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
-    this.map = new PolygonMap(4);
+    this.map = new PolygonMap(nEdges);
     this.balls[0] = new Ball();
     this.balls[0].findTarget(this.map.edges);
 
@@ -297,20 +319,23 @@ export default class Game {
         const paddle = this.paddles[ball.target.index];
         const edge = this.map.edges[ball.target.index];
         const boundSegment = paddle.line;
-        const paddleTouchTheBall = (pointOnLine as any)(ball.target.hit, boundSegment, 1);
-        console.log("Hitted side ", ball.target.index, ball.target.hit, paddleTouchTheBall);
-        console.log("Bound segment", boundSegment);
+        const paddleTouchTheBall = (pointOnLine as any)(
+          ball.target.hit,
+          boundSegment,
+          1,
+        );
+        console.log(
+          'Hitted side ',
+          ball.target.index,
+          ball.target.hit,
+          paddleTouchTheBall,
+        );
+        console.log('Bound segment', boundSegment);
         if (paddleTouchTheBall) {
-          const incidenceAngle = angleToDegrees(ball.angle);
-          console.log("🚀 ~ file: game.class.ts ~ line 304 ~ Game ~ this.balls.forEach ~ incidenceAngle", incidenceAngle)
-          const surfaceAngle = lineAngle(boundSegment) ;//paddle.angle;
-          console.log("🚀 ~ file: game.class.ts ~ line 306 ~ Game ~ this.balls.forEach ~ surfaceAngle", surfaceAngle)
-          const newDegree = angleReflect(incidenceAngle, surfaceAngle);
-          console.log("🚀 ~ file: game.class.ts ~ line 308 ~ Game ~ this.balls.forEach ~ newDegree", newDegree)
+          const incidenceAngleDeg = angleToDegrees(ball.angle);
+          const surfaceAngleDeg = paddle.angle; //paddle.angle;
+          const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
           const newAngle = angleToRadians(newDegree);
-          console.log("🚀 ~ file: game.class.ts ~ line 310 ~ Game ~ this.balls.forEach ~ newAngle", newAngle)
-          console.log("Reflected by user", ball.target.index, incidenceAngle, surfaceAngle);
-          console.log("Degree", newDegree, "became", newAngle);
           ball.setAngle(newAngle);
           ball.findTarget(this.map.edges);
 
@@ -348,7 +373,6 @@ export default class Game {
       balls: [...this.balls],
     };
   }
-
 
   public get id() {
     return `${this.lobby.id}`;
