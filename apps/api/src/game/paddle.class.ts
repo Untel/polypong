@@ -8,15 +8,16 @@ export default class Paddle {
     interpolationEnd: Function;
     width: number;
     angle: number;
+    bounceAngle: number;
     index: number;
     ratio: number;
 
-    constructor(axis: Line, index: number, width = 0.2) {
+    constructor(axis: Line, index: number, width = 0.2, bounce = 45) {
         this.width = width;
         this.index = index;
         this.color = GameTools.colors[index % GameTools.colors.length];
         this.angle = lineAngle(axis);
-
+        this.bounceAngle = bounce;
         // On cree un sous line sur laquelle le paddle va pouvoir glisser
         // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
         const preInterpolate = lineInterpolate(axis);
@@ -26,9 +27,7 @@ export default class Paddle {
         this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
         this.updatePercentOnAxis(0.5);
     }
-    public getCenterY(): number {
-        return (this.line[0][1] + this.width / 2);
-    }
+
     updatePercentOnAxis(ratio: number) {
         this.ratio = ratio;
         const newPosStart = this.interpolationStart(ratio);

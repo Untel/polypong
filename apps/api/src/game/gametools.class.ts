@@ -22,15 +22,18 @@ export default class GameTools {
 
         return null; // No collision
     }
-    static getRandomArbitrary(min, max) {
+    static getRandomArbitrary(min, max): number {
         return Math.floor(Math.random() * (max - min) + min);
     }
-    static getRandomFloatArbitrary(min, max) {
+    static getRandomFloatArbitrary(min, max): number {
         return Math.random() * (max - min) + min;
     }
 
-    static distance(x1: number, y1: number, x2: number, y2: number) {
+    static distance(x1: number, y1: number, x2: number, y2: number): number {
         return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    }
+    static percentage(small: number, big: number): number {
+        return (small / big) * 100;
     }
 
 

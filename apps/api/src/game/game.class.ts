@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 17:42:16 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/27 17:59:04 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ export default class Game {
     this.store = store;
     // this.run();
     this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 2;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
 
@@ -124,14 +124,7 @@ export default class Game {
     });
   }
 
-  distance(n1: number, n2: number) {
-    if (n1 > n2)
-      return n1 - n2
-    return n2 - n1;
-  }
-  isWhatPercentOf(numA, numB) {
-    return (numA / numB) * 100;
-  }
+
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
@@ -162,83 +155,24 @@ export default class Game {
             let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
             // const newAngle = angleToRadians(newDegree);
 
-            // console.log('new angle ', newAngle);
-            console.log('paddle ', paddle)
-            console.log('paddleTouchedTheBall, ', paddleTouchTheBall);
             /**
-             * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
-             * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
-             * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
-             */
-            let l1 = lineLength([[paddle.line[0][0], paddle.line[0][1]], [ball.position.x, ball.position.y]]);
-            let l2 = lineLength([[paddle.line[1][0], paddle.line[1][1]], [ball.position.x, ball.position.y]]);
-            console.log("Dist between edges of paddle", lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
-            // let min = 0;
-            // let max = 20;
-            // console.log(max)
-            // console.log("l1 lenght", l1);
-            // console.log("l2 lenght", l2);
-            // console.log("ratio 1", l1 / l2);
-            // console.log("ratio 2", l2 / l1);
-            let pc1 = this.isWhatPercentOf(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
-            let pc2 = this.isWhatPercentOf(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
+            * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
+            * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
+            * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
+            */
 
-            // console.log("percenntage 1", this.isWhatPercentOf(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]])))
-            // console.log("percenntage 2", this.isWhatPercentOf(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]])))
+            /**
+             * Je crois que c'est gucci
+             */
+
+            let l1 = lineLength([[...paddle.line[0]], [ball.position.x, ball.position.y]]);
+            let l2 = lineLength([[...paddle.line[1]], [ball.position.x, ball.position.y]]);
+            let pc1 = GameTools.percentage(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
+            let pc2 = GameTools.percentage(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
 
             console.log("diff", pc1 - pc2);
-            // console.log("old deg", newDegree);
-            newDegree += ((pc1 - pc2) / 100) * 45;
-            // if (Math.floor(l1 / l2) === Math.floor(l2 / l1)) {
-            //   console.log("center")
-            // }
-            // else if (l1 / l2 < l2 / l1) {
-            //   console.log("right is close")
-            //   // newDegree += 35 //% paddle.angle;
-            // }
-            // else {
-            //   // newDegree -= 35// % paddle.angle;
+            newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
 
-            //   console.log("left is closer")
-            // }
-            // console.log("new deg", newDegree)
-
-            // let final = ((l1 / l2) - min) / (max - min)
-            // let final2 = ((l2 / l1) - min) / (max - min)
-            // // let final2
-            // console.log('final', final);
-            // console.log('final2', final2)
-
-            // let tmpY: number = paddle.line[0][1] * paddle.line[1][1] / ball.position.y;
-
-            // let xPercent = paddle.line[0][0] > paddle.line[1][0] ? tmpX / paddle.line[0][0] : tmpX / paddle.line[1][0];
-            // let yPercent = paddle.line[0][1] > paddle.line[1][1] ? tmpX / paddle.line[0][1] : tmpY / paddle.line[1][1];
-
-            // console.log('y percent', yPercent);
-
-            // console.log('x percent', xPercent);
-            // if (paddle.line[0][0] > paddle.line[1][0])
-            //   console.log(tmpX / paddle.line[0][0]);
-            // else
-            // //   console.log(tmpX / paddle.line[1][0]);
-            // if (paddle.line[0][1] > paddle.line[1][1])
-            //   console.log(tmpY / paddle.line[0][1]);
-            // else
-            //   console.log(tmpY / paddle.line[1][1]);
-
-            // console.log(tmpY / paddle.line[0][1]);
-            // let tmpX: number = paddle.line[0][0] * paddle.line[1][0] / ball.position.x;
-            // let tmpY: number = paddle.line[0][1] * paddle.line[1][1] / ball.position.y;
-
-            // console.log('tmpx', tmpX);
-
-            // console.log('tmpy', tmpY);
-
-            // console.log('centerY', paddleCenter);
-            // console.log('ratio ', paddleCenter - ballCenter);
-            // ball.speed *= 1.1;
-
-            //Comment and uncomment above this to remove ball response to pos on paddle
             const newAngle = angleToRadians(newDegree);
 
             ball.setAngle(newAngle);
