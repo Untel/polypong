@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pong.service.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/22 17:55:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/27 11:07:56 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ export class PongService {
     return this.tmpGame.isPaused;
   }
 
-  tick() {
+  tick(): any {
     this.tmpGame.tick();
     return this.tmpGame.devTick;
   }

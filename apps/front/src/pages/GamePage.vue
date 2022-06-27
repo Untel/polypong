@@ -21,11 +21,7 @@
 <template>
   <q-page padding>
     <div style="display: flex; justify-content: center; align-items: center;">
-      <PolygonMap class="map" ref="mapEl"
-        :verticles="verticles"
-        :paddles="paddles"
-        :balls="balls"
-        >
+      <PolygonMap class="map" ref="mapEl" :verticles="verticles" :paddles="paddles" :balls="balls">
         <!-- <div class="ball"
            v-for="ball in balls"
           :style="formatBallStyle(ball)">a</div>
@@ -36,9 +32,7 @@
       </PolygonMap>
     </div>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
-    <q-btn
-      :label="isPaused ? 'play' : 'pause'"
-      @click="togglePause()">
+    <q-btn :label="isPaused ? 'play' : 'pause'" @click="togglePause()">
     </q-btn>
     <q-btn dense @click="tick()">
       tick
@@ -109,6 +103,7 @@ const mapEl = ref(null);
 
 const { elementX, elementWidth } = useMouseInElement(mapEl)
 watch(elementX, (x: number) => {
+  // console.log("sending")
   let ratio = x / elementWidth.value;
   if (ratio > 1) ratio = 1;
   else if (ratio < 0) ratio = 0;
@@ -117,7 +112,7 @@ watch(elementX, (x: number) => {
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
-  console.log('Event', evt);
+  // console.log('Event', evt);
   balls.value = [...b];
   // console.log("Paddles", evt.paddles);
   paddles.value = [...p];
