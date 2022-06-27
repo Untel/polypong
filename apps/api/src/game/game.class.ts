@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 17:16:40 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/27 17:42:16 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,9 @@ export default class Game {
       return n1 - n2
     return n2 - n1;
   }
-
+  isWhatPercentOf(numA, numB) {
+    return (numA / numB) * 100;
+  }
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
@@ -170,27 +172,36 @@ export default class Game {
              */
             let l1 = lineLength([[paddle.line[0][0], paddle.line[0][1]], [ball.position.x, ball.position.y]]);
             let l2 = lineLength([[paddle.line[1][0], paddle.line[1][1]], [ball.position.x, ball.position.y]]);
+            console.log("Dist between edges of paddle", lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
             // let min = 0;
             // let max = 20;
             // console.log(max)
-            console.log("l1 lenght", l1);
-            console.log("l2 lenght", l2);
-            console.log("ratio 1", l1 / l2);
-            console.log("ratio 2", l2 / l1);
-            console.log("old deg", newDegree)
-            if (Math.floor(l1 / l2) === Math.floor(l2 / l1)) {
-              console.log("center")
-            }
-            else if (l1 / l2 < l2 / l1) {
-              console.log("right is close")
-              newDegree += 35 //% paddle.angle;
-            }
-            else {
-              newDegree -= 35// % paddle.angle;
+            // console.log("l1 lenght", l1);
+            // console.log("l2 lenght", l2);
+            // console.log("ratio 1", l1 / l2);
+            // console.log("ratio 2", l2 / l1);
+            let pc1 = this.isWhatPercentOf(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
+            let pc2 = this.isWhatPercentOf(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
 
-              console.log("left is closer")
-            }
-            console.log("new deg", newDegree)
+            // console.log("percenntage 1", this.isWhatPercentOf(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]])))
+            // console.log("percenntage 2", this.isWhatPercentOf(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]])))
+
+            console.log("diff", pc1 - pc2);
+            // console.log("old deg", newDegree);
+            newDegree += ((pc1 - pc2) / 100) * 45;
+            // if (Math.floor(l1 / l2) === Math.floor(l2 / l1)) {
+            //   console.log("center")
+            // }
+            // else if (l1 / l2 < l2 / l1) {
+            //   console.log("right is close")
+            //   // newDegree += 35 //% paddle.angle;
+            // }
+            // else {
+            //   // newDegree -= 35// % paddle.angle;
+
+            //   console.log("left is closer")
+            // }
+            // console.log("new deg", newDegree)
 
             // let final = ((l1 / l2) - min) / (max - min)
             // let final2 = ((l2 / l1) - min) / (max - min)
