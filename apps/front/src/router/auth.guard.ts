@@ -11,8 +11,8 @@ function buildRedirectObject(to: RouteLocationNormalized): any {
   if (to.name === 'home') return {};
 
   const redirect: IRedirect = { name: to.name as string };
-  if (to.query) redirect.query = to.query;
-  if (to.params) redirect.params = to.params;
+  if (Object.keys(to.query).length) redirect.query = to.query;
+  if (Object.keys(to.params).length) redirect.params = to.params;
   return { redirect: JSON.stringify(redirect) };
 }
 
@@ -28,7 +28,8 @@ export default async (
     await auth.connectToSocket();
     next();
   } catch (error) {
-    console.log('Auth guard fail', error, to.name);
-    next({ name: 'login', ...buildRedirectObject(to) });
+    const redirect = buildRedirectObject(to);
+    console.log('Auth guard fail', error, to.name, redirect);
+    next({ name: 'login', query: redirect });
   }
 };

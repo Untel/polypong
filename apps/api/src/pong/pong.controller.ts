@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pong.controller.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 17:08:00 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/27 21:01:23 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ export class PongController {
 
   @Get('tick')
   tick() {
-    this.pongService.updatePaddlePercent(null, 0.5);
-    return JSON.parse(JSON.stringify(this.pongService.tick()));
+    // this.pongService.updatePaddlePercent(null, 0.5);
+    return this.pongService.tick();
   }
 
   @Delete('lobbies')

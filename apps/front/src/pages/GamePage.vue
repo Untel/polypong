@@ -20,7 +20,7 @@
 </style>
 <template>
   <q-page padding>
-    <div style="display: flex; justify-content: center; align-items: center;">
+    <div style="border: 2px solid green; display: flex; justify-content: center; align-items: center;">
       <PolygonMap class="map" ref="mapEl" :verticles="verticles" :paddles="paddles" :balls="balls">
         <!-- <div class="ball"
            v-for="ball in balls"
@@ -32,11 +32,13 @@
       </PolygonMap>
     </div>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
-    <q-btn :label="isPaused ? 'play' : 'pause'" @click="togglePause()">
+    <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
+      {{ isPaused === 'true' ? 'Play' : 'Pause' }}
     </q-btn>
     <q-btn dense @click="tick()">
       tick
     </q-btn>
+    <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/>
     <q-btn dense @click="reset()">
       reset
     </q-btn>
@@ -44,17 +46,17 @@
       {{ tickValue }}
     </pre> -->
     <pre style="background-color: grey;">
-      <!-- El x {{ elementX }} -->
+      El : {{ usedRatio }}
+      Pause : {{ isPaused }} {{ typeof(isPaused) }}
       Ball : {{ balls }}
       Paddle : {{ paddles }}
       Info : {{ info }}
-      <!-- Pause : {{ isPaused }} -->
     </pre>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, onMounted, StyleValue, Ref, watch } from 'vue';
+import { defineProps, ref, onMounted, StyleValue, Ref, watch, computed } from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
 import { Position, Paddle, Ball } from 'src/utils/game';
@@ -75,6 +77,12 @@ const props = defineProps({
 const onKeyDown = (evt: KeyboardEvent) => {
   socket?.emit('paddleUpdate', evt.key);
 }
+
+const {
+  data: isPaused,
+  execute: togglePause,
+  // afterFetch: (ctx: any) => ({ data: ctx.data === 'true', ...ctx }),
+} = useApi<string>('pong/pause', { immediate: false });
 
 function formatPositionStyle(position: Position) {
   const { x, y, h, w } = position;
@@ -104,14 +112,24 @@ function formatBallStyle(ball: Ball): StyleValue {
 
 const mapEl = ref(null);
 
-const { elementX, elementWidth } = useMouseInElement(mapEl)
-watch(elementX, (x: number) => {
-  // console.log("sending")
-  let ratio = x / elementWidth.value;
-  if (ratio > 1) ratio = 1;
-  else if (ratio < 0) ratio = 0;
-  socket?.emit('paddlePercent', ratio);
-})
+const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
+const ratio = computed(() => {
+  let r = elementX.value / elementWidth.value;
+  if (r > 1) r = 1;
+  else if (r < 0) r = 0;
+  return r;
+});
+const forcedRatio = ref(null);
+
+const usedRatio = computed(() => {
+  const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
+  console.log("Ratio update", val);
+  return val;
+});
+
+watch(usedRatio, (val) => {
+  socket?.emit('paddlePercent', val);
+});
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
@@ -138,18 +156,14 @@ socket?.on('gameUpdate', update);
 socket?.on('mapChange', mapChange);
 
 const {
-  data: isPaused,
-  execute: togglePause,
-} = useApi('pong/pause', { immediate: false });
-
-const {
   data: tickValue,
   execute: tick,
 } = useApi('pong/tick', { immediate: false }).json();
 
 const {
   data: test,
-  execute: reset, } = useApi('pong/reset', { immediate: false });
+  execute: reset
+} = useApi('pong/reset', { immediate: false });
 
 
 </script>

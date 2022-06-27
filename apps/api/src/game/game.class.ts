@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 17:59:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/27 20:46:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,13 +66,14 @@ export default class Game {
     this.store = store;
     // this.run();
     this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 12;
+    this.nPlayers = 4;
     this.generateMap(this.nPlayers);
   }
 
   addBall() {
     const ball = new Ball();
-    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.setAngle(Math.PI / 4);
+    // ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     ball.findTarget(this.map.edges);
     this.balls.push(ball);
   }
@@ -122,6 +123,7 @@ export default class Game {
     this.paddles.forEach((paddle) => {
       paddle.updatePercentOnAxis(percent);
     });
+    this.socket.emit('gameUpdate', this.networkState);
   }
 
 
@@ -170,17 +172,15 @@ export default class Game {
             let pc1 = GameTools.percentage(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
             let pc2 = GameTools.percentage(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
 
-            console.log("diff", pc1 - pc2);
+            console.log("diff", pc1 - pc2, pc1, pc2);
             newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
 
             const newAngle = angleToRadians(newDegree);
-
+            // ball.speed *= 1.1;
             ball.setAngle(newAngle);
             ball.findTarget(this.map.edges);
           } else {
-            this.nPlayers -= 1;
-            if (this.nPlayers < 2) this.nPlayers = 2;
-            this.generateMap(this.nPlayers);
+            this.reduce();
           }
         }
       }
@@ -188,11 +188,14 @@ export default class Game {
     });
   }
 
+  public reduce() {
+    // this.nPlayers -= 1;
+    // if (this.nPlayers < 2) this.nPlayers = 2;
+    this.generateMap(this.nPlayers);
+  }
+
   public reset() {
-    this.balls.forEach(e => {
-      e.reset();
-      e.findTarget(this.map.edges);
-    });
+    this.generateMap(this.nPlayers);
   }
   // Getters
   public get isPaused() {
@@ -226,7 +229,7 @@ export default class Game {
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
     // console.log(this.timeElapsed);
-    // if (this.timeElapsed > 5 * this.balls.length) this.addBall();
+    // if (this.timeElapsed > 10 * this.balls.length) this.addBall();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }
