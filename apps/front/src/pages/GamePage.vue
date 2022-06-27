@@ -37,6 +37,9 @@
     <q-btn dense @click="tick()">
       tick
     </q-btn>
+    <q-btn dense @click="reset()">
+      reset
+    </q-btn>
     <!-- <pre>
       {{ tickValue }}
     </pre> -->
@@ -143,5 +146,10 @@ const {
   data: tickValue,
   execute: tick,
 } = useApi('pong/tick', { immediate: false }).json();
+
+const {
+  data: test,
+  execute: reset, } = useApi('pong/reset', { immediate: false });
+
 
 </script>

@@ -15,15 +15,14 @@ import { LoggedInGuard } from 'src/guards/logged-in.guard';
 import { JwtLoggedGuard } from 'src/guards/jwt-logged.guard';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
 
-@UseGuards(JwtLoggedGuard)
+// @UseGuards(JwtLoggedGuard)
 @WebSocketGateway({
   cors: true,
   transports: ['websocket'],
 })
 export class PongGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  constructor(private readonly pongService: PongService) {}
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly pongService: PongService) { }
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
@@ -32,6 +31,11 @@ export class PongGateway
   handleMessage(socket: Socket, lobbyConfig: ILobbyConfig): void {
     this.logger.log(`Create lobby from client ${socket.id}`);
     this.pongService.addLobby(socket, lobbyConfig);
+  }
+
+  @SubscribeMessage('reset')
+  reset(client: Socket, evt: any) {
+    this.pongService.reset();
   }
 
   @SubscribeMessage('joinLobby')

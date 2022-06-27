@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 14:31:57 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/27 17:16:40 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ export default class Game {
     this.store = store;
     // this.run();
     this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 12;
+    this.nPlayers = 2;
     this.generateMap(this.nPlayers);
   }
 
@@ -157,9 +157,10 @@ export default class Game {
           if (paddleTouchTheBall) {
             const incidenceAngleDeg = angleToDegrees(ball.angle);
             const surfaceAngleDeg = paddle.angle; //paddle.angle;
-            const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-            const newAngle = angleToRadians(newDegree);
-            console.log('new angle ', newAngle);
+            let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+            // const newAngle = angleToRadians(newDegree);
+
+            // console.log('new angle ', newAngle);
             console.log('paddle ', paddle)
             console.log('paddleTouchedTheBall, ', paddleTouchTheBall);
             /**
@@ -167,41 +168,40 @@ export default class Game {
              * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
              * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
              */
-            let paddleCenter: number = paddle.getCenterY();
-            let ballCenter: number = ball.position.y
-
-            let bigGap;
-
-
-            if (this.distance(paddle.line[0][0], paddle.line[0][1]) > this.distance(paddle.line[0][1], paddle.line[1][1])) {
-              // console.log('big gap X')
-              bigGap = this.distance(paddle.line[0][0], paddle.line[0][1])
+            let l1 = lineLength([[paddle.line[0][0], paddle.line[0][1]], [ball.position.x, ball.position.y]]);
+            let l2 = lineLength([[paddle.line[1][0], paddle.line[1][1]], [ball.position.x, ball.position.y]]);
+            // let min = 0;
+            // let max = 20;
+            // console.log(max)
+            console.log("l1 lenght", l1);
+            console.log("l2 lenght", l2);
+            console.log("ratio 1", l1 / l2);
+            console.log("ratio 2", l2 / l1);
+            console.log("old deg", newDegree)
+            if (Math.floor(l1 / l2) === Math.floor(l2 / l1)) {
+              console.log("center")
+            }
+            else if (l1 / l2 < l2 / l1) {
+              console.log("right is close")
+              newDegree += 35 //% paddle.angle;
             }
             else {
-              // console.log('big gap Y')
-              bigGap = this.distance(paddle.line[0][1], paddle.line[1][1])
+              newDegree -= 35// % paddle.angle;
+
+              console.log("left is closer")
             }
-            // console.log('gap =', bigGap)
+            console.log("new deg", newDegree)
 
-            let dist_start = GameTools.distance(paddle.line[0][0], paddle.line[0][1], ball.position.x, ball.position.y);
-            let dist_end = GameTools.distance(paddle.line[1][0], paddle.line[1][1], ball.position.x, ball.position.y)
-
-            console.log('dist start', dist_start)
-            console.log('dist end', dist_end)
-            console.log('total', dist_start + dist_end)
-
-            console.log('final', dist_start / dist_end);
-            console.log(dist_start / dist_end > 0.5 ? 'right' : 'left')
-
-
-            let tmpX = (paddle.line[0][0] > paddle.line[1][0]) ? paddle.line[0][0] * paddle.line[1][0] / ball.position.x : paddle.line[1][0] * paddle.line[0][0] / ball.position.x
-
-            let tmpY = (paddle.line[0][1] > paddle.line[1][1]) ? paddle.line[0][1] * paddle.line[1][1] / ball.position.x : paddle.line[1][1] * paddle.line[0][1] / ball.position.y
+            // let final = ((l1 / l2) - min) / (max - min)
+            // let final2 = ((l2 / l1) - min) / (max - min)
+            // // let final2
+            // console.log('final', final);
+            // console.log('final2', final2)
 
             // let tmpY: number = paddle.line[0][1] * paddle.line[1][1] / ball.position.y;
 
-            let xPercent = paddle.line[0][0] > paddle.line[1][0] ? tmpX / paddle.line[0][0] : tmpX / paddle.line[1][0];
-            let yPercent = paddle.line[0][1] > paddle.line[1][1] ? tmpX / paddle.line[0][1] : tmpY / paddle.line[1][1];
+            // let xPercent = paddle.line[0][0] > paddle.line[1][0] ? tmpX / paddle.line[0][0] : tmpX / paddle.line[1][0];
+            // let yPercent = paddle.line[0][1] > paddle.line[1][1] ? tmpX / paddle.line[0][1] : tmpY / paddle.line[1][1];
 
             // console.log('y percent', yPercent);
 
@@ -226,6 +226,10 @@ export default class Game {
             // console.log('centerY', paddleCenter);
             // console.log('ratio ', paddleCenter - ballCenter);
             // ball.speed *= 1.1;
+
+            //Comment and uncomment above this to remove ball response to pos on paddle
+            const newAngle = angleToRadians(newDegree);
+
             ball.setAngle(newAngle);
             ball.findTarget(this.map.edges);
           } else {
@@ -239,6 +243,12 @@ export default class Game {
     });
   }
 
+  public reset() {
+    this.balls.forEach(e => {
+      e.reset();
+      e.findTarget(this.map.edges);
+    });
+  }
   // Getters
   public get isPaused() {
     return !this.interval;

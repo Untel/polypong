@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pong.controller.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/23 02:45:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/27 17:08:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ import { PongService } from './pong.service';
 
 @Controller('pong')
 export class PongController {
-  constructor(private readonly pongService: PongService) {}
+  constructor(private readonly pongService: PongService) { }
 
   @Get('lobbies')
   lobbies(): Lobby[] {
@@ -42,5 +42,9 @@ export class PongController {
   @Delete('lobbies')
   clear() {
     this.pongService.clearLobbies();
+  }
+  @Get('reset')
+  reset() {
+    this.pongService.reset();
   }
 }
