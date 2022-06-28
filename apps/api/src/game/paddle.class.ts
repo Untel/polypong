@@ -8,8 +8,8 @@ export default class Paddle {
     interpolationEnd: Function;
     width: number;
     angle: number;
-    bounceAngle: number;
     index: number;
+    bounceAngle: number;
     ratio: number;
 
     constructor(axis: Line, index: number, width = 0.2, bounce = 45) {

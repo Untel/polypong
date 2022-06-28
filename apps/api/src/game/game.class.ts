@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 20:46:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/28 03:15:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 import Redis from 'ioredis';
 import RedisBridge from './redis.bridge';
 import Store from 'redis-json';
+import { debounce } from 'lodash';
 import {
   lineInterpolate,
   polygonRegular,
@@ -66,13 +67,13 @@ export default class Game {
     this.store = store;
     // this.run();
     this.socket.on('PaddleUpdate', this.updatePaddle);
-    this.nPlayers = 4;
+    this.nPlayers = 16;
     this.generateMap(this.nPlayers);
   }
 
   addBall() {
-    const ball = new Ball();
-    ball.setAngle(Math.PI / 4);
+    const ball = new Ball(this.map.center);
+    ball.setAngle(angleToRadians(this.map.angles[1]));
     // ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     ball.findTarget(this.map.edges);
     this.balls.push(ball);
@@ -82,10 +83,9 @@ export default class Game {
     this.balls = [];
     this.timeElapsed = 0;
     console.log('Generating a new map');
-    const nEdges = (nPlayers > 2 && nPlayers) || 4;
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
-    this.map = new PolygonMap(nEdges);
+    this.map = new PolygonMap(nPlayers === 2 && 4 || nPlayers);
     const playerEdges =
       nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
     this.paddles = playerEdges.map((line, idx) => {
@@ -123,7 +123,10 @@ export default class Game {
     this.paddles.forEach((paddle) => {
       paddle.updatePercentOnAxis(percent);
     });
-    this.socket.emit('gameUpdate', this.networkState);
+    // if (this.isPaused) debounce(
+    //   this.socket.emit('gameUpdate', this.networkState),
+    //   500
+    // );
   }
 
 
@@ -153,6 +156,7 @@ export default class Game {
           );
           if (paddleTouchTheBall) {
             const incidenceAngleDeg = angleToDegrees(ball.angle);
+            // this.verticles =
             const surfaceAngleDeg = paddle.angle; //paddle.angle;
             let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
             // const newAngle = angleToRadians(newDegree);
@@ -173,8 +177,9 @@ export default class Game {
             let pc2 = GameTools.percentage(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
 
             console.log("diff", pc1 - pc2, pc1, pc2);
+            console.log("pre deg", newDegree);
             newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
-
+            console.log("final deg", newDegree);
             const newAngle = angleToRadians(newDegree);
             // ball.speed *= 1.1;
             ball.setAngle(newAngle);
@@ -189,23 +194,38 @@ export default class Game {
   }
 
   public reduce() {
-    // this.nPlayers -= 1;
-    // if (this.nPlayers < 2) this.nPlayers = 2;
+    this.stop();
+    this.nPlayers -= 1;
+    if (this.nPlayers < 2) this.nPlayers = 2;
     this.generateMap(this.nPlayers);
+    // if (this.isPaused) setTimeout(() => {
+    //   if (this.isPaused) this.run();
+    // }, 3000)
   }
 
   public reset() {
+    this.nPlayers = 8;
     this.generateMap(this.nPlayers);
   }
   // Getters
   public get isPaused() {
     return !this.interval;
   }
+
+  public get ballsNetScheme() {
+    return this.balls.map(b => b.netScheme);
+  }
+
+  public get paddlesNetScheme() {
+    return this.paddles
+      .map(b => b.netScheme)
+      .map((b, i) => ({ ...b, name: i }))
+  }
+
   public get networkState() {
     return {
-      edges: this.map.edges,
-      balls: this.balls.map((b) => b.netScheme),
-      paddles: this.paddles.map((p, i) => ({ name: i, ...p.netScheme })),
+      balls: this.ballsNetScheme,
+      paddles: this.paddlesNetScheme,
     };
   }
   public get networkMap() {

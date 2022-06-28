@@ -123,7 +123,7 @@ const forcedRatio = ref(null);
 
 const usedRatio = computed(() => {
   const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
-  console.log("Ratio update", val);
+  // console.log("Ratio update", val);
   return val;
 });
 
@@ -133,11 +133,9 @@ watch(usedRatio, (val) => {
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
-  // console.log('Event', evt);
-  balls.value = [...b];
-  // console.log("Paddles", evt.paddles);
-  paddles.value = [...p];
-  info.value = rest;
+  if (b) balls.value = b;
+  if (p) paddles.value = p;
+  // info.value = rest;
 }
 
 onMounted(() => {

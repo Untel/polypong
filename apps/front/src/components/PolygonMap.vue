@@ -10,11 +10,17 @@
 </style>
 
 <template>
-  <div class="wrapper">
-    <svg viewBox="-50 -50 100 100">
-
+  <div class="svg-test wrapper">
+    <svg
+      viewBox="-50 -50 100 100"
+    >
+  <filter ref="filterRef" id="displacementFilter">
+    <feTurbulence type="turbulence" baseFrequency="0.3" numOctaves="2" result="turbulence"/>
+    <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="50" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
       <polygon
-        :points="verticlesToPoint"
+        ref="polygonRef"
+        style="filter: url(#displacementFilter)"
         fill="yellow" stroke="gray">
       </polygon>
 
@@ -76,12 +82,15 @@
     <pre v-if="balls && balls[0]">
       {{ balls[0].pos }}
     </pre>
+    <q-btn @click="test">test</q-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, PropType, StyleValue } from 'vue';
+import { onMounted, computed, PropType, StyleValue, watch, ref } from 'vue';
 import { Position, Paddle, Ball } from 'src/utils/game';
+
+import anime from 'animejs/lib/anime.es.js';
 
 const props = defineProps({
   verticles: {
@@ -148,13 +157,56 @@ function formatBallStyle(ball: Ball): StyleValue {
   return style;
 }
 
-const verticlesToPoint = computed(() => {
-  const points = props.verticles
-    .map(([x, y]) => `${x},${y}`)
-    .join(' ');
-  console.log("Computed points", points);
-  return points;
-});
+// const verticlesToPoint = computed(() => {
+//   const points = props.verticles
+//     .map(([x, y]) => `${x},${y}`)
+//     .join(' ');
+//   console.log("Computed points", points);
+
+//   return points;
+// });
+
+const test = () => {};
+
+const polygonRef = ref<HTMLElement>();
+const filterRef = ref<HTMLElement>();
+
+watch(() => props.verticles, (verticles, oldVerticles = []) => {
+  console.log("News", verticles);
+  console.log("Olds", oldVerticles);
+  console.log("refs", polygonRef, filterRef);
+  // const polyEl = document.querySelector('.svg-test polygon');
+  // const feTurbulenceEl = document.querySelector('feTurbulence');
+  // const feDisplacementMap = document.querySelector('feDisplacementMap');
+  // // polyEl.setAttribute('points', '55,55 5,95 50,50 50,0 45,45 100,95');
+  // feTurbulenceEl.setAttribute('baseFrequency', Math.random() * 100 + '');
+  // feDisplacementMap.setAttribute('scale', '20');
+  console.log("New polygons", oldVerticles);
+  const targets = [polygonRef.value, ...(filterRef.value?.childNodes as any)];
+
+  (anime.timeline as any)({
+      targets,
+      easing: 'easeInOutExpo',
+      points: verticles.join(' '),
+      rotation: 0,
+      scale: 1,
+      baseFrequency: 60,
+    })
+    .add({})
+      //   points: oldVerticles
+      //     .reduce((acc: number[][], v, i) => ([...acc, v, [0, 0]]), [])
+      //     .join(' '),
+    // .add({
+    //   scale: 30,
+    //   // rotate: '360deg',
+    //   baseFrequency: 56,
+    // })
+    // .add({
+    //   scale: 1,
+    //   baseFrequency: 1,
+    // })
+
+}, { immediate: false });
 
 onMounted(() => {
   console.log("Mounted polygon");
