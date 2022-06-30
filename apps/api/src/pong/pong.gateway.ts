@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pong.gateway.ts                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/06/30 17:00:38 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -21,8 +33,9 @@ import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
   transports: ['websocket'],
 })
 export class PongGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly pongService: PongService) { }
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+  constructor(private readonly pongService: PongService) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
@@ -42,11 +55,6 @@ export class PongGateway
   send(client: Socket, id: LobbyId): void {
     this.logger.log(`Client ${client.id} is joining lobby ${id}`);
     this.pongService.joinLobby(client, id);
-  }
-
-  @SubscribeMessage('paddleUpdate')
-  handleUpdate(client: Socket, evt: any) {
-    this.pongService.updatePaddles(client, evt);
   }
 
   @SubscribeMessage('paddlePercent')

@@ -2,11 +2,13 @@
   .wrapper {
     width: 300px;
     position: relative;
-
     svg {
-
+      polygon {
+        fill: white;
+      }
     }
   }
+
 </style>
 
 <template>
@@ -15,14 +17,12 @@
       viewBox="-50 -50 100 100"
       ref="svgRef"
     >
-  <filter ref="filterRef" id="displacementFilter">
+  <!-- <filter ref="filterRef" id="displacementFilter">
     <feTurbulence type="turbulence" baseFrequency="0.3" numOctaves="2" result="turbulence"/>
     <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="50" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
+  </filter> -->
       <polygon
-        ref="polygonRef"
-        style="/*filter: url(#displacementFilter)*/"
-        fill="yellow" stroke="gray">
+        ref="polygonRef">
       </polygon>
 
       <line
@@ -46,14 +46,14 @@
         v-for="ball in balls"
         v-bind="formatBallTrajectoryPoints(ball)"
       />
-      <text
+      <!-- <text
         v-for="vertex in map.verticles"
         :x="vertex[0]" :y="vertex[1]"
         fill="green" font-size="5"
       >
         {{ vertex[0].toFixed(1) }},{{ vertex[1].toFixed(1) }}
-      </text>
-      <text
+      </text> -->
+      <!-- <text
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
         :key="ball"
         :x="ball.target.hit.x" :y="ball.target.hit.y"
@@ -76,16 +76,16 @@
         fill="orange" font-size="5"
       >
         {{ paddle.name }} - {{ paddle.line[1][0].toFixed(1) }}, {{paddle.line[1][1].toFixed(1) }}
-      </text>
+      </text> -->
     </svg>
     <slot />
     <!-- <pre v-if="paddles && paddles[0]">
       {{ paddles[0].line }}
     </pre> -->
-    <pre v-if="balls && balls[0]">
+    <!-- <pre v-if="balls && balls[0]">
       {{ balls[0].pos }}
-    </pre>
-    <q-btn @click="test">test</q-btn>
+    </pre> -->
+    <!-- <q-btn @click="test">test</q-btn> -->
   </div>
 </template>
 
@@ -109,7 +109,7 @@ const props = defineProps({
   balls: {
     type: Array as any,
     default: () => [],
-  }
+  },
 });
 
 function formatBallTrajectoryPoints(ball: Ball) {
@@ -140,9 +140,9 @@ function formatBallPosition(position: Position) {
 const polygonRef = ref<HTMLElement>();
 const svgRef = ref<HTMLElement>();
 
-watch(() => props.map, (map, oldMap = []) => {
+watch(() => props.map, (map, oldMap) => {
   const { verticles, angles } = map;
-  const { verticles: oldVerticles } = oldMap;
+  // const { verticles: oldVerticles } = oldMap;
 
   (anime.timeline as any)({
     targets: polygonRef.value,
@@ -153,12 +153,13 @@ watch(() => props.map, (map, oldMap = []) => {
       targets: svgRef.value,
       keyframes: [
         { rotate: 0 },
-        { rotate: 360 + angles[0] },
+        { rotate: angles[0] },
       ],
+      scale: -1,
     });
 }, { immediate: false });
 
 onMounted(() => {
   console.log("Mounted polygon");
-})
+});
 </script>

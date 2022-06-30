@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 14:34:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/30 16:46:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,11 @@ import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
 import PolygonMap from './polygon.class';
 
-import Ball from './ball.class';
-
-import Paddle from './paddle.class';
+import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
 
 const FRAME_RATE = 30;
-
 
 export default class Game {
   lobby: Lobby;
@@ -54,6 +51,7 @@ export default class Game {
   balls: Ball[] = [];
   nPlayers: number;
   paddles: Paddle[] = [];
+  walls: Wall[] = [];
   speed = 10;
   edges: any;
   map: PolygonMap;
@@ -65,17 +63,15 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    // this.run();
-    this.socket.on('PaddleUpdate', this.updatePaddle);
     this.nPlayers = 16;
     this.generateMap(this.nPlayers);
   }
 
   addBall() {
-    const ball = new Ball(this.map.center);
-    ball.setAngle(angleToRadians(this.map.angles[1]));
-    // ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
-    ball.findTarget(this.map.edges);
+    const ball = new Ball(new Vector(this.map.center.x, this.map.center.y));
+    // ball.setAngle(angleToRadians(this.map.angles[1]));
+    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.findTarget(this.walls);
     this.balls.push(ball);
   }
 
@@ -85,12 +81,21 @@ export default class Game {
     console.log('Generating a new map');
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
-    this.map = new PolygonMap(nPlayers === 2 && 4 || nPlayers);
+    this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
     const playerEdges =
       nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
-    this.paddles = playerEdges.map((line, idx) => {
-      return new Paddle(line, idx, 0.4);
+    this.paddles = [];
+    this.walls = this.map.edges.map((line: Line, index) => {
+      let paddle = null;
+      if (nPlayers > 2 || index % 2) {
+        paddle = new Paddle(line, index, 0.4);
+        this.paddles.push(paddle);
+      }
+      return new Wall(line, paddle);
     });
+    // this.paddles = playerEdges.map((line, idx) => {
+    //   return new Paddle(line, idx, 0.4);
+    // });
     this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
@@ -106,19 +111,6 @@ export default class Game {
     this.interval = null;
   }
 
-  updatePaddle(evt: string) {
-    if (evt === 'ArrowUp') {
-      this.paddles[0].ratio -= 0.1;
-    } else if (evt === 'ArrowDown') {
-      this.paddles[0].ratio += 0.1;
-      // }
-    }
-  }
-
-  updatePositionPaddles({ y }) {
-    // this.paddles[0].pos.y = y;
-  }
-
   updatePaddlePercent(percent: number) {
     this.paddles.forEach((paddle) => {
       paddle.updatePercentOnAxis(percent);
@@ -129,11 +121,9 @@ export default class Game {
     // );
   }
 
-
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
-
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
           const edge = this.map.edges[ball.target.index];
@@ -141,7 +131,7 @@ export default class Game {
           const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
           const newAngle = angleToRadians(newDegree);
           ball.setAngle(newAngle);
-          ball.findTarget(this.map.edges);
+          ball.findTarget(this.walls);
         } else {
           // en 1v1 il y a deux murs en plus, c'est un trick pour pas que ca bug mais c'est moche, a rework
           const idx =
@@ -162,28 +152,39 @@ export default class Game {
             // const newAngle = angleToRadians(newDegree);
 
             /**
-            * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
-            * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
-            * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
-            */
+             * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
+             * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
+             * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
+             */
 
             /**
              * Je crois que c'est gucci
              */
+            const l1 = lineLength([
+              [...paddle.line[0]],
+              [ball.position.x, ball.position.y],
+            ]);
+            const l2 = lineLength([
+              [...paddle.line[1]],
+              [ball.position.x, ball.position.y],
+            ]);
+            const pc1 = GameTools.percentage(
+              l2,
+              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
+            );
+            const pc2 = GameTools.percentage(
+              l1,
+              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
+            );
 
-            let l1 = lineLength([[...paddle.line[0]], [ball.position.x, ball.position.y]]);
-            let l2 = lineLength([[...paddle.line[1]], [ball.position.x, ball.position.y]]);
-            let pc1 = GameTools.percentage(l2, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
-            let pc2 = GameTools.percentage(l1, lineLength([[...paddle.line[1]], [...paddle.line[0]]]));
-
-            console.log("diff", pc1 - pc2, pc1, pc2);
-            console.log("pre deg", newDegree);
+            console.log('diff', pc1 - pc2, pc1, pc2);
+            console.log('pre deg', newDegree);
             newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
-            console.log("final deg", newDegree);
+            console.log('final deg', newDegree);
             const newAngle = angleToRadians(newDegree);
             // ball.speed *= 1.1;
             ball.setAngle(newAngle);
-            ball.findTarget(this.map.edges);
+            ball.findTarget(this.walls);
           } else {
             this.reduce();
           }
@@ -195,12 +196,14 @@ export default class Game {
 
   public reduce() {
     this.stop();
-    this.nPlayers -= 1;
+    this.nPlayers--;
     if (this.nPlayers < 2) this.nPlayers = 2;
     this.generateMap(this.nPlayers);
-    if (this.isPaused) setTimeout(() => {
-        if (this.isPaused) this.run();
-      }, 3000);
+    const timer = 3000;
+    this.socket.emit('timer', { timer });
+    setTimeout(() => {
+      if (this.isPaused) this.run();
+    }, timer + 1000);
   }
 
   public reset() {
@@ -213,13 +216,13 @@ export default class Game {
   }
 
   public get ballsNetScheme() {
-    return this.balls.map(b => b.netScheme);
+    return this.balls.map((b) => b.netScheme);
   }
 
   public get paddlesNetScheme() {
     return this.paddles
-      .map(b => b.netScheme)
-      .map((b, i) => ({ ...b, name: i }))
+      .map((b) => b.netScheme)
+      .map((b, i) => ({ ...b, name: i }));
   }
 
   public get networkState() {
@@ -250,7 +253,7 @@ export default class Game {
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
     // console.log(this.timeElapsed);
-    // if (this.timeElapsed > 10 * this.balls.length) this.addBall();
+    if (this.timeElapsed > 10 * this.balls.length) this.addBall();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }

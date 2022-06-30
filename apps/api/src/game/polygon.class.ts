@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   polygon.class.ts                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/06/30 17:00:23 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { Vector, Polygon } from 'collider2d';
 import {
   polygonRegular,
@@ -37,10 +49,10 @@ export default class MyPolygon {
     } else {
       const angle = (Math.PI * 2) / npoints;
       for (let i = 0; i < npoints; i++) {
-        const sx = /*Math.fround*/(x + Math.cos(angle * i) * radius);
-        const sy = /*Math.fround*/(y + Math.sin(angle * i) * radius);
+        const sx = /*Math.fround*/ x + Math.cos(angle * i) * radius;
+        const sy = /*Math.fround*/ y + Math.sin(angle * i) * radius;
         this.verticles.push([sx, sy]);
-        this.sides.push(new Vector(sx, sy))
+        this.sides.push(new Vector(sx, sy));
         console.log('sx, sy ', [sx, sy]);
       }
       this.shape = new Polygon(this.center, this.sides);
@@ -49,11 +61,11 @@ export default class MyPolygon {
     for (let i = 0; i < this.verticles.length; i++) {
       const next = i === this.verticles.length - 1 ? 0 : i + 1;
       const line: Line = [this.verticles[i], this.verticles[next]];
-      this.angles.push(lineAngle(line))
+      this.angles.push(lineAngle(line));
       this.edges[i] = line;
     }
 
-    console.log("-- Edges", this.shape);
+    console.log('-- Edges', this.shape);
     this.edgeWidth = radius;
   }
 }

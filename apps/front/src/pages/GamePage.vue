@@ -59,7 +59,7 @@ import { useApi } from 'src/utils/api';
 import { Position, Paddle, Ball } from 'src/utils/game';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core'
 import PolygonMap from 'src/components/PolygonMap.vue';
-
+import { Notify } from 'quasar';
 const { socket } = useAuthStore();
 
 
@@ -118,8 +118,18 @@ const mapChange = (res) => {
   mapProps.value = res;
 };
 
+const printTimer = ({ timer }: {timer: number}) => {
+  Notify.create({
+    timeout: timer,
+    progress: true,
+    position: 'top',
+    message: `New round will start`,
+  });
+};
+
 socket?.on('gameUpdate', update);
 socket?.on('mapChange', mapChange);
+socket?.on('timer', printTimer);
 
 const {
   data: tickValue,

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pong.service.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/27 17:08:57 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/06/30 15:54:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,14 +88,6 @@ export class PongService {
     client.join(`lobby-${id}`);
     console.log('Joined', this.lobbies);
     this.socketServer.emit('refreshedLobbies');
-  }
-
-  updatePaddles(client: Socket, evt: any) {
-    this.tmpGame.updatePaddle(evt);
-  }
-
-  updatePositionPaddles(client: Socket, evt: any) {
-    this.tmpGame.updatePositionPaddles(evt);
   }
 
   updatePaddlePercent(client: Socket, percent: number) {
