@@ -14,20 +14,24 @@
   position: absolute;
 }
 
-.map {
-  position: relative;
+.wrapper {
+  min-height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
 <template>
-  <q-page padding>
-    <div style="border: 2px solid green; display: flex; justify-content: center; align-items: center;">
+  <q-page>
+    <FssFallback class="wrapper">
       <PolygonMap class="map" ref="mapEl"
         :map="mapProps"
         :paddles="paddles"
         :balls="balls"
+        @paddleMove="updatePaddlePercent"
       >
       </PolygonMap>
-    </div>
+    </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
       {{ isPaused === 'true' ? 'Play' : 'Pause' }}
@@ -43,7 +47,7 @@
       {{ tickValue }}
     </pre> -->
     <pre style="background-color: grey;">
-      El : {{ usedRatio }}
+      <!-- El : {{ usedRatio }} -->
       Pause : {{ isPaused }} {{ typeof(isPaused) }}
       Ball : {{ balls }}
       Paddle : {{ paddles }}
@@ -59,6 +63,7 @@ import { useApi } from 'src/utils/api';
 import { Position, Paddle, Ball } from 'src/utils/game';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core'
 import PolygonMap from 'src/components/PolygonMap.vue';
+import FssFallback from 'src/components/FssFallback.vue';
 import { Notify } from 'quasar';
 const { socket } = useAuthStore();
 
@@ -79,24 +84,27 @@ const {
 } = useApi<string>('pong/pause', { immediate: false });
 
 
-const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
-const ratio = computed(() => {
-  let r = elementX.value / elementWidth.value;
-  if (r > 1) r = 1;
-  else if (r < 0) r = 0;
-  return r;
-});
-const forcedRatio = ref(null);
+// const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
+// const ratio = computed(() => {
+//   let r = elementX.value / elementWidth.value;
+//   if (r > 1) r = 1;
+//   else if (r < 0) r = 0;
+//   return r;
+// });
+// const forcedRatio = ref(null);
 
-const usedRatio = computed(() => {
-  const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
-  // console.log("Ratio update", val);
-  return val;
-});
+// const usedRatio = computed(() => {
+//   const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
+//   // console.log("Ratio update", val);
+//   return val;
+// });
 
-watch(usedRatio, (val) => {
-  socket?.emit('paddlePercent', val);
-});
+const updatePaddlePercent = (percent: number) => {
+  socket?.emit('paddlePercent', percent);
+};
+// watch(usedRatio, (val) => {
+//   updatePaddlePercent((val as number));
+// });
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 16:46:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/30 18:06:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,8 @@ export default class Game {
   }
   public get networkMap() {
     return {
+      walls: this.walls.map((w) => w.netScheme),
+      wallWith: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
     };

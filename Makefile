@@ -13,6 +13,9 @@ detach:
 build:
 	$(COMPOSE) up --build
 
+down:
+	$(COMPOSE) down
+
 clear:
 	$(COMPOSE) down -v
 	docker system prune -f
