@@ -21,14 +21,11 @@
 <template>
   <q-page padding>
     <div style="border: 2px solid green; display: flex; justify-content: center; align-items: center;">
-      <PolygonMap class="map" ref="mapEl" :verticles="verticles" :paddles="paddles" :balls="balls">
-        <!-- <div class="ball"
-           v-for="ball in balls"
-          :style="formatBallStyle(ball)">a</div>
-        <div class="paddle"
-          v-for="paddle in paddles"
-          :style="formatPaddleStyle(paddle)"
-        >b</div> -->
+      <PolygonMap class="map" ref="mapEl"
+        :map="mapProps"
+        :paddles="paddles"
+        :balls="balls"
+      >
       </PolygonMap>
     </div>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
@@ -56,11 +53,11 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, onMounted, StyleValue, Ref, watch, computed } from 'vue';
+import { defineProps, ref, onMounted, StyleValue, Ref, watch, computed, VueElement } from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
 import { Position, Paddle, Ball } from 'src/utils/game';
-import { useMouseInElement } from '@vueuse/core'
+import { MaybeElementRef, useMouseInElement } from '@vueuse/core'
 import PolygonMap from 'src/components/PolygonMap.vue';
 
 const { socket } = useAuthStore();
@@ -68,15 +65,12 @@ const { socket } = useAuthStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
-const info: Ref<any> = ref(null);
+const info: Ref<object> = ref();
+const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
 const props = defineProps({
   lobbyId: Number,
 });
-
-const onKeyDown = (evt: KeyboardEvent) => {
-  socket?.emit('paddleUpdate', evt.key);
-}
 
 const {
   data: isPaused,
@@ -84,33 +78,6 @@ const {
   // afterFetch: (ctx: any) => ({ data: ctx.data === 'true', ...ctx }),
 } = useApi<string>('pong/pause', { immediate: false });
 
-function formatPositionStyle(position: Position) {
-  const { x, y, h, w } = position;
-  return {
-    top: `${y}%`,
-    left: `${x}%`,
-    width: `${w}%`,
-    height: `${h}%`,
-  };
-}
-
-function formatPaddleStyle(paddle: Paddle): StyleValue {
-  return {
-    ...formatPositionStyle(paddle.pos),
-    transform: `rotate(${paddle.angle}deg)`,
-    backgroundColor: 'green',
-  };
-}
-
-function formatBallStyle(ball: Ball): StyleValue {
-  const style = {
-    ...formatPositionStyle(ball.pos),
-    backgroundColor: 'red',
-  };
-  return style;
-}
-
-const mapEl = ref(null);
 
 const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
 const ratio = computed(() => {
@@ -135,19 +102,20 @@ const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
   if (b) balls.value = b;
   if (p) paddles.value = p;
-  // info.value = rest;
-}
+  // if (rest) console.log('Updating rest is', rest);
+};
 
 onMounted(() => {
   // console.log(ball_ref.value, world.value, paddle1_ref.value, paddle2_ref.value);
   // window.addEventListener('keydown', onKeyDown);
 });
 
-const verticles = ref([]);
+const mapProps: Ref<{ verticles: number[], angles: number[] }> = ref({
+  verticles: [],
+  angles: [],
+});
 const mapChange = (res) => {
-  console.log("Change map", res);
-  verticles.value = res.edges;
-  console.log("new verticles", verticles.value)
+  mapProps.value = res;
 };
 
 socket?.on('gameUpdate', update);
@@ -160,7 +128,7 @@ const {
 
 const {
   data: test,
-  execute: reset
+  execute: reset,
 } = useApi('pong/reset', { immediate: false });
 
 

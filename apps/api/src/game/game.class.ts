@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/28 03:15:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/06/30 14:34:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ export default class Game {
 
   run() {
     // this.generateMap(this.nPlayers);
-    this.socket.emit('mapChange', this.networkMap);
+    // this.socket.emit('mapChange', this.networkMap);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
   }
   stop() {
@@ -198,9 +198,9 @@ export default class Game {
     this.nPlayers -= 1;
     if (this.nPlayers < 2) this.nPlayers = 2;
     this.generateMap(this.nPlayers);
-    // if (this.isPaused) setTimeout(() => {
-    //   if (this.isPaused) this.run();
-    // }, 3000)
+    if (this.isPaused) setTimeout(() => {
+        if (this.isPaused) this.run();
+      }, 3000);
   }
 
   public reset() {
@@ -230,7 +230,8 @@ export default class Game {
   }
   public get networkMap() {
     return {
-      edges: this.map.verticles,
+      angles: this.map.angles,
+      verticles: this.map.verticles,
     };
   }
 

@@ -13,6 +13,7 @@
   <div class="svg-test wrapper">
     <svg
       viewBox="-50 -50 100 100"
+      ref="svgRef"
     >
   <filter ref="filterRef" id="displacementFilter">
     <feTurbulence type="turbulence" baseFrequency="0.3" numOctaves="2" result="turbulence"/>
@@ -20,7 +21,7 @@
   </filter>
       <polygon
         ref="polygonRef"
-        style="filter: url(#displacementFilter)"
+        style="/*filter: url(#displacementFilter)*/"
         fill="yellow" stroke="gray">
       </polygon>
 
@@ -46,7 +47,7 @@
         v-bind="formatBallTrajectoryPoints(ball)"
       />
       <text
-        v-for="vertex in verticles"
+        v-for="vertex in map.verticles"
         :x="vertex[0]" :y="vertex[1]"
         fill="green" font-size="5"
       >
@@ -54,6 +55,7 @@
       </text>
       <text
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
+        :key="ball"
         :x="ball.target.hit.x" :y="ball.target.hit.y"
         fill="green" font-size="5"
       >
@@ -62,6 +64,7 @@
 
       <text
         v-for="paddle in paddles"
+        :key="paddle"
         :x="paddle.line[0][0]" :y="paddle.line[0][1]"
         fill="orange" font-size="5"
       >
@@ -89,13 +92,15 @@
 <script setup lang="ts">
 import { onMounted, computed, PropType, StyleValue, watch, ref } from 'vue';
 import { Position, Paddle, Ball } from 'src/utils/game';
-
 import anime from 'animejs/lib/anime.es.js';
 
 const props = defineProps({
-  verticles: {
-    type: Array as PropType<number[][]>,
-    default: () => [],
+  map: {
+    type: Object as PropType<{ verticles: number[], angles: number[] }>,
+    default: () => ({
+      verticles: [],
+      angles: [],
+    }),
   },
   paddles: {
     type: Array as any,
@@ -107,23 +112,13 @@ const props = defineProps({
   }
 });
 
-function formatPositionStyle(position: Position) {
-  const { x, y, h, w } = position;
-  return {
-    top: `${y}%`,
-    left: `${x}%`,
-    width: `${w}%`,
-    height: `${h}%`,
-  };
-}
-
 function formatBallTrajectoryPoints(ball: Ball) {
   return {
     x1: ball.position.x,
     x2: ball.target.hit.x,
     y1: ball.position.y,
     y2: ball.target.hit.y,
-  }
+  };
 }
 
 function formatPaddlePoints(paddle: Paddle) {
@@ -132,80 +127,35 @@ function formatPaddlePoints(paddle: Paddle) {
     x2: paddle.line[1][0],
     y1: paddle.line[0][1],
     y2: paddle.line[1][1],
-  }
+  };
 }
 
 function formatBallPosition(position: Position) {
   return {
     cx: position.x,
     cy: position.y,
-  }
-}
-function formatPaddleStyle(paddle: Paddle): StyleValue {
-  return {
-    ...formatPositionStyle(paddle.pos),
-    transform: `rotate(${paddle.angle}deg)`,
-    backgroundColor: 'green',
   };
 }
-
-function formatBallStyle(ball: Ball): StyleValue {
-  const style = {
-    ...formatPositionStyle(ball.pos),
-    backgroundColor: 'red',
-  };
-  return style;
-}
-
-// const verticlesToPoint = computed(() => {
-//   const points = props.verticles
-//     .map(([x, y]) => `${x},${y}`)
-//     .join(' ');
-//   console.log("Computed points", points);
-
-//   return points;
-// });
-
-const test = () => {};
 
 const polygonRef = ref<HTMLElement>();
-const filterRef = ref<HTMLElement>();
+const svgRef = ref<HTMLElement>();
 
-watch(() => props.verticles, (verticles, oldVerticles = []) => {
-  console.log("News", verticles);
-  console.log("Olds", oldVerticles);
-  console.log("refs", polygonRef, filterRef);
-  // const polyEl = document.querySelector('.svg-test polygon');
-  // const feTurbulenceEl = document.querySelector('feTurbulence');
-  // const feDisplacementMap = document.querySelector('feDisplacementMap');
-  // // polyEl.setAttribute('points', '55,55 5,95 50,50 50,0 45,45 100,95');
-  // feTurbulenceEl.setAttribute('baseFrequency', Math.random() * 100 + '');
-  // feDisplacementMap.setAttribute('scale', '20');
-  console.log("New polygons", oldVerticles);
-  const targets = [polygonRef.value, ...(filterRef.value?.childNodes as any)];
+watch(() => props.map, (map, oldMap = []) => {
+  const { verticles, angles } = map;
+  const { verticles: oldVerticles } = oldMap;
 
   (anime.timeline as any)({
-      targets,
-      easing: 'easeInOutExpo',
-      points: verticles.join(' '),
-      rotation: 0,
-      scale: 1,
-      baseFrequency: 60,
-    })
-    .add({})
-      //   points: oldVerticles
-      //     .reduce((acc: number[][], v, i) => ([...acc, v, [0, 0]]), [])
-      //     .join(' '),
-    // .add({
-    //   scale: 30,
-    //   // rotate: '360deg',
-    //   baseFrequency: 56,
-    // })
-    // .add({
-    //   scale: 1,
-    //   baseFrequency: 1,
-    // })
-
+    targets: polygonRef.value,
+    easing: 'easeInOutExpo',
+    points: verticles.join(' '),
+  })
+    .add({
+      targets: svgRef.value,
+      keyframes: [
+        { rotate: 0 },
+        { rotate: 360 + angles[0] },
+      ],
+    });
 }, { immediate: false });
 
 onMounted(() => {
