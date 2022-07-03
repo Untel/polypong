@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 16:06:28 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/04 00:24:32 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ export default class Game {
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
-      if (nPlayers > 2 || index % 2) {
+      if (nPlayers > 2 || !(index % 2)) {
         paddle = new Paddle(line, index, 1);
         this.paddles.push(paddle);
       }
@@ -135,11 +135,14 @@ export default class Game {
       const paddle = this.paddles[idx];
       // console.log("ball target", ball.target.index)
       const dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.t_axis[0], paddle.t_axis[1])
-      const dist2: number = GameTools.pDistance(ball.position.x + ball.direction.x, ball.position.y + ball.direction.y, paddle.t_axis[0], paddle.t_axis[1])
+      // const dist2: number = GameTools.pDistance(ball.position.x + ball.direction.x, ball.position.y + ball.direction.y, paddle.t_axis[0], paddle.t_axis[1])
       // console.log("dist to targett line is : ", dist);
       // console.log("ball radius", ball.radius) = 3
+      // let ndist = GameTools.distance(ball.position.x, ball.position.y, ball.newTarget[0], ball.newTarget[1])
+      // console.log("diff bt target x", ndist)
       if (dist <= ball.radius) {//|| (dist > ball.radius && dist2  )) {
         // console.log("Collision !");
+        console.log("distance", dist)
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
           const edge = this.map.edges[ball.target.index];
@@ -155,6 +158,14 @@ export default class Game {
           //     ? 1
           //     : ball.target.index;
           // const paddle = this.paddles[idx];
+
+
+          //Need to check that vector is properly rotated
+          // let test = [ball.adjacent, 0]
+          // let test2 = GameTools.vectorRotate(0, -ball.radius, ball.alpha);
+          // console.log("test 2=", test2)
+          // test2[0] += ball.target.hit[0]
+          // test2[1] += ball.target.hit[1]
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.target.hit,
             paddle.line,
@@ -181,10 +192,10 @@ export default class Game {
 
           // console.log("dist + dx", ball.position.x + b);
           // console.log("dist + dy", ball.position.y + b);
-          console.log("paddle angle ", paddle.angle);
-          console.log("ball angle ", ball.angle)
-          console.log("pos being C : ", ball.position)
-          console.log("target being A : ", ball.target.hit)
+          // console.log("paddle angle ", paddle.angle);
+          // console.log("ball angle ", ball.angle)
+          // console.log("pos being C : ", ball.position)
+          // console.log("target being A : ", ball.target.hit)
 
           console.log("distance to botton part", dist);
           console.log("distance to botton target", GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]));

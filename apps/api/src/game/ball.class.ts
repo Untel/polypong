@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 16:28:43 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/04 00:24:59 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,11 @@ export class Ball extends Circle {
   //   index: number,
   // };
   target: any;
+  // newTarget: any;
   newTarget: any;
   targetInfo: any;
+  adjacent: any;
+  alpha: any;
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
     super(startPos, radius);
@@ -105,23 +108,27 @@ export class Ball extends Circle {
     }
     this.adjustTarget(this.target.edge);
   }
+  applyNew() {
+
+  }
   adjustTarget(wall) {
     // console.log([this.angle, lineAngle(wall)])
     console.log("Ball angle :", angleToDegrees(this.angle));
-    console.log("Walll angle :", lineAngle(wall));
+    console.log("Walllangle  :", lineAngle(wall));
     let alpha = (lineAngle(wall) - angleToDegrees(this.angle)) % 360;
+    // console
     if (alpha < 0)
       alpha += 360
     if (alpha > 90)
       alpha = 180 - alpha;
-
+    console.log("angle attaque", alpha)
     var hypothenuse = this.radius / Math.sin(alpha * (Math.PI / 180))
-    console.log("hypothenuse len", hypothenuse);
+    // console.log("hypothenuse len", hypothenuse);
 
     var adjacent = (this.radius / Math.tan(alpha * (Math.PI / 180)));
-    console.log("adjacent len", adjacent);
-    console.log("opposé", this.radius)
-    console.log("check pytha", (hypothenuse * hypothenuse), " vs ", (adjacent * adjacent) + (this.radius * this.radius))
+    // console.log("adjacent len", adjacent);
+    // console.log("opposé", this.radius)
+    // console.log("check pytha", (hypothenuse * hypothenuse), " vs ", (adjacent * adjacent) + (this.radius * this.radius))
 
     // var v1: [number, number];
     // var v2: [number, number];
@@ -130,19 +137,20 @@ export class Ball extends Circle {
     // v1[1] = this.radius;
 
     // let rvx = GameTools.vectorRotate(0, this.radius, alpha * (Math.PI / 180));
-    let rvx = GameTools.vectorRotate(adjacent, this.radius, alpha * (Math.PI / 180));
-
+    let rvx = GameTools.vectorRotate(adjacent, this.radius, angleToRadians(alpha))// * (Math.PI / 180));
     console.log("rvx", rvx);
     // console.log("rvy", rvy);
 
     // rvx[0] += rvy[0];
     // rvx[1] += rvy[1];
-
-    let newTarget: any = [this.target.hit[0] + rvx[0], this.target.hit[1] + rvx[1]]
+    this.alpha = alpha;
+    this.adjacent = adjacent;
+    this.newTarget = [this.target.hit[0] + rvx[0], this.target.hit[1] + rvx[1]]
     console.log("old target", this.target.hit)
     // this.target.hit = newTarget;
-    console.log("new target", newTarget)
-
+    // // console.log("ratios"
+    // console.log("new target", this.newTarget)
+    // console.log("ratios,", this.newTarget[0] / this.target.hit[0], "and ", this.newTarget[1] / this.target.hit[1]);
     // v1[0] = ad
     // g("v2, ", v2);
 
@@ -195,6 +203,7 @@ export class Ball extends Circle {
         x: this.position.x,
         y: this.position.y,
       },
+      newTarget: this.newTarget,
       radius: this.radius,
       target: {
         ...this.target,
