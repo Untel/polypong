@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 06:06:41 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 07:40:07 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 3;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
 
@@ -88,7 +88,7 @@ export default class Game {
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (nPlayers > 2 || index % 2) {
-        paddle = new Paddle(line, index, 1);
+        paddle = new Paddle(line, index, 0.5);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -127,9 +127,18 @@ export default class Game {
     this.balls.forEach((ball) => {
 
       let collisionCheck: boolean;
-      let dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.line[0], paddle.line[1])
-      console.log("dist is : ", dist);
-      if (ball.targetDistance <= ball.radius) {
+
+      const idx =
+        this.nPlayers === 2 && ball.target.index === 2
+          ? 1
+          : ball.target.index;
+      const paddle = this.paddles[idx];
+      // console.log("ball target", ball.target.index)
+      const dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.t_axis[0], paddle.t_axis[1])
+      // console.log("dist to targett line is : ", dist);
+      // console.log("ball radius", ball.radius) = 3
+      if (dist <= ball.radius) {
+        // console.log("Collision !");
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
           const edge = this.map.edges[ball.target.index];
@@ -140,25 +149,37 @@ export default class Game {
           ball.findTarget(this.walls);
         } else {
           // en 1v1 il y a deux murs en plus, c'est un trick pour pas que ca bug mais c'est moche, a rework
-          const idx =
-            this.nPlayers === 2 && ball.target.index === 2
-              ? 1
-              : ball.target.index;
-          const paddle = this.paddles[idx];
+          // const idx =
+          //   this.nPlayers === 2 && ball.target.index === 2
+          //     ? 1
+          //     : ball.target.index;
+          // const paddle = this.paddles[idx];
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.target.hit,
             paddle.line,
             1,
           );
-          console.log("distance is ", dist)
-          if (dist <= ball.radius) {
-            console.log("got a hit");
-            if (paddleTouchTheBall)
-              console.log("othe method as well");
-            else
-              console.log("other didnt");
+          // console.log("distance is ", dist)
+          // console.log("point Padle touched ", paddleTouchTheBall)
 
-          }
+          var a: number = dist;
+
+          var c: number = GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]);
+          var b: number = Math.sqrt(Math.pow(c, 2) - Math.pow(a, 2));
+          // console.log("a: ", a);
+          // console.log("c: ", c);
+
+          // console.log("It hit: ", b, "befor it should have i think");
+
+
+          // if (dist <= ball.radius) {
+          //   console.log("got a hit");
+          //   if (paddleTouchTheBall)
+          //     console.log("othe method as well");
+          //   else
+          //     console.log("other didnt");
+
+          // }
           // console.log()
           if (paddleTouchTheBall) {
             const incidenceAngleDeg = angleToDegrees(ball.angle);
@@ -176,7 +197,7 @@ export default class Game {
             /**
              * Je crois que c'est gucci
              */
-            console.log("target:  ", ball.target);
+            // console.log("target:  ", ball.target);
 
 
             // const l1 = lineLength([
@@ -189,7 +210,7 @@ export default class Game {
             // ]);
             const l1 = lineLength([
               [...paddle.line[0]],
-              [ball.target.hit[0], ball.target.hit[0]],
+              [ball.position.x, ball.position.y],
             ]);
             const l2 = lineLength([
               [...paddle.line[1]],
@@ -214,7 +235,7 @@ export default class Game {
             ball.findTarget(this.walls);
           } else {
             console.log("reduce");
-            // this.reduce();
+            this.reduce();
           }
         }
       }
@@ -223,9 +244,10 @@ export default class Game {
   }
 
   public reduce() {
-    // this.stop();
-    this.nPlayers--;
-    if (this.nPlayers < 2) this.nPlayers = 2;
+    this.stop();
+    // if (this.nPlayers > 4)
+    // this.nPlayers--;
+    if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
     const timer = 1000;
     this.socket.emit('timer', { timer });
@@ -235,7 +257,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 3;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
   // Getters

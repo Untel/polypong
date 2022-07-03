@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 00:41:51 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 07:26:02 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ export class Paddle {
   bounceAngle: number;
   paddleWidth: number;
   ratio: number;
+  t_axis: Line;
   static distance(x1: number, y1: number, x2: number, y2: number): number {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
@@ -43,6 +44,7 @@ export class Paddle {
     this.color = colors[index % colors.length];
     this.angle = lineAngle(axis);
     this.bounceAngle = bounce;
+    this.t_axis = axis;
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     console.log("axis:", axis);
