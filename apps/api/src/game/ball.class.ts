@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 15:37:49 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 16:28:43 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,29 @@ export class Ball extends Circle {
     console.log("adjacent len", adjacent);
     console.log("opposé", this.radius)
     console.log("check pytha", (hypothenuse * hypothenuse), " vs ", (adjacent * adjacent) + (this.radius * this.radius))
+
+    // var v1: [number, number];
+    // var v2: [number, number];
+    // // v1.push()
+    // v1[0] = 0;
+    // v1[1] = this.radius;
+
+    // let rvx = GameTools.vectorRotate(0, this.radius, alpha * (Math.PI / 180));
+    let rvx = GameTools.vectorRotate(adjacent, this.radius, alpha * (Math.PI / 180));
+
+    console.log("rvx", rvx);
+    // console.log("rvy", rvy);
+
+    // rvx[0] += rvy[0];
+    // rvx[1] += rvy[1];
+
+    let newTarget: any = [this.target.hit[0] + rvx[0], this.target.hit[1] + rvx[1]]
+    console.log("old target", this.target.hit)
+    // this.target.hit = newTarget;
+    console.log("new target", newTarget)
+
+    // v1[0] = ad
+    // g("v2, ", v2);
 
     // var newEnd = lineLength(this.target.hit)
     // alpha = alpha >= 0 ? alpha : alpha + 360;

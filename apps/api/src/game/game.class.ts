@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 15:35:33 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 16:06:28 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 12;
+    this.nPlayers = 4;
     this.generateMap(this.nPlayers);
   }
 
@@ -296,7 +296,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 12;
+    this.nPlayers = 4;
     this.generateMap(this.nPlayers);
   }
   // Getters

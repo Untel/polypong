@@ -6,9 +6,11 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 05:52:42 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 16:28:27 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+import { Vector } from "collider2d";
 
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
@@ -39,6 +41,25 @@ export default class GameTools {
   }
   static getRandomFloatArbitrary(min, max): number {
     return Math.random() * (max - min) + min;
+  }
+
+  static vectorRotate(vx: number, vy: number, degree: number) {
+
+    // const L = Math.norm([vx,vy]) this.distance(0, 0, vx, vy);
+    // L =
+    let vec: Vector = new Vector(vx, vy)
+    // console.log("vector L is ", L);
+    console.log('vec is ', vec);
+
+    // {
+    // ang = -ang * (Math.PI / 180);
+    var cos = Math.cos(degree);
+    var sin = Math.sin(degree);
+    let rotated = Array(Math.round(10000 * (vx * cos - vy * sin)) / 10000, Math.round(10000 * (vx * sin + vy * cos)) / 10000);
+    // };
+    // console.log("rotated :", rotated)
+    return rotated;
+
   }
 
   static pDistance(x: number, y: number, p1: number[], p2: number[]): number {
