@@ -24,22 +24,18 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl"
-        :map="mapProps"
-        :paddles="paddles"
-        :balls="balls"
-        @paddleMove="updatePaddlePercent"
-      >
+      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls"
+        @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
-    <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
+    <q-btn @click="togglePause()" :icon="isPaused === 'true' ? 'play_arrow' : 'pause'">
       {{ isPaused === 'true' ? 'Play' : 'Pause' }}
     </q-btn>
     <q-btn dense @click="tick()">
       tick
     </q-btn>
-    <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/>
+    <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green" />
     <q-btn dense @click="reset()">
       reset
     </q-btn>
@@ -48,10 +44,10 @@
     </pre> -->
     <pre style="background-color: grey;">
       <!-- El : {{ usedRatio }} -->
-      Pause : {{ isPaused }} {{ typeof(isPaused) }}
+      <!-- Pause : {{ isPaused }} {{ typeof (isPaused) }} -->
       Ball : {{ balls }}
       Paddle : {{ paddles }}
-      Info : {{ info }}
+      <!-- Info : {{ info }} -->
     </pre>
   </q-page>
 </template>
@@ -126,7 +122,7 @@ const mapChange = (res) => {
   mapProps.value = res;
 };
 
-const printTimer = ({ timer }: {timer: number}) => {
+const printTimer = ({ timer }: { timer: number }) => {
   Notify.create({
     timeout: timer,
     progress: true,

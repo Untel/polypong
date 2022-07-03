@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 18:06:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/03 06:06:41 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 16;
+    this.nPlayers = 3;
     this.generateMap(this.nPlayers);
   }
 
@@ -88,7 +88,7 @@ export default class Game {
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (nPlayers > 2 || index % 2) {
-        paddle = new Paddle(line, index, 0.4);
+        paddle = new Paddle(line, index, 1);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -121,8 +121,14 @@ export default class Game {
     // );
   }
 
+
+
   runPhysics() {
     this.balls.forEach((ball) => {
+
+      let collisionCheck: boolean;
+      let dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.line[0], paddle.line[1])
+      console.log("dist is : ", dist);
       if (ball.targetDistance <= ball.radius) {
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
@@ -144,6 +150,16 @@ export default class Game {
             paddle.line,
             1,
           );
+          console.log("distance is ", dist)
+          if (dist <= ball.radius) {
+            console.log("got a hit");
+            if (paddleTouchTheBall)
+              console.log("othe method as well");
+            else
+              console.log("other didnt");
+
+          }
+          // console.log()
           if (paddleTouchTheBall) {
             const incidenceAngleDeg = angleToDegrees(ball.angle);
             // this.verticles =
@@ -160,9 +176,20 @@ export default class Game {
             /**
              * Je crois que c'est gucci
              */
+            console.log("target:  ", ball.target);
+
+
+            // const l1 = lineLength([
+            //   [...paddle.line[0]],
+            //   [ball.position.x, ball.position.y],
+            // ]);
+            // const l2 = lineLength([
+            //   [...paddle.line[1]],
+            //   [ball.position.x, ball.position.y],
+            // ]);
             const l1 = lineLength([
               [...paddle.line[0]],
-              [ball.position.x, ball.position.y],
+              [ball.target.hit[0], ball.target.hit[0]],
             ]);
             const l2 = lineLength([
               [...paddle.line[1]],
@@ -186,7 +213,8 @@ export default class Game {
             ball.setAngle(newAngle);
             ball.findTarget(this.walls);
           } else {
-            this.reduce();
+            console.log("reduce");
+            // this.reduce();
           }
         }
       }
@@ -195,11 +223,11 @@ export default class Game {
   }
 
   public reduce() {
-    this.stop();
+    // this.stop();
     this.nPlayers--;
     if (this.nPlayers < 2) this.nPlayers = 2;
     this.generateMap(this.nPlayers);
-    const timer = 3000;
+    const timer = 1000;
     this.socket.emit('timer', { timer });
     setTimeout(() => {
       if (this.isPaused) this.run();
@@ -207,7 +235,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 8;
+    this.nPlayers = 3;
     this.generateMap(this.nPlayers);
   }
   // Getters
@@ -255,7 +283,7 @@ export default class Game {
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
     // console.log(this.timeElapsed);
-    if (this.timeElapsed > 10 * this.balls.length) this.addBall();
+    // if (this.timeElapsed > 10 * this.balls.length) this.addBall();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }

@@ -1,78 +1,54 @@
 <style lang="scss" scoped>
-  .wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    svg {
-      margin: 20px;
-      height: 70%;
-      width: auto;
-      polygon {
-        fill: rgba(255, 255, 255, .3);
-        // stroke: black;
-      }
+.wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
 
-      .ball {
-        fill: rgba(81, 5, 5, 0.9);
-      }
+  svg {
+    margin: 20px;
+    height: 70%;
+    width: auto;
 
-      .wall {
-        fill: rgba(46, 164, 38, 0.9);
-        stroke: rgba(46, 164, 38, 0.9);
+    polygon {
+      fill: rgba(255, 255, 255, .3);
+      // stroke: black;
+    }
 
-        &.mine {
-          fill: rgba(24, 32, 145, 0.9);
-          stroke: rgba(24, 32, 145, 0.9);
-        }
+    .ball {
+      fill: rgba(81, 5, 5, 0.9);
+    }
+
+    .wall {
+      fill: rgba(46, 164, 38, 0.9);
+      stroke: rgba(46, 164, 38, 0.9);
+
+      &.mine {
+        fill: rgba(24, 32, 145, 0.9);
+        stroke: rgba(24, 32, 145, 0.9);
       }
     }
   }
-
+}
 </style>
 
 <template>
   <div class="svg-test wrapper">
-    <svg
-      viewBox="-50 -50 100 100"
-      ref="svgRef"
-    >
-  <!-- <filter ref="filterRef" id="displacementFilter">
+    <svg viewBox="-50 -50 100 100" ref="svgRef">
+      <!-- <filter ref="filterRef" id="displacementFilter">
     <feTurbulence type="turbulence" baseFrequency="0.3" numOctaves="2" result="turbulence"/>
     <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="50" xChannelSelector="R" yChannelSelector="G"/>
   </filter> -->
-      <polygon
-        ref="polygonRef">
+      <polygon ref="polygonRef">
       </polygon>
 
-      <line
-        v-for="(wall, idx) in map.walls || []"
-        :class="{ 'mine': idx === 0 }"
-        ref="wallsRef"
-        class="wall"
-        stroke-width="1px"
-        v-bind="formatLine(wall.line)"
-      />
-      <line
-        v-for="paddle in paddles"
-        :stroke="paddle.color"
-        stroke-width="2px"
-        v-bind="formatLine(paddle.line)"
-      />
-      <circle class="ball" fill="green" r="3"
-        v-for="ball in balls"
-        v-bind="formatBallPosition(ball.position)"
-      />
-      <circle fill="red" r="1"
-        v-for="ball in balls.filter((b: any) => b.target?.hit)"
-        v-bind="formatBallPosition(ball.target.hit)"
-      />
-      <line
-        stroke="red"
-        stroke-width="0.5px"
-        stroke-dasharray="2"
-        v-for="ball in balls"
-        v-bind="formatBallTrajectoryPoints(ball)"
-      />
+      <line v-for="(wall, idx) in map.walls || []" :class="{ 'mine': idx === 0 }" ref="wallsRef" class="wall"
+        stroke-width="1px" v-bind="formatLine(wall.line)" />
+      <line v-for="paddle in paddles" :stroke="paddle.color" stroke-width="2px" v-bind="formatLine(paddle.line)" />
+      <circle class="ball" fill="green" r="3" v-for="ball in balls" v-bind="formatBallPosition(ball.position)" />
+      <circle fill="red" r="1" v-for="ball in balls.filter((b: any) => b.target?.hit)"
+        v-bind="formatBallPosition(ball.target.hit)" />
+      <line stroke="red" stroke-width="0.5px" stroke-dasharray="2" v-for="ball in balls"
+        v-bind="formatBallTrajectoryPoints(ball)" />
       <!-- <text
         v-for="vertex in map.verticles"
         :x="vertex[0]" :y="vertex[1]"
@@ -204,7 +180,7 @@ watch(() => props.map, (map, oldMap) => {
       targets: svgRef.value,
       keyframes: [
         { rotate: 0 },
-        { rotate: 360 - angles[0] + 180 },
+        // { rotate: 360 - angles[0] + 180 },
       ],
     });
 }, { immediate: false });
