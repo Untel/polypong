@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 07:26:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 08:13:49 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ export class Paddle {
     this.t_axis = axis;
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
-    console.log("axis:", axis);
-    console.log("axis lengt:", lineLength(axis));
+    // console.log("axis:", axis);
+    // console.log("axis lengt:", lineLength(axis));
 
 
     const preInterpolate = lineInterpolate(axis);
-    console.log("preinterpolator, ", preInterpolate)
+    // console.log("preinterpolator, ", preInterpolate)
     const effectiveAxisStart: Line = [axis[0], preInterpolate(1 - this.width)];
     const effectiveAxisEnd: Line = [preInterpolate(this.width), axis[1]];
     // this.paddleWidth = distance()
@@ -63,7 +63,7 @@ export class Paddle {
     // console.log("line ", this.line);
     // this.paddleWidth = Paddle.distance(this.line[0][0], this.line[0][1], this.line[1][0], this.line[1][1])
     // console.log("width ; ", this.paddleWidth)
-    console.log("paddle lengt:", lineLength(this.line));;
+    // console.log("paddle lengt:", lineLength(this.line));;
   }
 
   updatePercentOnAxis(ratio: number) {

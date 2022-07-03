@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 07:40:07 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 08:37:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ export default class Game {
   nPlayers: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
-  speed = 10;
+  speed = 5;
   edges: any;
   map: PolygonMap;
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 12;
+    this.nPlayers = 4;
     this.generateMap(this.nPlayers);
   }
 
@@ -78,7 +78,7 @@ export default class Game {
   generateMap(nPlayers: number) {
     this.balls = [];
     this.timeElapsed = 0;
-    console.log('Generating a new map');
+    // console.log('Generating a new map');
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
@@ -166,12 +166,26 @@ export default class Game {
 
           var c: number = GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]);
           var b: number = Math.sqrt(Math.pow(c, 2) - Math.pow(a, 2));
-          // console.log("a: ", a);
-          // console.log("c: ", c);
 
-          // console.log("It hit: ", b, "befor it should have i think");
+          var ratio: number;
+          // ratio  =
+          // var ratiox = ball.target.hit[0] - ball.position.x;
+          // console.log("ratiox = ", ratiox)
+          // var ratioy = ball.target.hit[1] - ball.position.y;
+          // console.log("ratioy = ", ratiox)
+          // // console.log("a: ", a);
+          // // console.log("c: ", c);
 
+          console.log("It hit: ", b, "before it should have i think");
 
+          console.log("dist + dx", ball.position.x + b);
+          console.log("dist + dy", ball.position.y + b);
+
+          console.log("pos : ", ball.position)
+          console.log("final : ", ball.position.x + b, ball.position.y + b)
+
+          // ball.position.x += b; 
+          // ball.position.y += b;
           // if (dist <= ball.radius) {
           //   console.log("got a hit");
           //   if (paddleTouchTheBall)
@@ -224,11 +238,13 @@ export default class Game {
               l1,
               lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
             );
+            // console.log("pc1 :", pc1)
+            // console.log("pc2 :", pc2)
 
-            console.log('diff', pc1 - pc2, pc1, pc2);
-            console.log('pre deg', newDegree);
+            // console.log('diff', pc1 - pc2, pc1, pc2);
+            // console.log('pre deg', newDegree);
             newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
-            console.log('final deg', newDegree);
+            // console.log('final deg', newDegree);
             const newAngle = angleToRadians(newDegree);
             // ball.speed *= 1.1;
             ball.setAngle(newAngle);
@@ -247,7 +263,7 @@ export default class Game {
     this.stop();
     // if (this.nPlayers > 4)
     // this.nPlayers--;
-    if (this.nPlayers < 3) this.nPlayers = 3;
+    // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
     const timer = 1000;
     this.socket.emit('timer', { timer });
@@ -257,7 +273,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 12;
+    this.nPlayers = 4;
     this.generateMap(this.nPlayers);
   }
   // Getters
