@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 16:59:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/03 15:37:49 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Circle, Vector } from 'collider2d';
-import { Line, lineLength, Point } from 'geometric';
+import { Line, lineLength, Point, lineAngle, angleToDegrees, angleToRadians } from 'geometric';
 import GameTools from './gametools.class';
 import { Wall } from './wall.class';
 export class Ball extends Circle {
@@ -23,6 +23,7 @@ export class Ball extends Circle {
   //   index: number,
   // };
   target: any;
+  newTarget: any;
   targetInfo: any;
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
@@ -102,8 +103,43 @@ export class Ball extends Circle {
       this.target = { hit: [0, 0], index: 0 };
       this.targetInfo = null;
     }
+    this.adjustTarget(this.target.edge);
   }
+  adjustTarget(wall) {
+    // console.log([this.angle, lineAngle(wall)])
+    console.log("Ball angle :", angleToDegrees(this.angle));
+    console.log("Walll angle :", lineAngle(wall));
+    let alpha = (lineAngle(wall) - angleToDegrees(this.angle)) % 360;
+    if (alpha < 0)
+      alpha += 360
+    if (alpha > 90)
+      alpha = 180 - alpha;
 
+    var hypothenuse = this.radius / Math.sin(alpha * (Math.PI / 180))
+    console.log("hypothenuse len", hypothenuse);
+
+    var adjacent = (this.radius / Math.tan(alpha * (Math.PI / 180)));
+    console.log("adjacent len", adjacent);
+    console.log("opposé", this.radius)
+    console.log("check pytha", (hypothenuse * hypothenuse), " vs ", (adjacent * adjacent) + (this.radius * this.radius))
+
+    // var newEnd = lineLength(this.target.hit)
+    // alpha = alpha >= 0 ? alpha : alpha + 360;
+    // console.log("wall : ", wall)
+    // let x1, x2, y1, y2
+    // x1 = this.position.x;
+    // y1 = this.position.y;
+    // x2 = this.target.hit[0];
+    // y2 = this.target.hit[1];
+
+    // var dx = x2 - x1
+    // var dy = y2 - y1
+    // var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    // console.log("ang is", ang);
+    console.log(`Effective attack angle is ${alpha}`)
+
+
+  }
   move() {
     this.position.x = this.position.x + this.direction.x;
     this.position.y = this.position.y + this.direction.y;

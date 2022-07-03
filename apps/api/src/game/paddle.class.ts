@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 08:13:49 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 14:42:11 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ export class Paddle {
     return {
       line: this.line,
       color: this.color,
-      // angle: this.angle,
+      angle: this.angle,
     };
   }
 }

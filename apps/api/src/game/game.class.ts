@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 08:37:26 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/03 15:35:33 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ export default class Game {
   nPlayers: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
-  speed = 5;
+  speed = 10;
   edges: any;
   map: PolygonMap;
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 4;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
 
@@ -88,7 +88,7 @@ export default class Game {
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (nPlayers > 2 || index % 2) {
-        paddle = new Paddle(line, index, 0.5);
+        paddle = new Paddle(line, index, 1);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -135,9 +135,10 @@ export default class Game {
       const paddle = this.paddles[idx];
       // console.log("ball target", ball.target.index)
       const dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.t_axis[0], paddle.t_axis[1])
+      const dist2: number = GameTools.pDistance(ball.position.x + ball.direction.x, ball.position.y + ball.direction.y, paddle.t_axis[0], paddle.t_axis[1])
       // console.log("dist to targett line is : ", dist);
       // console.log("ball radius", ball.radius) = 3
-      if (dist <= ball.radius) {
+      if (dist <= ball.radius) {//|| (dist > ball.radius && dist2  )) {
         // console.log("Collision !");
         if (this.nPlayers == 2 && ball.target.index % 2) {
           const incidenceAngleDeg = angleToDegrees(ball.angle);
@@ -169,26 +170,48 @@ export default class Game {
 
           var ratio: number;
           // ratio  =
-          // var ratiox = ball.target.hit[0] - ball.position.x;
+          var ratiox = ball.target.hit[0] - ball.position.x;
           // console.log("ratiox = ", ratiox)
           // var ratioy = ball.target.hit[1] - ball.position.y;
           // console.log("ratioy = ", ratiox)
           // // console.log("a: ", a);
           // // console.log("c: ", c);
 
-          console.log("It hit: ", b, "before it should have i think");
+          // console.log("It hit: ", b, "before it should have i think");
 
-          console.log("dist + dx", ball.position.x + b);
-          console.log("dist + dy", ball.position.y + b);
+          // console.log("dist + dx", ball.position.x + b);
+          // console.log("dist + dy", ball.position.y + b);
+          console.log("paddle angle ", paddle.angle);
+          console.log("ball angle ", ball.angle)
+          console.log("pos being C : ", ball.position)
+          console.log("target being A : ", ball.target.hit)
 
-          console.log("pos : ", ball.position)
-          console.log("final : ", ball.position.x + b, ball.position.y + b)
+          console.log("distance to botton part", dist);
+          console.log("distance to botton target", GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]));
+
+          let trajy: number = ball.position.y - ball.target.hit[1];
+          let trajx: number = ball.position.x - ball.target.hit[0]
+          // console.log("traj x", trajx)
+          // console.log("traj y", trajy)
+          // let x = Math.cos(paddle.angle) * dist
+          // let y = Math.sin(paddle.angle) * dist
+          // console.log("x :", x, "y :", y)
+          // console.log("ratio x ", trajx * (ball.position.x / ball.target.hit[0]))
+          // console.log("ratioy ", trajy * (ball.position.y / ball.target.hit[1]))
+          // // ball.position.x += trajx * (ball.position.x / ball.target.hit[0]);
+          // // ball.position.y += trajy * (ball.position.y / ball.target.hit[1]);
+          // console.log("on line final x ", ball.target.hit[0] + (ball.position.x - ball.target.hit[0]) / (ball.position.x / ball.target.hit[0]))
+          // console.log("on line final y ", ball.target.hit[1] + (ball.position.y - ball.target.hit[1]) / (ball.position.y / ball.target.hit[1]))
+          // console.log("point on line current",pointOnLine())
+          // ball.position.x = ball.target.hit[0] + (ball.position.x - ball.target.hit[0]) / (ball.position.x / ball.target.hit[0]);
+          // ball.position.y = ball.target.hit[1] + (ball.position.y - ball.target.hit[1]) / (ball.position.y / ball.target.hit[1])
+          // console.log("final  : ", ball.position.x + b, ball.position.y + b)
 
           // ball.position.x += b; 
           // ball.position.y += b;
           // if (dist <= ball.radius) {
           //   console.log("got a hit");
-          //   if (paddleTouchTheBall)
+          //   if (paddleTouchTheBall) 
           //     console.log("othe method as well");
           //   else
           //     console.log("other didnt");
@@ -243,7 +266,7 @@ export default class Game {
 
             // console.log('diff', pc1 - pc2, pc1, pc2);
             // console.log('pre deg', newDegree);
-            newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
+            // newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
             // console.log('final deg', newDegree);
             const newAngle = angleToRadians(newDegree);
             // ball.speed *= 1.1;
@@ -273,7 +296,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 4;
+    this.nPlayers = 12;
     this.generateMap(this.nPlayers);
   }
   // Getters

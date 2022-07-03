@@ -39,15 +39,15 @@
     <q-btn dense @click="reset()">
       reset
     </q-btn>
-    <!-- <pre>
+    <pre>
       {{ tickValue }}
-    </pre> -->
+    </pre>
     <pre style="background-color: grey;">
-      <!-- El : {{ usedRatio }} -->
-      <!-- Pause : {{ isPaused }} {{ typeof (isPaused) }} -->
+      El : {{ usedRatio }}
+      Pause : {{ isPaused }} {{ typeof (isPaused) }}
       Ball : {{ balls }}
       Paddle : {{ paddles }}
-      <!-- Info : {{ info }} -->
+      Info : {{ info }}
     </pre>
   </q-page>
 </template>
@@ -80,20 +80,20 @@ const {
 } = useApi<string>('pong/pause', { immediate: false });
 
 
-// const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
-// const ratio = computed(() => {
-//   let r = elementX.value / elementWidth.value;
-//   if (r > 1) r = 1;
-//   else if (r < 0) r = 0;
-//   return r;
-// });
-// const forcedRatio = ref(null);
+const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
+const ratio = computed(() => {
+  let r = elementX.value / elementWidth.value;
+  if (r > 1) r = 1;
+  else if (r < 0) r = 0;
+  return r;
+});
+const forcedRatio = ref(null);
 
-// const usedRatio = computed(() => {
-//   const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
-//   // console.log("Ratio update", val);
-//   return val;
-// });
+const usedRatio = computed(() => {
+  const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
+  // console.log("Ratio update", val);
+  return val;
+});
 
 const updatePaddlePercent = (percent: number) => {
   socket?.emit('paddlePercent', percent);

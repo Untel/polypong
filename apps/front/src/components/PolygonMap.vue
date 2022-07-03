@@ -179,7 +179,7 @@ watch(() => props.map, (map, oldMap) => {
     .add({
       targets: svgRef.value,
       keyframes: [
-        { rotate: 0 },
+        // { rotate: 0 },
         // { rotate: 360 - angles[0] + 180 },
       ],
     });
