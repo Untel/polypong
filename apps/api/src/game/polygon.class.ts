@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 17:00:23 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/03 21:34:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ export default class MyPolygon {
         const sy = /*Math.fround*/ y + Math.sin(angle * i) * radius;
         this.verticles.push([sx, sy]);
         this.sides.push(new Vector(sx, sy));
-        console.log('sx, sy ', [sx, sy]);
+        // console.log('sx, sy ', [sx, sy]);
       }
       this.shape = new Polygon(this.center, this.sides);
     }

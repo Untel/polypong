@@ -12,9 +12,9 @@
         // stroke: black;
       }
 
-      .ball {
-        fill: rgba(81, 5, 5, 0.9);
-      }
+      // .ball {
+      //   fill: rgba(81, 5, 5, 0.9);
+      // }
 
       .wall {
         fill: rgba(46, 164, 38, 0.9);
@@ -49,7 +49,7 @@
         :class="{ 'mine': idx === 0 }"
         ref="wallsRef"
         class="wall"
-        stroke-width="1px"
+        stroke-width=".1px"
         v-bind="formatLine(wall.line)"
       />
       <line
@@ -58,17 +58,17 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <circle class="ball" fill="green" r="3"
+      <circle :fill="ball.color || 'yellow'" r="3"
         v-for="ball in balls"
         v-bind="formatBallPosition(ball.position)"
       />
-      <circle fill="red" r="1"
+      <circle :fill="ball.color || 'yellow'" r=".5"
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
         v-bind="formatBallPosition(ball.target.hit)"
       />
       <line
-        stroke="red"
-        stroke-width="0.5px"
+        :stroke="ball.color || 'red'"
+        stroke-width="0.25px"
         stroke-dasharray="2"
         v-for="ball in balls"
         v-bind="formatBallTrajectoryPoints(ball)"

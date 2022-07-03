@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 17:00:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 00:11:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,20 @@ import {
   Point,
   lineInterpolate,
   LineInterpolator,
+  lineLength,
 } from 'geometric';
 import GameTools from './gametools.class';
 export class Paddle {
   color: string;
   line: Line;
-  interpolationStart: LineInterpolator;
-  interpolationEnd: LineInterpolator;
   width: number;
   angle: number;
   index: number;
+  interpolationStart: LineInterpolator;
+  interpolationEnd: LineInterpolator;
   bounceAngle: number;
-  ratio: number;
 
-  constructor(axis: Line, index: number, width = 0.2, bounce = 45) {
-    this.width = width;
+  constructor(axis: Line, index: number, relativeSize = 0.2, bounce = 45) {
     this.index = index;
     this.color = GameTools.colors[index % GameTools.colors.length];
     this.angle = lineAngle(axis);
@@ -39,15 +38,15 @@ export class Paddle {
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(axis);
-    const effectiveAxisStart: Line = [axis[0], preInterpolate(1 - this.width)];
-    const effectiveAxisEnd: Line = [preInterpolate(this.width), axis[1]];
+    const effectiveAxisStart: Line = [axis[0], preInterpolate(1 - relativeSize)];
+    const effectiveAxisEnd: Line = [preInterpolate(relativeSize), axis[1]];
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
     this.updatePercentOnAxis(0.5);
+    this.width = lineLength(this.line);
   }
 
   updatePercentOnAxis(ratio: number) {
-    this.ratio = ratio;
     const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];

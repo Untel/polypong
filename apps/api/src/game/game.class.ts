@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 18:06:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 00:34:44 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ export default class Game {
     // this.paddles = playerEdges.map((line, idx) => {
     //   return new Paddle(line, idx, 0.4);
     // });
+    // for (let i = 0; i < 100; i++)
     this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
@@ -124,75 +125,29 @@ export default class Game {
   runPhysics() {
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.radius) {
-        if (this.nPlayers == 2 && ball.target.index % 2) {
-          const incidenceAngleDeg = angleToDegrees(ball.angle);
-          const edge = this.map.edges[ball.target.index];
-          const surfaceAngleDeg = lineAngle(edge); //paddle.angle;
-          const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-          const newAngle = angleToRadians(newDegree);
-          ball.setAngle(newAngle);
-          ball.findTarget(this.walls);
-        } else {
-          // en 1v1 il y a deux murs en plus, c'est un trick pour pas que ca bug mais c'est moche, a rework
-          const idx =
-            this.nPlayers === 2 && ball.target.index === 2
-              ? 1
-              : ball.target.index;
-          const paddle = this.paddles[idx];
+        const paddle = ball.target.wall.paddle;
+        if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.target.hit,
             paddle.line,
             1,
           );
           if (paddleTouchTheBall) {
-            const incidenceAngleDeg = angleToDegrees(ball.angle);
-            // this.verticles =
-            const surfaceAngleDeg = paddle.angle; //paddle.angle;
-            let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-            // const newAngle = angleToRadians(newDegree);
-
-            /**
-             * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
-             * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
-             * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
-             */
-
-            /**
-             * Je crois que c'est gucci
-             */
-            const l1 = lineLength([
-              [...paddle.line[0]],
-              [ball.position.x, ball.position.y],
-            ]);
-            const l2 = lineLength([
-              [...paddle.line[1]],
-              [ball.position.x, ball.position.y],
-            ]);
-            const pc1 = GameTools.percentage(
-              l2,
-              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
-            );
-            const pc2 = GameTools.percentage(
-              l1,
-              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
-            );
-
-            console.log('diff', pc1 - pc2, pc1, pc2);
-            console.log('pre deg', newDegree);
-            newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
-            console.log('final deg', newDegree);
-            const newAngle = angleToRadians(newDegree);
-            // ball.speed *= 1.1;
-            ball.setAngle(newAngle);
-            ball.findTarget(this.walls);
+            ball.bouncePaddle(paddle, this.walls);
           } else {
-            this.reduce();
+            // Reduce is real game. To debug bounce instead
+            // this.reduce();
+            ball.bounceTargetWall(this.walls);
           }
+        } else {
+          ball.bounceTargetWall(this.walls);
         }
       }
       ball.move();
     });
   }
+
+
 
   public reduce() {
     this.stop();
@@ -252,10 +207,26 @@ export default class Game {
     return `${this.lobby.id}`;
   }
 
+  public ballsCollides() {
+    for (let bIdx = 0; bIdx < this.balls.length; bIdx++) {
+      const currBall = this.balls[bIdx];
+      for (let cIdx = bIdx + 1; cIdx < this.balls.length; cIdx++) {
+        const compared: Ball = this.balls[cIdx];
+        if (currBall.collideWithBall(compared)) {
+          currBall.swapAngles(compared);
+          currBall.findTarget(this.walls);
+          compared.findTarget(this.walls);
+          break ;
+        }
+      }
+    }
+  }
+
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
     // console.log(this.timeElapsed);
-    if (this.timeElapsed > 10 * this.balls.length) this.addBall();
+    if (this.timeElapsed > 5 * this.balls.length) this.addBall();
+    this.ballsCollides();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }

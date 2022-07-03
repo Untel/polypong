@@ -6,27 +6,31 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 16:59:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 00:31:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Circle, Vector } from 'collider2d';
-import { Line, lineLength, Point } from 'geometric';
+import e from 'express';
+import { angleReflect, angleToDegrees, angleToRadians, Line, lineAngle, lineLength, Point } from 'geometric';
 import GameTools from './gametools.class';
+import { Paddle } from './paddle.class';
 import { Wall } from './wall.class';
+
+const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 export class Ball extends Circle {
   _speed = 1;
   direction: Vector;
   angle: number;
-  // target: {
-  //   hit: Point,
-  //   index: number,
-  // };
-  target: any;
-  targetInfo: any;
+  target: {
+    hit: Point,
+    wall: Wall,
+  };
+  color: string;
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
     super(startPos, radius);
+    this.color = `#${genRanHex(6)}`;
   }
 
   public get speed() {
@@ -71,6 +75,7 @@ export class Ball extends Circle {
     ];
 
     const [[x1, y1], [x2, y2]] = line;
+    let collided = false;
     for (let i = 0; i < walls.length; i++) {
       const wall: Wall = walls[i];
       const edge: Line = wall.line;
@@ -89,18 +94,15 @@ export class Ball extends Circle {
       if (intersection) {
         this.target = {
           hit: [intersection.x, intersection.y],
-          edge,
-          index: i,
+          wall,
         };
-        this.targetInfo = {
-          edgeIndex: i,
-          edge,
-          ...intersection,
-        };
+        collided = true;
         break;
       }
-      this.target = { hit: [0, 0], index: 0 };
-      this.targetInfo = null;
+    }
+    if (!collided) {
+      console.log("something strange happened", this);
+      // this.reset();
     }
   }
 
@@ -113,6 +115,45 @@ export class Ball extends Circle {
     this.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     this.position.x = position.x;
     this.position.y = position.y;
+  }
+
+  collideWithBall(compared: Ball) {
+    const dist = lineLength([this.point, compared.point]);
+    if (dist < (this.radius + compared.radius)) {
+      const delta = compared.position.clone().sub(this.position);
+      const diff = delta.dot(compared.direction.clone().sub(this.direction));
+      return (diff < 0);
+    }
+  }
+
+  swapAngles(compared: Ball) {
+    const tmpAngle = this.angle;
+    this.setAngle(compared.angle);
+    compared.setAngle(tmpAngle);
+  }
+
+  bounceTargetWall(walls: Wall[]) {
+    const incidenceAngleDeg = angleToDegrees(this.angle);
+    const surfaceAngleDeg = lineAngle(this.target.wall.line); //paddle.angle;
+    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    const newAngle = angleToRadians(newDegree);
+    this.setAngle(newAngle);
+    this.findTarget(walls);
+  }
+
+  bouncePaddle(paddle: Paddle, walls: Wall[]) {
+    const incidenceAngleDeg = angleToDegrees(this.angle);
+    const surfaceAngleDeg = paddle.angle; //paddle.angle;
+    let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    const hitLen = lineLength([paddle.line[1], this.target.hit]);
+    // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    const percent = hitLen / paddle.width - .5;
+    const addDeg = (percent * paddle.bounceAngle);
+    newDegree += addDeg;
+    const newAngle = angleToRadians(newDegree);
+    this.setAngle(newAngle);
+    this.findTarget(walls);
   }
 
   /**
@@ -132,20 +173,18 @@ export class Ball extends Circle {
   }
   public get netScheme() {
     return {
+      color: this.color,
       position: {
         x: this.position.x,
         y: this.position.y,
       },
       radius: this.radius,
       target: {
-        ...this.target,
         hit: {
           x: this.target.hit[0],
           y: this.target.hit[1],
         },
       },
-      targetInfo: this.targetInfo,
-      targetDistance: this.targetDistance,
     };
   }
 }
