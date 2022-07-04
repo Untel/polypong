@@ -1,14 +1,18 @@
 <template>
   <q-page padding>
     <pre>Response: {{ lobbies.getLobbies }}</pre>
-    <q-card v-for="lobby of lobbies.getLobbies">
-      <pre>{{ lobby }}</pre>
-      <q-btn @click="lobbies.joinLobby(lobby.id)">Join lobby {{ lobby.id }}</q-btn>
-    </q-card>
-    <q-card>
-      <q-input v-model="lobbyName"></q-input>
-      <q-btn @click="lobbies.createLobby(lobbyName)">Create lobby</q-btn>
-    </q-card>
+    <div class="q-pa-md row items-start q-gutter-md">
+      <LobbyCard name="MatchMacking" />
+      <LobbyCard
+        v-for="lobby of lobbies.getLobbies"
+        :name="lobby.name"
+      />
+      <LobbyCard
+        name="Create"
+        join-text="Create"
+        @joinLobby="lobbies.createLobby(lobbyName)"
+      />
+    </div>
   </q-page>
 </template>
 
@@ -16,6 +20,7 @@
 import { useApi } from 'src/utils/api';
 import { useLobbiesStore } from 'src/stores/lobbies';
 import { useAuthStore } from 'src/stores/auth.store';
+import LobbyCard from 'src/components/LobbyCard.vue';
 import { ref } from 'vue';
 const lobbies = useLobbiesStore();
 const { socket } = useAuthStore();

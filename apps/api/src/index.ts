@@ -9,6 +9,7 @@ export * from './auth';
 export * from './config';
 export * from './game';
 export * from './guards';
+export * from './lobby';
 export * from './mail';
 export * from './pong';
 export * from './providers';
