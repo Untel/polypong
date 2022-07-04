@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 03:53:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 17:02:09 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,12 @@ const col = new Collider2d();
 // col.testCirclePolygon
 // col.testPolygonCircle
 
+const TEST_MODE = true;
+
+export enum MODE {
+  Coalition = 'coalition',
+  Battleground = 'battleground',
+}
 export default class Game {
   lobby: Lobby;
   socket: Server;
@@ -61,6 +67,7 @@ export default class Game {
   speed = 10;
   edges: any;
   map: PolygonMap;
+  mode: MODE = MODE.Battleground;
 
   timeElapsed = 0;
   interval: NodeJS.Timer;
@@ -144,9 +151,12 @@ export default class Game {
           if (paddleTouchTheBall) {
             ball.bouncePaddle(paddle, this.walls);
           } else {
-            // Reduce is real game. To debug bounce instead
-            // this.reduce();
-            ball.bounceTargetWall(this.walls);
+            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
+            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+              ball.bounceTargetWall(this.walls);
+            } else {
+              this.reduce();
+            }
           }
         } else {
           ball.bounceTargetWall(this.walls);
@@ -248,7 +258,7 @@ export default class Game {
     const powerClass = PowerList[GameTools.getRandomArbitrary(0, PowerList.length)]
     const powerObj: Power = new powerClass(this, this.map.randomPosition());
     this.powers.push(powerObj);
-    console.log("Adding new power", powerObj.position.x, powerObj.position.y);
+    console.log("Adding new power", powerObj.name, Object.keys(powerObj), typeof powerObj);
     this.socket.emit('powers', this.powers.map((p) => p.netScheme));
   }
 

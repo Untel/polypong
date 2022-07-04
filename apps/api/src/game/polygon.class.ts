@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 03:42:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 17:00:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ export default class MyPolygon {
       this.edges[i] = line;
     }
 
-    console.log('-- Edges', this.shape);
+    // console.log('-- Edges', this.shape);
     this.edgeWidth = radius;
   }
 
