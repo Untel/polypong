@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 17:00:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 02:21:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,7 @@ export default class GameTools {
   static percentage(small: number, big: number): number {
     return (small / big) * 100;
   }
+
+  static genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+
 }

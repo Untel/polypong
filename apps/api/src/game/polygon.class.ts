@@ -6,11 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 21:34:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 03:42:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Vector, Polygon } from 'collider2d';
+import { Vector, Polygon, Circle } from 'collider2d';
 import {
   polygonRegular,
   lineAngle,
@@ -21,7 +21,8 @@ import {
 // import Polygon from 'polygon';
 
 export default class MyPolygon {
-  shape;
+  inradius: number;
+  shape: Polygon;
   sides = [];
   verticles = [];
   edges = [];
@@ -31,6 +32,8 @@ export default class MyPolygon {
 
   constructor(npoints, x = 0, y = 0, radius = 50) {
     this.center = new Vector(x, y);
+    this.inradius = radius - 5;
+    console.log("In radius", this.inradius);
     if (npoints === 2) {
       // this.verticles = [
       //   [-50, 50],
@@ -67,5 +70,15 @@ export default class MyPolygon {
 
     console.log('-- Edges', this.shape);
     this.edgeWidth = radius;
+  }
+
+  randomPosition() {
+    const r = this.inradius * Math.sqrt(Math.random());
+    const theta = Math.random() * 2 * Math.PI;
+
+    const x = r * Math.cos(theta)
+    const y = r * Math.sin(theta)
+
+    return new Vector(x, y);
   }
 }

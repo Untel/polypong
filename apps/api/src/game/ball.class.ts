@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 00:31:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 02:22:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,21 @@ import GameTools from './gametools.class';
 import { Paddle } from './paddle.class';
 import { Wall } from './wall.class';
 
-const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 export class Ball extends Circle {
   _speed = 1;
+  maxSpeed = 1.5;
   direction: Vector;
   angle: number;
+  lastHitten?: Paddle;
   target: {
     hit: Point,
     wall: Wall,
   };
   color: string;
 
-  constructor(startPos: Vector = new Vector(0, 0), radius = 3) {
+  constructor(startPos: Vector = new Vector(0, 0), radius = 2) {
     super(startPos, radius);
-    this.color = `#${genRanHex(6)}`;
+    this.color = `#${GameTools.genRanHex(6)}`;
   }
 
   public get speed() {
@@ -65,12 +66,10 @@ export class Ball extends Circle {
    * @see public get targetDistance()
    */
   findTarget(walls: Wall[]) {
-    const fakeBall = this.clone();
-    for (let i = 0; i < 100; i++) fakeBall.move();
-
+    const reach = this.direction.clone().scale(100);
+    const fakePos = this.position.clone().add(reach);
     const line: Line = [
-      [fakeBall.position.x, fakeBall.position.y],
-      // [tx, ty],
+      [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
     ];
 
@@ -101,7 +100,7 @@ export class Ball extends Circle {
       }
     }
     if (!collided) {
-      console.log("something strange happened", this);
+      console.log("something strange happened", this.angle);
       // this.reset();
     }
   }
@@ -152,8 +151,18 @@ export class Ball extends Circle {
     const addDeg = (percent * paddle.bounceAngle);
     newDegree += addDeg;
     const newAngle = angleToRadians(newDegree);
+    this.lastHitten = paddle;
+    this.color = paddle.color;
     this.setAngle(newAngle);
     this.findTarget(walls);
+  }
+
+  increaseSpeed(ratio = 1.1) {
+    this.speed *= ratio;
+    if (this.speed > this.maxSpeed) {
+      this.speed = this.maxSpeed;
+      // console.log("Max ball speed reached");
+    }
   }
 
   /**

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 00:34:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/04 03:53:18 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,17 @@ import {
 import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
 import PolygonMap from './polygon.class';
+import { Power, PowerList } from './power.class';
 
 import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
 
 const FRAME_RATE = 30;
+
+const col = new Collider2d();
+// col.testCirclePolygon
+// col.testPolygonCircle
 
 export default class Game {
   lobby: Lobby;
@@ -52,12 +57,14 @@ export default class Game {
   nPlayers: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
+  powers: Power[] = [];
   speed = 10;
   edges: any;
   map: PolygonMap;
 
   timeElapsed = 0;
   interval: NodeJS.Timer;
+  intervalPowers: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
     this.lobby = lobby;
@@ -77,13 +84,12 @@ export default class Game {
 
   generateMap(nPlayers: number) {
     this.balls = [];
+    this.powers = [];
     this.timeElapsed = 0;
     console.log('Generating a new map');
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
-    const playerEdges =
-      nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
@@ -106,10 +112,13 @@ export default class Game {
     // this.generateMap(this.nPlayers);
     // this.socket.emit('mapChange', this.networkMap);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
+    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);
+    clearInterval(this.intervalPowers);
     this.interval = null;
+    this.intervalPowers = null;
   }
 
   updatePaddlePercent(percent: number) {
@@ -142,6 +151,7 @@ export default class Game {
         } else {
           ball.bounceTargetWall(this.walls);
         }
+        ball.increaseSpeed();
       }
       ball.move();
     });
@@ -210,6 +220,7 @@ export default class Game {
   public ballsCollides() {
     for (let bIdx = 0; bIdx < this.balls.length; bIdx++) {
       const currBall = this.balls[bIdx];
+      // Ball Collide with other balls
       for (let cIdx = bIdx + 1; cIdx < this.balls.length; cIdx++) {
         const compared: Ball = this.balls[cIdx];
         if (currBall.collideWithBall(compared)) {
@@ -219,13 +230,30 @@ export default class Game {
           break ;
         }
       }
+
+      // Ball Collide with powers
+      for (let pIdx = 0; pIdx < this.powers.length; pIdx++) {
+        const power: Power = this.powers[pIdx];
+        if (power.collideWithBall(currBall)) {
+          power.effect(currBall);
+          this.powers.splice(pIdx, 1);
+          console.log("removing power", this.powers.length);
+          this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+        }
+      }
     }
+  }
+
+  public addRandomPower() {
+    const powerClass = PowerList[GameTools.getRandomArbitrary(0, PowerList.length)]
+    const powerObj: Power = new powerClass(this, this.map.randomPosition());
+    this.powers.push(powerObj);
+    console.log("Adding new power", powerObj.position.x, powerObj.position.y);
+    this.socket.emit('powers', this.powers.map((p) => p.netScheme));
   }
 
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
-    // console.log(this.timeElapsed);
-    if (this.timeElapsed > 5 * this.balls.length) this.addBall();
     this.ballsCollides();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);

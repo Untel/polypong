@@ -32,6 +32,9 @@
 
 <template>
   <div class="svg-test wrapper">
+    <!-- <pre>
+      pow {{ powers }}
+    </pre> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
@@ -58,13 +61,17 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <circle :fill="ball.color || 'yellow'" r="3"
+      <circle :fill="ball.color || 'yellow'" r="2"
         v-for="ball in balls"
-        v-bind="formatBallPosition(ball.position)"
+        v-bind="formatCirclePosition(ball.position)"
       />
       <circle :fill="ball.color || 'yellow'" r=".5"
         v-for="ball in balls.filter((b: any) => b.target?.hit)"
-        v-bind="formatBallPosition(ball.target.hit)"
+        v-bind="formatCirclePosition(ball.target.hit)"
+      />
+      <circle stroke="yellow" r="2"
+        v-for="power in powers"
+        v-bind="formatCirclePosition(power.position)"
       />
       <line
         :stroke="ball.color || 'red'"
@@ -106,9 +113,7 @@
       </text> -->
     </svg>
     <slot />
-    <!-- <pre v-if="paddles && paddles[0]">
-      {{ paddles[0].line }}
-    </pre> -->
+
     <!-- <pre v-if="balls && balls[0]">
       {{ balls[0].pos }}
     </pre> -->
@@ -138,6 +143,10 @@ const props = defineProps({
     type: Array as any,
     default: () => [],
   },
+  powers: {
+    type: Array as any,
+    default: () => [],
+  },
 });
 const emit = defineEmits(['paddleMove']);
 
@@ -159,7 +168,8 @@ function formatLine(line) {
   };
 }
 
-function formatBallPosition(position: Position) {
+function formatCirclePosition(position: Position) {
+  // console.log("Receive circle pos", position);
   return {
     cx: position.x,
     cy: position.y,
