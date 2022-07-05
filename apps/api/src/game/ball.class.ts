@@ -6,13 +6,14 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 00:24:59 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/05 01:44:28 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Circle, Vector } from 'collider2d';
-import { Line, lineLength, Point, lineAngle, angleToDegrees, angleToRadians } from 'geometric';
+import { Line, lineLength, Point, lineAngle, angleToDegrees, angleToRadians, angleReflect } from 'geometric';
 import GameTools from './gametools.class';
+import Triangle from 'triangle-solver'
 import { Wall } from './wall.class';
 export class Ball extends Circle {
   _speed = 1;
@@ -96,7 +97,83 @@ export class Ball extends Circle {
           edge,
           index: i,
         };
+        let values = { //letter pairs i.e. a-A are opposite to each other as seen on picture above
+          // a: 3, //lowercase letters corresponds to sides length 
+          // c: Int,
+          // A: 90, //uppercase letters corresponds to angle in degrees
+          // C: angleToDegrees(this.angle),
+          // B: 25
+        }
+        // let test = new Triangle(values);
+        // console.log("new,", test)
+
+        // test.solve();
+        // console.log("solved,", test)
+        // console.log(test);
+
+        // let test: any = Triangle.triangleBySideAndTwoNearAngles(3, angleToDegrees(this.angle), 90);
+        // console.log("resolved, ", test);
+        let intersectionVector: Vector = new Vector(intersection.x - this.position.x, intersection.y - this.position.y);
+        console.log("Intersection vector / normalized", [intersectionVector, intersectionVector.normalize()]);
+        // console.log("Normalized             ", intersectionVector.normalize());
+        console.log("Dist to target :", lineLength([[this.position.x, this.position.y], [this.target.hit[0], this.target.hit[1]]]));
+        const incidenceAngle = angleToDegrees(this.angle)
+        console.log("Incidence angle is :", incidenceAngle);
+        console.log("Surface angle  is :", wall.angle);
+        let alpha: number;
+
+        // if (incidenceAngle > wall.angle) {
+        //   alpha = (incidenceAngle - wall.angle) % 90;
+        //   values = {
+        //     b: 3,
+        //     B: alpha,
+        //     A: 90
+        //   };
+        //   console.log("block1", alpha)
+        // }
+        // else {
+        alpha = wall.angle - incidenceAngle;
+        if (alpha < 0)
+          alpha += 360;
+        // alpha =
+        if (alpha > 90)
+          alpha = 180 - alpha
+        console.log("final angle is ", alpha);
+
+        values = {
+          b: 3,
+          B: alpha,
+          A: 90
+        }
+        // console.log("block2", alpha)
+
+        // }
+
+        let test = new Triangle(values);
+        // console.log(test)
+        test.solve()
+        // console.log(test)
+        console.log("Dist between hit and acutal is ", test.sides.a)
+        // this.limit = test.sides.a;
+        //   alpha
+        // console.log("incid is bigger ", (incidenceAngle - wall.angle) % 90)
+        // else
+        // console.log("wall is bigger ", )
+
+        // console.log("reflected would be ", angleReflect(angleToDegrees(this.angle), wall.angle))
+        // console.log("final would be ", 180 - angleReflect(angleToDegrees(this.angle), wall.angle))
+
+        // const newDegree = 90 - angleReflect(this.angle, surfac eAngleDeg);
+
+        // console.log("Target angle is :", wall.angle);
+        // console.log("diff  = ", (wall.angle - angleToDegrees(this.angle)) % 180);
+        // var sub1 = angleToDegrees(this.angle) - wall.angle;
+        // if (sub1 > 180)
+        //   sub1 -= 180
+        // console.log("sub1  = ", sub1);
+
         this.targetInfo = {
+          limit: test.sides.a,
           edgeIndex: i,
           edge,
           ...intersection,
@@ -106,22 +183,22 @@ export class Ball extends Circle {
       this.target = { hit: [0, 0], index: 0 };
       this.targetInfo = null;
     }
-    this.adjustTarget(this.target.edge);
+    // this.adjustTarget(this.target.edge);
   }
   applyNew() {
 
   }
   adjustTarget(wall) {
     // console.log([this.angle, lineAngle(wall)])
-    console.log("Ball angle :", angleToDegrees(this.angle));
-    console.log("Walllangle  :", lineAngle(wall));
+    // console.log("Ball angle :", angleToDegrees(this.angle));
+    // console.log("Walllangle  :", lineAngle(wall));
     let alpha = (lineAngle(wall) - angleToDegrees(this.angle)) % 360;
     // console
     if (alpha < 0)
       alpha += 360
     if (alpha > 90)
       alpha = 180 - alpha;
-    console.log("angle attaque", alpha)
+    // console.log("angle attaque", alpha)
     var hypothenuse = this.radius / Math.sin(alpha * (Math.PI / 180))
     // console.log("hypothenuse len", hypothenuse);
 
@@ -130,6 +207,13 @@ export class Ball extends Circle {
     // console.log("opposé", this.radius)
     // console.log("check pytha", (hypothenuse * hypothenuse), " vs ", (adjacent * adjacent) + (this.radius * this.radius))
 
+    var dt: any;
+
+    var vec1: Vector = new Vector(this.target.hit[0] - wall[0][0], this.target.hit[1] - wall[0][1]);
+
+    var vec2: Vector = new Vector(this.target.hit[0] - wall[1][0], this.target.hit[1] - wall[1][1]);
+    // console.log("check out vectors :", [vec1, vec2]);
+    dt = adjacent
     // var v1: [number, number];
     // var v2: [number, number];
     // // v1.push()
@@ -138,7 +222,7 @@ export class Ball extends Circle {
 
     // let rvx = GameTools.vectorRotate(0, this.radius, alpha * (Math.PI / 180));
     let rvx = GameTools.vectorRotate(adjacent, this.radius, angleToRadians(alpha))// * (Math.PI / 180));
-    console.log("rvx", rvx);
+    // console.log("rvx", rvx);
     // console.log("rvy", rvy);
 
     // rvx[0] += rvy[0];
@@ -146,7 +230,7 @@ export class Ball extends Circle {
     this.alpha = alpha;
     this.adjacent = adjacent;
     this.newTarget = [this.target.hit[0] + rvx[0], this.target.hit[1] + rvx[1]]
-    console.log("old target", this.target.hit)
+    // console.log("old target", this.target.hit)
     // this.target.hit = newTarget;
     // // console.log("ratios"
     // console.log("new target", this.newTarget)
@@ -167,7 +251,7 @@ export class Ball extends Circle {
     // var dy = y2 - y1
     // var ang = Math.atan2(dy, dx) * 180 / Math.PI;
     // console.log("ang is", ang);
-    console.log(`Effective attack angle is ${alpha}`)
+    // console.log(`Effective attack angle is ${alpha}`)
 
 
   }

@@ -34,7 +34,7 @@
 
 <template>
   <div class="svg-test wrapper">
-    <svg viewBox="-60 -60 150 150" ref="svgRef">
+    <svg viewBox="-60 -60 150 150" transform="rotate()" ref="svgRef">
       <!-- <filter ref="filterRef" id="displacementFilter">
     <feTurbulence type="turbulence" baseFrequency="0.3" numOctaves="2" result="turbulence"/>
     <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="50" xChannelSelector="R" yChannelSelector="G"/>

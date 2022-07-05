@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 00:24:32 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/05 01:58:20 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,113 +124,44 @@ export default class Game {
 
 
   runPhysics() {
+
     this.balls.forEach((ball) => {
-
-      let collisionCheck: boolean;
-
       const idx =
         this.nPlayers === 2 && ball.target.index === 2
           ? 1
           : ball.target.index;
+
+
       const paddle = this.paddles[idx];
-      // console.log("ball target", ball.target.index)
+      const incidenceAngleDeg = angleToDegrees(ball.angle);
+      const surfaceAngleDeg = lineAngle(ball.target.edge)
+
       const dist: number = GameTools.pDistance(ball.position.x, ball.position.y, paddle.t_axis[0], paddle.t_axis[1])
-      // const dist2: number = GameTools.pDistance(ball.position.x + ball.direction.x, ball.position.y + ball.direction.y, paddle.t_axis[0], paddle.t_axis[1])
-      // console.log("dist to targett line is : ", dist);
-      // console.log("ball radius", ball.radius) = 3
-      // let ndist = GameTools.distance(ball.position.x, ball.position.y, ball.newTarget[0], ball.newTarget[1])
-      // console.log("diff bt target x", ndist)
-      if (dist <= ball.radius) {//|| (dist > ball.radius && dist2  )) {
+      const dist2: number = lineLength([[ball.position.x, ball.position.y], [ball.target.hit[0], ball.target.hit[1]]]) - (ball.radius / 2)
+      if (dist2 - ball.targetInfo.limit < 0)
+        console.log("nice")
+      if (dist2 - ball.targetInfo.limit <= 0) {//(dist <= ball.radius) {//|| (dist > ball.radius && dist2  )) {
         // console.log("Collision !");
-        console.log("distance", dist)
+        console.log("Missed it ?", dist2, ball.targetInfo.limit);
+        console.log("distance to wall", dist)
+        console.log("Distance to target", lineLength([[ball.position.x, ball.position.y], [ball.target.hit[0], ball.target.hit[1]]]))
         if (this.nPlayers == 2 && ball.target.index % 2) {
-          const incidenceAngleDeg = angleToDegrees(ball.angle);
-          const edge = this.map.edges[ball.target.index];
-          const surfaceAngleDeg = lineAngle(edge); //paddle.angle;
+
+          // const edge = this.map.edges[ball.target.index];
+          // const surfaceAngleDeg = lineAngle(edge); //paddle.angle;
           const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
           const newAngle = angleToRadians(newDegree);
           ball.setAngle(newAngle);
           ball.findTarget(this.walls);
         } else {
-          // en 1v1 il y a deux murs en plus, c'est un trick pour pas que ca bug mais c'est moche, a rework
-          // const idx =
-          //   this.nPlayers === 2 && ball.target.index === 2
-          //     ? 1
-          //     : ball.target.index;
-          // const paddle = this.paddles[idx];
 
-
-          //Need to check that vector is properly rotated
-          // let test = [ball.adjacent, 0]
-          // let test2 = GameTools.vectorRotate(0, -ball.radius, ball.alpha);
-          // console.log("test 2=", test2)
-          // test2[0] += ball.target.hit[0]
-          // test2[1] += ball.target.hit[1]
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.target.hit,
             paddle.line,
             1,
           );
-          // console.log("distance is ", dist)
-          // console.log("point Padle touched ", paddleTouchTheBall)
 
-          var a: number = dist;
-
-          var c: number = GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]);
-          var b: number = Math.sqrt(Math.pow(c, 2) - Math.pow(a, 2));
-
-          var ratio: number;
-          // ratio  =
-          var ratiox = ball.target.hit[0] - ball.position.x;
-          // console.log("ratiox = ", ratiox)
-          // var ratioy = ball.target.hit[1] - ball.position.y;
-          // console.log("ratioy = ", ratiox)
-          // // console.log("a: ", a);
-          // // console.log("c: ", c);
-
-          // console.log("It hit: ", b, "before it should have i think");
-
-          // console.log("dist + dx", ball.position.x + b);
-          // console.log("dist + dy", ball.position.y + b);
-          // console.log("paddle angle ", paddle.angle);
-          // console.log("ball angle ", ball.angle)
-          // console.log("pos being C : ", ball.position)
-          // console.log("target being A : ", ball.target.hit)
-
-          console.log("distance to botton part", dist);
-          console.log("distance to botton target", GameTools.distance(ball.position.x, ball.position.y, ball.target.hit[0], ball.target.hit[1]));
-
-          let trajy: number = ball.position.y - ball.target.hit[1];
-          let trajx: number = ball.position.x - ball.target.hit[0]
-          // console.log("traj x", trajx)
-          // console.log("traj y", trajy)
-          // let x = Math.cos(paddle.angle) * dist
-          // let y = Math.sin(paddle.angle) * dist
-          // console.log("x :", x, "y :", y)
-          // console.log("ratio x ", trajx * (ball.position.x / ball.target.hit[0]))
-          // console.log("ratioy ", trajy * (ball.position.y / ball.target.hit[1]))
-          // // ball.position.x += trajx * (ball.position.x / ball.target.hit[0]);
-          // // ball.position.y += trajy * (ball.position.y / ball.target.hit[1]);
-          // console.log("on line final x ", ball.target.hit[0] + (ball.position.x - ball.target.hit[0]) / (ball.position.x / ball.target.hit[0]))
-          // console.log("on line final y ", ball.target.hit[1] + (ball.position.y - ball.target.hit[1]) / (ball.position.y / ball.target.hit[1]))
-          // console.log("point on line current",pointOnLine())
-          // ball.position.x = ball.target.hit[0] + (ball.position.x - ball.target.hit[0]) / (ball.position.x / ball.target.hit[0]);
-          // ball.position.y = ball.target.hit[1] + (ball.position.y - ball.target.hit[1]) / (ball.position.y / ball.target.hit[1])
-          // console.log("final  : ", ball.position.x + b, ball.position.y + b)
-
-          // ball.position.x += b; 
-          // ball.position.y += b;
-          // if (dist <= ball.radius) {
-          //   console.log("got a hit");
-          //   if (paddleTouchTheBall) 
-          //     console.log("othe method as well");
-          //   else
-          //     console.log("other didnt");
-
-          // }
-          // console.log()
           if (paddleTouchTheBall) {
-            const incidenceAngleDeg = angleToDegrees(ball.angle);
             // this.verticles =
             const surfaceAngleDeg = paddle.angle; //paddle.angle;
             let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
