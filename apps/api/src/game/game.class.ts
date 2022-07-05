@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/05 01:58:20 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/05 05:26:56 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 4;
+    this.nPlayers = 5;
     this.generateMap(this.nPlayers);
   }
 
@@ -88,7 +88,7 @@ export default class Game {
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (nPlayers > 2 || !(index % 2)) {
-        paddle = new Paddle(line, index, 1);
+        paddle = new Paddle(line, index, 0.5);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -156,7 +156,7 @@ export default class Game {
         } else {
 
           const paddleTouchTheBall = (pointOnLine as any)(
-            ball.target.hit,
+            ball.targetInfo.actualhit,
             paddle.line,
             1,
           );
@@ -238,7 +238,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 4;
+    this.nPlayers = 5;
     this.generateMap(this.nPlayers);
   }
   // Getters
