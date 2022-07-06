@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 18:06:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 18:32:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ export class Paddle {
     const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];
+    this.width = lineLength(this.line);
   }
 
   affectPower(power: Power) {

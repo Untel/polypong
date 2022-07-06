@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/05 01:06:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 17:37:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ export class LobbyService {
   clearLobbies() {
     this.redis.del('lobby-*');
   }
+
+  createLobby() {}
 
   // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
   // }

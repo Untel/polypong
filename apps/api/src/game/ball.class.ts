@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/04 02:22:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 18:45:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,16 +141,24 @@ export class Ball extends Circle {
   }
 
   bouncePaddle(paddle: Paddle, walls: Wall[]) {
-    const incidenceAngleDeg = angleToDegrees(this.angle);
+    const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
     let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-    const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    const percent = hitLen / paddle.width - .5;
-    const addDeg = (percent * paddle.bounceAngle);
-    newDegree += addDeg;
-    const newAngle = angleToRadians(newDegree);
+
+    /**
+     * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
+     * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
+     * le paddle. Peut etre remettre ca en 1v1 only?
+     */
+    // const hitLen = lineLength([paddle.line[1], this.target.hit]);
+    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    // const percent = hitLen / paddle.width - .5;
+    // const maxAngle = Math.abs(newDegree) - Math.abs(incidenceAngleDeg);
+    // const addDeg = (maxAngle * percent);
+    // newDegree += addDeg;
+
+    const newAngle = angleToRadians(newDegree % 360);
     this.lastHitten = paddle;
     this.color = paddle.color;
     this.setAngle(newAngle);

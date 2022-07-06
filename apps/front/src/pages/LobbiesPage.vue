@@ -5,7 +5,7 @@
       <LobbyCard name="MatchMacking" />
       <LobbyCard
         v-for="lobby of lobbies.getLobbies"
-        :name="lobby.name"
+        :name="lobby.name || 'Unamed lobby'"
       />
       <LobbyCard
         name="Create"
@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { useApi } from 'src/utils/api';
-import { useLobbiesStore } from 'src/stores/lobbies';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import LobbyCard from 'src/components/LobbyCard.vue';
 import { ref } from 'vue';

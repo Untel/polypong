@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lobbies.ts                                         :+:      :+:    :+:   */
+/*   lobbies.store.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/13 03:00:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 17:07:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@ import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
 import { useAuthStore } from './auth.store';
-import { LoadingBar } from 'quasar';
+import { LoadingBar, Notify } from 'quasar';
 
 type Lobby = {
   id: number;
@@ -38,9 +38,17 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      const { data } = await useApi<Lobby[]>('pong/lobbies').get().json();
-      console.log('Lobbies fetched', data.value, this.lobbies);
-      this.lobbies = data.value || [];
+      const { data, error } = await useApi<Lobby[]>('lobbies').get().json();
+
+      if (!error) {
+        console.log('Lobbies fetched', data.value, this.lobbies);
+        this.lobbies = data.value || [];
+      } else {
+        Notify.create({
+          type: 'negative',
+          message: "Error while fetching lobbies"
+        });
+      }
     },
     async createLobby(lobbyName: string) {
       const { socket, getIsConnected } = useAuthStore();

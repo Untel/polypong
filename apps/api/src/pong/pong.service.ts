@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 15:54:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 17:38:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,20 @@ import Player from 'src/game/player.class';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import Store from 'redis-json';
+import { UserService } from 'src/user';
 
 @Injectable()
 export class PongService {
   store;
   socketServer: Server = null;
   lobbies = new Map<number, Lobby>();
-  connectedPlayer = new Map<string, Player>();
   id = 0;
   tmpGame: Game = null;
 
-  constructor(@InjectRedis() private readonly redis: Redis) {
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    private readonly userService: UserService,
+  ) {
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });
     setTimeout(() => {
       // console.log('In constrcutor service', this.socketServer);
@@ -59,14 +62,6 @@ export class PongService {
   clearLobbies() {
     this.lobbies = new Map<number, Lobby>();
     this.id = 0;
-  }
-
-  addConnectedPeople(player: Player) {
-    if (this.connectedPlayer.has(player.socketId)) {
-      console.log('Player is still connected');
-      return;
-    }
-    this.connectedPlayer.set(player.socketId, player);
   }
 
   addLobby(client: Socket, lobbyConfig: ILobbyConfig) {

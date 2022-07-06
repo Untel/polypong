@@ -22,6 +22,22 @@ export class UserService {
   ) {}
 
   logger = new Logger(`UserService`);
+  connectedUsers = new Map<number, string>();
+
+  setUserAsConnected(id: number, socketId: string) {
+    this.connectedUsers.set(id, socketId);
+    return true;
+  }
+  setSocketAsDisconnected(socketId: string) {
+    const user = [...this.connectedUsers.entries()]
+      .find(([uId, sId]) => sId === socketId);
+    if (user) {
+      this.connectedUsers.delete(user[0])
+    }
+  }
+  userConnectedSocketId(id: number) : string {
+    return this.connectedUsers.get(id);
+  }
 
   async findById(id: string | number): Promise<User> {
     if (id) {
@@ -182,5 +198,9 @@ export class UserService {
     const email = user.email;
     const localUser = await this.find({ email });
     return localUser.avatar;
+  }
+
+  setIsConnected() {
+
   }
 }

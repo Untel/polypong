@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pong.gateway.ts                                    :+:      :+:    :+:   */
+/*   socket.gateway.ts                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/30 17:00:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/06 17:40:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,22 +20,26 @@ import {
 } from '@nestjs/websockets';
 import { Logger, UseGuards } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { PongService } from './pong.service';
+import { PongService } from 'src/pong/pong.service';
 import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { LoggedInGuard } from 'src/guards/logged-in.guard';
 import { JwtLoggedGuard } from 'src/guards/jwt-logged.guard';
 import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
+import { UserService } from 'src/user/user.service';
 
 // @UseGuards(JwtLoggedGuard)
 @WebSocketGateway({
   cors: true,
   transports: ['websocket'],
 })
-export class PongGateway
+export class SocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly pongService: PongService) {}
+  constructor(
+    private readonly pongService: PongService,
+    private readonly userService: UserService,
+  ) {}
 
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('PongGateway');
@@ -69,6 +73,7 @@ export class PongGateway
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
+    // this.userService.setUserAsConnected(client.id);
   }
 
   // @UseGuards(JwtAuthenticationGuard)
