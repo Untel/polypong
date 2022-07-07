@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/05 05:29:40 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/07 06:50:53 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,18 +139,24 @@ export class Ball extends Circle {
         // console.log("Dist between hit and acutal is ", test.sides.a)
         // console.log("Dist on axis  is ", test.sides.c);
         normvector.scale(test.sides.c);
-        let npx = this.target.hit[0] + normvector.x;
-        let npy = this.target.hit[1] + normvector.y;
+        // let npx = this.target.hit[0] + normvector.x;
+        // let npy = this.target.hit[1] + normvector.y;
 
         // console.log("newPoint x ", npx, " and y ", npy);
         // console.log("old is x ", this.target.hit);
 
         let ratio;
-        let distx = (normvector.x * test.sides.c) + this.target.hit[0];
-        let disty = (normvector.y * test.sides.c) + this.target.hit[1];
+        let distx = (normvector.x) + this.target.hit[0];
+        let disty = (normvector.y) + this.target.hit[1];
 
         ratio = GameTools.percentage(lineLength([[edge[0][0], edge[0][1]], [distx, disty]]), lineLength(edge))
         let ratio2 = GameTools.percentage(lineLength([[edge[1][0], edge[1][1]], [distx, disty]]), lineLength(edge))
+
+        console.log("ratio : ", ratio);
+        console.log("ratio2 : ", ratio2);
+
+        this.newTarget = [distx, disty];
+        // this.newTarget[1] = disty;
 
         // ratio = (lineLength([[this.target.hit[0], this.target.hit[1]], [distx, disty]]) / lineLength(edge)) * 100
 
