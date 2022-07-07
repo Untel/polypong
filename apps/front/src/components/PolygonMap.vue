@@ -65,7 +65,7 @@
       <line
         class="paddle"
         v-for="paddle in paddles"
-        :fill="paddle.color || 'red'"
+        :stroke="paddle.color || 'red'"
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
