@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useLobbiesStore } from 'src/stores/lobbies';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import { ref } from 'vue';
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 14:42:11 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/07 15:09:32 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,65 +19,84 @@ import {
   lineLength,
   LineInterpolator,
 } from 'geometric';
-// import distance from './gametools.class'
-
-const colors = ['red', 'blue', 'magenta', 'purple', 'green'];
-// import { distance, colors } from 'gametools';
+import GameTools from './gametools.class';
+import { Power } from './power.class';
 export class Paddle {
+  axis: Line;
   color: string;
   line: Line;
-  interpolationStart: LineInterpolator;
-  interpolationEnd: LineInterpolator;
   width: number;
   angle: number;
+  maxAngle: number;
   index: number;
+  interpolationStart: LineInterpolator;
+  interpolationEnd: LineInterpolator;
   bounceAngle: number;
-  paddleWidth: number;
-  ratio: number;
-  t_axis: Line;
-  static distance(x1: number, y1: number, x2: number, y2: number): number {
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  }
-  constructor(axis: Line, index: number, width = 0.2, bounce = 45) {
-    this.width = width;
+  initialSize: number;
+
+  effects: { [key: string]: { count: number } };
+
+  constructor(axis: Line, index: number, relativeSize = 0.4, bounce = 45) {
+    this.initialSize = relativeSize;
     this.index = index;
-    this.color = colors[index % colors.length];
+    this.axis = axis;
+    this.effects = {};
+    // this.color = GameTools.colors[index % GameTools.colors.length];
+    this.color = `#${GameTools.genRanHex(6)}`;
     this.angle = lineAngle(axis);
     this.bounceAngle = bounce;
-    this.t_axis = axis;
+    this.setRelativeSize(relativeSize);
+    this.updatePercentOnAxis(0.5);
+  }
+
+  setRelativeSize(relativeSize?) {
+    const relSize = relativeSize || this.initialSize;
+    console.log("REL SIZE", relSize, relativeSize, this.initialSize);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
-    // console.log("axis:", axis);
-    // console.log("axis lengt:", lineLength(axis));
-
-
-    const preInterpolate = lineInterpolate(axis);
-    // console.log("preinterpolator, ", preInterpolate)
-    const effectiveAxisStart: Line = [axis[0], preInterpolate(1 - this.width)];
-    const effectiveAxisEnd: Line = [preInterpolate(this.width), axis[1]];
-    // this.paddleWidth = distance()
+    const preInterpolate = lineInterpolate(this.axis);
+    const effectiveAxisStart: Line = [this.axis[0], preInterpolate(1 - relSize)];
+    const effectiveAxisEnd: Line = [preInterpolate(relSize), this.axis[1]];
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);
-    // console.log()
-    this.updatePercentOnAxis(0.5);
-    // console.log("line ", this.line);
-    // this.paddleWidth = Paddle.distance(this.line[0][0], this.line[0][1], this.line[1][0], this.line[1][1])
-    // console.log("width ; ", this.paddleWidth)
-    // console.log("paddle lengt:", lineLength(this.line));;
   }
 
   updatePercentOnAxis(ratio: number) {
-    this.ratio = ratio;
     const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];
+    this.width = lineLength(this.line);
+  }
+
+  affectPower(power: Power) {
+    if (!this.effects[power.name]) {
+      this.effects[power.name] = { count: 0 };
+      if (power.timeout) {
+        this.timeoutEffect(power);
+      }
+    } else {
+      this.effects[power.name].count += 1;
+    }
+  }
+
+  timeoutEffect(power) {
+    setTimeout(() => {
+      const effect = this.effects[power.name];
+      if (effect.count <= 0) {
+        delete this.effects[power.name];
+        power.fade(this);
+      } else {
+        effect.count -= 1;
+        this.timeoutEffect(power);
+      }
+    }, power.timeout);
   }
 
   public get netScheme() {
     return {
       line: this.line,
       color: this.color,
-      angle: this.angle,
+      effects: this.effects,
     };
   }
 }

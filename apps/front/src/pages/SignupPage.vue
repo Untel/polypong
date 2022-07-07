@@ -40,51 +40,27 @@
     lazy-rules
     :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
   />
-  <q-input
+  <PasswordInput
     v-model="password"
     class="full-width"
-    filled
     dense
-    label="Password"
-    :type="showPassword ? 'text' : 'password'"
-    lazy-rules
-    :rules="[
-      val => !!val || 'Password cannot be empty',
-      val => val.length > 6 || 'Password must be stronger',
-    ]"
-  >
-    <template v-slot:append>
-      <q-icon
-        :name="showPassword ? 'visibility_off' : 'visibility'"
-        class="cursor-pointer"
-        @click="showPassword = !showPassword"
-      />
-    </template>
-  </q-input>
-  <q-input
+    filled
+    label="password"
+  />
+  <PasswordInput
     v-model="repeatPassword"
     class="full-width"
     dense
     filled
     label="Repeat password"
-    :type="showPassword ? 'text' : 'password'"
-    lazy-rules
-    :rules="[ val => val === password || 'The password dont match']"
-  >
-    <template v-slot:append>
-      <q-icon
-        :name="showPassword ? 'visibility_off' : 'visibility'"
-        class="cursor-pointer"
-        @click="showPassword = !showPassword"
-      />
-    </template>
-  </q-input>
+    :rules="[ (val: string) => val === password || 'The password dont match']"
+  />
 
   <CoalitionSelector
-    label="Coalition"
     v-model="coalition"
+    label="Coalition"
     lazy-rules
-    :rules="[val => !!val && val.length || 'You must choose a coalition']"
+    :rules="[(val: CoalitionChoice) => !!val && val.length || 'You must choose a coalition']"
   />
 
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN UP</q-btn>
@@ -94,21 +70,20 @@
 <script lang="ts" setup>
 import { ref, watch, onBeforeUnmount, defineEmits } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import LogoCoalition from 'src/components/LogoCoalition.vue';
+import { Notify } from 'quasar';
+
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
 import { useAuthStore } from 'src/stores/auth.store';
-import { ValidationRule } from 'quasar';
-import { Notify } from 'quasar';
-import { mande, defaults, MandeError } from 'mande';
+import LogoCoalition from 'src/components/LogoCoalition.vue';
+import PasswordInput from "src/components/PasswordInput.vue"
+import { CoalitionChoice } from 'src/types';
 
 
-const email           = ref<String>(),
-      name            = ref<String>(),
-      password        = ref<String>(),
-      repeatPassword  = ref<String>(),
-      coalition       = ref<String>(),
-
-      showPassword    = ref(false),
+const email           = ref<string>(''),
+      name            = ref<string>(''),
+      password        = ref<string>(''),
+      repeatPassword  = ref<string>(''),
+      coalition       = ref<CoalitionChoice>(''),
       router          = useRouter(),
       route           = useRoute(),
       auth            = useAuthStore();
@@ -122,13 +97,13 @@ const onSignUp = async (form: Event) => {
       coalition.value,
     );
     const redirect = route.query.redirect
-      ? JSON.parse(route.query.redirect)
+      ? JSON.parse((route.query.redirect) as string)
       : { name: 'home' }
     router.push(redirect);
   } catch({ response, body }) {
     Notify.create({
       type: 'negative',
-      message: body.message,
+      message: (body as any).message,
     });
   }
 };

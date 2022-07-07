@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gametools.class.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/03 16:28:27 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/07 12:24:49 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,7 @@ export default class GameTools {
   static percentage(small: number, big: number): number {
     return (small / big) * 100;
   }
+
+  static genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+
 }

@@ -24,8 +24,13 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls"
-        @paddleMove="updatePaddlePercent">
+      <PolygonMap class="map" ref="mapEl"
+        :map="mapProps"
+        :paddles="paddles"
+        :balls="balls"
+        :powers="powers"
+        @paddleMove="updatePaddlePercent"
+      >
       </PolygonMap>
     </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
@@ -35,7 +40,7 @@
     <q-btn dense @click="tick()">
       tick
     </q-btn>
-    <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green" />
+    <!-- <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/> -->
     <q-btn dense @click="reset()">
       reset
     </q-btn>
@@ -66,6 +71,7 @@ const { socket } = useAuthStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
+const powers: Ref<any[]> = ref([]);
 const info: Ref<object> = ref();
 const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
@@ -122,7 +128,12 @@ const mapChange = (res) => {
   mapProps.value = res;
 };
 
-const printTimer = ({ timer }: { timer: number }) => {
+const powersUpdate = (res) => {
+  console.log("powers update", res);
+  powers.value = res;
+};
+
+const printTimer = ({ timer }: {timer: number}) => {
   Notify.create({
     timeout: timer,
     progress: true,
@@ -133,6 +144,7 @@ const printTimer = ({ timer }: { timer: number }) => {
 
 socket?.on('gameUpdate', update);
 socket?.on('mapChange', mapChange);
+socket?.on('powers', powersUpdate);
 socket?.on('timer', printTimer);
 
 const {

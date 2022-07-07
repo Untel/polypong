@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 
 import { defineProps, computed } from 'vue';
-import { useLobbiesStore } from 'src/stores/lobbies';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useApi } from 'src/utils/api';
 
 const props = defineProps({
@@ -29,7 +29,7 @@ const lobbies = useLobbiesStore();
 lobbies.joinLobby(+props.lobbyId);
 
 const start = () => {
-  // props.lobbyId = 
+  // props.lobbyId =
   // lobby.resolve()
 }
 

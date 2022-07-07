@@ -1,42 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pong.controller.ts                                 :+:      :+:    :+:   */
+/*   lobby.controller.ts                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/05 01:04:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/05 01:10:45 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Controller, Get, Delete, Param } from '@nestjs/common';
 import Lobby from 'src/game/lobby.class';
-import { PongService } from './pong.service';
+import { LobbyService } from './lobby.service';
 
-@Controller('pong')
-export class PongController {
+@Controller('lobbies')
+export class LobbyController {
   constructor(
-    private readonly pongService: PongService,
+    private readonly lobbyService: LobbyService,
   ) {}
 
-  @Get('pause')
-  togglePause(): boolean {
-    return this.pongService.togglePause();
+  @Get()
+  lobbies(): Promise<Lobby[]> {
+    return this.lobbyService.getLobbies();
   }
 
-  @Get('tick')
-  tick() {
-    // this.pongService.updatePaddlePercent(null, 0.5);
-    return this.pongService.tick();
+  @Get('/:id')
+  lobby(@Param('id') id: number): Lobby {
+    return this.lobbyService.getLobby(id);
   }
 
-  @Delete('lobbies')
-  clear() {
-    this.pongService.clearLobbies();
-  }
-  @Get('reset')
-  reset() {
-    this.pongService.reset();
-  }
+  // @Get('/createLobby')
+  // create() : Lobby {
+  //   return this.lobbyService.createLobby();
+  // }
 }

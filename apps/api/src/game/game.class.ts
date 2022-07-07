@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/07 07:21:18 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/07 15:15:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ import {
 import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
 import PolygonMap from './polygon.class';
+import { Power, PowerList } from './power.class';
 
 import { Ball, Wall, Paddle } from '.';
 
@@ -43,6 +44,16 @@ import GameTools from './gametools.class';
 
 const FRAME_RATE = 30;
 
+const col = new Collider2d();
+// col.testCirclePolygon
+// col.testPolygonCircle
+
+const TEST_MODE = true;
+
+export enum MODE {
+  Coalition = 'coalition',
+  Battleground = 'battleground',
+}
 export default class Game {
   lobby: Lobby;
   socket: Server;
@@ -52,12 +63,15 @@ export default class Game {
   nPlayers: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
+  powers: Power[] = [];
   speed = 10;
   edges: any;
   map: PolygonMap;
+  mode: MODE = MODE.Battleground;
 
   timeElapsed = 0;
   interval: NodeJS.Timer;
+  intervalPowers: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
     this.lobby = lobby;
@@ -77,18 +91,17 @@ export default class Game {
 
   generateMap(nPlayers: number) {
     this.balls = [];
+    this.powers = [];
     this.timeElapsed = 0;
     // console.log('Generating a new map');
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
-    const playerEdges =
-      nPlayers == 2 ? [this.map.edges[0], this.map.edges[2]] : this.map.edges;
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (nPlayers > 2 || !(index % 2)) {
-        paddle = new Paddle(line, index, 1);
+        paddle = new Paddle(line, index);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -96,7 +109,8 @@ export default class Game {
     // this.paddles = playerEdges.map((line, idx) => {
     //   return new Paddle(line, idx, 0.4);
     // });
-    this.addBall();
+    for (let i = 0; i < 5; i++)
+      this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
   }
@@ -105,10 +119,13 @@ export default class Game {
     // this.generateMap(this.nPlayers);
     // this.socket.emit('mapChange', this.networkMap);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
+    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);
+    clearInterval(this.intervalPowers);
     this.interval = null;
+    this.intervalPowers = null;
   }
 
   updatePaddlePercent(percent: number) {
@@ -127,27 +144,9 @@ export default class Game {
   runPhysics() {
 
     this.balls.forEach((ball) => {
-      const idx =
-        this.nPlayers === 2 && ball.target.index === 2
-          ? 1
-          : ball.target.index;
-
-
-      const paddle = this.paddles[idx];
-      const incidenceAngleDeg = angleToDegrees(ball.angle);
-      const surfaceAngleDeg = lineAngle(ball.target.edge)
-
-      const dist2: number = lineLength([[ball.position.x, ball.position.y], [ball.target.hit[0], ball.target.hit[1]]]) - (ball.radius / 2)
-      if (dist2 - ball.targetInfo.limit < 0)
-        console.log("nice")
-      if (dist2 - ball.targetInfo.limit <= 0) {//(dist <= ball.radius) {//|| (dist > ball.radius && dist2  )) {
-        if (this.nPlayers == 2 && ball.target.index % 2) {
-          const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-          const newAngle = angleToRadians(newDegree);
-          ball.setAngle(newAngle);
-          ball.findTarget(this.walls);
-        } else {
-
+      if (ball.targetDistance <= ball.radius) {
+        const paddle = ball.target.wall.paddle;
+        if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.targetInfo.actualhit,
             paddle.line,
@@ -155,50 +154,31 @@ export default class Game {
           );
 
           if (paddleTouchTheBall) {
-            const surfaceAngleDeg = paddle.angle;
-            let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-
-            /**
-             * @TODO Ajouter a cet angle un % suivant ou on tape sur a raquette
-             * Pour ca il faut d'abord trouver ou la ball a toucher sur la raquette,
-             * donc changer paddleTouchTheBall = poitOnLine ou modifier comme on a fait avec lineIntersection
-             */
-            const l1 = lineLength([
-              [...paddle.line[0]],
-              [ball.newTarget[0], ball.newTarget[1]],
-            ]);
-            const l2 = lineLength([
-              [...paddle.line[1]],
-              [ball.newTarget[0], ball.newTarget[1]],
-            ]);
-            const pc1 = GameTools.percentage(
-              l2,
-              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
-            );
-            const pc2 = GameTools.percentage(
-              l1,
-              lineLength([[...paddle.line[1]], [...paddle.line[0]]]),
-            );
-
-            newDegree += ((pc1 - pc2) / 100) * paddle.bounceAngle;
-            const newAngle = angleToRadians(newDegree);
-            // ball.speed *= 1.1;
-            ball.setAngle(newAngle);
-            ball.findTarget(this.walls);
+            ball.bouncePaddle(paddle, this.walls);
           } else {
-            // console.log("reduce");
-            this.reduce();
+            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
+            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+              ball.bounceTargetWall(this.walls);
+            } else {
+              this.reduce();
+            }
           }
+        } else {
+          ball.bounceTargetWall(this.walls);
         }
+        ball.increaseSpeed();
       }
       ball.move();
     });
   }
 
+
+
   public reduce() {
     this.stop();
     // if (this.nPlayers > 4)
-    // this.nPlayers--;
+    if (this.nPlayers > 2)
+      this.nPlayers--;
     // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
     const timer = 1000;
@@ -209,7 +189,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 5;
+    this.nPlayers = 6;
     this.generateMap(this.nPlayers);
   }
   // Getters
@@ -254,10 +234,44 @@ export default class Game {
     return `${this.lobby.id}`;
   }
 
+  public ballsCollides() {
+    for (let bIdx = 0; bIdx < this.balls.length; bIdx++) {
+      const currBall = this.balls[bIdx];
+      // Ball Collide with other balls
+      for (let cIdx = bIdx + 1; cIdx < this.balls.length; cIdx++) {
+        const compared: Ball = this.balls[cIdx];
+        if (currBall.collideWithBall(compared)) {
+          currBall.swapAngles(compared);
+          currBall.findTarget(this.walls);
+          compared.findTarget(this.walls);
+          break ;
+        }
+      }
+
+      // Ball Collide with powers
+      for (let pIdx = 0; pIdx < this.powers.length; pIdx++) {
+        const power: Power = this.powers[pIdx];
+        if (power.collideWithBall(currBall)) {
+          power.effect(currBall);
+          this.powers.splice(pIdx, 1);
+          console.log("removing power", this.powers.length);
+          this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+        }
+      }
+    }
+  }
+
+  public addRandomPower() {
+    const powerClass = PowerList[GameTools.getRandomArbitrary(0, PowerList.length)]
+    const powerObj: Power = new powerClass(this, this.map.randomPosition());
+    this.powers.push(powerObj);
+    console.log("Adding new power", powerObj.name, Object.keys(powerObj), typeof powerObj);
+    this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+  }
+
   public tick() {
     this.timeElapsed += 1 / FRAME_RATE;
-    // console.log(this.timeElapsed);
-    if (this.timeElapsed > 10 * this.balls.length) this.addBall();
+    this.ballsCollides();
     this.runPhysics();
     this.socket.emit('gameUpdate', this.networkState);
   }
