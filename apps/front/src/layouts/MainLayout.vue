@@ -62,6 +62,11 @@ const linksList = [{
   caption: 'Find a lobby of ppl to play with',
   icon: 'fab fa-forumbee',
   to: 'lobbies',
+}, {
+  title: 'Users',
+  caption: 'See all connected users',
+  icon: 'fab fa-users',
+  to: 'users',
 }];
 
 const miniState = ref(true);

@@ -2,7 +2,7 @@ import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
 
-export type LobbyId = number;
+export type LobbyId = string;
 
 export interface ILobby {
   id: LobbyId;

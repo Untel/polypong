@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/12 22:50:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/09 20:23:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@ import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
 import { mande, defaults, MandeError } from 'mande';
 import { useApi } from 'src/utils/api';
+import { User } from 'src/types/user';
 
 export const authApi = mande(`/api/auth`);
 
 type AuthState = {
   socket?: Socket | null,
-  user: {
-    token: string,
-  },
+  user: any,
+  connectedUsers: User[],
 }
 
 const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
@@ -33,9 +33,11 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: {},
     socket: null,
+    connectedUsers: [],
   } as AuthState),
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
+    getConnectedUsers: (state) => state.connectedUsers,
   },
   actions: {
     connectToSocket() {
@@ -45,9 +47,13 @@ export const useAuthStore = defineStore('auth', {
         // withCredentials: true,
         extraHeaders: {
           'Authorization': `Bearer ${this.user.token}`,
-          'yolo': 'ahah'
         }
       });
+
+      this.socket.on('connectedUsers', (users) => {
+        console.log("New connected users", users);
+        this.connectedUsers = users;
+      })
     },
     async login(email: string, password: string) {
       this.user = await authApi.post('login', { email, password });
@@ -67,6 +73,10 @@ export const useAuthStore = defineStore('auth', {
     async whoAmI() {
       defaults.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
       this.user = await authApi.get('user');
+    },
+
+    async fetchConnectedUsers() {
+      this.connectedUsers = await authApi.get('connectedUsers');
     },
   },
 });

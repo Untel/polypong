@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 17:37:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/09 19:44:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,27 +18,36 @@ import Player from 'src/game/player.class';
 
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
+import Store from 'redis-json';
 
 @Injectable()
 export class LobbyService {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
 
-  async getLobbies(): Promise<any> {
-    const lobbies = await this.redis.get('lobbies');
-    return lobbies;
+  lobbies = new Map<LobbyId, Lobby>();
+  store: Store<Lobby>;
+
+  constructor(@InjectRedis() private readonly redis: Redis) {
+    this.store = new Store<Lobby>(redis, { prefix: 'game:' });
   }
 
-  getLobby(id: number): any {
-    return this.redis.get(`lobby-${id}`);
+  async getLobbies(): Promise<Lobby[]> {
+    const lobbies: any = await this.store.get('*');
+    console.log("Lobbies", lobbies);
+    return [...(lobbies)];
   }
 
+  async getLobby(id: LobbyId): Promise<Lobby> {
+    return await this.store.get(id);
+  }
 
   clearLobbies() {
-    this.redis.del('lobby-*');
+    this.store.clearAll();
   }
 
-  createLobby() {}
-
+  async createLobby(hostId: LobbyId) {
+    await this.store.set(hostId, new Lobby(hostId, new Player(hostId)));
+    return this.getLobby(hostId);
+  }
   // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
   // }
 

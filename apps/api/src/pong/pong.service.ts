@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 17:38:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/09 19:43:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ import { UserService } from 'src/user';
 export class PongService {
   store;
   socketServer: Server = null;
-  lobbies = new Map<number, Lobby>();
   id = 0;
   tmpGame: Game = null;
 
@@ -39,7 +38,7 @@ export class PongService {
       this.tmpGame = new Game(
         this.socketServer,
         this.store,
-        new Lobby(0, new Player(0)),
+        new Lobby('sdfsd', new Player(0)),
       );
     }, 3000);
   }
@@ -51,39 +50,39 @@ export class PongService {
     this.tmpGame.reset();
   }
 
-  getLobbies(): Lobby[] {
-    return [...this.lobbies.values()];
-  }
+  // getLobbies(): Lobby[] {
+  //   return [...this.lobbies.values()];
+  // }
 
-  getLobby(id: number): Lobby {
-    return this.lobbies.get(id);
-  }
+  // getLobby(id: number): Lobby {
+  //   return this.lobbies.get(id);
+  // }
 
-  clearLobbies() {
-    this.lobbies = new Map<number, Lobby>();
-    this.id = 0;
-  }
+  // clearLobbies() {
+  //   this.lobbies = new Map<number, Lobby>();
+  //   this.id = 0;
+  // }
 
-  addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
-    // console.log("Adding lobby", socket, this.socketServer);
-    const host = new Player(client.id);
-    const lobby = new Lobby(this.generateId(), host);
-    if (lobbyConfig) {
-      console.log('Setting lobby config', lobbyConfig);
-      lobby.configure(lobbyConfig);
-    }
-    client.join(`lobby-${lobby.id}`);
-    this.socketServer.emit('refreshedLobbies');
-  }
+  // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
+  //   // console.log("Adding lobby", socket, this.socketServer);
+  //   const host = new Player(client.id);
+  //   const lobby = new Lobby(this.generateId(), host);
+  //   if (lobbyConfig) {
+  //     console.log('Setting lobby config', lobbyConfig);
+  //     lobby.configure(lobbyConfig);
+  //   }
+  //   client.join(`lobby-${lobby.id}`);
+  //   this.socketServer.emit('refreshedLobbies');
+  // }
 
-  joinLobby(client: Socket, id: LobbyId) {
-    console.log('Pong service joining room', id);
-    const lobby = this.lobbies.get(id);
-    lobby.addPlayer(new Player(client.id));
-    client.join(`lobby-${id}`);
-    console.log('Joined', this.lobbies);
-    this.socketServer.emit('refreshedLobbies');
-  }
+  // joinLobby(client: Socket, id: LobbyId) {
+  //   console.log('Pong service joining room', id);
+  //   const lobby = this.lobbies.get(id);
+  //   lobby.addPlayer(new Player(client.id));
+  //   client.join(`lobby-${id}`);
+  //   console.log('Joined', this.lobbies);
+  //   this.socketServer.emit('refreshedLobbies');
+  // }
 
   updatePaddlePercent(client: Socket, percent: number) {
     this.tmpGame.updatePaddlePercent(percent);

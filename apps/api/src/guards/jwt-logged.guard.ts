@@ -17,6 +17,7 @@ export class JwtLoggedGuard implements CanActivate {
     const decodedToken = await this.authService.decodeTokenFromCookie(cookie);
     const user = await this.userService.findById(decodedToken.userId);
     req.user = user;
+    console.log("req", req);
     return !!user;
   }
 }

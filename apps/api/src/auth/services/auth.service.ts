@@ -39,7 +39,11 @@ export class AuthService {
 
   async decodeTokenFromCookie(cookie: string) {
     const reg = /(?<=Authentication=)[^;]*/gi; // REGEX MADE BY ANDY OLALA
-    const token = reg.exec(cookie)[0];
+    const found = reg.exec(cookie);
+    if (!found || !found[0]) {
+      return null;
+    }
+    const token = found[0];
     const decoded: any = await this.verifyToken(token);
     return decoded;
   }
