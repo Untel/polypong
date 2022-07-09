@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/07 15:15:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/08 10:40:02 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,8 @@ export default class Game {
   runPhysics() {
 
     this.balls.forEach((ball) => {
-      if (ball.targetDistance <= ball.radius) {
+      // if (ball.targetDistance <= ball.radius)
+      if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle = ball.target.wall.paddle;
         if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
@@ -244,7 +245,7 @@ export default class Game {
           currBall.swapAngles(compared);
           currBall.findTarget(this.walls);
           compared.findTarget(this.walls);
-          break ;
+          break;
         }
       }
 

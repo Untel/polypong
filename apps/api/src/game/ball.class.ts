@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/07 14:40:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/08 10:35:03 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,18 +122,10 @@ export class Ball extends Circle {
         test.solve()
         normvector.scale(test.sides.c);
 
-        // let ratio;
-        // console.log("normvector ", normvector)
-        let distx = (normvector.x) + this.target.hit[0];
-        let disty = (normvector.y) + this.target.hit[1];
-
-        // let ratio = GameTools.percentage(lineLength([[edge[0][0], edge[0][1]], [distx, disty]]), lineLength(edge))
-        // let ratio2 = GameTools.percentage(lineLength([[edge[1][0], edge[1][1]], [distx, disty]]), lineLength(edge))
-
-        this.newTarget = [distx, disty];
+        this.newTarget = [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])];
 
         this.targetInfo = {
-          actualhit: [distx, disty],
+          actualhit: this.newTarget,
           limit: test.sides.a,
           edgeIndex: i,
           edge,
