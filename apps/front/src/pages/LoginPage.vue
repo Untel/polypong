@@ -59,9 +59,9 @@ import { mande, defaults, MandeError } from 'mande';
 
 const auth = useAuthStore();
 
-const login         = ref('');
-const password      = ref('');
-const showPassword  = ref(false);
+const login         = ref<string>('');
+const password      = ref<string>('');
+const showPassword  = ref<boolean>(false);
 const router        = useRouter();
 const route         = useRoute();
 
