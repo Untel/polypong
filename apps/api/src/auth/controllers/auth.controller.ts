@@ -28,7 +28,8 @@ import { PasswordService } from '../services/password-auth.service';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
 import JwtGuard from 'src/guards/jwt.guard';
-
+import { IntraOAuthGuard } from 'src/guards';
+import url from 'url';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -205,5 +206,31 @@ export class AuthController {
   async resetPassword(@Body() body: ResetPasswordDto) {
     this.logger.log(`in auth/password/reset, body.token = ${body.token}\n`);
     this.passwordService.resetPassword(body.token, body.password);
+  }
+
+
+  @Get('intra')
+  @UseGuards(IntraOAuthGuard)
+  async intraAuth(@Req() req) {}
+
+  @Get('intra/callback')
+  @UseGuards(IntraOAuthGuard)
+  async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
+    this.logger.log(`@Get() auth/intra/callback`);
+    console.log("Auth inner query 2", req.query);
+    const user = req.user;
+    const token = this.authService.getToken({ ...user as any });
+    if (user.isTwoFactorAuthenticationEnabled) {
+      return res.send({
+        isTwoFactorAuthenticationEnabled: true,
+        accessCookie: token,
+      });
+    }
+
+    this.logger.log(`@Post(login), returning user`);
+    return res.redirect(url.format({
+      pathname: '/',
+      query: { token }
+    }));
   }
 }

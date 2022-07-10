@@ -43,7 +43,8 @@
   </q-input>
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
   <q-separator size="2px" class="full-width" />
-  <q-btn href="/api/auth/intra" size="large" color="secondary" class="full-width">
+  <!-- <pre>{{ `/api/auth/intra?redirect=${route.query.redirect}` }}</pre> -->
+  <q-btn :href="`/api/auth/intra`" size="large" color="secondary" class="full-width">
     Connect with &nbsp;<q-icon name="img:src/assets/42_logo.svg"/>
   </q-btn>
 </q-form>
@@ -64,12 +65,13 @@ const showPassword  = ref(false);
 const router        = useRouter();
 const route         = useRoute();
 
+
 const connectWithLocal = async (form: Event) => {
   try {
-    await auth.login(login.value, password.value);
     const redirect = route.query.redirect
-      ? JSON.parse(route.query.redirect)
+      ? JSON.parse((route.query.redirect as string))
       : { name: 'home' }
+    await auth.login(login.value, password.value);
     router.push(redirect);
   } catch (error: MandeError) {
     Notify.create({
@@ -78,4 +80,5 @@ const connectWithLocal = async (form: Event) => {
     });
   }
 };
+
 </script>
