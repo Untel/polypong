@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/09 20:23:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/10 18:36:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,8 @@ export const useAuthStore = defineStore('auth', {
       this.socket = io(SOCKET_BASE_URL, {
         path: '/socket',
         transports: ['websocket'],
-        // withCredentials: true,
-        extraHeaders: {
-          'Authorization': `Bearer ${this.user.token}`,
-        }
+        withCredentials: true,
+        auth: { token: `${this.user.token}` },
       });
 
       this.socket.on('connectedUsers', (users) => {
@@ -71,6 +69,10 @@ export const useAuthStore = defineStore('auth', {
       return this.user;
     },
     async whoAmI() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token, no need to query the api");
+      }
       defaults.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
       this.user = await authApi.get('user');
     },

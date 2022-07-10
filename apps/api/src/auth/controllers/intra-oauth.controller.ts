@@ -30,8 +30,9 @@ export class IntraOAuthController {
     this.logger.log(`@Get() auth/intra/callback`);
     const { user } = req;
     console.log('Gotten user is', user);
-    const accessCookie = this.authService.getCookieWithJwtToken(user.id);
-    res.setHeader('Set-Cookie', accessCookie);
+    console.log('BEFORE JWWWT PASSSPORT CHECKKKK');
+    // const accessCookie = this.authService.getCookieWithJwtToken(user.id);
+    // res.setHeader('Set-Cookie', accessCookie);
     user.password = undefined;
     res.redirect(`/`);
   }

@@ -11,6 +11,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 import * as configs from 'src/config';
+import { SocketModule } from './socket';
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],
@@ -31,6 +32,7 @@ const asyncConfig = (moduleName) => ({
     UserModule,
     MailModule,
     AuthModule,
+    SocketModule,
     PongModule,
     LobbyModule,
   ],

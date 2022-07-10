@@ -15,12 +15,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
-import * as jwt from 'jsonwebtoken';
+import { verify, JwtPayload, sign } from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
 import { RegisterUserDto } from '../dtos/register-user.dto';
 import TokenPayload from '../interfaces/tokenPayload.interface';
 import { authenticator } from 'otplib';
 
+export interface UserJwtPayload extends JwtPayload, User {};
 @Injectable()
 export class AuthService {
   constructor(
@@ -34,7 +35,7 @@ export class AuthService {
 
   verifyToken(token: string) {
     const secret = this.configService.get('JWT_SECRET');
-    return jwt.verify(token, secret);
+    return verify(token, secret);
   }
 
   async decodeTokenFromCookie(cookie: string) {
@@ -119,7 +120,7 @@ export class AuthService {
   sendEmailVerificationMail(user: User): void {
     // Create a session JWT that holds the users' email
     // as payload and expires in 14 days.
-    const token = jwt.sign({ ...user }, process.env.JWT_SECRET, {
+    const token = sign({ ...user }, process.env.JWT_SECRET, {
       expiresIn: 60 * 60 * 24 * 14,
     });
 
@@ -139,7 +140,7 @@ export class AuthService {
     // Validate token. Will throw error if it's not valid.
     let userFromTokenPayload: any;
     try {
-      userFromTokenPayload = jwt.verify(token, process.env.JWT_SECRET);
+      userFromTokenPayload = verify(token, process.env.JWT_SECRET);
     } catch (error) {
       throw new BadRequestException('Invalid token');
     }
@@ -163,35 +164,6 @@ export class AuthService {
     });
   }
 
-  // The is2fa property distinguishes bewteen tokens created with
-  // or without two-factor authentication
-  public getCookieWithJwtToken(userId: number, is2fa = false) {
-    const payload: TokenPayload = { userId, is2fa };
-    const token = this.getToken(payload);
-    this.logger.log('Auth Token is ' + token);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`;
-  }
-
-  public getCookieWithJwtRefreshToken(userId: number, is2fa = false) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION + 's',
-    });
-    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME}`;
-    return { cookie, token };
-  }
-
-  // Since jwt are stateless, we can't just make a token invalid.
-  // So in order to log an user out, we just remove the token from
-  // the browser.
-  public getCookieForLogOut() {
-    return [
-      'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0',
-    ];
-  }
-
   // Check that a client's 2FA QR code matches the secret in the db
   public isTwoFactorAuthenticationCodeValid(
     twoFactorAuthenticationCode: string,
@@ -203,15 +175,19 @@ export class AuthService {
     });
   }
 
-  public async findUserByAccessToken(token: string) {
-    const payload: TokenPayload = this.jwtService.verify(token, {
+  public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
+    console.log("Checking token", token);
+    const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
-    this.logger.log(
-      `findUserByAccessToken - payload.userId = ${payload.userId}`,
-    );
-    if (payload.userId) {
-      return this.userService.findById(payload.userId);
-    }
+    console.log("Verified payload", payload);
+    return payload;
+    // console.log("Checking token", payload);
+    // this.logger.log(
+    //   `findUserByAccessToken - payload.userId = ${payload}`,
+    // );
+    // if (payload.userId) {
+    //   return this.userService.findById(payload.userId);
+    // }
   }
 }
