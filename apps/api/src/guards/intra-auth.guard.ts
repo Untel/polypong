@@ -13,8 +13,6 @@ export class IntraOAuthGuard extends AuthGuard('intra') {
     console.log('two');
 
     console.log('tree', redirect);
-    // console.log('four');
     return activate;
   }
-
 }

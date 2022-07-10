@@ -16,7 +16,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       clientSecret: process.env.INTRA_SECRET,
       callbackURL: process.env.INTRA_CALLBACK,
       scope: ['public'],
-      proxy: true,
+      proxy: false,
     });
   }
 
