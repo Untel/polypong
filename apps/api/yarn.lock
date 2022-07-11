@@ -5129,6 +5129,11 @@ tree-kill@1.2.2:
   resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
   integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
+triangle-solver@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/triangle-solver/-/triangle-solver-1.1.1.tgz#8b33759cc3d073659034b80ef110627442a85d82"
+  integrity sha512-M8X9YP8jlUQ6I85tS6T+pcZEwVRSk2jfyVY1mKRQX2x8AhiJtqkv0a6d/w4944xJNrPB2TwKglxVcx4A8YiCdw==
+
 ts-loader@^9.2.3:
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.3.0.tgz#980f4dbfb60e517179e15e10ed98e454b132159f"
@@ -5645,3 +5650,8 @@ yn@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
+
+yy-angle@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/yy-angle/-/yy-angle-2.0.1.tgz#99741c5de6da4a87786a092f6a80257e6db95227"
+  integrity sha512-LAeTddWyUHEvtIWpOSdwlBmKsU2E/t68GIqbYTGm55i5bO0v55qQNo1ox+5A91duDybH1A9n2DzYEsrxBauKFA==
