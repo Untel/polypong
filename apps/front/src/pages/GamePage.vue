@@ -23,17 +23,8 @@
 </style>
 <template>
   <q-page>
-    <!-- <p-application
-      :width="300"
-      :height="300"
-      :background-color="'red'"
-      :skip-hello="true"
-    >
-      <p-text text="yo" />
-    </p-application> -->
-    <!-- <FssFallback class="wrapper">
-
-
+    <!-- LE JEU -->
+    <FssFallback class="wrapper">
       <PolygonMap class="map" ref="mapEl"
         :map="mapProps"
         :paddles="paddles"
@@ -42,28 +33,16 @@
         @paddleMove="updatePaddlePercent"
       >
       </PolygonMap>
-    </FssFallback> -->
-    <!-- :icon="isPaused ? 'unpause' : 'play'" -->
+    </FssFallback>
     <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
       {{ isPaused === 'true' ? 'Play' : 'Pause' }}
     </q-btn>
     <q-btn dense @click="tick()">
       tick
     </q-btn>
-    <!-- <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/> -->
     <q-btn dense @click="reset()">
       reset
     </q-btn>
-    <!-- <pre>
-      {{ tickValue }}
-    </pre> -->
-    <pre style="background-color: grey;">
-      <!-- El : {{ usedRatio }} -->
-      Pause : {{ isPaused }} {{ typeof(isPaused) }}
-      Ball : {{ balls }}
-      Paddle : {{ paddles }}
-      Info : {{ info }}
-    </pre>
   </q-page>
 </template>
 
@@ -78,9 +57,12 @@ import FssFallback from 'src/components/FssFallback.vue';
 import { Notify } from 'quasar';
 import * as PIXI from 'pixi.js';
 
+let app = new PIXI.Application({ width: 600, height: 600 });
+document.body.appendChild(app.view);
+let sprite = PIXI.Sprite.from('src/assets/federation_background.jpg');
+app.stage.addChild(sprite);
+
 const { socket } = useAuthStore();
-
-
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
@@ -95,54 +77,29 @@ const props = defineProps({
 const {
   data: isPaused,
   execute: togglePause,
-  // afterFetch: (ctx: any) => ({ data: ctx.data === 'true', ...ctx }),
 } = useApi<string>('pong/pause', { immediate: false });
-
-
-// const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
-// const ratio = computed(() => {
-//   let r = elementX.value / elementWidth.value;
-//   if (r > 1) r = 1;
-//   else if (r < 0) r = 0;
-//   return r;
-// });
-// const forcedRatio = ref(null);
-
-// const usedRatio = computed(() => {
-//   const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
-//   // console.log("Ratio update", val);
-//   return val;
-// });
 
 const updatePaddlePercent = (percent: number) => {
   socket?.emit('paddlePercent', percent);
 };
-// watch(usedRatio, (val) => {
-//   updatePaddlePercent((val as number));
-// });
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
   if (b) balls.value = b;
   if (p) paddles.value = p;
-  // if (rest) console.log('Updating rest is', rest);
 };
-
-onMounted(() => {
-  // console.log(ball_ref.value, world.value, paddle1_ref.value, paddle2_ref.value);
-  // window.addEventListener('keydown', onKeyDown);
-});
 
 const mapProps: Ref<{ verticles: number[], angles: number[] }> = ref({
   verticles: [],
   angles: [],
 });
 const mapChange = (res) => {
+  // change map
   mapProps.value = res;
 };
 
 const powersUpdate = (res) => {
-  console.log("powers update", res);
+  // add mes powers
   powers.value = res;
 };
 
@@ -169,8 +126,4 @@ const {
   data: test,
   execute: reset,
 } = useApi('pong/reset', { immediate: false });
-
-let app = new PIXI.Application({ width: 640, height: 360 });
-PIXI.Point();
-// console.log(app);
 </script>
