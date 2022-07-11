@@ -67,12 +67,10 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     );
     // console.log('Has coa', coalition);
     const user = await this.OAuthService.socialLogin({
-      user: {
-        email: email,
-        name: login,
-        avatar: image_url,
-        coalition,
-      },
+      email: email,
+      name: login,
+      avatar: image_url,
+      coalition,
       socialChannel: 'intra',
     });
 
