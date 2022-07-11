@@ -47,7 +47,7 @@ export class Bot extends Player {
         // }
     }
     popBall(target: Ball) {
-        this.tasks.splice(this.tasks.indexOf(target))
+        this.tasks.splice(this.tasks.indexOf(target), 1)
     }
     addBall(target: Ball) {
         this.tasks.push(target);
