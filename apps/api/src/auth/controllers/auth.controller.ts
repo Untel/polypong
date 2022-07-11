@@ -30,6 +30,7 @@ import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
 import JwtGuard from 'src/guards/jwt.guard';
 import { IntraOAuthGuard } from 'src/guards';
 import url from 'url';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -94,24 +95,10 @@ export class AuthController {
     return res.send({ ...user, token });
   }
 
-  @Get('verifyToken')
-  async verifyToken(@Req() req, @Query('token') token: string) {
-    console.log('Provided token before', token);
-    console.log('Provided token before', req.query);
-    return this.authService.verifyToken(token);
-  }
-
-  //	@UseGuards(LoggedInGuard)
-  //	@Get('logout')
-  //	logout(@Request() req) {
-  //	  req.session.destroy();
-  //	  return req.logOut();
-  //	}
   @UseGuards(JwtGuard)
   @Post('logout')
   async logOut(@Req() req, @Res() res) {
-    this.logger.log(`@Post(logout)`);
-    await this.userService.removeRefreshToken(req.user.id);
+    this.authService.logout(req.user.id);
     return res.sendStatus(200);
   }
 
@@ -208,29 +195,4 @@ export class AuthController {
     this.passwordService.resetPassword(body.token, body.password);
   }
 
-
-  @Get('intra')
-  @UseGuards(IntraOAuthGuard)
-  async intraAuth(@Req() req) {}
-
-  @Get('intra/callback')
-  @UseGuards(IntraOAuthGuard)
-  async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
-    this.logger.log(`@Get() auth/intra/callback`);
-    console.log("Auth inner query 2", req.query);
-    const user = req.user;
-    const token = this.authService.getToken({ ...user as any });
-    if (user.isTwoFactorAuthenticationEnabled) {
-      return res.send({
-        isTwoFactorAuthenticationEnabled: true,
-        accessCookie: token,
-      });
-    }
-
-    this.logger.log(`@Post(login), returning user`);
-    return res.redirect(url.format({
-      pathname: '/',
-      query: { token }
-    }));
-  }
 }

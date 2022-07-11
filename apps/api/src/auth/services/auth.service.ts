@@ -33,22 +33,6 @@ export class AuthService {
 
   logger = new Logger('AuthService');
 
-  verifyToken(token: string) {
-    const secret = this.configService.get('JWT_SECRET');
-    return verify(token, secret);
-  }
-
-  async decodeTokenFromCookie(cookie: string) {
-    const reg = /(?<=Authentication=)[^;]*/gi; // REGEX MADE BY ANDY OLALA
-    const found = reg.exec(cookie);
-    if (!found || !found[0]) {
-      return null;
-    }
-    const token = found[0];
-    const decoded: any = await this.verifyToken(token);
-    return decoded;
-  }
-
   async registerUser(creds: RegisterUserDto) {
     this.logger.log('registerUser');
     if (await this.userService.find({ email: creds.email }))
@@ -76,7 +60,7 @@ export class AuthService {
    * Check user by credentials.
    * @param {string} email : The email of the user.
    * @param {string} password : The plain password of the user
-   * @returns Promise<User> | null : The user object.
+   * @returns Promise<Use | null : The user object.
    */
   async validateUser(email: string, password: string): Promise<User> | null {
     // Find the user by email from database and also load the password.
@@ -180,14 +164,10 @@ export class AuthService {
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
-    console.log("Verified payload", payload);
     return payload;
-    // console.log("Checking token", payload);
-    // this.logger.log(
-    //   `findUserByAccessToken - payload.userId = ${payload}`,
-    // );
-    // if (payload.userId) {
-    //   return this.userService.findById(payload.userId);
-    // }
+  }
+
+  public async logout(userID) {
+
   }
 }

@@ -6,11 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/10 21:30:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:03:38 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
 import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
@@ -20,6 +20,7 @@ import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import Store from 'redis-json';
 import { UserService } from 'src/user';
+import { SocketGateway } from 'src/socket/socket.gateway';
 // import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
@@ -31,8 +32,10 @@ export class PongService {
 
   constructor(
     @InjectRedis() private readonly redis: Redis,
-    // private readonly userService: UserService,
+    // @Inject(forwardRef(() => SocketGateway))
     // private readonly socketGateway: SocketGateway,
+
+    // private readonly userService: UserService,
   ) {
     // this.socketServer = socketGateway.server;
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/10 18:36:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:24:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ import { useApi } from 'src/utils/api';
 import { User } from 'src/types/user';
 
 export const authApi = mande(`/api/auth`);
+export const onlineApi = mande(`/api/online`);
 
 type AuthState = {
   socket?: Socket | null,
@@ -48,10 +49,15 @@ export const useAuthStore = defineStore('auth', {
         auth: { token: `${this.user.token}` },
       });
 
-      this.socket.on('connectedUsers', (users) => {
-        console.log("New connected users", users);
-        this.connectedUsers = users;
-      })
+      this.socket.on('online', ({ name, type }) => {
+        Notify.create({
+          message: `${name} just is now ${
+            type === 'connect' ? 'connected' : 'disconnected'
+          }`,
+        });
+        this.fetchConnectedUsers();
+      });
+      console.log(this.socket);
     },
     async login(email: string, password: string) {
       this.user = await authApi.post('login', { email, password });
@@ -78,7 +84,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchConnectedUsers() {
-      this.connectedUsers = await authApi.get('connectedUsers');
+      this.connectedUsers = await onlineApi.get('/');
     },
   },
 });

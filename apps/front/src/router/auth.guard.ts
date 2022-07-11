@@ -22,6 +22,12 @@ export default async (
   next: NavigationGuardNext,
 ) => {
   const auth = useAuthStore();
+
+  /**
+   * Si on etait deja log, on clear la precedente connection
+   * (Pour eviter d'overlap les websockets)
+   */
+  if (auth.socket?.connected) auth.socket?.disconnect();
   /**
    * Si un token est passe en params query, alors on tente de s'auto connect via se token
    */

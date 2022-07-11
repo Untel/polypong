@@ -41,6 +41,7 @@ import { ref } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
 import Logo from 'src/components/Logo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
+import { Notify } from 'quasar';
 
 const linksList = [{
   title: 'Home',
@@ -70,4 +71,6 @@ const linksList = [{
 }];
 
 const miniState = ref(true);
+const auth = useAuthStore();
+
 </script>

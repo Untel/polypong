@@ -17,5 +17,5 @@
 import { useAuthStore } from 'src/stores/auth.store';
 
 const auth = useAuthStore();
-// auth.fetchConnectedUsers();
+auth.fetchConnectedUsers();
 </script>

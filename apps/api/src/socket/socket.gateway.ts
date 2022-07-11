@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/10 21:28:21 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:21:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
 import { AuthSocket, WSAuthMiddleware } from './ws-auth.middleware';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { SocketService } from 'src';
 
 /**
  * Ne pas utiliser ce AuthGuard. La protection de l'auth se fait grace au Middleware dans afterInit
@@ -36,17 +38,20 @@ import { AuthSocket, WSAuthMiddleware } from './ws-auth.middleware';
   cors: true,
   transports: ['websocket'],
 })
-export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    // @Inject(@forwardRef(() => PongService))
+    @Inject(forwardRef(() => SocketService))
+    private socketService: SocketService,
     private readonly pongService: PongService,
-    // private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
 
-  @WebSocketServer() server: Server;
+  @WebSocketServer() server: Server<
+    DefaultEventsMap,
+    DefaultEventsMap,
+    DefaultEventsMap,
+    AuthSocket
+  >;
   private logger: Logger = new Logger('PongGateway');
 
   // @SubscribeMessage('createLobby')
@@ -82,29 +87,12 @@ export class SocketGateway
   }
 
   handleDisconnect(client: AuthSocket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    // this.userService.setSocketAsDisconnected(client.id);
-    // this.server.send({ connectedUsers: [...this.userService.connectedUsers.values()] })
+    this.logger.log(`Client disconnected: ${client.id} Name ${client.user.username}`);
+    this.server.emit('online', { name: client.user.name, type: 'disconnect' });
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
-    console.log("SOCKET HANDLE", client.user);
-    // console.log("client.connected", client);
-    // const user = await this.getUserFromSocket(client);
-    // this.userService.setUserAsConnected(user.id, client.id);
-    // const connectedUsers = [...this.userService.connectedUsers.values()];
-    // this.server.send({ connectedUsers })
-    // this.logger.log(`Client connected: ${client.id} ID ${user.id}`);
-    // console.log("connectedUsers", connectedUsers)
-  }
-
-  getConnectedUsers() {
-    return [...this.server.sockets.sockets.values()]
-      .map((el: AuthSocket) => el.user);
-  }
-
-  getUserSocket(userID) {
-    return [...this.server.sockets.sockets.values()]
-      .find((el: AuthSocket) => el.user.id === userID);
+    this.logger.log(`Client connected: ${client.id} Name ${client.user.username}`);
+    this.server.emit('online', { name: client.user.name, type: 'connect' });
   }
 }
