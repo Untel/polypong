@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/09 19:45:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:34:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ export class LobbyController {
     private readonly lobbyService: LobbyService,
   ) {}
 
-  @Get('/')
-  getLobbies(): Promise<Lobby[]> {
+  @Get()
+  lobbies(): Promise<Lobby[]> {
     return this.lobbyService.getLobbies();
   }
 

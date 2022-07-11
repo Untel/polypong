@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:03:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:35:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ import Redis from 'ioredis';
 import Store from 'redis-json';
 import { UserService } from 'src/user';
 import { SocketGateway } from 'src/socket/socket.gateway';
-// import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class PongService {

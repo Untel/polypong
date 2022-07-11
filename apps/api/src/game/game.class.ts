@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/10 21:31:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:32:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 16;
+    this.nPlayers = 5;
     this.generateMap(this.nPlayers);
   }
 
@@ -93,15 +93,15 @@ export default class Game {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
-    console.log('Generating a new map');
+    // console.log('Generating a new map');
     // console.log('Edges', this.edges);
     // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
-      if (nPlayers > 2 || index % 2) {
-        paddle = new Paddle(line, index, 0.4);
+      if (nPlayers > 2 || !(index % 2)) {
+        paddle = new Paddle(line, index);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
@@ -129,6 +129,7 @@ export default class Game {
   }
 
   updatePaddlePercent(percent: number) {
+    // console.log("here is percent", percent);
     this.paddles.forEach((paddle) => {
       paddle.updatePercentOnAxis(percent);
     });
@@ -138,16 +139,21 @@ export default class Game {
     // );
   }
 
+
+
   runPhysics() {
+
     this.balls.forEach((ball) => {
-      if (ball.targetDistance <= ball.radius) {
+      // if (ball.targetDistance <= ball.radius)
+      if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle = ball.target.wall.paddle;
         if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
-            ball.target.hit,
+            ball.targetInfo.actualhit,
             paddle.line,
             1,
           );
+
           if (paddleTouchTheBall) {
             ball.bouncePaddle(paddle, this.walls);
           } else {
@@ -171,10 +177,12 @@ export default class Game {
 
   public reduce() {
     this.stop();
-    this.nPlayers--;
-    if (this.nPlayers < 2) this.nPlayers = 2;
+    // if (this.nPlayers > 4)
+    if (this.nPlayers > 2)
+      this.nPlayers--;
+    // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
-    const timer = 3000;
+    const timer = 1000;
     this.socket.emit('timer', { timer });
     setTimeout(() => {
       if (this.isPaused) this.run();
@@ -182,7 +190,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 8;
+    this.nPlayers = 6;
     this.generateMap(this.nPlayers);
   }
   // Getters
@@ -237,7 +245,7 @@ export default class Game {
           currBall.swapAngles(compared);
           currBall.findTarget(this.walls);
           compared.findTarget(this.walls);
-          break ;
+          break;
         }
       }
 

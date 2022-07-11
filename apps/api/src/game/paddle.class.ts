@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 18:32:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:33:24 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ import {
   lineAngle,
   Point,
   lineInterpolate,
-  LineInterpolator,
   lineLength,
+  LineInterpolator,
 } from 'geometric';
 import GameTools from './gametools.class';
 import { Power } from './power.class';
@@ -36,7 +36,7 @@ export class Paddle {
 
   effects: { [key: string]: { count: number } };
 
-  constructor(axis: Line, index: number, relativeSize = 0.5, bounce = 45) {
+  constructor(axis: Line, index: number, relativeSize = 0.4, bounce = 45) {
     this.initialSize = relativeSize;
     this.index = index;
     this.axis = axis;
@@ -47,7 +47,6 @@ export class Paddle {
     this.bounceAngle = bounce;
     this.setRelativeSize(relativeSize);
     this.updatePercentOnAxis(0.5);
-    this.width = lineLength(this.line);
   }
 
   setRelativeSize(relativeSize?) {

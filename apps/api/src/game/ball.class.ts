@@ -6,17 +6,16 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 18:45:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:36:38 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Circle, Vector } from 'collider2d';
-import e from 'express';
-import { angleReflect, angleToDegrees, angleToRadians, Line, lineAngle, lineLength, Point } from 'geometric';
+import { Line, lineLength, Point, lineAngle, angleToDegrees, angleToRadians, angleReflect } from 'geometric';
 import GameTools from './gametools.class';
-import { Paddle } from './paddle.class';
+import Triangle from 'triangle-solver';
 import { Wall } from './wall.class';
-
+import { Paddle } from './paddle.class';
 export class Ball extends Circle {
   _speed = 1;
   maxSpeed = 1.5;
@@ -28,6 +27,11 @@ export class Ball extends Circle {
     wall: Wall,
   };
   color: string;
+  targetInfo: any;
+  adjacent: any;
+  alpha: any;
+  newTarget: any;
+
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 2) {
     super(startPos, radius);
@@ -91,9 +95,41 @@ export class Ball extends Circle {
       );
 
       if (intersection) {
+
         this.target = {
           hit: [intersection.x, intersection.y],
           wall,
+        };
+
+        const incidenceAngle = angleToDegrees(this.angle)
+
+        let normvector: Vector = new Vector(
+          (this.target.wall.line[0][0] - this.target.wall.line[1][0]),
+          (this.target.wall.line[0][1] - this.target.wall.line[1][1])
+        ).normalize();
+
+
+        let alpha: number = wall.angle - incidenceAngle;
+        alpha = (alpha < 0) ? alpha + 360 : alpha;
+
+        let values = {
+          b: 3,
+          B: alpha,
+          A: 90
+        }
+
+        const test: Triangle = new Triangle(values);
+        test.solve()
+        normvector.scale(test.sides.c);
+
+        this.newTarget = [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])];
+
+        this.targetInfo = {
+          actualhit: this.newTarget,
+          limit: test.sides.a,
+          edgeIndex: i,
+          edge,
+          ...intersection,
         };
         collided = true;
         break;
@@ -104,7 +140,6 @@ export class Ball extends Circle {
       // this.reset();
     }
   }
-
   move() {
     this.position.x = this.position.x + this.direction.x;
     this.position.y = this.position.y + this.direction.y;
@@ -195,6 +230,7 @@ export class Ball extends Circle {
         x: this.position.x,
         y: this.position.y,
       },
+      newTarget: this.newTarget,
       radius: this.radius,
       target: {
         hit: {

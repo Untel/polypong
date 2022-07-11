@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/09 19:44:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:36:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ export class LobbyService {
   async getLobby(id: LobbyId): Promise<Lobby> {
     return await this.store.get(id);
   }
+
 
   clearLobbies() {
     this.store.clearAll();
