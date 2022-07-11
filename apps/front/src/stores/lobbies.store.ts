@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 00:20:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/12 00:43:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ type Lobby = {
   spectators: Array<any>;
   spectatorsMax: number;
   description: string;
+  isPrivate?: boolean;
   host: {
     avatar: string,
     name: string,
@@ -62,11 +63,12 @@ export const useLobbiesStore = defineStore('lobbies', {
           avatar: 'https://cdn.intra.42.fr/users/adda-sil.jpg',
           id: 75,
           name: 'Adrien',
-        }
+        },
+        isPrivate: true,
       }, {
         id: 75,
         name: 'Partie de Enzoooo',
-        description: 'lol c mieu che moi',
+        description: '1v1 noscope bg only',
         spectatorsMax: 50,
         playersMax: 2,
         players: [1],

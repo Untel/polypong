@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <q-card flat bordered class="lobby-card">
+  <q-card flat bordered class="lobby-card" :color="'primary'">
     <q-form ref="form">
 
       <q-item>
@@ -30,7 +30,11 @@
       </q-card-section>
       <q-separator />
       <q-card-actions class="q-pa-md row q-gutter-md">
-        <q-btn color="primary" class="col" @click="emit('joinLobby')">{{ joinText }}</q-btn>
+        <q-btn
+          :color="!isPrivate ? 'primary' : 'negative'"
+          class="col" @click="emit('joinLobby')"
+          :icon="!isPrivate ? 'sports_tennis' : 'lock'"
+          :label="joinText" />
       </q-card-actions>
     </q-form>
   </q-card>
@@ -70,8 +74,8 @@ const props = defineProps({
   host: {
     type: Object as PropType<any>
   },
-  password: {
-    type: String,
+  isPrivate: {
+    type: Boolean,
   },
 });
 
