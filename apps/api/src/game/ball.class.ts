@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/08 10:35:03 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/11 08:18:13 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,7 @@ export class Ball extends Circle {
   color: string;
   targetInfo: any;
   adjacent: any;
-  alpha: any;
-  newTarget: any;
+  alpha: number;
 
 
   constructor(startPos: Vector = new Vector(0, 0), radius = 2) {
@@ -76,7 +75,8 @@ export class Ball extends Circle {
       [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
     ];
-
+    if (this.target)
+      this.target.wall.clearBall(this);
     const [[x1, y1], [x2, y2]] = line;
     let collided = false;
     for (let i = 0; i < walls.length; i++) {
@@ -100,6 +100,7 @@ export class Ball extends Circle {
           hit: [intersection.x, intersection.y],
           wall,
         };
+        wall.addBall(this);
 
         const incidenceAngle = angleToDegrees(this.angle)
 
@@ -122,16 +123,16 @@ export class Ball extends Circle {
         test.solve()
         normvector.scale(test.sides.c);
 
-        this.newTarget = [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])];
 
         this.targetInfo = {
-          actualhit: this.newTarget,
+          actualhit: [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])],
           limit: test.sides.a,
           edgeIndex: i,
           edge,
           ...intersection,
         };
         collided = true;
+
         break;
       }
     }
@@ -230,7 +231,6 @@ export class Ball extends Circle {
         x: this.position.x,
         y: this.position.y,
       },
-      newTarget: this.newTarget,
       radius: this.radius,
       target: {
         hit: {

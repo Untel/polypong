@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/07 15:09:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 10:06:29 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ export class Paddle {
   angle: number;
   maxAngle: number;
   index: number;
+  ratio: number;
   interpolationStart: LineInterpolator;
   interpolationEnd: LineInterpolator;
   bounceAngle: number;
@@ -51,7 +52,7 @@ export class Paddle {
 
   setRelativeSize(relativeSize?) {
     const relSize = relativeSize || this.initialSize;
-    console.log("REL SIZE", relSize, relativeSize, this.initialSize);
+    // console.log("REL SIZE", relSize, relativeSize, this.initialSize);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(this.axis);
@@ -62,6 +63,7 @@ export class Paddle {
   }
 
   updatePercentOnAxis(ratio: number) {
+    this.ratio = ratio;
     const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];

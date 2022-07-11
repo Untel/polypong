@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/08 10:40:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/11 09:06:29 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 import Redis from 'ioredis';
 import RedisBridge from './redis.bridge';
 import Store from 'redis-json';
+import { Bot } from '.';
 import { debounce } from 'lodash';
 import {
   lineInterpolate,
@@ -60,7 +61,10 @@ export default class Game {
   store: Store;
 
   balls: Ball[] = [];
+  nBall: number = 1;
+  bots: Bot[] = [];
   nPlayers: number;
+  nBots: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
   powers: Power[] = [];
@@ -78,7 +82,9 @@ export default class Game {
     this.socket = socket;
     this.store = store;
     this.nPlayers = 5;
+    this.nBots = 4;
     this.generateMap(this.nPlayers);
+    this.spawnBots(this.nBots);
   }
 
   addBall() {
@@ -88,6 +94,7 @@ export default class Game {
     ball.findTarget(this.walls);
     this.balls.push(ball);
   }
+
 
   generateMap(nPlayers: number) {
     this.balls = [];
@@ -109,10 +116,18 @@ export default class Game {
     // this.paddles = playerEdges.map((line, idx) => {
     //   return new Paddle(line, idx, 0.4);
     // });
-    for (let i = 0; i < 5; i++)
+    for (let i = 0; i < this.nBall; i++)
       this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
+  }
+
+  spawnBots(botNb: number) {
+
+    for (let i = 0; i < botNb; i++) {
+      const tmp: Bot = new Bot(this.walls[i], i)
+      this.bots.push(tmp);
+    }
   }
 
   run() {
@@ -130,9 +145,10 @@ export default class Game {
 
   updatePaddlePercent(percent: number) {
     // console.log("here is percent", percent);
-    this.paddles.forEach((paddle) => {
-      paddle.updatePercentOnAxis(percent);
-    });
+    // this.paddles.forEach((paddle) => {
+    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent)
+    // paddle.updatePercentOnAxis(percent);
+    // });
     // if (this.isPaused) debounce(
     //   this.socket.emit('gameUpdate', this.networkState),
     //   500
@@ -144,9 +160,8 @@ export default class Game {
   runPhysics() {
 
     this.balls.forEach((ball) => {
-      // if (ball.targetDistance <= ball.radius)
       if (ball.targetDistance <= ball.targetInfo.limit) {
-        const paddle = ball.target.wall.paddle;
+        const paddle: Paddle = ball.target.wall.paddle;
         if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.targetInfo.actualhit,
@@ -173,7 +188,11 @@ export default class Game {
     });
   }
 
-
+  runBots() {
+    this.bots.forEach(e => {
+      e.think();
+    })
+  }
 
   public reduce() {
     this.stop();
@@ -190,8 +209,13 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = 6;
+    // this.nPlayers = 1;
     this.generateMap(this.nPlayers);
+    while (this.bots.length != 0) {
+      this.bots.pop();
+    }
+    this.spawnBots(this.nBots);
+
   }
   // Getters
   public get isPaused() {
@@ -274,6 +298,7 @@ export default class Game {
     this.timeElapsed += 1 / FRAME_RATE;
     this.ballsCollides();
     this.runPhysics();
+    this.runBots();
     this.socket.emit('gameUpdate', this.networkState);
   }
 }
