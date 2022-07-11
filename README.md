@@ -3,7 +3,7 @@
 Last project of 42 Cursus
 
 Built with:
-  - Back: NestJS, PassportJwt, TypeOrm, Swagger
+  - Back: NestJS, TypeOrm, Swagger, Passort: Jwt + Oauth 42/Google
   - Data: PostgresSQL, Redis,
   - Front: VueJS 3.0 (With composition API only), PiniaJS, Mande, AnimeJS
   - Other: Docker, Docker Compose, Nginx, Mailhog
