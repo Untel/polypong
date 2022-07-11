@@ -10,4 +10,4 @@ Built with:
   - Data: PostgresSQL, Redis,
   - Front: VueJS 3.0 (With composition API only), Quasar, PiniaJS, Mande, VueUse, AnimeJS
   - Other: Docker, Docker Compose, Nginx as reverse proxy, Mailhog
-  - Game: Geometric.js, Collider2d
+  - Math helpers: Geometric.js, Collider2d, Flat Surface Shaders
