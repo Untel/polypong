@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:36:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 23:14:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ export class LobbyService {
   }
 
   async getLobbies(): Promise<Lobby[]> {
-    const lobbies: any = await this.store.get('*');
+    const lobbies: any = await this.store.get('*') || [];
     console.log("Lobbies", lobbies);
     return [...(lobbies)];
   }
 
   async getLobby(id: LobbyId): Promise<Lobby> {
-    return await this.store.get(id);
+    return await this.store.get(`${id}`);
   }
 
 
@@ -46,7 +46,8 @@ export class LobbyService {
   }
 
   async createLobby(hostId: LobbyId) {
-    await this.store.set(hostId, new Lobby(hostId, new Player(hostId)));
+    console.log("Host id", hostId);
+    await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
     return this.getLobby(hostId);
   }
   // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
