@@ -60,33 +60,6 @@ export class UserService {
     return user;
   }
 
-  // save the hash of the current refresh token in db
-  async setCurrentRefreshToken(refreshToken: string, userId: number) {
-    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userRepository.update(userId, {
-      currentHashedRefreshToken,
-    });
-  }
-  // compare a refresh token to an user's and return info if matching
-  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
-    const user = await this.findById(userId);
-
-    const isRefreshTokenMatching = await bcrypt.compare(
-      refreshToken,
-      user.currentHashedRefreshToken,
-    );
-
-    if (isRefreshTokenMatching) {
-      return user;
-    }
-  }
-  // clear refresh tokens from the db
-  async removeRefreshToken(userId: number) {
-    return this.userRepository.update(userId, {
-      currentHashedRefreshToken: null,
-    });
-  }
-
   // save the 2fa secret in the database
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     return this.userRepository.update(userId, {

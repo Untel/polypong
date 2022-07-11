@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/07 15:09:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:33:24 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ export class Paddle {
 
   setRelativeSize(relativeSize?) {
     const relSize = relativeSize || this.initialSize;
-    console.log("REL SIZE", relSize, relativeSize, this.initialSize);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(this.axis);

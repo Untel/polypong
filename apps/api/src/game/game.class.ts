@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/08 10:40:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/11 02:32:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ export default class Game {
     // this.paddles = playerEdges.map((line, idx) => {
     //   return new Paddle(line, idx, 0.4);
     // });
-    for (let i = 0; i < 5; i++)
-      this.addBall();
+    // for (let i = 0; i < 100; i++)
+    this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
   }

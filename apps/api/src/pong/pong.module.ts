@@ -3,11 +3,12 @@ import { PongController } from './pong.controller';
 import { PongService } from './pong.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
-import { SocketGateway } from './socket.gateway';
+import { LobbyModule } from 'src/lobby';
 
 @Module({
-  imports: [AuthModule, UserModule],
+  imports: [UserModule],
   controllers: [PongController],
-  providers: [PongService, SocketGateway],
+  providers: [PongService],
+  exports: [PongService],
 })
 export class PongModule {}

@@ -40,6 +40,9 @@
 
 <template>
   <div class="svg-test wrapper">
+    <!-- <pre>
+      pow {{ powers }}
+    </pre> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
@@ -89,6 +92,12 @@
         v-bind="formatBallTrajectoryPoints(ball)"
       />
     </svg>
+    <slot />
+
+    <!-- <pre v-if="balls && balls[0]">
+      {{ balls[0].pos }}
+    </pre> -->
+    <!-- <q-btn @click="test">test</q-btn> -->
   </div>
 </template>
 
