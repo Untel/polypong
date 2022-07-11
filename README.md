@@ -1,5 +1,8 @@
 # polypong
 
+## IN PROGRESS
+---
+
 Last project of 42 Cursus
 
 Built with:
