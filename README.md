@@ -6,5 +6,5 @@ Built with:
   - Back: NestJS, PassportJwt, TypeOrm, Swagger
   - Data: PostgresSQL, Redis,
   - Front: VueJS 3.0 (With composition API only), PiniaJS, Mande, AnimeJS
-  - Other: Docker compose, Nginx, Mailhog
+  - Other: Docker, Docker Compose, Nginx, Mailhog
   
