@@ -10,3 +10,5 @@ Built with:
   - Data: PostgresSQL, Redis,
   - Front: VueJS 3.0 (With composition API only), Quasar, PiniaJS, Mande, VueUse, AnimeJS
   - Other: Docker, Docker Compose, Nginx as reverse proxy, Mailhog, Geometric.js, Collider2d, Flat Surface Shaders, Socket.io
+
+cc
