@@ -23,7 +23,17 @@
 </style>
 <template>
   <q-page>
-    <FssFallback class="wrapper">
+    <!-- <p-application
+      :width="300"
+      :height="300"
+      :background-color="'red'"
+      :skip-hello="true"
+    >
+      <p-text text="yo" />
+    </p-application> -->
+    <!-- <FssFallback class="wrapper">
+
+
       <PolygonMap class="map" ref="mapEl"
         :map="mapProps"
         :paddles="paddles"
@@ -32,7 +42,7 @@
         @paddleMove="updatePaddlePercent"
       >
       </PolygonMap>
-    </FssFallback>
+    </FssFallback> -->
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
       {{ isPaused === 'true' ? 'Play' : 'Pause' }}
@@ -66,7 +76,10 @@ import { MaybeElementRef, useMouseInElement } from '@vueuse/core'
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
 import { Notify } from 'quasar';
+import * as PIXI from 'pixi.js';
+
 const { socket } = useAuthStore();
+
 
 
 const paddles: Ref<Paddle[]> = ref([]);
@@ -157,5 +170,7 @@ const {
   execute: reset,
 } = useApi('pong/reset', { immediate: false });
 
-
+let app = new PIXI.Application({ width: 640, height: 360 });
+PIXI.Point();
+// console.log(app);
 </script>

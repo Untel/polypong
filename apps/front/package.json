@@ -26,6 +26,7 @@
     "vue": "^3.0.0",
     "vue-flat-surface-shader": "^1.0.5",
     "vue-i18n": "^9.0.0",
+    "vue-pixi-wrapper": "^2.3.5",
     "vue-router": "^4.0.0"
   },
   "devDependencies": {
