@@ -3,6 +3,7 @@ import { authenticator } from 'otplib';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { toFileStream, toDataURL } from 'qrcode';
+
 @Injectable()
 export class TwoFactorAuthenticationService {
   constructor(private readonly userService: UserService) {}

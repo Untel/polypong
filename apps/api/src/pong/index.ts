@@ -3,4 +3,3 @@
 export * from './pong.controller';
 export * from './pong.module';
 export * from './pong.service';
-export * from './socket.gateway';

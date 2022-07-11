@@ -21,15 +21,30 @@ export default async (
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ) => {
-  console.log("Ah ?", from, to);
+  const auth = useAuthStore();
+
+  /**
+   * Si on etait deja log, on clear la precedente connection
+   * (Pour eviter d'overlap les websockets)
+   */
+  if (auth.socket?.connected) auth.socket?.disconnect();
+  /**
+   * Si un token est passe en params query, alors on tente de s'auto connect via se token
+   */
+  const autoToken: string = to.query.token as string;
+  if (autoToken) {
+    localStorage.setItem('token', autoToken);
+    delete to.query.token;
+    return next(to);
+  }
+
   try {
-    const auth = useAuthStore();
     await auth.whoAmI();
     await auth.connectToSocket();
     next();
   } catch (error) {
     const redirect = buildRedirectObject(to);
     console.log('Auth guard fail', error, to.name, redirect);
-    next({ name: 'login', query: redirect });
+    return next({ name: 'login', query: redirect });
   }
 };
