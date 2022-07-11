@@ -1,5 +1,4 @@
 import { AuthService } from '../services/auth.service';
-import { LoggedInGuard } from 'src/guards/logged-in.guard';
 import {
   Body,
   Controller,
@@ -27,10 +26,10 @@ import { UpdatePasswordDto } from '../dtos/update-password.dto';
 import { VerifyEmailTokenDto } from '../dtos/verify-email-token.dto';
 import { PasswordService } from '../services/password-auth.service';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
-import JwtRefreshGuard from 'src/guards/jwt-refresh.guard';
 import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
-import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
-import { AuthGuard } from '@nestjs/passport';
+import JwtGuard from 'src/guards/jwt.guard';
+import { IntraOAuthGuard } from 'src/guards';
+import url from 'url';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +37,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly passwordService: PasswordService,
     private readonly userService: UserService,
+    // private readonly socketGateway: SocketGateway,
   ) {}
   logger = new Logger('AuthController');
 
@@ -58,17 +58,7 @@ export class AuthController {
     console.log('registerUserDto', registerUserDto);
     const result = await this.authService.registerUser(registerUserDto);
     if (result.user) {
-      // call req.logIn from passport (Done by LocalGuard in .login()) to generate the session
-      await new Promise((resolve, reject) => {
-        req.login(result.user, (err) => {
-          if (err)
-            throw new Error(
-              'Sorry, somethin went wrong. We could register but sign you in.',
-            );
-          resolve(req.session);
-        });
-      });
-      // then call the login controller to set the cookie
+      req.user = result.user;
       return this.login(req, res);
     }
   }
@@ -105,38 +95,11 @@ export class AuthController {
     return res.send({ ...user, token });
   }
 
-  @Get('verifyToken')
-  async verifyToken(@Req() req, @Query('token') token: string) {
-    console.log('Provided token before', token);
-    console.log('Provided token before', req.query);
-    return this.authService.verifyToken(token);
-  }
-
-  //	@UseGuards(LoggedInGuard)
-  //	@Get('logout')
-  //	logout(@Request() req) {
-  //	  req.session.destroy();
-  //	  return req.logOut();
-  //	}
-  @UseGuards(JwtTwoFactorGuard)
+  @UseGuards(JwtGuard)
   @Post('logout')
   async logOut(@Req() req, @Res() res) {
-    this.logger.log(`@Post(logout)`);
-    await this.userService.removeRefreshToken(req.user.id);
-
-    res.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+    this.authService.logout(req.user.id);
     return res.sendStatus(200);
-  }
-
-  @UseGuards(JwtRefreshGuard)
-  @Get('refresh')
-  refresh(@Req() request: RequestWithUser) {
-    const accessTokenCookie = this.authService.getCookieWithJwtToken(
-      request.user.id,
-    );
-
-    request.res.setHeader('Set-Cookie', accessTokenCookie);
-    return request.user;
   }
 
   /**
@@ -144,9 +107,7 @@ export class AuthController {
    * @param {Request} req : The request object.
    * @returns
    */
-  // @UseGuards(JwtTwoFactorGuard)
-  // @UseGuards(new JwtAuthenticationGuard())
-  @UseGuards(LoggedInGuard)
+  @UseGuards(JwtGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
     delete req.user.password;
@@ -161,7 +122,6 @@ export class AuthController {
   // verify JWT and return user data, so the browser can check the validity
   // of the current jwt and get the data of the currently logged-in user.
   @UseGuards(JwtTwoFactorGuard)
-  //	@UseGuards(LoggedInGuard)
   @Get()
   authenticate(@Request() req: RequestWithUser) {
     const user = req.user;
@@ -234,4 +194,5 @@ export class AuthController {
     this.logger.log(`in auth/password/reset, body.token = ${body.token}\n`);
     this.passwordService.resetPassword(body.token, body.password);
   }
+
 }

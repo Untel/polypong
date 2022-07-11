@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 18:32:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/11 10:09:02 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ import {
   lineAngle,
   Point,
   lineInterpolate,
-  LineInterpolator,
   lineLength,
+  LineInterpolator,
 } from 'geometric';
 import GameTools from './gametools.class';
 import { Power } from './power.class';
@@ -29,6 +29,7 @@ export class Paddle {
   angle: number;
   maxAngle: number;
   index: number;
+  ratio: number;
   interpolationStart: LineInterpolator;
   interpolationEnd: LineInterpolator;
   bounceAngle: number;
@@ -36,7 +37,7 @@ export class Paddle {
 
   effects: { [key: string]: { count: number } };
 
-  constructor(axis: Line, index: number, relativeSize = 0.5, bounce = 45) {
+  constructor(axis: Line, index: number, relativeSize = 0.4, bounce = 45) {
     this.initialSize = relativeSize;
     this.index = index;
     this.axis = axis;
@@ -47,11 +48,11 @@ export class Paddle {
     this.bounceAngle = bounce;
     this.setRelativeSize(relativeSize);
     this.updatePercentOnAxis(0.5);
-    this.width = lineLength(this.line);
   }
 
   setRelativeSize(relativeSize?) {
     const relSize = relativeSize || this.initialSize;
+    // console.log("REL SIZE", relSize, relativeSize, this.initialSize);
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(this.axis);
@@ -62,6 +63,7 @@ export class Paddle {
   }
 
   updatePercentOnAxis(ratio: number) {
+    this.ratio = ratio;
     const newPosStart = this.interpolationStart(ratio);
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];

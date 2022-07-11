@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/06/13 03:00:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/09 20:14:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ const routes: RouteRecordRaw[] = [
         { name: 'lobbies', path: 'lobbies', component: () => import('pages/LobbiesPage.vue') },
         { name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'), },
         { name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue') },
+        { name: 'users', path: 'users', component: () => import('pages/UsersPage.vue') },
       ],
     }, {
       path: '/:catchAll(.*)*',

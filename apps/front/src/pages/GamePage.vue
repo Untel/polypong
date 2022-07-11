@@ -25,13 +25,8 @@
   <q-page>
     <!-- LE JEU -->
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl"
-        :map="mapProps"
-        :paddles="paddles"
-        :balls="balls"
-        :powers="powers"
-        @paddleMove="updatePaddlePercent"
-      >
+      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls" :powers="powers"
+        @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
     <q-btn @click="togglePause()" :icon=" isPaused === 'true' ? 'play_arrow' : 'pause'">
@@ -103,7 +98,7 @@ const powersUpdate = (res) => {
   powers.value = res;
 };
 
-const printTimer = ({ timer }: {timer: number}) => {
+const printTimer = ({ timer }: { timer: number }) => {
   Notify.create({
     timeout: timer,
     progress: true,

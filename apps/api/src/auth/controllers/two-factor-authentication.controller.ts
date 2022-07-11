@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import JwtAuthenticationGuard from 'src/guards/jwt-authentication.guard';
+import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from 'src/user/user.service';
 import { TwoFactorAuthenticationCodeDto } from '../dtos/two-factor-authentication-code.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
@@ -30,7 +30,7 @@ export class TwoFactorAuthenticationController {
   logger = new Logger(`2fa Controller`);
 
   @Get('generate')
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtGuard)
   async register(@Res() res, @Req() req: RequestWithUser) {
     const { user } = req;
     const { otpauthUrl } =
@@ -46,7 +46,7 @@ export class TwoFactorAuthenticationController {
 
   @Post('activate')
   @HttpCode(200)
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtGuard)
   async turnOnTwoFactorAuthentication(
     @Req() req: RequestWithUser,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
@@ -69,7 +69,7 @@ export class TwoFactorAuthenticationController {
 
   @Post('authenticate')
   @HttpCode(201)
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtGuard)
   async authenticate(
     @Req() req,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
@@ -85,13 +85,7 @@ export class TwoFactorAuthenticationController {
     const user = req.user;
     // create a jwt access token with the property is2fa set to true
     if (isValid) {
-      this.logger.log(`about to set cookie`);
-      const accessTokenCookie = this.authService.getCookieWithJwtToken(
-        req.user.id,
-        true,
-      );
-      res.setHeader('Set-Cookie', [accessTokenCookie]);
-      this.logger.log(`cookie set.`);
+      this.logger.log(`BEFORE REWORK PASSORT: about to set cookie`);
       res.send(user);
     } else {
       throw new UnauthorizedException('2fa code not valid');

@@ -22,10 +22,6 @@ export class User {
   id: number;
 
   @Column({ nullable: true })
-  @Exclude()
-  public currentHashedRefreshToken?: string;
-
-  @Column({ nullable: true })
   twoFactorAuthenticationSecret?: string;
 
   @Column({ default: false })
@@ -55,9 +51,6 @@ export class User {
 
   @Column({ default: false })
   emailVerified: boolean;
-
-  @Column({ default: false })
-  requireEmailVerification: boolean;
 
   @Column({ nullable: true })
   socialChannel: string;

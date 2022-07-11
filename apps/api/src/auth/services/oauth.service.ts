@@ -11,26 +11,23 @@ export class OAuthService {
    * @param {Request} req : The request object.
    * @returns
    */
-  async socialLogin(req: { user: any; socialChannel: string }) {
+  async socialLogin(user) {
     // nb : passport middleware adds the user to the request object.
-    if (!req.user) {
+    if (!user) {
       throw new BadRequestException('No account presented.');
     }
 
     // if there's as user already registered under that email, return it
-    const existingUser: User = await this.userService.find({
-      email: req.user.email,
-    });
+    const existingUser: User = await this.userService.find({ email: user.email });
     if (existingUser) {
       return existingUser;
     }
 
     // otherwise create an user entity and return it
     const newUser = await this.userService.createUser({
-      ...req.user,
-      socialChannel: req.socialChannel,
+      ...user,
       emailVerified: true,
     });
-    return { user: newUser };
+    return newUser;
   }
 }

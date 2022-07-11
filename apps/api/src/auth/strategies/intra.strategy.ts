@@ -16,7 +16,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       clientSecret: process.env.INTRA_SECRET,
       callbackURL: process.env.INTRA_CALLBACK,
       scope: ['public'],
-      proxy: true,
+      proxy: false,
     });
   }
 
@@ -31,7 +31,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   }
 
   async getUserCoalition(userId: number, accessToken: string) {
-    this.logger.log(`validate - getUserProfile`);
+    this.logger.log(`validate - getUserCoalition`);
     const { data } = await axios.get(
       `https://api.intra.42.fr/v2/users/${userId}/coalitions`,
       {
@@ -45,17 +45,15 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
 
   async validate(
     accessToken: string,
-    refreshToken: string,
-    profile: any,
-    done: VerifyCallback,
+    redirect: string
   ): Promise<any> {
-    this.logger.log(`validate`);
+    this.logger.log(`validate`, redirect);
     const data = await this.getUserProfile(accessToken);
-    this.logger.log(`data = ${data}`);
-    this.logger.log(`email = ${data.email}`);
+    // this.logger.log(`data = ${data}`);
+    // this.logger.log(`email = ${data.email}`);
     const { email, first_name, last_name, image_url, login, id, cursus } = data;
     // console.log("LOGIN DATA", Object.keys(data), data.patroned, data.patroning, data.roles);
-    this.logger.log(JSON.stringify(data));
+    // this.logger.log(JSON.stringify(data));
 
     const dataCoa = await this.getUserCoalition(+id, accessToken);
     const coalition = dataCoa.reduce(
@@ -67,16 +65,16 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
         (next.name === 'The Assembly' && 'assembly'),
       null,
     );
-    console.log('Has coa', coalition);
+    // console.log('Has coa', coalition);
     const user = await this.OAuthService.socialLogin({
-      user: {
-        email: email,
-        name: login,
-        avatar: image_url,
-        coalition,
-      },
+      email: email,
+      name: login,
+      avatar: image_url,
+      coalition,
       socialChannel: 'intra',
     });
+
+    // console.log("User is", user);
 
     return { ...user };
   }
