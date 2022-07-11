@@ -4,13 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
-import { AppService, AuthModule, UserModule, MailModule, PongModule } from '.';
+import { AppService, AuthModule, UserModule, MailModule, PongModule, LobbyModule } from '.';
 
 import { PassportModule } from '@nestjs/passport';
 
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 import * as configs from 'src/config';
+import { SocketModule } from './socket';
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],
@@ -31,7 +32,9 @@ const asyncConfig = (moduleName) => ({
     UserModule,
     MailModule,
     AuthModule,
+    SocketModule,
     PongModule,
+    LobbyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

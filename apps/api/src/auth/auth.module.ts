@@ -16,7 +16,6 @@ import { MailModule } from 'src/mail/mail.module';
 import { ForgotPasswordToken } from './entities/forgot-password-token.entity';
 import { AuthSerializer } from 'src/providers/serialization.provider';
 import { AuthService } from './services/auth.service';
-import { GoogleOAuthController } from './controllers/google-oauth.controller';
 import { OAuthService } from './services/oauth.service';
 import { IntraOAuthController } from './controllers/intra-oauth.controller';
 import { PasswordService } from './services/password-auth.service';
@@ -25,6 +24,7 @@ import { TwoFactorAuthenticationService } from './services/twoFactorAuthenticati
 import { ConfigService } from '@nestjs/config';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
+import { PongModule } from 'src/pong';
 
 @Module({
   providers: [
@@ -35,10 +35,11 @@ import Redis from 'ioredis';
     AuthSerializer,
     PasswordService,
     ...Object.values(strategies),
-  ],
+],
   imports: [
     UserModule,
     MailModule,
+    PongModule,
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => config.get('jwt'),
       inject: [ConfigService],
@@ -52,7 +53,6 @@ import Redis from 'ioredis';
   exports: [AuthService, PasswordService, JwtStrategy],
   controllers: [
     AuthController,
-    GoogleOAuthController,
     IntraOAuthController,
     TwoFactorAuthenticationController,
   ],
@@ -63,20 +63,25 @@ export class AuthModule implements NestModule {
     private readonly configService: ConfigService,
   ) {}
   configure(consumer: MiddlewareConsumer) {
-    const store = new (RedisStore(session))({
-      client: this.client,
-      logErrors: true,
-    });
-    const passportConfig = this.configService.get('passport');
-    consumer
-      .apply(
-        session({
-          store,
-          ...passportConfig,
-        }),
-        passport.initialize(),
-        passport.session(),
-      )
-      .forRoutes('*');
+
+    /**
+     * Inutile depuis qu'on n'utilise plus passport session
+     */
+
+    // const store = new (RedisStore(session))({
+    //   client: this.client,
+    //   logErrors: true,
+    // });
+    // const passportConfig = this.configService.get('passport');
+    // consumer
+    //   .apply(
+        // session({
+        //   // store,
+        //   ...passportConfig,
+        // }),
+        // passport.initialize(),
+        // passport.session(),
+      // )
+      // .forRoutes('*');
   }
 }
