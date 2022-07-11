@@ -16,16 +16,16 @@
       <LobbyCard
         :id="0"
         name="MatchMaking"
-        subhead="Found the regular opponent"
+        subhead="Find the regular opponent"
         avatar="/matchmaking.png"
       >
         <q-circular-progress
           show-value
-          class="text-light-blue q-ma-md"
+          class="text-primary q-ma-md"
           :value="3"
           indeterminate
           size="50px"
-          color="light-blue"
+          color="primary"
         /> Searching players
       </LobbyCard>
       <LobbyCard

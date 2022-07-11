@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 00:43:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/12 01:46:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,9 @@ export const useLobbiesStore = defineStore('lobbies', {
     },
     async createLobby(lobbyName: string) {
       try {
-        this.lobbies = await lobbiesApi.post('create');
+        this.lobbies = await lobbiesApi.post('create', {
+          name: lobbyName
+        });
       } catch (err) {
         console.log("err", err);
         Notify.create({

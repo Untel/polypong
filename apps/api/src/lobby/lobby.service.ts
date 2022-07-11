@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 23:14:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/12 01:48:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ export class LobbyService {
   }
 
   async getLobbies(): Promise<Lobby[]> {
-    const lobbies: any = await this.store.get('*') || [];
+    const lobbies: any = await this.store.get('game:*') || [];
     console.log("Lobbies", lobbies);
     return [...(lobbies)];
   }
 
   async getLobby(id: LobbyId): Promise<Lobby> {
-    return await this.store.get(`${id}`);
+    return await this.store.get(`game:${id}`);
   }
 
 
