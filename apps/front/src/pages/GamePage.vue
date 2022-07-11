@@ -24,13 +24,8 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl"
-        :map="mapProps"
-        :paddles="paddles"
-        :balls="balls"
-        :powers="powers"
-        @paddleMove="updatePaddlePercent"
-      >
+      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls" :powers="powers"
+        @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
@@ -48,11 +43,11 @@
       {{ tickValue }}
     </pre>
     <pre style="background-color: grey;">
-      El : {{ usedRatio }}
+      <!-- El : {{ usedRatio }}
       Pause : {{ isPaused }} {{ typeof (isPaused) }}
       Ball : {{ balls }}
       Paddle : {{ paddles }}
-      Info : {{ info }}
+      Info : {{ info }} -->
     </pre>
   </q-page>
 </template>
@@ -133,7 +128,7 @@ const powersUpdate = (res) => {
   powers.value = res;
 };
 
-const printTimer = ({ timer }: {timer: number}) => {
+const printTimer = ({ timer }: { timer: number }) => {
   Notify.create({
     timeout: timer,
     progress: true,
