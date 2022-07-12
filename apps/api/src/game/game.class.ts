@@ -3,42 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 10:08:43 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/12 18:42:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { Server, Socket } from 'socket.io';
-import Redis from 'ioredis';
-import RedisBridge from './redis.bridge';
+import { Server } from 'socket.io';
 import Store from 'redis-json';
 import { Bot } from '.';
-import { debounce } from 'lodash';
-import {
-  lineInterpolate,
-  polygonRegular,
-  lineAngle,
-  angleToDegrees,
-  pointOnLine,
-  pointWithLine,
-  Line,
-  pointInPolygon,
-  angleReflect,
-  Point,
-  polygonCentroid,
-  lineLength,
-  lineIntersectsLine,
-  angleToRadians,
-} from 'geometric';
-
-import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
-
+import { pointOnLine, Line } from 'geometric';
+import { Collider2d, Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
-
 import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
@@ -68,8 +47,6 @@ export default class Game {
   paddles: Paddle[] = [];
   walls: Wall[] = [];
   powers: Power[] = [];
-  speed = 10;
-  edges: any;
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
 
@@ -99,9 +76,7 @@ export default class Game {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
-    // console.log('Generating a new map');
-    // console.log('Edges', this.edges);
-    // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
+
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
@@ -112,9 +87,6 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    // this.paddles = playerEdges.map((line, idx) => {
-    //   return new Paddle(line, idx, 0.4);
-    // });
     for (let i = 0; i < this.nBall; i++) this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
