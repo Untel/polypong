@@ -36,8 +36,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly passwordService: PasswordService,
-    private readonly userService: UserService,
-    // private readonly socketGateway: SocketGateway,
+    private readonly userService: UserService, // private readonly socketGateway: SocketGateway,
   ) {}
   logger = new Logger('AuthController');
 
@@ -194,5 +193,4 @@ export class AuthController {
     this.logger.log(`in auth/password/reset, body.token = ${body.token}\n`);
     this.passwordService.resetPassword(body.token, body.password);
   }
-
 }

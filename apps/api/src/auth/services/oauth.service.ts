@@ -18,7 +18,9 @@ export class OAuthService {
     }
 
     // if there's as user already registered under that email, return it
-    const existingUser: User = await this.userService.find({ email: user.email });
+    const existingUser: User = await this.userService.find({
+      email: user.email,
+    });
     if (existingUser) {
       return existingUser;
     }

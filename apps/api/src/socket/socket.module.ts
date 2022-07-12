@@ -7,8 +7,8 @@ import { SocketController } from './socket.controller';
 
 @Module({
   imports: [PongModule, AuthModule],
-  controllers: [SocketController, ],
-  providers: [SocketGateway, SocketService, ],
+  controllers: [SocketController],
+  providers: [SocketGateway, SocketService],
   exports: [SocketGateway, SocketService],
 })
 export class SocketModule {}

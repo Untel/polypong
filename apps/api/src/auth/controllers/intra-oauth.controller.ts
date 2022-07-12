@@ -14,9 +14,7 @@ import { AuthService } from '../services/auth.service';
 import url from 'url';
 @Controller('auth/intra')
 export class IntraOAuthController {
-  constructor(
-    private authService: AuthService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   logger = new Logger('IntraOAuthController');
 
@@ -28,9 +26,9 @@ export class IntraOAuthController {
   @UseGuards(IntraOAuthGuard)
   async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
     this.logger.log(`@Get() auth/intra/callback`);
-    console.log("Auth inner query 2", req.query);
+    console.log('Auth inner query 2', req.query);
     const user = req.user;
-    const token = this.authService.getToken({ ...user as any });
+    const token = this.authService.getToken({ ...(user as any) });
     if (user.isTwoFactorAuthenticationEnabled) {
       return res.send({
         isTwoFactorAuthenticationEnabled: true,
@@ -39,9 +37,11 @@ export class IntraOAuthController {
     }
 
     this.logger.log(`@Post(login), returning user`);
-    return res.redirect(url.format({
-      pathname: '/',
-      query: { token }
-    }));
+    return res.redirect(
+      url.format({
+        pathname: '/',
+        query: { token },
+      }),
+    );
   }
 }

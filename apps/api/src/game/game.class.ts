@@ -61,7 +61,7 @@ export default class Game {
   store: Store;
 
   balls: Ball[] = [];
-  nBall: number = 1;
+  nBall = 1;
   bots: Bot[] = [];
   nPlayers: number;
   nBots: number;
@@ -95,7 +95,6 @@ export default class Game {
     this.balls.push(ball);
   }
 
-
   generateMap(nPlayers: number) {
     this.balls = [];
     this.powers = [];
@@ -116,16 +115,14 @@ export default class Game {
     // this.paddles = playerEdges.map((line, idx) => {
     //   return new Paddle(line, idx, 0.4);
     // });
-    for (let i = 0; i < this.nBall; i++)
-      this.addBall();
+    for (let i = 0; i < this.nBall; i++) this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
   }
 
   spawnBots(botNb: number) {
-
     for (let i = 0; i < botNb; i++) {
-      const tmp: Bot = new Bot(this.walls[i], i)
+      const tmp: Bot = new Bot(this.walls[i], i);
       this.bots.push(tmp);
     }
   }
@@ -146,7 +143,7 @@ export default class Game {
   updatePaddlePercent(percent: number) {
     // console.log("here is percent", percent);
     // this.paddles.forEach((paddle) => {
-    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent)
+    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent);
     // paddle.updatePercentOnAxis(percent);
     // });
     // if (this.isPaused) debounce(
@@ -155,10 +152,7 @@ export default class Game {
     // );
   }
 
-
-
   runPhysics() {
-
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle: Paddle = ball.target.wall.paddle;
@@ -173,7 +167,11 @@ export default class Game {
             ball.bouncePaddle(paddle, this.walls);
           } else {
             // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+            if (
+              TEST_MODE ||
+              (this.mode === MODE.Coalition &&
+                paddle.color === ball.lastHitten.color)
+            ) {
               ball.bounceTargetWall(this.walls);
             } else {
               this.reduce();
@@ -189,16 +187,15 @@ export default class Game {
   }
 
   runBots() {
-    this.bots.forEach(e => {
+    this.bots.forEach((e) => {
       e.think();
-    })
+    });
   }
 
   public reduce() {
     this.stop();
     // if (this.nPlayers > 4)
-    if (this.nPlayers > 2)
-      this.nPlayers--;
+    if (this.nPlayers > 2) this.nPlayers--;
     // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
     const timer = 1000;
@@ -215,7 +212,6 @@ export default class Game {
       this.bots.pop();
     }
     this.spawnBots(this.nBots);
-
   }
   // Getters
   public get isPaused() {
@@ -279,19 +275,31 @@ export default class Game {
         if (power.collideWithBall(currBall)) {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
-          console.log("removing power", this.powers.length);
-          this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+          console.log('removing power', this.powers.length);
+          this.socket.emit(
+            'powers',
+            this.powers.map((p) => p.netScheme),
+          );
         }
       }
     }
   }
 
   public addRandomPower() {
-    const powerClass = PowerList[GameTools.getRandomArbitrary(0, PowerList.length)]
+    const powerClass =
+      PowerList[GameTools.getRandomArbitrary(0, PowerList.length)];
     const powerObj: Power = new powerClass(this, this.map.randomPosition());
     this.powers.push(powerObj);
-    console.log("Adding new power", powerObj.name, Object.keys(powerObj), typeof powerObj);
-    this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+    console.log(
+      'Adding new power',
+      powerObj.name,
+      Object.keys(powerObj),
+      typeof powerObj,
+    );
+    this.socket.emit(
+      'powers',
+      this.powers.map((p) => p.netScheme),
+    );
   }
 
   public tick() {

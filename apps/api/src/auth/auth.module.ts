@@ -35,7 +35,7 @@ import { PongModule } from 'src/pong';
     AuthSerializer,
     PasswordService,
     ...Object.values(strategies),
-],
+  ],
   imports: [
     UserModule,
     MailModule,
@@ -63,11 +63,9 @@ export class AuthModule implements NestModule {
     private readonly configService: ConfigService,
   ) {}
   configure(consumer: MiddlewareConsumer) {
-
     /**
      * Inutile depuis qu'on n'utilise plus passport session
      */
-
     // const store = new (RedisStore(session))({
     //   client: this.client,
     //   logErrors: true,
@@ -75,13 +73,13 @@ export class AuthModule implements NestModule {
     // const passportConfig = this.configService.get('passport');
     // consumer
     //   .apply(
-        // session({
-        //   // store,
-        //   ...passportConfig,
-        // }),
-        // passport.initialize(),
-        // passport.session(),
-      // )
-      // .forRoutes('*');
+    // session({
+    //   // store,
+    //   ...passportConfig,
+    // }),
+    // passport.initialize(),
+    // passport.session(),
+    // )
+    // .forRoutes('*');
   }
 }

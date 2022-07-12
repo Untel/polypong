@@ -33,7 +33,7 @@ export default class MyPolygon {
   constructor(npoints, x = 0, y = 0, radius = 50) {
     this.center = new Vector(x, y);
     this.inradius = radius - 5;
-    console.log("In radius", this.inradius);
+    console.log('In radius', this.inradius);
     if (npoints === 2) {
       // this.verticles = [
       //   [-50, 50],
@@ -76,8 +76,8 @@ export default class MyPolygon {
     const r = this.inradius * Math.sqrt(Math.random());
     const theta = Math.random() * 2 * Math.PI;
 
-    const x = r * Math.cos(theta)
-    const y = r * Math.sin(theta)
+    const x = r * Math.cos(theta);
+    const y = r * Math.sin(theta);
 
     return new Vector(x, y);
   }

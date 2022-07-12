@@ -10,7 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Controller, Get, Post, Delete, Param, Body, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
@@ -19,9 +28,7 @@ import { LobbyService } from './lobby.service';
 
 @Controller('lobbies')
 export class LobbyController {
-  constructor(
-    private readonly lobbyService: LobbyService,
-  ) {}
+  constructor(private readonly lobbyService: LobbyService) {}
 
   @UseGuards(JwtGuard)
   @Get()
@@ -39,11 +46,9 @@ export class LobbyController {
   @UseGuards(JwtGuard)
   @Post('/create')
   createLobby(@Req() req: RequestWithUser, @Body('name') name) {
-    console.log("Create lobby", req.user.name, name);
+    console.log('Create lobby', req.user.name, name);
     const host = req.user;
-    this.lobbyService.createLobby(
-      host.id
-    );
+    this.lobbyService.createLobby(host.id);
   }
 
   // @Get('/createLobby')

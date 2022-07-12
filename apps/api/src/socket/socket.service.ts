@@ -10,29 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SocketGateway } from './socket.gateway';
 import { AuthSocket } from './ws-auth.middleware';
 
 @Injectable()
 export class SocketService {
-  constructor(
-    private readonly socketGateway: SocketGateway,
-  ) {}
+  constructor(private readonly socketGateway: SocketGateway) {}
 
   public get sockets() {
     return [...this.socketGateway.server.sockets.sockets.values()];
   }
 
   public get connectedUsers() {
-    return this.sockets
-      .map((el: AuthSocket) => el.user);
+    return this.sockets.map((el: AuthSocket) => el.user);
   }
 
   getUserSocket(userID) {
-    return this.sockets
-      .find((el: AuthSocket) => el.user.id === userID);
+    return this.sockets.find((el: AuthSocket) => el.user.id === userID);
   }
 }

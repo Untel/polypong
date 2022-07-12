@@ -29,13 +29,14 @@ export class UserService {
     return true;
   }
   setSocketAsDisconnected(socketId: string) {
-    const user = [...this.connectedUsers.entries()]
-      .find(([uId, sId]) => sId === socketId);
+    const user = [...this.connectedUsers.entries()].find(
+      ([uId, sId]) => sId === socketId,
+    );
     if (user) {
-      this.connectedUsers.delete(user[0])
+      this.connectedUsers.delete(user[0]);
     }
   }
-  userConnectedSocketId(id: number) : string {
+  userConnectedSocketId(id: number): string {
     return this.connectedUsers.get(id);
   }
 
@@ -173,7 +174,5 @@ export class UserService {
     return localUser.avatar;
   }
 
-  setIsConnected() {
-
-  }
+  setIsConnected() {}
 }

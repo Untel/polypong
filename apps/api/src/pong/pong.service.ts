@@ -30,11 +30,7 @@ export class PongService {
   tmpGame: Game = null;
 
   constructor(
-    @InjectRedis() private readonly redis: Redis,
-    // @Inject(forwardRef(() => SocketGateway))
-    // private readonly socketGateway: SocketGateway,
-
-    // private readonly userService: UserService,
+    @InjectRedis() private readonly redis: Redis, // @Inject(forwardRef(() => SocketGateway)) // private readonly socketGateway: SocketGateway, // private readonly userService: UserService,
   ) {
     // this.socketServer = socketGateway.server;
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });

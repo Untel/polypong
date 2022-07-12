@@ -43,10 +43,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     return data;
   }
 
-  async validate(
-    accessToken: string,
-    redirect: string
-  ): Promise<any> {
+  async validate(accessToken: string, redirect: string): Promise<any> {
     this.logger.log(`validate`, redirect);
     const data = await this.getUserProfile(accessToken);
     // this.logger.log(`data = ${data}`);

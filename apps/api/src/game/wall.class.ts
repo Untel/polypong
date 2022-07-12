@@ -35,12 +35,12 @@ export class Wall {
   }
   clearBall(target: Ball) {
     if (this.bot) {
-      this.bot.popBall(target)
+      this.bot.popBall(target);
     }
   }
   addBall(target: Ball) {
     if (this.bot) {
-      this.bot.addBall(target)
+      this.bot.addBall(target);
     }
   }
 

@@ -21,7 +21,7 @@ import { RegisterUserDto } from '../dtos/register-user.dto';
 import TokenPayload from '../interfaces/tokenPayload.interface';
 import { authenticator } from 'otplib';
 
-export interface UserJwtPayload extends JwtPayload, User {};
+export interface UserJwtPayload extends JwtPayload, User {}
 @Injectable()
 export class AuthService {
   constructor(
@@ -160,14 +160,12 @@ export class AuthService {
   }
 
   public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
-    console.log("Checking token", token);
+    console.log('Checking token', token);
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
     return payload;
   }
 
-  public async logout(userID) {
-
-  }
+  public async logout(userID) {}
 }

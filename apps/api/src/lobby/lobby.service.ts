@@ -22,7 +22,6 @@ import Store from 'redis-json';
 
 @Injectable()
 export class LobbyService {
-
   lobbies = new Map<LobbyId, Lobby>();
   store: Store<Lobby>;
 
@@ -31,22 +30,21 @@ export class LobbyService {
   }
 
   async getLobbies(): Promise<Lobby[]> {
-    const lobbies: any = await this.store.get('game:*') || [];
-    console.log("Lobbies", lobbies);
-    return [...(lobbies)];
+    const lobbies: any = (await this.store.get('game:*')) || [];
+    console.log('Lobbies', lobbies);
+    return [...lobbies];
   }
 
   async getLobby(id: LobbyId): Promise<Lobby> {
     return await this.store.get(`game:${id}`);
   }
 
-
   clearLobbies() {
     this.store.clearAll();
   }
 
   async createLobby(hostId: LobbyId) {
-    console.log("Host id", hostId);
+    console.log('Host id', hostId);
     await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
     return this.getLobby(hostId);
   }
