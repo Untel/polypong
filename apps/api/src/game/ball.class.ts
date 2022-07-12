@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 10:08:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/12 02:16:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ import { Wall } from './wall.class';
 import { Paddle } from './paddle.class';
 export class Ball extends Circle {
   _speed = 1;
-  maxSpeed = 1.5;
+  maxSpeed = 2;
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;

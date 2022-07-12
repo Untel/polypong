@@ -11,7 +11,8 @@ export class Bot extends Player {
     wall: Wall;
     tasks: Ball[] = [];
     id: number;
-    dir: number;
+    // dir: number;
+    level: number = 2;
     constructor(wall: Wall, id: number) {
         super(id);
         // this.botPaddle = paddle;
@@ -21,11 +22,42 @@ export class Bot extends Player {
         this.id = id;
     }
     think() {
+        switch (this.level) {
+            case 1:
+                this.level1();
+                break;
+            case 2:
+                this.level2();
+                this.level1();
+        }
         // console.log("thinking")
-        if (this.tasks.length === 0)
-            return; //Maybe go towards center instead?
-        const focus: Ball = this.tasks[0];
-        // let distToTgt = lineLength([lineMidpoint(this.wall.paddle.line), focus.targetInfo.actualhit]);
+
+
+        // }
+    }
+    level2() {
+        if (this.tasks.length !== 0 || this.wall.paddle.ratio === 0.5) {
+            return;
+        }
+        let offset: number;
+        const ratio: number = this.wall.paddle.ratio;
+        offset = (this.wall.paddle.ratio > 0.5) ? -0.01 : + 0.01;
+        if ((offset > 0 && (offset + ratio > 0.5)) || (offset < 0 && (offset + ratio < 0.5))) {
+            this.wall.paddle.updatePercentOnAxis(0.5);
+        }
+        else {
+            this.wall.paddle.updatePercentOnAxis(ratio + offset);
+        }
+
+    }
+    level1(id: number = 0) {
+        if (this.tasks.length === 0) {
+            return;
+        }
+
+        const focus: Ball = this.tasks[id];
+        // console.log(this.tasks.length);
+
         let rSideDist = lineLength([this.wall.paddle.line[1], focus.targetInfo.actualhit]);
         let lSideDist = lineLength([this.wall.paddle.line[0], focus.targetInfo.actualhit]);
 
@@ -43,8 +75,6 @@ export class Bot extends Player {
                 (this.wall.paddle.ratio + 0.01) <= 1 ?
                     this.wall.paddle.ratio + 0.01 : 1)
         }
-
-        // }
     }
     popBall(target: Ball) {
         this.tasks.splice(this.tasks.indexOf(target), 1)
