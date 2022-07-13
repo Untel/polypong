@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 03:55:37 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/13 12:22:08 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,8 +160,28 @@ export default class Game {
   runPhysics() {
 
     this.balls.forEach((ball) => {
-      if (ball.targetDistance <= ball.targetInfo.limit) {
+
+
+
+      let jump: boolean = lineLength([[ball.position.x, ball.position.y], [ball.position.x + ball.direction.x, ball.position.y + ball.direction.y]]) > ball.targetDistance
+      // if (lineLength([[ball.position.x, ball.position.y], [ball.position.x + ball.direction.x, ball.position.y + ball.direction.y]]) > ball.targetDistance) { }
+      // {
+      // if (ball.targetDistance <= ball.targetInfo.limit)
+      //   jump = false;
+      //   // ball.position.x = ball.targetInfo.actualhit[0];
+      //   // ball.position.x = ball.targetInfo.actualhit[1];
+      // }
+
+      // jump = false;
+      if ((ball.targetDistance <= ball.targetInfo.limit) || jump) {
+        if (jump) {
+          // console.log("currnet is", ball.position)
+          // console.log("Moving to is ", ball.targetInfo.actualhit)
+          ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * 0.50;
+          ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * 0.50;
+        }
         const paddle: Paddle = ball.target.wall.paddle;
+
         if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.targetInfo.actualhit,
@@ -183,8 +203,16 @@ export default class Game {
           ball.bounceTargetWall(this.walls);
         }
         ball.increaseSpeed();
+
       }
-      ball.move();
+      // if (jump) {
+      //   ball.position.x = ball.targetInfo.actualhit[0];
+      //   ball.position.y = ball.targetInfo.actualhit[1];
+      // }
+      if (!jump)
+        ball.move();
+
+
     });
   }
 

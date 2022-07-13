@@ -41,6 +41,10 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.players.set(player.socketId, player);
     player.inLobby = this.id;
   }
+  renameLobby(newName: string) {
+    this.name = newName;
+  }
+
 
   start(): Game {
     // this.game = new Game(this);

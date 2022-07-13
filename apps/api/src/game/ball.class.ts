@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/13 10:53:17 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/13 12:27:31 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ import { Wall } from './wall.class';
 import { Paddle } from './paddle.class';
 export class Ball extends Circle {
   _speed = 1;
-  maxSpeed = 1.5;
+  maxSpeed = 10;
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
@@ -119,14 +119,14 @@ export class Ball extends Circle {
           A: 90
         }
 
-        const test: Triangle = new Triangle(values);
-        test.solve()
-        normvector.scale(test.sides.c);
+        const triangle: Triangle = new Triangle(values)
+        triangle.solve();
+        normvector.scale(triangle.sides.c);
 
 
         this.targetInfo = {
           actualhit: [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])],
-          limit: test.sides.a,
+          limit: triangle.sides.a,
           edgeIndex: i,
           edge,
           ...intersection,
@@ -207,6 +207,7 @@ export class Ball extends Circle {
       this.speed = this.maxSpeed;
       // console.log("Max ball speed reached");
     }
+    // console.log("new speed is", this.speed)
   }
 
   /**
@@ -218,8 +219,18 @@ export class Ball extends Circle {
       [this.position.x, this.position.y],
       this.target.hit,
     ]);
+    // let test = lineLength()
     return length;
   }
+
+  // public get actualTargetDistance() {
+  //   const length = lineLength([
+  //     [this.targetInfo.actualhit[0], this.targetInfo.actualhit[1]],
+  //     this.target.hit,
+  //   ]);
+  //   // let test = lineLength()
+  //   return length;
+  // }
 
   public get point(): Point {
     return [this.position.x, this.position.y];
