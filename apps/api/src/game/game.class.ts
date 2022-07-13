@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/13 16:49:51 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/13 17:24:20 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,21 +161,13 @@ export default class Game {
 
     this.balls.forEach((ball) => {
 
-      const targetDistance = ball.targetDistance;
-      let jump: boolean = ball.direction.len() > targetDistance
-
-      // let jump: boolean = lineLength([[ball.position.x, ball.position.y], [ball.position.x + ball.direction.x, ball.position.y + ball.direction.y]]) > ball.targetDistance
-      // if (lineLength([[ball.position.x, ball.position.y], [ball.position.x + ball.direction.x, ball.position.y + ball.direction.y]]) > ball.targetDistance) { }
-      // {
-      // if (ball.targetDistance <= ball.targetInfo.limit)
-      //   jump = false;
-      //   // ball.position.x = ball.targetInfo.actualhit[0];
-      //   // ball.position.x = ball.targetInfo.actualhit[1];
-      // }
+      const targetDistance: number = ball.targetDistance;
+      // const jump: boolean = ball.direction.len() > targetDistance
+      const test: number = targetDistance / ball.direction.len()
 
       // jump = false;
-      if (jump || (targetDistance <= ball.targetInfo.limit)) {
-        if (jump && !(targetDistance <= ball.targetInfo.limit)) {
+      if (test < 1 || (targetDistance <= ball.targetInfo.limit)) {
+        if (test < 1 && !(targetDistance <= ball.targetInfo.limit)) {
           // console.log("Jump !");
           const ratio: number = targetDistance / ball.direction.len()
           ball.position.x += (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
