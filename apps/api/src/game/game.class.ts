@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 02:15:11 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/12 03:55:37 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,8 @@ export default class Game {
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 20;
-    this.nBots = 20;
+    this.nPlayers = 5;
+    this.nBots = 5;
     this.generateMap(this.nPlayers);
     this.spawnBots(this.nBots);
   }

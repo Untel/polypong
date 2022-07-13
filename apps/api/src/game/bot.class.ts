@@ -10,16 +10,17 @@ export class Bot extends Player {
     edge: Line;
     wall: Wall;
     tasks: Ball[] = [];
-    id: number;
+    // id: number;
     // dir: number;
-    level: number = 2;
-    constructor(wall: Wall, id: number) {
+    level: number;
+    constructor(wall: Wall, id: number, level: number = 1) {
         super(id);
+        this.level = level;
         // this.botPaddle = paddle;
         // this.wall = paddle.
         this.wall = wall;
-        this.wall.addBot(this);
-        this.id = id;
+        wall.addBot(this);
+        // this.id = id;
     }
     think() {
         switch (this.level) {
