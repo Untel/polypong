@@ -13,7 +13,7 @@ export class Bot extends Player {
     // id: number;
     // dir: number;
     level: number;
-    constructor(wall: Wall, id: number, level: number = 1) {
+    constructor(wall: Wall, id: number, level: number = 2) {
         super(id);
         this.level = level;
         // this.botPaddle = paddle;
