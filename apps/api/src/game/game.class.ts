@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/13 16:25:18 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/13 16:49:51 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,8 +177,11 @@ export default class Game {
       if (jump || (targetDistance <= ball.targetInfo.limit)) {
         if (jump && !(targetDistance <= ball.targetInfo.limit)) {
           // console.log("Jump !");
-          ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * 0.50;
-          ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * 0.50;
+          const ratio: number = targetDistance / ball.direction.len()
+          ball.position.x += (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
+          ball.position.y += (ball.target.hit[1] - ball.position.y) * (ratio)//0.90;
+          // ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * (ratio)//0.90;
+          // ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * (ratio)//0.90;
         }
         const paddle: Paddle = ball.target.wall.paddle;
 
