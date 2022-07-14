@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 02:43:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 04:41:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@ type Lobby = {
   description: string;
   isPrivate?: boolean;
   host: {
-    avatar: string,
-    name: string,
-    id: number,
+    user: {
+      avatar: string,
+      name: string,
+      id: number,
+    }
   }
 };
 

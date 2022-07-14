@@ -13,7 +13,7 @@ export interface ILobby {
 
 export interface ILobbyConfig {
   name: string;
-  playerMax: number;
+  playersMax: number;
   spectatorsMax: number;
 }
 
@@ -21,7 +21,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   id: LobbyId;
   name: string;
-  playerMax: number;
+  playersMax: number;
 
   @Type(() => Player)
   host: Player;
@@ -40,7 +40,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.players = new Map<number, Player>();
     this.addPlayer(host);
     this.spectators = [];
-    this.playerMax = 8;
+    this.playersMax = 8;
     this.spectatorsMax = 10;
   }
 
@@ -56,7 +56,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   configure(opts: ILobbyConfig) {
     if (opts.name) this.name = opts.name;
-    if (opts.playerMax) this.playerMax = opts.playerMax;
+    if (opts.playersMax) this.playersMax = opts.playersMax;
     if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
   }
 }

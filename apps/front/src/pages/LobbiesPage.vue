@@ -42,8 +42,8 @@
       <LobbyCard
         v-for="lobby of lobbies.getLobbies"
         :name="lobby.name || 'Unamed lobby'"
-        :subhead="lobby.description || ''"
-        :avatar="lobby.host.avatar"
+        :subhead="`${lobby.host.user.name}'s party`"
+        :avatar="lobby.host.user.avatar"
         :is-private="lobby.isPrivate"
       >
         <q-circular-progress
