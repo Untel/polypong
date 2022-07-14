@@ -21,9 +21,11 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Exclude()
   @Column({ nullable: true })
   twoFactorAuthenticationSecret?: string;
 
+  @Exclude()
   @Column({ default: false })
   public isTwoFactorAuthenticationEnabled: boolean;
 
@@ -43,6 +45,7 @@ export class User {
   })
   coalition: CoalitionChoice;
 
+  @Exclude()
   @Column({ nullable: true })
   password: string;
 
@@ -58,9 +61,11 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
+  @Exclude()
   @CreateDateColumn()
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn()
   updatedAt: Date;
 

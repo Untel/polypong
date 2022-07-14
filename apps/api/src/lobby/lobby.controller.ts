@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 01:44:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 03:18:18 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,14 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Delete,
   Param,
   Body,
   Req,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
@@ -32,23 +35,32 @@ export class LobbyController {
 
   @UseGuards(JwtGuard)
   @Get()
-  lobbies(): Promise<Lobby[]> {
+  async lobbies(): Promise<Lobby[]> {
     return this.lobbyService.getLobbies();
   }
 
   @UseGuards(JwtGuard)
   @Get('/:id')
   async getLobby(@Param('id') id: LobbyId): Promise<Lobby> {
-    const lobby = await this.lobbyService.getLobby(id);
+    const lobby = this.lobbyService.getLobby(id);
     return lobby;
   }
 
   @UseGuards(JwtGuard)
-  @Post('/create')
+  @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
   createLobby(@Req() req: RequestWithUser, @Body('name') name) {
+    const host = req.user;
+    const lobby = this.lobbyService.createLobby(host);
+    return lobby;
+  }
+
+  @UseGuards(JwtGuard)
+  @Put()
+  updateLobby(@Req() req: RequestWithUser, @Body('name') name) {
     console.log('Create lobby', req.user.name, name);
     const host = req.user;
-    this.lobbyService.createLobby(host.id);
+    // this.lobbyService.updateLobby(host.id);
   }
 
   // @Get('/createLobby')

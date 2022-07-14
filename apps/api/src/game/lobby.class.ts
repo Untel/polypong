@@ -1,12 +1,13 @@
 import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
+import { Transform, Type } from 'class-transformer';
 
 export type LobbyId = number;
 
 export interface ILobby {
   id: LobbyId;
-  players: Map<string, Player>;
+  players: Map<number, Player>;
   spectators: Spectator[];
 }
 
@@ -17,20 +18,26 @@ export interface ILobbyConfig {
 }
 
 export default class Lobby implements ILobby, ILobbyConfig {
+
   id: LobbyId;
   name: string;
   playerMax: number;
+
+  @Type(() => Player)
   host: Player;
-  players: Map<string, Player>;
+
+  @Type(() => Player)
+  @Transform(({ value }) => [...value.values()], { toPlainOnly: true })
+  players: Map<number, Player>;
+
   spectatorsMax: number;
   spectators: Spectator[];
   game: Game | null;
 
-  constructor(id: LobbyId, host: Player) {
-    this.id = id;
+  constructor(host: Player) {
     this.name = 'Unamed lobby';
     this.host = host;
-    this.players = new Map<string, Player>();
+    this.players = new Map<number, Player>();
     this.addPlayer(host);
     this.spectators = [];
     this.playerMax = 8;
@@ -38,7 +45,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   }
 
   addPlayer(player: Player) {
-    this.players.set(player.socketId, player);
+    this.players.set(player.id, player);
     player.inLobby = this.id;
   }
 

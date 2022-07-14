@@ -11,7 +11,7 @@ import {
   pointOnLine,
 } from 'geometric';
 import GameTools from './gametools.class';
-export class Bot extends Player {
+export class Bot {
   botPaddle: Paddle;
   maxSpeed: number;
   edge: Line;
@@ -20,7 +20,7 @@ export class Bot extends Player {
   id: number;
   dir: number;
   constructor(wall: Wall, id: number) {
-    super(id);
+    // super(id);
     // this.botPaddle = paddle;
     // this.wall = paddle.
     this.wall = wall;

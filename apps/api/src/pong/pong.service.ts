@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 23:14:22 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 02:57:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ export class PongService {
   ) {
     // this.socketServer = socketGateway.server;
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });
-    setTimeout(() => {
-      // console.log('In constrcutor service', this.socketServer);
-      this.tmpGame = new Game(
-        this.socketServer,
-        this.store,
-        new Lobby(0, new Player(0)),
-      );
-    }, 3000);
+    // setTimeout(() => {
+    //   // console.log('In constrcutor service', this.socketServer);
+    //   this.tmpGame = new Game(
+    //     this.socketServer,
+    //     this.store,
+    //     new Lobby(0, new Player(0)),
+    //   );
+    // }, 3000);
   }
 
   generateId() {

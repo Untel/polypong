@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 01:46:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 02:43:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,48 +51,48 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      this.lobbies = [{
-        id: 75,
-        name: 'Partie de Adrien',
-        description: 'Venez vous zamuze le zami ^^',
-        spectatorsMax: 50,
-        playersMax: 8,
-        players: [1,2,3,4,5,6],
-        spectators: [],
-        host: {
-          avatar: 'https://cdn.intra.42.fr/users/adda-sil.jpg',
-          id: 75,
-          name: 'Adrien',
-        },
-        isPrivate: true,
-      }, {
-        id: 75,
-        name: 'Partie de Enzoooo',
-        description: '1v1 noscope bg only',
-        spectatorsMax: 50,
-        playersMax: 2,
-        players: [1],
-        spectators: [],
-        host: {
-          avatar: 'https://cdn.intra.42.fr/users/edal--ce.jpg',
-          id: 75,
-          name: 'Enzooo',
-        }
-      }];
-      // try {
-      //   this.lobbies = await lobbiesApi.get('');
-      // } catch (err) {
-      //   console.log("err", err);
-      //   Notify.create({
-      //     type: 'negative',
-      //     message: "Error while fetching lobbies"
-      //   });
-      // }
+      // this.lobbies = [{
+      //   id: 75,
+      //   name: 'Partie de Adrien',
+      //   description: 'Venez vous zamuze le zami ^^',
+      //   spectatorsMax: 50,
+      //   playersMax: 8,
+      //   players: [1,2,3,4,5,6],
+      //   spectators: [],
+      //   host: {
+      //     avatar: 'https://cdn.intra.42.fr/users/adda-sil.jpg',
+      //     id: 75,
+      //     name: 'Adrien',
+      //   },
+      //   isPrivate: true,
+      // }, {
+      //   id: 75,
+      //   name: 'Partie de Enzoooo',
+      //   description: '1v1 noscope bg only',
+      //   spectatorsMax: 50,
+      //   playersMax: 2,
+      //   players: [1],
+      //   spectators: [],
+      //   host: {
+      //     avatar: 'https://cdn.intra.42.fr/users/edal--ce.jpg',
+      //     id: 75,
+      //     name: 'Enzooo',
+      //   }
+      // }];
+      try {
+        this.lobbies = await lobbiesApi.get('');
+      } catch (err) {
+        console.log("err", err);
+        Notify.create({
+          type: 'negative',
+          message: "Error while fetching lobbies"
+        });
+      }
 
     },
     async createLobby(lobbyName: string) {
       try {
-        this.lobbies = await lobbiesApi.post('create', {
+        this.lobbies = await lobbiesApi.post('', {
           name: lobbyName
         });
       } catch (err) {
