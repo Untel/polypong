@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:33:36 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 01:47:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ import {
   Line,
   Point,
   angleToDegrees,
+  lineLength,
 } from 'geometric';
 // import Polygon from 'polygon';
 
@@ -32,8 +33,6 @@ export default class MyPolygon {
 
   constructor(npoints, x = 0, y = 0, radius = 50) {
     this.center = new Vector(x, y);
-    this.inradius = radius - 5;
-    console.log('In radius', this.inradius);
     if (npoints === 2) {
       // this.verticles = [
       //   [-50, 50],
@@ -69,16 +68,15 @@ export default class MyPolygon {
     }
 
     // console.log('-- Edges', this.shape);
-    this.edgeWidth = radius;
+    this.edgeWidth = lineLength(this.edges[0]);
+    this.inradius = this.edgeWidth / ((Math.tan(Math.PI / npoints) * 2))
   }
 
   randomPosition() {
     const r = this.inradius * Math.sqrt(Math.random());
     const theta = Math.random() * 2 * Math.PI;
-
     const x = r * Math.cos(theta);
     const y = r * Math.sin(theta);
-
     return new Vector(x, y);
   }
 }

@@ -25,6 +25,10 @@
       // stroke: red;
     }
 
+    .ball {
+      box-shadow: inset 0 0 0 6px #e78267;
+    }
+
     .wall {
       fill: rgba(46, 164, 38, 0.9);
       stroke: rgba(46, 164, 38, 0.9);
@@ -56,6 +60,7 @@
 
       <polygon ref="polygonRef">
       </polygon>
+      <circle fill="#ff00001a" :r="map.inradius" :x="0" :y="0"/>
 
       <line
         v-for="(wall, idx) in map.walls || []"
@@ -72,7 +77,7 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <circle :fill="ball.color || 'yellow'" r="2"
+      <circle class="ball" :fill="ball.color || 'yellow'" r="2"
         v-for="ball in balls"
         v-bind="formatCirclePosition(ball.position)"
       />
@@ -109,7 +114,7 @@ import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
 
 const props = defineProps({
   map: {
-    type: Object as PropType<{ verticles: number[], angles: number[] }>,
+    type: Object as PropType<{ inradius: number, verticles: number[], angles: number[] }>,
     default: () => ({
       verticles: [],
       angles: [],

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 18:14:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 01:59:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ export class Ball extends Circle {
   bouncePaddle(paddle: Paddle, walls: Wall[]) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
 
     /**
      * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
@@ -195,8 +195,9 @@ export class Ball extends Circle {
     // const hitLen = lineLength([paddle.line[1], this.target.hit]);
     // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
     // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // const percent = hitLen / paddle.width - .5;
-    // const maxAngle = Math.abs(newDegree) - Math.abs(incidenceAngleDeg);
+    // // x2 pour aller de -1 a 1;
+    // const percent = ((hitLen / paddle.width) - .5) * 2;
+    // const maxAngle = Math.abs(surfaceAngleDeg - incidenceAngleDeg);
     // const addDeg = (maxAngle * percent);
     // newDegree += addDeg;
 
@@ -207,8 +208,8 @@ export class Ball extends Circle {
     this.findTarget(walls);
   }
 
-  increaseSpeed(ratio = 1.1) {
-    this.speed *= ratio;
+  increaseSpeed(ratio = (this.speed * 0.1)) {
+    this.speed += ratio;
     if (this.speed > this.maxSpeed) {
       this.speed = this.maxSpeed;
       // console.log("Max ball speed reached");

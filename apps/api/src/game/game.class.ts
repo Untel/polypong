@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/12 18:42:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 01:49:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@ import Lobby from './lobby.class';
 import { Server } from 'socket.io';
 import Store from 'redis-json';
 import { Bot } from '.';
-import { pointOnLine, Line } from 'geometric';
+import { pointOnLine, Line, angleToDegrees } from 'geometric';
 import { Collider2d, Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
@@ -23,11 +23,6 @@ import { Ball, Wall, Paddle } from '.';
 import GameTools from './gametools.class';
 
 const FRAME_RATE = 30;
-
-const col = new Collider2d();
-// col.testCirclePolygon
-// col.testPolygonCircle
-
 const TEST_MODE = true;
 
 export enum MODE {
@@ -55,11 +50,13 @@ export default class Game {
   intervalPowers: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
+    console.log("Angle: ", angleToDegrees(6.28));
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 5;
-    this.nBots = 4;
+    const rand = GameTools.getRandomArbitrary(2, 20);
+    this.nPlayers = rand;
+    this.nBots = rand - 1;
     this.generateMap(this.nPlayers);
     this.spawnBots(this.nBots);
   }
@@ -178,7 +175,8 @@ export default class Game {
   }
 
   public reset() {
-    // this.nPlayers = 1;
+    this.nPlayers = GameTools.getRandomArbitrary(3, 6);
+    this.nBots = this.nPlayers;
     this.generateMap(this.nPlayers);
     while (this.bots.length != 0) {
       this.bots.pop();
@@ -212,6 +210,7 @@ export default class Game {
       wallWith: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
+      inradius: this.map.inradius,
     };
   }
 
