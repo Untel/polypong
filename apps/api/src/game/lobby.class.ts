@@ -35,6 +35,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   game: Game | null;
 
   constructor(host: Player) {
+    this.id = host.id;
     this.name = 'Unamed lobby';
     this.host = host;
     this.players = new Map<number, Player>();

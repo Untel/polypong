@@ -33,7 +33,7 @@
         name="Create"
         subhead="Create a new lobby"
         join-text="Create"
-        @joinLobby="lobbies.createLobby(lobbyName)"
+        @joinLobby="createLobby"
       >
         <q-input label="Lobby name" dense filled v-model="lobbyName"/>
         <q-toggle label="Private" v-model="isPrivate" />
@@ -41,6 +41,7 @@
       </LobbyCard>
       <LobbyCard
         v-for="lobby of lobbies.getLobbies"
+        :key="`lobby-${lobby.id}`"
         :name="lobby.name || 'Unamed lobby'"
         :subhead="`${lobby.host.user.name}'s party`"
         :avatar="lobby.host.user.avatar"
@@ -65,17 +66,39 @@
 
 <script lang="ts" setup>
 import { useApi } from 'src/utils/api';
-import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import LobbyCard from 'src/components/LobbyCard.vue';
 import PasswordInput from "src/components/PasswordInput.vue"
+import { useRouter, useRoute } from 'vue-router';
+import { onMounted, onBeforeUnmount, ref } from 'vue';
 
-import { ref } from 'vue';
 const lobbies = useLobbiesStore();
 const { socket } = useAuthStore();
 lobbies.fetchLobbies();
 const lobbyName = ref('');
 const password = ref('');
 const isPrivate = ref(false);
-socket?.on('refreshedLobbies', lobbies.fetchLobbies);
+const router = useRouter();
+
+async function createLobby() {
+  const newLobby = await lobbies.createLobby(lobbyName.value);
+  if (newLobby) {
+    console.log('New lobby is', newLobby, newLobby.id);
+    router.push({ name: 'lobby', params: { id: newLobby.id } });
+  } else {
+    console.log('Error lulz');
+  }
+}
+
+onMounted(() => {
+  socket?.on('refreshedLobbies', lobbies.fetchLobbies);
+});
+
+onBeforeUnmount(() => {
+  socket?.off('refreshedLobbies', (args) => {
+    console.log('Removing listeners', args);
+  });
+});
+
 </script>

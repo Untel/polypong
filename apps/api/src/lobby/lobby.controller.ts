@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 03:18:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/15 09:01:23 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
+import { CurrentUser } from 'src/auth/user.decorator';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
 import { LobbyService } from './lobby.service';
@@ -47,11 +48,22 @@ export class LobbyController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('/:id/join')
+  async getLobbyAndJoin(
+    @CurrentUser() user,
+    @Param('id') id: LobbyId,
+  ): Promise<Lobby> {
+    console.log('Joining lobby', id, user);
+    const lobby = this.lobbyService.getAndJoinLobby(id, user);
+    // const socketOfJoiningUser = this.so
+    return lobby;
+  }
+
+  @UseGuards(JwtGuard)
   @Post()
   @UseInterceptors(ClassSerializerInterceptor)
-  createLobby(@Req() req: RequestWithUser, @Body('name') name) {
-    const host = req.user;
-    const lobby = this.lobbyService.createLobby(host);
+  createLobby(@CurrentUser() user, @Body('name') name) {
+    const lobby = this.lobbyService.createLobby(user);
     return lobby;
   }
 

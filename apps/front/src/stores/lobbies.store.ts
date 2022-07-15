@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 04:41:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/15 08:50:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@ import { useApi } from 'src/utils/api';
 import { useAuthStore } from './auth.store';
 import { LoadingBar, Notify } from 'quasar';
 import { mande } from 'mande';
+import router from 'src/router';
 
 export const lobbiesApi = mande(`/api/lobbies`);
 
-type Lobby = {
+export type Lobby = {
   id: number;
   name: string;
   players: Array<any>;
@@ -53,56 +54,33 @@ export const useLobbiesStore = defineStore('lobbies', {
   },
   actions: {
     async fetchLobbies() {
-      // this.lobbies = [{
-      //   id: 75,
-      //   name: 'Partie de Adrien',
-      //   description: 'Venez vous zamuze le zami ^^',
-      //   spectatorsMax: 50,
-      //   playersMax: 8,
-      //   players: [1,2,3,4,5,6],
-      //   spectators: [],
-      //   host: {
-      //     avatar: 'https://cdn.intra.42.fr/users/adda-sil.jpg',
-      //     id: 75,
-      //     name: 'Adrien',
-      //   },
-      //   isPrivate: true,
-      // }, {
-      //   id: 75,
-      //   name: 'Partie de Enzoooo',
-      //   description: '1v1 noscope bg only',
-      //   spectatorsMax: 50,
-      //   playersMax: 2,
-      //   players: [1],
-      //   spectators: [],
-      //   host: {
-      //     avatar: 'https://cdn.intra.42.fr/users/edal--ce.jpg',
-      //     id: 75,
-      //     name: 'Enzooo',
-      //   }
-      // }];
       try {
         this.lobbies = await lobbiesApi.get('');
       } catch (err) {
         console.log("err", err);
         Notify.create({
           type: 'negative',
-          message: "Error while fetching lobbies"
+          message: 'Error while fetching lobbies',
         });
       }
-
+    },
+    async fetchAndJoinLobby(lobbyId: number | string) {
+      const lobby = await lobbiesApi.get(`${lobbyId}/join`);
+      return lobby;
     },
     async createLobby(lobbyName: string) {
       try {
-        this.lobbies = await lobbiesApi.post('', {
-          name: lobbyName
+        const newLobby: Lobby = await lobbiesApi.post('', {
+          name: lobbyName,
         });
+        return newLobby;
       } catch (err) {
         console.log("err", err);
         Notify.create({
           type: 'negative',
-          message: "Error while fetching lobbies"
+          message: "Error while creating lobby",
         });
+        return null;
       }
     },
     async joinLobby(lobbyId: number) {

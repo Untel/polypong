@@ -1,12 +1,9 @@
 <template>
   <q-page padding>
     Here we should config the lobby page and wait for peoples to connect
-    <q-linear-progress v-model="isFetching" indeterminate></q-linear-progress>
-    <pre>
-      {{ isFetching }}
-      {{ data }}
-    </pre>
+    Id: {{ props.id }} {{ props }}
     <q-btn @click="start">Start game</q-btn>
+    {{ lobby }}
   </q-page>
 </template>
 
@@ -17,16 +14,16 @@ import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useApi } from 'src/utils/api';
 
 const props = defineProps({
-  lobbyId: {
+  id: {
     type: String,
     required: true,
   },
 });
 
-const { data, error, isFetching } = useApi(`pong/lobby/${props.lobbyId}`);
-
 const lobbies = useLobbiesStore();
-lobbies.joinLobby(+props.lobbyId);
+
+const lobby = lobbies.fetchAndJoinLobby(props.id);
+// lobbies.joinLobby(+props.lobbyId);
 
 const start = () => {
   // props.lobbyId =
