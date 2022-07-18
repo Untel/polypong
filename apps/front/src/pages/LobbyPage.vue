@@ -7,11 +7,12 @@
 
   <section>
     <q-form
+      ref="lobbyForm"
       @validationSuccess="onFormChange"
       >
       <q-slider
         name="playersMax"
-        v-model="lobbyForm.playersMax"
+        v-model="lobbyValues.playersMax"
         :min="2"
         :max="16"
         snap
@@ -21,11 +22,12 @@
         label-always
         label
       />
-      <q-input v-model="lobbyForm.name" label="Lobby name"
+      <q-input v-model="lobbyValues.name" label="Lobby name"
         name="name"
+        lazy-rules
         :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
       />
-    <q-btn color="primary" type="submit" label="Validate" />
+    <!-- <q-btn color="primary" type="submit" label="Validate" /> -->
     </q-form>
   </section>
   <section>
@@ -40,7 +42,7 @@
 
 <script lang="ts" setup>
 
-import { defineProps, computed, ref, reactive } from 'vue';
+import { defineProps, computed, ref, reactive, watch } from 'vue';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useApi } from 'src/utils/api';
 
@@ -53,9 +55,14 @@ const props = defineProps({
 
 const lobbies = useLobbiesStore();
 
-const lobbyForm = reactive({
+const lobbyForm = ref();
+const lobbyValues = reactive({
   name: '',
   playersMax: 8,
+});
+
+watch(lobbyValues, () => {
+  console.log("Lobby change", lobbyValues, lobbyForm.value);
 });
 
 const lobby = lobbies.fetchAndJoinLobby(props.id);
