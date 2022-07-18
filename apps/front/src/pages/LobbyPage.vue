@@ -3,48 +3,65 @@
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
     <q-btn @click="start">Start game</q-btn>
-    {{ lobby }}
 
-  <section>
-    <q-form
-      ref="lobbyForm"
-      @validationSuccess="onFormChange"
-      >
-      <q-slider
-        name="playersMax"
-        v-model="lobbyValues.playersMax"
-        :min="2"
-        :max="16"
-        snap
-        vertical
-        reverse
-        markers
-        label-always
-        label
-      />
-      <q-input v-model="lobbyValues.name" label="Lobby name"
-        name="name"
-        lazy-rules
-        :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
-      />
-    <!-- <q-btn color="primary" type="submit" label="Validate" /> -->
-    </q-form>
-  </section>
-  <section>
-    <article>
-      <code>
-        yolo
-      </code>
-    </article>
-  </section>
+    <section>
+      <q-form
+        ref="lobbyForm"
+        @validationSuccess="onFormChange"
+        >
+        <q-slider
+          name="playersMax"
+          v-model="lobby.playersMax"
+          :min="2"
+          :max="16"
+          snap
+          vertical
+          reverse
+          markers
+          label-always
+          label
+        />
+        <q-input v-model="lobby.name" label="Lobby name"
+          name="name"
+          lazy-rules
+          :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
+        />
+      <!-- <q-btn color="primary" type="submit" label="Validate" /> -->
+      </q-form>
+    </section>
+    <section>
+    </section>
   </q-page>
 </template>
 
-<script lang="ts" setup>
-
-import { defineProps, computed, ref, reactive, watch } from 'vue';
+<script lang="ts">
 import { useLobbiesStore } from 'src/stores/lobbies.store';
-import { useApi } from 'src/utils/api';
+import { Notify } from 'quasar';
+import { useAuthStore } from 'src/stores/auth.store';
+
+export default {
+  async preFetch(ctx: PreFetchOptions<any>) {
+    const { store, currentRoute, previousRoute, redirect, urlPath, publicPath } = ctx;
+    const $lobbies = useLobbiesStore();
+    const $auth = useAuthStore();
+    const id = currentRoute.params['id'] as string;
+    try {
+      const response = await $lobbies.fetchAndJoinLobby(id);
+      $lobbies.activeLobby = response;
+    } catch(err) {
+      Notify.create({
+        type: 'negative',
+        message: 'Error while joining lobby',
+      });
+      return redirect({ name: 'lobbies' });
+    }
+  },
+}
+</script>
+<script lang="ts" setup>
+import { defineProps, computed, ref, reactive, watch, onMounted } from 'vue';
+import { Lobby } from 'src/stores/lobbies.store';
+import { PreFetchOptions } from '@quasar/app-vite';
 
 const props = defineProps({
   id: {
@@ -53,20 +70,10 @@ const props = defineProps({
   },
 });
 
-const lobbies = useLobbiesStore();
+const $lobbies = useLobbiesStore();
+const lobby = $lobbies.getActiveLobby as Lobby;
 
 const lobbyForm = ref();
-const lobbyValues = reactive({
-  name: '',
-  playersMax: 8,
-});
-
-watch(lobbyValues, () => {
-  console.log("Lobby change", lobbyValues, lobbyForm.value);
-});
-
-const lobby = lobbies.fetchAndJoinLobby(props.id);
-// lobbies.joinLobby(+props.lobbyId);
 
 const start = () => {
   // props.lobbyId =
@@ -74,7 +81,7 @@ const start = () => {
 };
 
 const onFormChange = (evt) => {
-  console.log("Form changed", evt);
+  // $lobbies.up
 };
 
 const missingPlayers = computed(() => {

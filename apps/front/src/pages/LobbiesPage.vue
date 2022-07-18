@@ -32,7 +32,7 @@
         :id="-1"
         name="Create"
         subhead="Create a new lobby"
-        join-text="Create"
+        joinText="Create"
         @joinLobby="createLobby"
       >
         <q-input label="Lobby name" dense filled v-model="lobbyName"/>
@@ -46,6 +46,7 @@
         :subhead="`${lobby.host.user.name}'s party`"
         :avatar="lobby.host.user.avatar"
         :is-private="lobby.isPrivate"
+        @joinLobby="router.push({ name: 'lobby', params: { id: lobby.id } })"
       >
         <q-circular-progress
           show-value

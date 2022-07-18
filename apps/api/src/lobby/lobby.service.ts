@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/15 09:04:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/19 01:53:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,14 @@ export class LobbyService {
   getAndJoinLobby(id: LobbyId, user: User): Lobby {
     // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
+    console.log("Searching lobby", lobby, this.lobbies);
+    if (!lobby) return null;
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
     if (!socketOfJoiner) {
       console.log('This should never happen if socket is connected');
     }
-    socketOfJoiner.join('lobby');
-    console.log('User ', user.id, 'joined the lobby', id);
+    socketOfJoiner.join(`lobby-${lobby.id}`);
+    console.log('User ', user.id, 'joined the lobby', lobby.id);
     return lobby;
   }
 
