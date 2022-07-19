@@ -41,6 +41,7 @@ const routes: RouteRecordRaw[] = [
         { name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'), },
         { name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue') },
         { name: 'users', path: 'users', component: () => import('pages/UsersPage.vue') },
+        { name: 'settings', path: 'settings', component: () => import('pages/SettingsPage.vue') },
       ],
     }, {
       path: '/:catchAll(.*)*',
