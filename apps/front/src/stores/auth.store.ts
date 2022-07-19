@@ -39,6 +39,7 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
     getConnectedUsers: (state) => state.connectedUsers,
+    getUser: (state) => state.user,
   },
   actions: {
     connectToSocket() {
@@ -86,5 +87,10 @@ export const useAuthStore = defineStore('auth', {
     async fetchConnectedUsers() {
       this.connectedUsers = await onlineApi.get('/');
     },
+
+    async changeName() {
+      // change name here
+    },
+
   },
 });
