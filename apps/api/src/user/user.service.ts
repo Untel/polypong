@@ -174,6 +174,5 @@ export class UserService {
   }
 
   setIsConnected() {
-
   }
 }
