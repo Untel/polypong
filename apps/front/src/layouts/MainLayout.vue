@@ -66,8 +66,13 @@ const linksList = [{
 }, {
   title: 'Users',
   caption: 'See all connected users',
-  icon: 'fab fa-users',
+  icon: 'fa-solid fa-users',
   to: 'users',
+}, {
+  title: 'Settings',
+  caption: 'Account settings',
+  icon: 'fa-solid fa-gear',
+  to: 'settings',
 }];
 
 const miniState = ref(true);
