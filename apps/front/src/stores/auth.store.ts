@@ -21,6 +21,7 @@ import { User } from 'src/types/user';
 
 export const authApi = mande(`/api/auth`);
 export const onlineApi = mande(`/api/online`);
+export const userApi = mande(`/api/user`);
 
 type AuthState = {
   socket?: Socket | null,
@@ -35,11 +36,21 @@ export const useAuthStore = defineStore('auth', {
     user: {},
     socket: null,
     connectedUsers: [],
+    error: {},
   } as AuthState),
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
     getConnectedUsers: (state) => state.connectedUsers,
     getUser: (state) => state.user,
+  },
+  mutations: {
+    SET_USER(state, user) {
+      state.user = user;
+      state.error = {};
+    },
+    SET_ERROR(state, error) {
+      state.error = error;
+    },
   },
   actions: {
     connectToSocket() {
@@ -88,9 +99,33 @@ export const useAuthStore = defineStore('auth', {
       this.connectedUsers = await onlineApi.get('/');
     },
 
-    async changeName() {
-      // change name here
+    async updateUser(properties: any) {
+      console.log(`in authStore - updateUser - user.id = ${this.user.id} , properties = ${JSON.stringify(properties)}`);
+      try {
+        const res = await userApi.put('updateUser' + '/' + this.user.id, {
+          ...properties
+        });
+        console.log(`in authStore - updateUser - res = ${JSON.stringify(res)}`);
+        this.user = res; this.error = {};
+      } catch (error) {
+        // we are having trouble catching errors here...
+        console.log(`in authStore - updateUser - caught error = ${JSON.stringify(error)}`);
+        this.state.error = { error, area: 'updateUser'};
+        console.log(`in authStore - updateUser - rethrowing error`);
+        throw (error);
+      }
     },
+
+    async updateName(name: string) {
+      console.log(`in authStore - updateName - user.id = ${this.user.id} , name = ${name}`);
+      try {
+        await this.updateUser(name);
+      } catch (error) {
+        console.log(`in authStore - updateName - caught error = ${JSON.stringify(error)}`);
+        this.error = { error, area: 'updateName' };
+      }
+
+    }
 
   },
 });

@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, forwardRef} from '@nestjs/common';
 import RedisStore from 'connect-redis';
 import session from 'express-session';
 import passport from 'passport';
@@ -35,9 +35,9 @@ import { PongModule } from 'src/pong';
     AuthSerializer,
     PasswordService,
     ...Object.values(strategies),
-],
+  ],
   imports: [
-    UserModule,
+    forwardRef(() => UserModule),
     MailModule,
     PongModule,
     JwtModule.registerAsync({

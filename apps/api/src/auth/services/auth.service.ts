@@ -25,6 +25,7 @@ export interface UserJwtPayload extends JwtPayload, User {};
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,

@@ -87,7 +87,7 @@ export class AuthController {
     if (user.isTwoFactorAuthenticationEnabled) {
       return res.send({
         isTwoFactorAuthenticationEnabled: true,
-        accessCookie: token,
+        token: token,
       });
     }
 
