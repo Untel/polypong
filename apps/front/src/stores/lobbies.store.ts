@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/19 01:58:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/19 21:42:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,19 +86,19 @@ export const useLobbiesStore = defineStore('lobbies', {
         return null;
       }
     },
-    // async updateLobby(lobby: Lobby) {
-    //   try {
-    //     const newLobby: Lobby = await lobbiesApi.put('', {  });
-    //     return newLobby;
-    //   } catch (err) {
-    //     console.log("err", err);
-    //     Notify.create({
-    //       type: 'negative',
-    //       message: "Error while creating lobby",
-    //     });
-    //     return null;
-    //   }
-    // },
+    async updateLobby(lobby: Lobby) {
+      try {
+        const newLobby: Lobby = await lobbiesApi.put('', { name: 'haha' });
+        return newLobby;
+      } catch (err) {
+        console.log("err", err);
+        Notify.create({
+          type: 'negative',
+          message: "Error while updating lobby",
+        });
+        return null;
+      }
+    },
     async joinLobby(lobbyId: number) {
       const { socket, getIsConnected } = useAuthStore();
       console.log('I will join room', lobbyId);

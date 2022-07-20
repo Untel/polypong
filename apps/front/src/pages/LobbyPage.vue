@@ -80,6 +80,11 @@ const start = () => {
   // lobby.resolve()
 };
 
+watch(lobby, (newVal, oldVal) => {
+  console.log('Watching lobby', newVal);
+  $lobbies.updateLobby(newVal);
+});
+
 const onFormChange = (evt) => {
   // $lobbies.up
 };

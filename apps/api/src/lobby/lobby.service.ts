@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/19 01:53:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/20 00:05:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,21 @@ export class LobbyService {
     this.lobbies.set(host.id, new Lobby(player));
     const lobby: Lobby = this.getLobby(host.id);
     this.socketService.sendNewLobby(lobby);
+    return lobby;
+  }
+
+  updateLobby(id: LobbyId, lobby: Lobby): Lobby {
+    console.log("Updating value", lobby);
+    const old = this.lobbies.get(id);
+    console.log("YOLOOOO", old, lobby);
+    Object.assign(old, lobby);
+    // this.lobbies.set(lobby.id, {
+    //   ...old,
+    //   ...lobby,
+    // });
+    const oldold = this.lobbies.get(id);
+    console.log("Oldold", oldold);
+    // this.socketService.sendNewLobby(lobby);
     return lobby;
   }
   // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {

@@ -77,14 +77,14 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: polypong
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: ${POSTGRES_HOST}
     expose:
       - 5432
     networks:
       - database
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -113,6 +113,8 @@ services:
     container_name: mailhog
     restart: always
     stop_signal: SIGINT
+    logging:
+      driver: none
 
 networks:
   database:

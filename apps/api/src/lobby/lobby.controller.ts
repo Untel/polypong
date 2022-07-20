@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/19 01:46:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/20 02:11:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ import JwtGuard from 'src/guards/jwt.guard';
 import { LobbyService } from './lobby.service';
 
 @UseGuards(JwtGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('lobbies')
 export class LobbyController {
   constructor(private readonly lobbyService: LobbyService) {}
@@ -48,7 +49,6 @@ export class LobbyController {
   }
 
   @Get('/:id/join')
-  @UseInterceptors(ClassSerializerInterceptor)
   async getLobbyAndJoin(
     @CurrentUser() user,
     @Param('id') id: LobbyId,
@@ -64,16 +64,17 @@ export class LobbyController {
   }
 
   @Post()
-  @UseInterceptors(ClassSerializerInterceptor)
   createLobby(@CurrentUser() user, @Body('name') name) {
     const lobby = this.lobbyService.createLobby(user);
     return lobby;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put()
-  updateLobby(@Req() req: RequestWithUser, @Body('name') name) {
-    console.log('Create lobby', req.user.name, name);
-    const host = req.user;
+  updateLobby(@CurrentUser() user, @Param('id') id: LobbyId, @Body() lobby) {
+    console.log("Updating", user, lobby);
+    const _lobby = this.lobbyService.updateLobby(id, lobby);
+    return _lobby;
     // this.lobbyService.updateLobby(host.id);
   }
 
