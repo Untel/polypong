@@ -101,35 +101,12 @@ export const useAuthStore = defineStore('auth', {
 
     async updateUser(properties: any) {
       console.log(`in authStore - updateUser - user.id = ${this.user.id} , properties = ${JSON.stringify(properties)}`);
-      try {
-        const res = await userApi.put('updateUser' + '/' + this.user.id, {
-          ...properties
-        });
-        console.log(`in authStore - updateUser - res = ${JSON.stringify(res)}`);
-        if(res.statusCode == 201) {
-          this.user = res.user; this.error = {};
-        } else {
-          this.error = { message: res.message, area: res.area };
-        }
-      } catch (error) {
-        // we are having trouble catching errors here...
-        console.log(`in authStore - updateUser - caught error = ${JSON.stringify(error)}`);
-        this.state.error = { error, area: 'updateUser'};
-        console.log(`in authStore - updateUser - rethrowing error`);
-        throw (error);
-      }
+      const res = await userApi.put('/' + this.user.id, {
+        ...properties
+      });
+      console.log(`in authStore - updateUser - res = ${JSON.stringify(res)}`);
+      this.user = res.user;
     },
-
-    async updateName(name: string) {
-      console.log(`in authStore - updateName - user.id = ${this.user.id} , name = ${name}`);
-      try {
-        await this.updateUser(name);
-      } catch (error) {
-        console.log(`in authStore - updateName - caught error = ${JSON.stringify(error)}`);
-        this.error = { error, area: 'updateName' };
-      }
-
-    }
 
   },
 });

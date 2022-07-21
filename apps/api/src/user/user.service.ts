@@ -137,10 +137,14 @@ export class UserService {
         this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
       } catch (error) {
         this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
-        throw { error: error.response, area: 'updateName' };
+        this.logger.log(`updateSelf - rethrowing error`);
+        throw error;
       }
     }
     this.logger.log(`updateSelf - returning res = ${JSON.stringify(res)}`);
+    if (!res) {
+      throw new BadRequestException('no properties were updated');
+    }
     return res;
   }
 

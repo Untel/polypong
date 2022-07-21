@@ -35,7 +35,7 @@ export class UserController {
    */
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put('updateUser/:userId')
+  @Put(':userId')
   async updateUser(
     @Body() updateUserDto: updateUserDto,
     @Param('userId') userId,
@@ -46,7 +46,7 @@ export class UserController {
     this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
     const isSelf = userId == req.user.id ? true : false;
     this.logger.log(`updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`);
-    let updatedUser;
+    let updatedUser = null;
     try {
       if (isSelf) {
         updatedUser = await this.userService.updateSelf(req.user, updateUserDto);
@@ -56,11 +56,12 @@ export class UserController {
     } catch (error) {
       this.logger.log(`updateUser - caught error = ${JSON.stringify(error)}`);
       this.logger.log(`updateUser - rethrowing error`);
-      return {
-        message: error.error.message,
-        area: error.area,
-        statusCode: error.error.statusCode,
-      };
+      throw error;
+//      return {
+//        message: error.error.message,
+//        area: error.area,
+//        statusCode: error.error.statusCode,
+//      };
     }
     this.logger.log(`updateUser - ret = ${JSON.stringify(updatedUser)}`);
     return { user: updatedUser, statusCode: 201 };
