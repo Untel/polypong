@@ -46,20 +46,24 @@ export class UserController {
     this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
     const isSelf = userId == req.user.id ? true : false;
     this.logger.log(`updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`);
-    let res;
+    let updatedUser;
     try {
       if (isSelf) {
-        res = await this.userService.updateSelf(req.user, updateUserDto);
+        updatedUser = await this.userService.updateSelf(req.user, updateUserDto);
       } else {
-        res = await this.userService.updateOther(req.user, updateUserDto, userId);
+        updatedUser = await this.userService.updateOther(req.user, updateUserDto, userId);
       }
     } catch (error) {
       this.logger.log(`updateUser - caught error = ${JSON.stringify(error)}`);
       this.logger.log(`updateUser - rethrowing error`);
-      throw error;
+      return {
+        message: error.error.message,
+        area: error.area,
+        statusCode: error.error.statusCode,
+      };
     }
-    this.logger.log(`updateUser - ret = ${JSON.stringify(res)}`);
-    return res;
+    this.logger.log(`updateUser - ret = ${JSON.stringify(updatedUser)}`);
+    return { user: updatedUser, statusCode: 201 };
     // check properties and redirect to the right controllers ? Or do stuff in the service ?
   }
 }

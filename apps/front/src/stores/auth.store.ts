@@ -106,7 +106,11 @@ export const useAuthStore = defineStore('auth', {
           ...properties
         });
         console.log(`in authStore - updateUser - res = ${JSON.stringify(res)}`);
-        this.user = res; this.error = {};
+        if(res.statusCode == 201) {
+          this.user = res.user; this.error = {};
+        } else {
+          this.error = { message: res.message, area: res.area };
+        }
       } catch (error) {
         // we are having trouble catching errors here...
         console.log(`in authStore - updateUser - caught error = ${JSON.stringify(error)}`);

@@ -1,14 +1,13 @@
 <template>
+  <span>{{authStore.user}}</span>
   <q-page padding>
     <q-card>
-      Current name : {{authStore.user.name}}
+      <pre>name : {{authStore.user.name}}</pre>
       <q-input v-model="newName"></q-input>
       <q-btn @click="changeName(newName)">change name</q-btn>
-      <!--
-        <div v-if="authStore.error.area === 'updateName'" class="text-red-500">
+        <pre v-if="authStore.error.area === 'updateName'">
           {{ authStore.error.message }}
-        </div>
-      -->
+        </pre>
     </q-card>
   </q-page>
 </template>

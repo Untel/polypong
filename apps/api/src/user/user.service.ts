@@ -127,16 +127,17 @@ export class UserService {
   async updateSelf(user: UserInterface, properties: any) {
     this.logger.log(`updateSelf - properties = ${JSON.stringify(properties)}`);
     let res = null;
-    if (properties.name) {
-      if (properties.name !== user.name) {
-        try {
-          res = await this.setName(user, properties.name);
-          this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
-        } catch (error) {
-          this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
-          this.logger.log(`updateSelf - rethrowing error`);
-          throw error;
-        }
+    this.logger.log(`updateSelf - properties.name = ${properties.name}`);
+    this.logger.log(`updateSelf - user.name = ${user.name}`);
+    this.logger.log(`updateSelf - user.name !== properties.name = ` + properties.name != user.name);
+    this.logger.log(`updateSelf - properties.hasOwnProperty('name') = ${properties.hasOwnProperty('name')}`);
+    if (properties.hasOwnProperty('name')) {
+      try {
+        res = await this.setName(user, properties.name);
+        this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
+      } catch (error) {
+        this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
+        throw { error: error.response, area: 'updateName' };
       }
     }
     this.logger.log(`updateSelf - returning res = ${JSON.stringify(res)}`);
@@ -164,11 +165,12 @@ export class UserService {
     this.logger.log(`in setName, name = ${name}`);
     this.logger.log(`in setName, existingName = ${existingName}`);
     if (existingName) {
-      this.logger.log(`in setName, existingName found, throwing error`);
+      this.logger.log(`in setName, existingName found, throwing error : name already taken`);
       throw new ConflictException('Name already taken');
     }
     if (name.length < 3) {
-      throw new BadRequestException('Name need to be at least 3 letters long');
+      this.logger.log(`in setName, existingName found, throwing error : name too short`);
+      throw new BadRequestException('Name needs to be at least 3 letters long');
     }
     const email = user.email;
     const localUser = await this.find({ email });
