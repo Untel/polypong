@@ -10,12 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Controller, Get, Delete, Param, Logger, Body, Post, UseGuards, UsePipes, ValidationPipe, Req, Res, Put, forwardRef, Inject } from '@nestjs/common';
+import { Controller, Param, Logger, Body, Post, UseGuards, UsePipes, ValidationPipe, Req, Put, forwardRef, Inject, UploadedFile, UseInterceptors } from '@nestjs/common';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
 import { AuthService } from 'src/auth';
-import { inspect } from 'util';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+
 
 @Controller('user')
 export class UserController {
@@ -28,9 +29,9 @@ export class UserController {
   logger = new Logger('UserController');
 
   /**
-   * Change name of an user.
+   * Update the properties of an user.
    * @param {Request} req : The request object.
-   * @param {changeNameDto} body : new nickname
+   * @param {updateUserDto} updateUserDto : properties to update
    * @returns
    */
   @UseGuards(JwtGuard)
@@ -67,4 +68,26 @@ export class UserController {
     return { user: updatedUser, statusCode: 201 };
     // check properties and redirect to the right controllers ? Or do stuff in the service ?
   }
+
+  /**
+	* Set avatar of an user.
+	* @param {Request} req : The request object.
+	* @param {UpdateAvatarDto} body : new avatar
+	* @returns
+	*/
+	@UseGuards(JwtGuard)
+	@UsePipes(new ValidationPipe({ transform: true }))
+	@Post('setAvatar')
+	@UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
+  async setAvatar(
+    @Req() req,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+		this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
+		this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
+		return await this.userService.setAvatar(
+      req.user,
+      `${process.env.API_URL}/user/${avatar.path}`,
+		);
+	}
 }
