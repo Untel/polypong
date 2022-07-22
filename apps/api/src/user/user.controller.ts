@@ -17,7 +17,6 @@ import { updateUserDto } from './dtos/update-user.dto';
 import { AuthService } from 'src/auth';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 
-
 @Controller('user')
 export class UserController {
   constructor(
@@ -43,26 +42,37 @@ export class UserController {
     @Req() req,
   ) {
     this.logger.log(`updateUser - userId = ${userId}`);
-    this.logger.log(`updateUser - updateUserDto = ${JSON.stringify(updateUserDto)}`);
+    this.logger.log(
+      `updateUser - updateUserDto = ${JSON.stringify(updateUserDto)}`,
+    );
     this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
     const isSelf = userId == req.user.id ? true : false;
-    this.logger.log(`updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`);
+    this.logger.log(
+      `updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`,
+    );
     let updatedUser = null;
     try {
       if (isSelf) {
-        updatedUser = await this.userService.updateSelf(req.user, updateUserDto);
+        updatedUser = await this.userService.updateSelf(
+          req.user,
+          updateUserDto,
+        );
       } else {
-        updatedUser = await this.userService.updateOther(req.user, updateUserDto, userId);
+        updatedUser = await this.userService.updateOther(
+          req.user,
+          updateUserDto,
+          userId,
+        );
       }
     } catch (error) {
       this.logger.log(`updateUser - caught error = ${JSON.stringify(error)}`);
       this.logger.log(`updateUser - rethrowing error`);
       throw error;
-//      return {
-//        message: error.error.message,
-//        area: error.area,
-//        statusCode: error.error.statusCode,
-//      };
+      //      return {
+      //        message: error.error.message,
+      //        area: error.area,
+      //        statusCode: error.error.statusCode,
+      //      };
     }
     this.logger.log(`updateUser - ret = ${JSON.stringify(updatedUser)}`);
     return { user: updatedUser, statusCode: 201 };
@@ -70,24 +80,24 @@ export class UserController {
   }
 
   /**
-	* Set avatar of an user.
-	* @param {Request} req : The request object.
-	* @param {UpdateAvatarDto} body : new avatar
-	* @returns
-	*/
-	@UseGuards(JwtGuard)
-	@UsePipes(new ValidationPipe({ transform: true }))
-	@Post('setAvatar')
-	@UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
+   * Set avatar of an user.
+   * @param {Request} req : The request object.
+   * @param {UpdateAvatarDto} body : new avatar
+   * @returns
+   */
+  @UseGuards(JwtGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Post('setAvatar')
+  @UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
   async setAvatar(
     @Req() req,
     @UploadedFile() avatar: Express.Multer.File,
   ) {
-		this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
-		this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
-		return await this.userService.setAvatar(
+    this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
+    this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
+    return await this.userService.setAvatar(
       req.user,
       `${process.env.API_URL}/user/${avatar.path}`,
-		);
-	}
+    );
+  }
 }
