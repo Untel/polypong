@@ -39,5 +39,4 @@ const changeName = async (newName) => {
     });
   }
 };
-
 </script>
