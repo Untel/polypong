@@ -14,7 +14,7 @@
         style="max-width: 50%; max-height: 50%; border-radius: 15px;"
       />
       <q-uploader dark
-        url="http://localhost:9999/user/setAvatar"
+        url="http://localhost:9999/api/user/setAvatar"
         accept=".jpg, image/*"
       />
     </q-card>
