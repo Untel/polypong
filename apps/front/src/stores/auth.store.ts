@@ -19,8 +19,9 @@ import { mande, defaults, MandeError } from 'mande';
 import { useApi } from 'src/utils/api';
 import { User } from 'src/types/user';
 
-export const authApi = mande(`/api/auth`);
-export const onlineApi = mande(`/api/online`);
+export const authApi = mande('/api/auth');
+export const onlineApi = mande('/api/online');
+export const userApi = mande('/api/user');
 
 type AuthState = {
   socket?: Socket | null,
@@ -35,10 +36,12 @@ export const useAuthStore = defineStore('auth', {
     user: {},
     socket: null,
     connectedUsers: [],
+    error: {},
   } as AuthState),
   getters: {
     getIsConnected: (state) => state.socket && state.socket.connected,
     getConnectedUsers: (state) => state.connectedUsers,
+    getUser: (state) => state.user,
   },
   actions: {
     connectToSocket() {
@@ -77,14 +80,24 @@ export const useAuthStore = defineStore('auth', {
     async whoAmI() {
       const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No token, no need to query the api");
+        throw new Error('No token, no need to query the api');
       }
-      defaults.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
+      defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
       this.user = await authApi.get('user');
     },
 
     async fetchConnectedUsers() {
       this.connectedUsers = await onlineApi.get('/');
     },
+
+    async updateUser(properties: any) {
+      console.log(`in authStore - updateUser - user.id = ${this.user.id} , properties = ${JSON.stringify(properties)}`);
+      const res = await userApi.put(`/${this.user.id}`, {
+        ...properties,
+      });
+      console.log(`in authStore - updateUser - res = ${JSON.stringify(res)}`);
+      this.user = res.user;
+    },
+
   },
 });

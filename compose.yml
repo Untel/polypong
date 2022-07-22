@@ -53,6 +53,7 @@ services:
     volumes:
       - ./apps/api:/app/
       - "/app/node_modules"
+      - "/avatars"
     expose:
       - 3000
     env_file:

@@ -70,7 +70,7 @@ const linksList = [{
   to: 'users',
 }, {
   title: 'Settings',
-  caption: 'Account settings',
+  caption: 'Your account settings',
   icon: 'fa-solid fa-gear',
   to: 'settings',
 }];
