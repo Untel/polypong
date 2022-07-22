@@ -39,7 +39,6 @@ export default class JwtGuard
     // console.log("===> JWT HANDLE");
     // console.log('Handling the request', err, user, info);
     if (err || !user) {
-      console.log('ERRERERERERERRE');
       throw err || new Error();
     }
     return user;

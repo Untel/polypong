@@ -43,6 +43,9 @@ export default async (
     await auth.connectToSocket();
     next();
   } catch (error) {
+    // if (error.statusCode === _HTTPCODEFOR2FA_ ) {
+    //  redirect2fa =
+    // }
     const redirect = buildRedirectObject(to);
     console.log('Auth guard fail', error, to.name, redirect);
     return next({ name: 'login', query: redirect });

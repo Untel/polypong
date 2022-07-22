@@ -13,21 +13,22 @@
         :src="authStore.user.avatar"
         style="max-width: 50%; max-height: 50%; border-radius: 15px;"
       />
-      <q-uploader dark
-        url="http://localhost:9999/api/user/setAvatar"
-        accept=".jpg, image/*"
-      />
+      <q-uploader
+        dark accept="image/*" :factory="factoryFn" field-name="avatar"
+        @finish="authStore.whoAmI"
+        />
     </q-card>
   </q-page>
 </template>
 
 <script lang="ts" setup>
 import { useAuthStore } from 'src/stores/auth.store';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { Notify } from 'quasar';
 
-// name change
 const authStore = useAuthStore();
+
+// name change
 const newName = ref('');
 const changeName = async (newName) => {
   try {
@@ -39,5 +40,19 @@ const changeName = async (newName) => {
     });
   }
 };
+
+// avatar change
+function factoryFn(file: any): Promise<any> {
+  return new Promise((resolve, reject) => {
+    // Retrieve JWT token from your store.
+    resolve({
+      url: 'http://localhost:9999/api/user/setAvatar',
+      method: 'POST',
+      headers: [
+        { name: 'Authorization', value: `Bearer ${localStorage.getItem('token')}` },
+      ],
+    });
+  });
+}
 
 </script>

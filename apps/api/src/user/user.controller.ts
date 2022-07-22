@@ -10,12 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Controller, Param, Logger, Body, Post, UseGuards, UsePipes, ValidationPipe, Req, Put, forwardRef, Inject, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  Logger,
+  Body,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+  Req,
+  Put,
+  forwardRef,
+  Inject,
+  UploadedFile,
+  UseInterceptors,
+  Get,
+  Res,
+} from '@nestjs/common';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
 import { AuthService } from 'src/auth';
-import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -89,15 +106,29 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post('setAvatar')
   @UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
-  async setAvatar(
-    @Req() req,
-    @UploadedFile() avatar: Express.Multer.File,
-  ) {
+  async setAvatar(@Req() req, @UploadedFile() avatar: Express.Multer.File) {
     this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
     this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
     return await this.userService.setAvatar(
       req.user,
-      `${process.env.API_URL}/user/${avatar.path}`,
+      `http://localhost:9999/api/user/${avatar.path}`,
     );
+  }
+
+  /**
+   * Get avatar of the current user.
+   * @param {Request} req : The request object.
+   * @returns
+   */
+  @UseGuards(JwtGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @Get('avatars/:fileId')
+  async serveAvatar(
+    @Param('fileId') fileId,
+    @Res() res,
+  ) {
+    this.logger.log(`in serveAvatar, fileId = ${fileId}`);
+    this.logger.log(`in serveAvatar, fileId = ${fileId}`);
+    res.sendfile(fileId, { root: 'avatars' });
   }
 }
