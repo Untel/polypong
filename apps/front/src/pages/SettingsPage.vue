@@ -15,7 +15,6 @@
       />
       <q-uploader
         dark accept="image/*" :factory="factoryFn" field-name="avatar"
-        @finish="authStore.whoAmI"
         />
     </q-card>
   </q-page>
@@ -23,8 +22,8 @@
 
 <script lang="ts" setup>
 import { useAuthStore } from 'src/stores/auth.store';
-import { onMounted, ref } from 'vue';
 import { Notify } from 'quasar';
+import { ref } from 'vue';
 
 const authStore = useAuthStore();
 
@@ -43,7 +42,7 @@ const changeName = async (newName) => {
 
 // avatar change
 function factoryFn(file: any): Promise<any> {
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     // Retrieve JWT token from your store.
     resolve({
       url: 'http://localhost:9999/api/user/setAvatar',
@@ -53,6 +52,14 @@ function factoryFn(file: any): Promise<any> {
       ],
     });
   });
+  promise.then(() => {
+    console.log('lala');
+    authStore.user = authStore.whoAmI();
+    console.log('lele');
+    console.log(`updated user = ${JSON.stringify(authStore.user)}`);
+    console.log('lulu');
+  });
+  return promise;
 }
 
 </script>

@@ -120,7 +120,6 @@ export class UserController {
    * @param {Request} req : The request object.
    * @returns
    */
-  @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('avatars/:fileId')
   async serveAvatar(
@@ -128,7 +127,7 @@ export class UserController {
     @Res() res,
   ) {
     this.logger.log(`in serveAvatar, fileId = ${fileId}`);
-    this.logger.log(`in serveAvatar, fileId = ${fileId}`);
+    this.logger.log(`in serveAvatar, about to res.sendfile`);
     res.sendfile(fileId, { root: 'avatars' });
   }
 }
