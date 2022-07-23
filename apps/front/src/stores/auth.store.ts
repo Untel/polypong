@@ -99,5 +99,15 @@ export const useAuthStore = defineStore('auth', {
       this.user = res.user;
     },
 
+    async fetchUser() {
+      let res;
+      try {
+        res = await userApi.get('user');
+      } catch (error) {
+        console.log(error); return;
+      }
+      this.user = res;
+    },
+
   },
 });

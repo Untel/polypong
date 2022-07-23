@@ -45,6 +45,17 @@ export class UserController {
   logger = new Logger('UserController');
 
   /**
+   * Get data of the current user.
+   * @param {Request} req : The request object.
+   * @returns
+   */
+  @UseGuards(JwtGuard)
+  @Get('user')
+  async getUser(@Req() req): Promise<any> {
+    return this.userService.findById(req.user.id);
+  }
+
+  /**
    * Update the properties of an user.
    * @param {Request} req : The request object.
    * @param {updateUserDto} updateUserDto : properties to update
