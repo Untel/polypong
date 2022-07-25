@@ -31,17 +31,16 @@
 </template>
 
 <script setup lang="ts">
-import { CoalitionChoice } from "src/types/coalition"
-import { coalitions } from 'src/types/coalition'
-import FssFallback from "./FssFallback.vue";
-import LogoBannerCoalition from "./LogoBannerCoalition.vue";
-import { PropType } from "vue";
-import { User } from "src/types/user";
+import { CoalitionChoice, coalitions } from 'src/types/coalition';
+import { PropType } from 'vue';
+import { User } from 'src/types/user';
+import FssFallback from './FssFallback.vue';
+import LogoBannerCoalition from './LogoBannerCoalition.vue';
 
 const props = defineProps({
   user: {
     type: Object as PropType<User>,
     default: null,
-  }
+  },
 });
 </script>

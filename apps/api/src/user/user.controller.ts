@@ -52,7 +52,8 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get('user')
   async getUser(@Req() req): Promise<any> {
-    return this.userService.findById(req.user.id);
+    this.logger.log(`user = req.user = ${JSON.stringify(req.user)}`);
+    return this.userService.findById(req.user.userId);
   }
 
   /**

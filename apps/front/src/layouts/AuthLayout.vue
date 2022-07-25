@@ -49,6 +49,7 @@ import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
 import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';
 import Logo from 'src/components/Logo.vue';
 import { ref, Ref } from 'vue';
+import { useAuthStore } from 'src/stores/auth.store';
 
 const defaultBackgroundParams = {
   fssSettings: useLoginShaders(),
@@ -57,13 +58,11 @@ const defaultBackgroundParams = {
 const backgroundParams = ref(defaultBackgroundParams);
 
 const changeBackground = (coalition: CoalitionChoice) => {
-  if (!coalition)
-    backgroundParams.value = null;
-  else {
+  if (!coalition) { backgroundParams.value = null; } else {
     backgroundParams.value = {
       fssSettings: coalitions[coalition].shaderConfig,
       fallbackUrl: coalitions[coalition].fssFallback,
     };
   }
-}
+};
 </script>

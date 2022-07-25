@@ -38,10 +38,10 @@ export class TwoFactorAuthenticationController {
         user,
       );
 
-    this.twoFactorAuthenticationService.sendQrCodeAsDataURL(res, otpauthUrl);
-    //		return this.twoFactorAuthenticationService.pipeQrCodeStream(
-    //			res, otpauthUrl
-    //		);
+    //this.twoFactorAuthenticationService.sendQrCodeAsDataURL(res, otpauthUrl);
+    return this.twoFactorAuthenticationService.pipeQrCodeStream(
+      res, otpauthUrl,
+    );
   }
 
   @Post('activate')
@@ -75,13 +75,13 @@ export class TwoFactorAuthenticationController {
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
     @Res() res,
   ) {
-    this.logger.log("@Post('authenticate')");
+    this.logger.log(`authenticate`);
     const isValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
         req.user,
       );
-    this.logger.log(`@Post('authenticate') - isValid = ${isValid}`);
+    this.logger.log(`authenticate - isValid = ${isValid}`);
     const user = req.user;
     // create a jwt access token with the property is2fa set to true
     if (isValid) {

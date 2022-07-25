@@ -107,9 +107,14 @@ export class AuthController {
   async getUser(@Request() req): Promise<any> {
     delete req.user.password;
 
+    this.logger.log(`user - req.user = ${JSON.stringify(req.user)}`);
+    const id = req.user.userId;
+    this.logger.log(`user - req.user.userId = ${id}`);
+    const user = await this.userService.findById(id);
+    this.logger.log(`user - findById = ${JSON.stringify(user)}`);
     // Ici on ajoute le jwt token au payload car on en aura besoin pour authentifier le websocket
     return {
-      ...req.user,
+      ...user,
       token: this.authService.getToken({ ...req.user }),
     };
   }

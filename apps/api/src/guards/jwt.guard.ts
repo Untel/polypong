@@ -25,7 +25,7 @@ export default class JwtGuard
           },
         };
       case 'http':
-        this.logger.log(`http - returning context.switchToHttp().getRequest()`);
+        this.logger.log(`getRequest - http - returning context.switchToHttp().getRequest()`);
         return context.switchToHttp().getRequest();
       default:
         console.log("Unhandled execution context", context.getType());
@@ -40,7 +40,7 @@ export default class JwtGuard
   }
 
   handleRequest(err, user, info) {
-    this.logger.log(`handleRequest`);
+    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     // console.log("===> JWT HANDLE");
     // console.log('Handling the request', err, user, info);
     if (err || !user) {

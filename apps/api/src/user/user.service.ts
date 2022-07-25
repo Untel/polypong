@@ -40,8 +40,11 @@ export class UserService {
   }
 
   async findById(id: string | number): Promise<User> {
+    this.logger.log(`findById - id = ${id}`);
     if (id) {
-      return this.userRepository.findOne({ where: { id: +id } });
+      const res = await this.userRepository.findOne({ where: { id: +id } });
+      this.logger.log(`findById - res = ${JSON.stringify(res)}`);
+      return res;
     }
     return null;
   }

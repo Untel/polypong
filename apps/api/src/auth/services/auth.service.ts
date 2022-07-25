@@ -162,11 +162,19 @@ export class AuthService {
   }
 
   public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
-    console.log("Checking token", token);
+    this.logger.log(`findUserByAccessToken - token = ${token}`);
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
-    return payload;
+    this.logger.log(`findUserByAccessToken - payload = ${JSON.stringify(payload)}`);
+    if (payload.is2fa) {
+      return payload; // don't return all the user info if the token was signed with is2fa
+    } else {
+      this.logger.log(`findUserByAccessToken - payload.userId = ${payload.userId}`);
+      const user = this.userService.findById(payload.userId);
+      this.logger.log(`findUserByAccessToken - user = ${JSON.stringify(user)}`);
+      return user;
+    }
   }
 
   public async logout(userID) {

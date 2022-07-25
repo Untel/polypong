@@ -31,7 +31,11 @@ export class IntraOAuthController {
     this.logger.log(`callback - Auth inner query 2 - req.query = ${req.query}`);
 
     const user = req.user;
-    const token = this.authService.getToken({ ...user as any });
+    this.logger.log(`callback - req.user = ${JSON.stringify(req.user)}`);
+    const token = this.authService.getToken({
+      userId: user.id,
+      is2fa: user.isTwoFactorAuthenticationEnabled = false,
+    });
 
     this.logger.log(`callback - redirecting to front '/' with token ${token} in query url`);
     return res.redirect(url.format({

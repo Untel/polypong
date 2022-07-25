@@ -22,18 +22,18 @@ export class TwoFactorAuthenticationService {
 
   // serve the otpauth url to the user in a QR code
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-    this.logger.log(`otpauthUrl = ${otpauthUrl}`);
+    this.logger.log(`pipeQrCodeStream - otpauthUrl = ${otpauthUrl}`);
     return toFileStream(stream, otpauthUrl);
   }
 
   public async sendQrCodeAsDataURL(@Res() res, otpauthUrl: string) {
-    this.logger.log(`in sendQrCodeAsDataURL`);
+    this.logger.log(`sendQrCodeAsDataURL`);
     const qrAsDataUrl = await new Promise((resolve, reject) => {
       toDataURL(otpauthUrl, [], (error, result) => {
         resolve(result);
       });
     });
-    this.logger.log(`qrAsDataURL = ${qrAsDataUrl}`);
+    this.logger.log(`sendQrCodeAsDataURL - qrAsDataURL = ${qrAsDataUrl}`);
     res.send(qrAsDataUrl);
   }
 
@@ -42,6 +42,7 @@ export class TwoFactorAuthenticationService {
     twoFactorAuthenticationCode: string,
     user: User,
   ) {
+    this.logger.log(`isTwoFactorAuthenticationCodeValid`);
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthenticationSecret,
