@@ -76,12 +76,7 @@ export class AuthController {
       `@Post(login), req.session = ${JSON.stringify(req.session)}`,
     );
     const user = req.user;
-    // const accessCookie = this.authService.getCookieWithJwtToken(user.id);
     const token = this.authService.getToken({ ...user });
-    // const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`
-    // res.setHeader(
-    //   'Set-Cookie', [cookie]
-    // );
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {

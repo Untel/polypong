@@ -45,6 +45,7 @@ export class AuthService {
       const res = await this.userService.createUser({
         ...creds,
         password: hashedPassword,
+        isTwoFactorAuthenticationEnabled: false,
       });
       this.sendEmailVerificationMail(res);
       return { user: res };

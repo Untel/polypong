@@ -27,18 +27,13 @@ export class IntraOAuthController {
   @Get('callback')
   @UseGuards(IntraOAuthGuard)
   async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
-    this.logger.log(`@Get() auth/intra/callback`);
-    console.log("Auth inner query 2", req.query);
+    this.logger.log(`callback`);
+    this.logger.log(`callback - Auth inner query 2 - req.query = ${req.query}`);
+
     const user = req.user;
     const token = this.authService.getToken({ ...user as any });
-    if (user.isTwoFactorAuthenticationEnabled) {
-      return res.send({
-        isTwoFactorAuthenticationEnabled: true,
-        accessCookie: token,
-      });
-    }
 
-    this.logger.log(`@Post(login), returning user`);
+    this.logger.log(`callback - redirecting to front '/' with token ${token} in query url`);
     return res.redirect(url.format({
       pathname: '/',
       query: { token }

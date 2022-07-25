@@ -1,13 +1,23 @@
 <template>
   <span>{{authStore.user}}</span>
   <q-page padding>
-    <q-card>
+    <q-card> <!-- NAME CHANGE -->
       <pre>current name : {{authStore.user.name}}</pre>
       <q-input v-model="newName"></q-input>
       <q-btn @click="changeName(newName)">change name</q-btn>
     </q-card>
     <br>
-    <q-card class="column flex-center">
+    <q-card> <!-- 2FA -->
+      <q-div v-if="authStore.user.twofactor === true">
+        <pre>2fa is required</pre>
+        <q-btn @click="turnOff2fa()">turn off 2fa</q-btn>
+      </q-div><q-div v-else>
+        <pre>2fa not required</pre>
+        <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
+      </q-div>
+    </q-card>
+    <br>
+    <q-card class="column flex-center"> <!-- AVATAR -->
       <pre class="self-start">current avatar :</pre>
       <q-img
         :src="authStore.user.avatar"
@@ -18,6 +28,7 @@
         @finish="authStore.fetchUser()"
       />
     </q-card>
+    <br>
   </q-page>
 </template>
 
@@ -42,6 +53,14 @@ const changeName = async (newName) => {
     });
   }
 };
+
+// 2fa
+async function turnOn2fa() {
+  await authStore.updateUser({ isTwoFactorAuthenticationEnabled: true });
+}
+async function turnOff2fa() {
+  await authStore.updateUser({ isTwoFactorAuthenticationEnabled: false });
+}
 
 // avatar change
 function factoryFn(file: any): Promise<any> {

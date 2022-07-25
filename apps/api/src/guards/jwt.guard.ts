@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { HttpArgumentsHost, WsArgumentsHost } from '@nestjs/common/interfaces';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
@@ -12,6 +12,8 @@ export default class JwtGuard
     super();
   }
 
+  logger = new Logger('JwtGuard');
+
   getRequest(context: ExecutionContext) {
     switch (context.getType()) {
       case 'ws':
@@ -23,6 +25,7 @@ export default class JwtGuard
           },
         };
       case 'http':
+        this.logger.log(`http - returning context.switchToHttp().getRequest()`);
         return context.switchToHttp().getRequest();
       default:
         console.log("Unhandled execution context", context.getType());
@@ -31,11 +34,13 @@ export default class JwtGuard
   }
 
   canActivate(context: ExecutionContext) {
+    this.logger.log(`canActivate - context = ${context}`);
     // console.log("Parent activate ctx");
     return super.canActivate(context) as boolean;
   }
 
   handleRequest(err, user, info) {
+    this.logger.log(`handleRequest`);
     // console.log("===> JWT HANDLE");
     // console.log('Handling the request', err, user, info);
     if (err || !user) {

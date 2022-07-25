@@ -83,6 +83,7 @@ export class UserService {
     const {
       name,
       email,
+      isTwoFactorAuthenticationEnabled,
       password,
       coalition,
       avatar,
@@ -93,6 +94,7 @@ export class UserService {
     const newUser = await this.userRepository.create({
       name,
       email,
+      isTwoFactorAuthenticationEnabled: isTwoFactorAuthenticationEnabled || false,
       coalition,
       password: password,
       avatar:
@@ -129,17 +131,21 @@ export class UserService {
     let res = null;
     this.logger.log(`updateSelf - properties.name = ${properties.name}`);
     this.logger.log(`updateSelf - user.name = ${user.name}`);
-    this.logger.log(`updateSelf - user.name !== properties.name = ` + properties.name != user.name);
-    this.logger.log(`updateSelf - properties.hasOwnProperty('name') = ${properties.hasOwnProperty('name')}`);
-    if (properties.hasOwnProperty('name')) {
-      try {
+    try {
+      if (properties.hasOwnProperty('name')) {
         res = await this.setName(user, properties.name);
         this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
-      } catch (error) {
-        this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
-        this.logger.log(`updateSelf - rethrowing error`);
-        throw error;
       }
+      this.logger.log(`properties.hasOwnProperty('isTwoFactorAuthenticationEnabled')) = ${properties.hasOwnProperty('isTwoFactorAuthenticationEnabled')}`)
+      if (properties.hasOwnProperty('isTwoFactorAuthenticationEnabled')) {
+        this.logger.log('lala');
+        res = await this.set2fa(user, properties.isTwoFactorAuthenticationEnabled);
+        this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
+      }
+    } catch (error) {
+      this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
+      this.logger.log(`updateSelf - rethrowing error`);
+      throw error;
     }
     this.logger.log(`updateSelf - returning res = ${JSON.stringify(res)}`);
     if (!res) {
@@ -179,6 +185,19 @@ export class UserService {
     const email = user.email;
     const localUser = await this.find({ email });
     const res = await this.updateUser(localUser.id, { name: name });
+    return res;
+  }
+
+  /**
+   * set 2fa on or off
+   * @param user : the user interface
+   * @param isTwoFactorAuthenticationEnabled : 2fa status
+   * @returns : the updated user entity
+   */
+  async set2fa(user: UserInterface, isTwoFactorAuthenticationEnabled: boolean) {
+    const email = user.email;
+    const localUser = await this.find({ email });
+    const res = await this.updateUser(localUser.id, { isTwoFactorAuthenticationEnabled: isTwoFactorAuthenticationEnabled });
     return res;
   }
 

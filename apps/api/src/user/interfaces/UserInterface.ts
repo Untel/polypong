@@ -3,6 +3,7 @@ import { CoalitionChoice } from '../user.entity';
 export interface UserInterface {
   name: string;
   email: string;
+  isTwoFactorAuthenticationEnabled: boolean;
   password?: string;
   isActive?: boolean;
   emailVerified?: boolean;
