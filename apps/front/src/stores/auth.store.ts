@@ -20,6 +20,7 @@ import { useApi } from 'src/utils/api';
 import { User } from 'src/types/user';
 
 export const authApi = mande('/api/auth');
+export const twoFactorApi = mande('/api/2fa');
 export const onlineApi = mande('/api/online');
 export const userApi = mande('/api/user');
 
