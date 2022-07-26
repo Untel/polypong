@@ -1,11 +1,8 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, Logger, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import TokenPayload from '../interfaces/tokenPayload.interface';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/user';
 import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
@@ -23,10 +20,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   logger = new Logger('JwtStrategy');
 
-  validate(user: JwtPayload) {
-    this.logger.log(`===>Validating`);
+  validate(userJwtPayload: JwtPayload) {
+    this.logger.log(`validate - userJWtPayload = ${JSON.stringify(userJwtPayload)}`);
     // Ya un soucis si on delete pas ca, a check
-    delete user.exp;
-    return user;
+    delete userJwtPayload.exp;
+    return userJwtPayload;
   }
 }

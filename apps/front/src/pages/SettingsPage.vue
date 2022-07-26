@@ -6,7 +6,9 @@
       <q-input v-model="newName"></q-input>
       <q-btn @click="changeName(newName)">change name</q-btn>
     </q-card>
+
     <br>
+
     <q-card> <!-- 2FA -->
       <q-div v-if="authStore.user.twofactor === true">
         <pre>2fa is required</pre>
@@ -15,8 +17,15 @@
         <pre>2fa not required</pre>
         <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
       </q-div>
+      <br>
+      <q-div>{{qrCode}}</q-div>
+      <pre>QrCode requested : {{qrCode.requested}}</pre>
+      <q-btn @click="requestQrCode()">request QrCode</q-btn>
+      <q-img v-bind:src="qrCode.imageBytes"></q-img>
     </q-card>
+
     <br>
+
     <q-card class="column flex-center"> <!-- AVATAR -->
       <pre class="self-start">current avatar :</pre>
       <q-img
@@ -33,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from 'src/stores/auth.store';
+import { twoFactorApi, useAuthStore } from 'src/stores/auth.store';
 import { Notify } from 'quasar';
 import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -60,6 +69,21 @@ async function turnOn2fa() {
 }
 async function turnOff2fa() {
   await authStore.updateUser({ isTwoFactorAuthenticationEnabled: false });
+}
+const qrCode = {
+  requested: false,
+  imageBytes: '',
+};
+async function requestQrCode() {
+  try {
+    console.log('SettingsPage - requestQrCode - before query');
+    const res = await twoFactorApi.get('generate'); // RES = UNDEFINED
+    console.log(`SettingsPage - requestQrCode - res ${console.dir(res)}`);
+    qrCode.requested = true;
+    //    qrCode.imageBytes = res.data;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // avatar change

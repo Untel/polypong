@@ -65,6 +65,7 @@ export class UserService {
 
   // save the 2fa secret in the database
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    this.logger.log(`setTwoFactorAuthenticationSecret - secret : ${secret}, userId: ${userId}`);
     return this.userRepository.update(userId, {
       twoFactorAuthenticationSecret: secret,
     });

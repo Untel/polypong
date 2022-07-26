@@ -9,14 +9,18 @@ export class TwoFactorAuthenticationService {
   constructor(private readonly userService: UserService) {}
   logger = new Logger('TwoFactorAuthenticationService');
 
-  public async generateTwoFactorAuthenticationSecret(user: User) {
+  public async generateTwoFactorAuthenticationSecret(user: any) {
+    this.logger.log(`generateTwoFactorAuthenticationSecret - user = ${JSON.stringify(user)}`);
     const secret = authenticator.generateSecret();
+    this.logger.log(`generateTwoFactorAuthenticationSecret - secret = ${secret}`);
     const otpauthUrl = authenticator.keyuri(
       user.email,
       process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
       secret,
     );
-    await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
+    this.logger.log(`generateTwoFactorAuthenticationSecret - otpauthUrl = ${otpauthUrl}`);
+    await this.userService.setTwoFactorAuthenticationSecret(secret, user.userId);
+    this.logger.log(`generateTwoFactorAuthenticationSecret - after = setTwoFactorAuthenticationSecret`);
     return { secret, otpauthUrl };
   }
 
@@ -26,15 +30,15 @@ export class TwoFactorAuthenticationService {
     return toFileStream(stream, otpauthUrl);
   }
 
-  public async sendQrCodeAsDataURL(@Res() res, otpauthUrl: string) {
-    this.logger.log(`sendQrCodeAsDataURL`);
+  public async qrCodeAsDataURL(otpauthUrl: string) {
+    this.logger.log(`qrCodeAsDataURL`);
     const qrAsDataUrl = await new Promise((resolve, reject) => {
       toDataURL(otpauthUrl, [], (error, result) => {
         resolve(result);
       });
     });
-    this.logger.log(`sendQrCodeAsDataURL - qrAsDataURL = ${qrAsDataUrl}`);
-    res.send(qrAsDataUrl);
+    this.logger.log(`qrCodeAsDataURL - qrAsDataURL = ${qrAsDataUrl}`);
+    return qrAsDataUrl;
   }
 
   // check if 2fa code sent by client matches secret in db
