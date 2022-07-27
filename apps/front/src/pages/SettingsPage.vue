@@ -8,12 +8,10 @@
     </q-card>
 
     <br>
-
     <q-card> <!-- 2FA -->
-      <q-div v-if="authStore.user.twofactor === true">
+      <q-div v-if="authStore.user.isTwoFactorAuthenticationEnabled === true">
         <pre>2fa is required</pre>
         <q-btn @click="turnOff2fa()">turn off 2fa</q-btn>
-      </q-div><q-div v-else>
         <pre>2fa not required</pre>
         <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
       </q-div>
@@ -21,7 +19,7 @@
       <q-div>{{qrCode}}</q-div>
       <pre>QrCode requested : {{qrCode.requested}}</pre>
       <q-btn @click="requestQrCode()">request QrCode</q-btn>
-      <q-img v-bind:src="qrCode.imageBytes"></q-img>
+
     </q-card>
 
     <br>
@@ -76,9 +74,8 @@ const qrCode = {
 };
 async function requestQrCode() {
   try {
-    console.log('SettingsPage - requestQrCode - before query');
     const res = await twoFactorApi.get('generate'); // RES = UNDEFINED
-    console.log(`SettingsPage - requestQrCode - res ${console.dir(res)}`);
+    console.log(`SettingsPage - requestQrCode - after query - res = ${console.dir(res)}`);
     qrCode.requested = true;
     //    qrCode.imageBytes = res.data;
   } catch (error) {

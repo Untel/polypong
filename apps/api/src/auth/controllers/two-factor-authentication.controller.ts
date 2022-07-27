@@ -18,7 +18,7 @@ import { TwoFactorAuthenticationCodeDto } from '../dtos/two-factor-authenticatio
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import { AuthService } from '../services/auth.service';
 import { TwoFactorAuthenticationService } from '../services/twoFactorAuthentication.service';
-import { inspect } from 'util';
+import { toDataURL } from 'qrcode';
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,7 +32,7 @@ export class TwoFactorAuthenticationController {
 
   @Get('generate')
   @UseGuards(JwtGuard)
-  async register(@Req() req: RequestWithUser) {
+  async register(@Req() req: RequestWithUser, @Res() res) {
     this.logger.log(`generate - req.user = ${JSON.stringify(req.user)}`);
     const { otpauthUrl } =
       await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
@@ -41,8 +41,13 @@ export class TwoFactorAuthenticationController {
 
     this.logger.log(`generate - otpauthUrl = ${otpauthUrl}`);
 
-    const res = await this.twoFactorAuthenticationService.qrCodeAsDataURL(otpauthUrl);
-    return res;
+    const qrAsDataUrl = await new Promise((resolve, reject) => {
+			toDataURL(otpauthUrl, [], (error, result) => {
+				resolve(result);
+			});
+		});
+
+    res.send(qrAsDataUrl);
 //    res.send(data);
 //    return this.twoFactorAuthenticationService.pipeQrCodeStream(
 //      res, otpauthUrl,

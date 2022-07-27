@@ -53,7 +53,7 @@ export class UserController {
   @Get('user')
   async getUser(@Req() req): Promise<any> {
     this.logger.log(`user = req.user = ${JSON.stringify(req.user)}`);
-    return this.userService.findById(req.user.userId);
+    return this.userService.findById(req.user.id);
   }
 
   /**
@@ -64,20 +64,20 @@ export class UserController {
    */
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put(':userId')
+  @Put(':id')
   async updateUser(
     @Body() updateUserDto: updateUserDto,
-    @Param('userId') userId,
+    @Param('id') id,
     @Req() req,
   ) {
-    this.logger.log(`updateUser - userId = ${userId}`);
+    this.logger.log(`updateUser - id = ${id}`);
     this.logger.log(
       `updateUser - updateUserDto = ${JSON.stringify(updateUserDto)}`,
     );
     this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
-    const isSelf = userId == req.user.id ? true : false;
+    const isSelf = id == req.user.id ? true : false;
     this.logger.log(
-      `updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`,
+      `updateUser - req.user.id = ${req.user.id}, id = ${id}, isSelf = ${isSelf}`,
     );
     let updatedUser = null;
     try {
@@ -90,7 +90,7 @@ export class UserController {
         updatedUser = await this.userService.updateOther(
           req.user,
           updateUserDto,
-          userId,
+          id,
         );
       }
     } catch (error) {

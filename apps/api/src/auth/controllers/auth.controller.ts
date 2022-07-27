@@ -108,8 +108,8 @@ export class AuthController {
     delete req.user.password;
 
     this.logger.log(`user - req.user = ${JSON.stringify(req.user)}`);
-    const id = req.user.userId;
-    this.logger.log(`user - req.user.userId = ${id}`);
+    const id = req.user.id;
+    this.logger.log(`user - req.user.id = ${id}`);
     const user = await this.userService.findById(id);
     this.logger.log(`user - findById = ${JSON.stringify(user)}`);
     // Ici on ajoute le jwt token au payload car on en aura besoin pour authentifier le websocket

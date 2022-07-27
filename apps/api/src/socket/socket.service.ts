@@ -31,8 +31,8 @@ export class SocketService {
       .map((el: AuthSocket) => el.user);
   }
 
-  getUserSocket(userID) {
+  getUserSocket(id) {
     return this.sockets
-      .find((el: AuthSocket) => el.user.id === userID);
+      .find((el: AuthSocket) => el.user.id === id);
   }
 }

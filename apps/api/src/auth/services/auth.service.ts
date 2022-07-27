@@ -170,14 +170,14 @@ export class AuthService {
     if (payload.is2fa) {
       return payload; // don't return all the user info if the token was signed with is2fa
     } else {
-      this.logger.log(`findUserByAccessToken - payload.userId = ${payload.userId}`);
-      const user = this.userService.findById(payload.userId);
+      this.logger.log(`findUserByAccessToken - payload.id = ${payload.id}`);
+      const user = this.userService.findById(payload.id);
       this.logger.log(`findUserByAccessToken - user = ${JSON.stringify(user)}`);
       return user;
     }
   }
 
-  public async logout(userID) {
+  public async logout(id) {
 
   }
 }

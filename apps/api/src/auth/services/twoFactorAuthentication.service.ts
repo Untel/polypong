@@ -19,7 +19,7 @@ export class TwoFactorAuthenticationService {
       secret,
     );
     this.logger.log(`generateTwoFactorAuthenticationSecret - otpauthUrl = ${otpauthUrl}`);
-    await this.userService.setTwoFactorAuthenticationSecret(secret, user.userId);
+    await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
     this.logger.log(`generateTwoFactorAuthenticationSecret - after = setTwoFactorAuthenticationSecret`);
     return { secret, otpauthUrl };
   }

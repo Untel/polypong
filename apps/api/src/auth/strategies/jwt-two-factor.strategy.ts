@@ -23,7 +23,7 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayload) {
-    const user = await this.userService.findById(payload.userId);
+    const user = await this.userService.findById(payload.id);
     // if 2fa isn't enabled, we just return the user
     if (!user.isTwoFactorAuthenticationEnabled) {
       return user;

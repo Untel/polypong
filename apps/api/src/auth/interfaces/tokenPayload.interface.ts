@@ -1,5 +1,5 @@
 interface TokenPayload {
-  userId: number;
+  id: number;
   is2fa?: boolean;
 }
 

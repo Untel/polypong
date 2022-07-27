@@ -30,10 +30,10 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     return data;
   }
 
-  async getUserCoalition(userId: number, accessToken: string) {
+  async getUserCoalition(id: number, accessToken: string) {
     this.logger.log(`validate - getUserCoalition`);
     const { data } = await axios.get(
-      `https://api.intra.42.fr/v2/users/${userId}/coalitions`,
+      `https://api.intra.42.fr/v2/users/${id}/coalitions`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

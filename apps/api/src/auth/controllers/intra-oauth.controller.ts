@@ -33,7 +33,7 @@ export class IntraOAuthController {
     const user = req.user;
     this.logger.log(`callback - req.user = ${JSON.stringify(req.user)}`);
     const token = this.authService.getToken({
-      userId: user.id,
+      id: user.id,
       is2fa: false, // means this token is not 2fa
     });
 
