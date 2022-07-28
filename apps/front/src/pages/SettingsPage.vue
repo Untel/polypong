@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from 'src/stores/auth.store';
+import { twoFactorApi, useAuthStore } from 'src/stores/auth.store';
 import { Notify } from 'quasar';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
