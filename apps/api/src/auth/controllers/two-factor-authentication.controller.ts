@@ -46,12 +46,9 @@ export class TwoFactorAuthenticationController {
 				resolve(result);
 			});
 		});
+    this.logger.log(`generate - qrAsDataUrl = ${qrAsDataUrl}`);
 
     res.send(qrAsDataUrl);
-//    res.send(data);
-//    return this.twoFactorAuthenticationService.pipeQrCodeStream(
-//      res, otpauthUrl,
-//    );
   }
 
   @Post('activate')
