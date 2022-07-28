@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/13 16:28:48 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/15 00:15:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,9 @@ export class Paddle {
     // this.color = GameTools.colors[index % GameTools.colors.length];
     this.color = `#${GameTools.genRanHex(6)}`;
     this.angle = lineAngle(axis);
+    this.angle = GameTools.angleNormalize(this.angle, 0, 360)
+    console.log("normalized is ", GameTools.angleNormalize(this.angle, 0, 360));
+
     console.log("this paddle angle is ", this.angle)
     this.bounceAngle = bounce;
     this.setRelativeSize(relativeSize);

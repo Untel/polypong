@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/13 21:42:03 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/15 00:06:20 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,13 @@ import {
 import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
 
 import PolygonMap from './polygon.class';
-import { Power, PowerList } from './power.class';
+import { Power, PowerList, SeeTrajectories } from './power.class';
 
 import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
+import { tmpdir } from 'os';
+import e from 'express';
 
 const FRAME_RATE = 30;
 
@@ -49,7 +51,7 @@ const col = new Collider2d();
 // col.testCirclePolygon
 // col.testPolygonCircle
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -123,18 +125,38 @@ export default class Game {
   }
 
   spawnBots(botNb: number) {
+    this.bots = [];
+    // if (botNb == 2) {
+    // let id: number = 1;
 
-    for (let i = 0; i < botNb; i++) {
-      const tmp: Bot = new Bot(this.walls[i], i)
-      this.bots.push(tmp);
-    }
+    this.walls.forEach((element, index) => {
+      if (element.paddle !== null) {
+        const tmp: Bot = new Bot(element, index)
+        this.bots.push(tmp);
+      }
+    });
+    // if (this.walls[0].paddle !== null) {
+
+    // }
+    // else if (this.walls[1].paddle !== null)
+    // }
+    // for (let i = 0; i < botNb; i++) {
+    //   const tmp: Bot = new Bot(this.walls[i], i)
+    //   this.bots.push(tmp);
+    // }
+
   }
+
+
 
   run() {
     // this.generateMap(this.nPlayers);
     // this.socket.emit('mapChange', this.networkMap);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    this.balls.forEach(e => {
+      e.findTarget(this.walls);
+    });
   }
   stop() {
     clearInterval(this.interval);
@@ -213,6 +235,8 @@ export default class Game {
   }
 
   runBots() {
+    if (this.bots.length === 0)
+      return;
     this.bots.forEach(e => {
       e.think();
     })
@@ -225,6 +249,10 @@ export default class Game {
       this.nPlayers--;
     // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
+    this.spawnBots(this.nPlayers);
+    this.balls.forEach(e => {
+      e.findTarget(this.walls);
+    });
     const timer = 1000;
     this.socket.emit('timer', { timer });
     setTimeout(() => {
@@ -235,10 +263,12 @@ export default class Game {
   public reset() {
     // this.nPlayers = 1;
     this.generateMap(this.nPlayers);
-    while (this.bots.length != 0) {
-      this.bots.pop();
-    }
-    this.spawnBots(this.nBots);
+    // this.bots = [];
+    this.spawnBots(this.nPlayers);
+    this.balls.forEach(e => {
+      e.findTarget(this.walls);
+    });
+
 
   }
   // Getters
