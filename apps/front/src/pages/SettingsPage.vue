@@ -16,9 +16,20 @@
         <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
       </q-div>
       <br>
-      <q-div>{{qrCode}}</q-div>
+      <!-- <q-div>{{qrCode}}</q-div> -->
       <pre>QrCode requested : {{qrCode.requested}}</pre>
+      <pre>QrCode data : {{qrCode.imageBytes}}</pre>
+      <!-- <pre class="self-start">current qrcode :</pre> -->
+      <img style="max-width: 50%; max-height: 50%; border-radius: 15px;" id="newImage"/>
+     <!-- <q-img data={{qrCode.imageBytes}}/> -->
+      <!-- <img src={{qrCode.imageBytes}} /> -->
       <q-btn @click="requestQrCode()">request QrCode</q-btn>
+      <!-- <img 
+        src={{qrCode.imageBytes.a}}
+      /> -->
+
+
+      
 
     </q-card>
 
@@ -50,6 +61,7 @@ const router = useRouter();
 
 // name change
 const newName = ref('');
+const new2fa = ref('');
 const changeName = async (newName) => {
   try {
     await authStore.updateUser({ name: newName });
@@ -73,14 +85,32 @@ const qrCode = {
   imageBytes: '',
 };
 async function requestQrCode() {
-  try {
-    const res = await twoFactorApi.get('generate'); // RES = UNDEFINED
-    console.log(`SettingsPage - requestQrCode - after query - res = ${console.dir(res)}`);
-    qrCode.requested = true;
+  // try {
+    console.log("Getting QR");
+    let oData: any;
+    let res: any = await twoFactorApi.get('generate').then(data => 
+    {
+      console.log("we got this", data);
+      oData = data; 
+      qrCode.requested = true;
+      qrCode.imageBytes = oData.out;
+    })
+    document.getElementById("newImage").src = qrCode.imageBytes
+    // new2fa.value = qrCode.imageBytes
+    // res.resolve();
+    // console.log("RES IS", oData);
+    // console.log(`SettingsPage - requestQrCode - after query - res = ${console.dir(res)}`);
+
+    console.log("qRCode ", qrCode, ";")
+
+    console.log("image data :",qrCode.imageBytes)
     //    qrCode.imageBytes = res.data;
-  } catch (error) {
-    console.log(error);
-  }
+  // } catch (error) {
+  // var img = document.createElement('img');
+  // img.src = oData;
+  // document.body.appendChild(img);
+    // console.log("failed : ", error);
+  // }
 }
 
 // avatar change

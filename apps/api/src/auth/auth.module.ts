@@ -50,7 +50,7 @@ import { PongModule } from 'src/pong';
     }),
     TypeOrmModule.forFeature([ForgotPasswordToken]),
   ],
-  exports: [AuthService, PasswordService, JwtStrategy],
+  exports: [AuthService, PasswordService, JwtStrategy, TwoFactorAuthenticationService],
   controllers: [
     AuthController,
     IntraOAuthController,
