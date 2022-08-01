@@ -6,6 +6,7 @@ import passport from 'passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtSimpleStrategy } from './strategies/jwt-simple.strategy';
 import { PassportModule } from '@nestjs/passport';
 
 import * as strategies from 'src/auth/strategies';
@@ -32,6 +33,7 @@ import { PongModule } from 'src/pong';
     OAuthService,
     TwoFactorAuthenticationService,
     JwtStrategy,
+    JwtSimpleStrategy,
     AuthSerializer,
     PasswordService,
     ...Object.values(strategies),
@@ -50,7 +52,13 @@ import { PongModule } from 'src/pong';
     }),
     TypeOrmModule.forFeature([ForgotPasswordToken]),
   ],
-  exports: [AuthService, PasswordService, JwtStrategy, TwoFactorAuthenticationService],
+  exports: [
+    AuthService,
+    PasswordService,
+    JwtStrategy,
+    JwtSimpleStrategy,
+    TwoFactorAuthenticationService,
+  ],
   controllers: [
     AuthController,
     IntraOAuthController,

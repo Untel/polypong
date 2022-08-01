@@ -12,13 +12,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from 'src/user/user.service';
 import { TwoFactorAuthenticationCodeDto } from '../dtos/two-factor-authentication-code.dto';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import { AuthService } from '../services/auth.service';
 import { TwoFactorAuthenticationService } from '../services/twoFactorAuthentication.service';
 import { toDataURL } from 'qrcode';
+import JwtSimpleGuard from 'src/guards/jwt-simple.guard';
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,7 +31,7 @@ export class TwoFactorAuthenticationController {
   logger = new Logger(`2fa Controller`);
 
   @Get('generate')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtSimpleGuard)
   async register(@Req() req: RequestWithUser, @Res() res) {
     console.log('GET GENERATE');
     // this.logger.log(`generate - req.user = ${JSON.stringify(req.user)}`);
@@ -54,7 +54,7 @@ export class TwoFactorAuthenticationController {
 
   @Post('activate')
   @HttpCode(200)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtSimpleGuard)
   async turnOnTwoFactorAuthentication(
     @Req() req: RequestWithUser,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
@@ -66,24 +66,25 @@ export class TwoFactorAuthenticationController {
         twoFactorAuthenticationCode,
         req.user,
       );
+    this.logger.log(`code validity = ${isValid}`);
 
     if (isValid) {
-      this.logger.log(`code valid ? ${isValid}`);
       await this.userService.turnOnTwoFactorAuthentication(req.user.id);
     } else {
-      throw new UnauthorizedException('2fa code not valid');
+      throw new UnauthorizedException('2FA activation code invalid, check your google authenticator');
     }
   }
 
   @Post('authenticate')
   @HttpCode(201)
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtSimpleGuard)
   async authenticate(
     @Req() req,
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
     @Res() res,
   ) {
-    this.logger.log(`authenticate`);
+    this.logger.log(`authenticate - req.user : ${JSON.stringify(req.user)}`);
+    this.logger.log(`authenticate - 2fa secret : ${TwoFactorAuthenticationCodeDto}`);
     const isValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
@@ -95,7 +96,7 @@ export class TwoFactorAuthenticationController {
     if (isValid) {
       res.send(user);
     } else {
-      throw new UnauthorizedException('2fa code not valid');
+      throw new UnauthorizedException('2FA');
     }
   }
 }

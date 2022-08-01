@@ -43,10 +43,16 @@ export default async (
     await auth.whoAmI();
     await auth.connectToSocket();
     next();
-  } catch (error) {
-    // if (error.statusCode === _HTTPCODEFOR2FA_ ) {
-    //  redirect2fa =
-    // }
+  } catch (error: any) {
+    console.log(`authguard - caught exception - error = ${JSON.stringify(error)}`);
+    console.log(`authguard - caught exception - error = ${JSON.stringify(error.body)}`);
+    if (error.body.statusCode === 401) {
+      console.log('authguard - lala');
+      if (error.body.message === '2FA') {
+        console.log('authguard - lele');
+        return next({ name: '2fa' });
+      }
+    }
     const redirect = buildRedirectObject(to);
     console.log('Auth guard fail', error, to.name, redirect);
     return next({ name: 'login', query: redirect });

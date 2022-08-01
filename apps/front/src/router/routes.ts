@@ -12,8 +12,8 @@
 
 import { RouteRecordRaw } from 'vue-router';
 // import PongPage from 'pages/PongPage.vue';
-import AuthGuard from './auth.guard';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
+import AuthGuard from './auth.guard';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -27,6 +27,7 @@ const routes: RouteRecordRaw[] = [
       children: [
         { name: 'login', path: '', component: () => import('pages/LoginPage.vue') },
         { name: 'signup', path: 'signup', component: () => import('pages/SignupPage.vue') },
+        { name: '2fa', path: 'TwoFactor', component: () => import('pages/TwoFactor.vue') },
       ],
     }, {
       path: '',
@@ -38,8 +39,12 @@ const routes: RouteRecordRaw[] = [
         { name: 'coalitions', path: 'coalitions', component: () => import('pages/CoalitionsPage.vue') },
         { name: 'profile', path: 'profile', component: () => import('pages/ProfilePage.vue') },
         { name: 'lobbies', path: 'lobbies', component: () => import('pages/LobbiesPage.vue') },
-        { name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'), },
-        { name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue') },
+        {
+          name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'),
+        },
+        {
+          name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue'),
+        },
         { name: 'users', path: 'users', component: () => import('pages/UsersPage.vue') },
         { name: 'settings', path: 'settings', component: () => import('pages/SettingsPage.vue') },
       ],

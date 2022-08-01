@@ -122,15 +122,23 @@ export const useAuthStore = defineStore('auth', {
       return res;
     },
 
-    async verifyQrCodeValue(decodedValue: number) {
-      console.log(`authStore - verifyQrCodeValue - decodedValue = ${decodedValue}`);
+    async activate2fa(decodedValue: number) {
+      console.log(`authStore - activate2fa - decodedValue = ${decodedValue}`);
       let res = null;
-      try {
-        res = await twoFactorApi.post('authenticate', { decodedValue });
-        console.log(`authStore - verifyQrCodeValue - res = ${res}`);
-      } catch (error) {
-        console.log(error);
-      }
+      res = await twoFactorApi.post('activate', {
+        twoFactorAuthenticationCode: decodedValue,
+      });
+      console.log(`authStore - activate2fa - res = ${res}`);
+      return res;
+    },
+
+    async authenticateQrCode(value: number) {
+      console.log(`authStore - authenticateQrCode = ${value}`);
+      let res = null;
+      res = await twoFactorApi.post('authenticate', {
+        twoFactorAuthenticationCode: value,
+      });
+      console.log(`authStore - authenticateQrCode - res = ${res}`);
       return res;
     },
 
