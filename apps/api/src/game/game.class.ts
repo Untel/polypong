@@ -50,7 +50,7 @@ export default class Game {
   intervalPowers: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
-    console.log("Angle: ", angleToDegrees(6.28));
+    console.log('Angle: ', angleToDegrees(6.28));
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;

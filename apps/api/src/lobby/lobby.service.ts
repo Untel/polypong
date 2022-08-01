@@ -10,7 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable, Inject, forwardRef, UseInterceptors, ClassSerializerInterceptor, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
 import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
@@ -51,7 +58,7 @@ export class LobbyService {
   getAndJoinLobby(id: LobbyId, user: User): Lobby {
     // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
-    console.log("Searching lobby", lobby, this.lobbies);
+    console.log('Searching lobby', lobby, this.lobbies);
     if (!lobby) return null;
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
     if (!socketOfJoiner) {
@@ -78,7 +85,7 @@ export class LobbyService {
   }
 
   updateLobby(id: LobbyId, lobby: Lobby): Lobby {
-    console.log("Updating value", lobby);
+    console.log('Updating value', lobby);
     const old = this.lobbies.get(id);
     if (!old) {
       throw new UnprocessableEntityException('Unfoundable lobby');

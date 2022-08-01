@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, forwardRef} from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  forwardRef,
+} from '@nestjs/common';
 import RedisStore from 'connect-redis';
 import session from 'express-session';
 import passport from 'passport';
@@ -50,7 +55,12 @@ import { PongModule } from 'src/pong';
     }),
     TypeOrmModule.forFeature([ForgotPasswordToken]),
   ],
-  exports: [AuthService, PasswordService, JwtStrategy],
+  exports: [
+    AuthService,
+    PasswordService,
+    JwtStrategy,
+    TwoFactorAuthenticationService,
+  ],
   controllers: [
     AuthController,
     IntraOAuthController,

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { HttpArgumentsHost, WsArgumentsHost } from '@nestjs/common/interfaces';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
@@ -8,6 +13,8 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   constructor() {
     super();
   }
+
+  logger = new Logger('JwtGuard');
 
   getRequest(context: ExecutionContext) {
     switch (context.getType()) {
@@ -20,6 +27,9 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
           },
         };
       case 'http':
+        this.logger.log(
+          `getRequest - http - returning context.switchToHttp().getRequest()`,
+        );
         return context.switchToHttp().getRequest();
       default:
         console.log('Unhandled execution context', context.getType());
@@ -28,6 +38,7 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   }
 
   canActivate(context: ExecutionContext) {
+    this.logger.log(`canActivate - context = ${context}`);
     // console.log("Parent activate ctx");
     return super.canActivate(context) as boolean;
   }
@@ -35,6 +46,7 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   handleRequest(err, user, info) {
     // console.log("===> JWT HANDLE");
     // console.log('Handling the request', err, user, info);
+    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     if (err || !user) {
       throw err || new Error();
     }

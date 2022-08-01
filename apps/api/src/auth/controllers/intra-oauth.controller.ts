@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   intra-oauth.controller.ts                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/01 19:27:38 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/01 19:29:04 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import {
   Controller,
   Get,
@@ -25,18 +37,19 @@ export class IntraOAuthController {
   @Get('callback')
   @UseGuards(IntraOAuthGuard)
   async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
-    this.logger.log(`@Get() auth/intra/callback`);
-    console.log('Auth inner query 2', req.query);
-    const user = req.user;
-    const token = this.authService.getToken({ ...(user as any) });
-    if (user.isTwoFactorAuthenticationEnabled) {
-      return res.send({
-        isTwoFactorAuthenticationEnabled: true,
-        accessCookie: token,
-      });
-    }
+    this.logger.log(`callback`);
+    this.logger.log(`callback - Auth inner query 2 - req.query = ${req.query}`);
 
-    this.logger.log(`@Post(login), returning user`);
+    const user = req.user;
+    this.logger.log(`callback - req.user = ${JSON.stringify(req.user)}`);
+    const token = this.authService.getToken({
+      id: user.id,
+      is2fa: false, // means this token is not 2fa
+    });
+
+    this.logger.log(
+      `callback - redirecting to front '/' with token ${token} in query url`,
+    );
     return res.redirect(
       url.format({
         pathname: '/',

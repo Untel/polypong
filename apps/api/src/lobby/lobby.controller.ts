@@ -59,7 +59,7 @@ export class LobbyController {
       throw new UnauthorizedException('Unknown lobby');
     }
     // const socketOfJoiningUser = this.so
-    console.log("GEt looby and join", lobby);
+    console.log('GEt looby and join', lobby);
     return lobby;
   }
 
@@ -71,7 +71,7 @@ export class LobbyController {
 
   @Put('/:id')
   updateLobby(@CurrentUser() user, @Param('id') id: LobbyId, @Body() lobby) {
-    console.log("Updating", id, typeof id);
+    console.log('Updating', id, typeof id);
     const _lobby = this.lobbyService.updateLobby(id, lobby);
     return _lobby;
     // this.lobbyService.updateLobby(host.id);

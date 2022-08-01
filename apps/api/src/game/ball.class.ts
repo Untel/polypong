@@ -185,7 +185,7 @@ export class Ball extends Circle {
   bouncePaddle(paddle: Paddle, walls: Wall[]) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
 
     /**
      * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
@@ -208,7 +208,7 @@ export class Ball extends Circle {
     this.findTarget(walls);
   }
 
-  increaseSpeed(ratio = (this.speed * 0.1)) {
+  increaseSpeed(ratio = this.speed * 0.1) {
     this.speed += ratio;
     if (this.speed > this.maxSpeed) {
       this.speed = this.maxSpeed;

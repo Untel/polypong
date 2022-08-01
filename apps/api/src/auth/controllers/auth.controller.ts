@@ -75,12 +75,7 @@ export class AuthController {
       `@Post(login), req.session = ${JSON.stringify(req.session)}`,
     );
     const user = req.user;
-    // const accessCookie = this.authService.getCookieWithJwtToken(user.id);
     const token = this.authService.getToken({ ...user });
-    // const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${process.env.JWT_EXPIRATION}`
-    // res.setHeader(
-    //   'Set-Cookie', [cookie]
-    // );
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {
@@ -94,13 +89,6 @@ export class AuthController {
     return res.send({ ...user, token });
   }
 
-  @UseGuards(JwtGuard)
-  @Post('logout')
-  async logOut(@Req() req, @Res() res) {
-    this.authService.logout(req.user.id);
-    return res.sendStatus(200);
-  }
-
   /**
    * Get data of the current user.
    * @param {Request} req : The request object.
@@ -109,13 +97,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
-    delete req.user.password;
-
-    // Ici on ajoute le jwt token au payload car on en aura besoin pour authentifier le websocket
-    return {
-      ...req.user,
-      token: this.authService.getToken({ ...req.user }),
-    };
+    return req.user;
   }
 
   // verify JWT and return user data, so the browser can check the validity

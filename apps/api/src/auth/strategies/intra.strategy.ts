@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   intra.strategy.ts                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/01 19:28:46 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/01 19:28:52 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { OAuthService } from '../services/oauth.service';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-oauth2';
@@ -30,10 +42,10 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     return data;
   }
 
-  async getUserCoalition(userId: number, accessToken: string) {
+  async getUserCoalition(id: number, accessToken: string) {
     this.logger.log(`validate - getUserCoalition`);
     const { data } = await axios.get(
-      `https://api.intra.42.fr/v2/users/${userId}/coalitions`,
+      `https://api.intra.42.fr/v2/users/${id}/coalitions`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -44,7 +56,9 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   }
 
   async validate(accessToken: string, redirect: string): Promise<any> {
-    this.logger.log(`validate`, redirect);
+    this.logger.log(`validate`);
+    this.logger.log(`validate - accessToken = ${accessToken}`);
+    this.logger.log(`validate - redirect = ${redirect}`);
     const data = await this.getUserProfile(accessToken);
     // this.logger.log(`data = ${data}`);
     // this.logger.log(`email = ${data.email}`);

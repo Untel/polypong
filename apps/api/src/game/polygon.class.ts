@@ -69,7 +69,7 @@ export default class MyPolygon {
 
     // console.log('-- Edges', this.shape);
     this.edgeWidth = lineLength(this.edges[0]);
-    this.inradius = this.edgeWidth / ((Math.tan(Math.PI / npoints) * 2))
+    this.inradius = this.edgeWidth / (Math.tan(Math.PI / npoints) * 2);
   }
 
   randomPosition() {

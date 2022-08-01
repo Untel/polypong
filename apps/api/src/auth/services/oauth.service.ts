@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 
@@ -6,12 +6,15 @@ import { UserService } from 'src/user/user.service';
 export class OAuthService {
   constructor(private readonly userService: UserService) {}
 
+  logger = new Logger('OAuthService');
+
   /**
    * Log in or register via oAuth.
    * @param {Request} req : The request object.
    * @returns
    */
   async socialLogin(user) {
+    this.logger.log(`socialLogin - user = ${JSON.stringify(user)}`);
     // nb : passport middleware adds the user to the request object.
     if (!user) {
       throw new BadRequestException('No account presented.');

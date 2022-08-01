@@ -45,6 +45,7 @@ export class AuthService {
       const res = await this.userService.createUser({
         ...creds,
         password: hashedPassword,
+        isTwoFactorAuthenticationEnabled: false,
       });
       this.sendEmailVerificationMail(res);
       return { user: res };
@@ -149,24 +150,21 @@ export class AuthService {
     });
   }
 
-  // Check that a client's 2FA QR code matches the secret in the db
-  public isTwoFactorAuthenticationCodeValid(
-    twoFactorAuthenticationCode: string,
-    user: User,
-  ) {
-    return authenticator.verify({
-      token: twoFactorAuthenticationCode,
-      secret: user.twoFactorAuthenticationSecret,
-    });
-  }
-
   public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
-    console.log('Checking token', token);
+    this.logger.log(`findUserByAccessToken - token = ${token}`);
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
-    return payload;
+    this.logger.log(
+      `findUserByAccessToken - payload = ${JSON.stringify(payload)}`,
+    );
+    if (payload.is2fa) {
+      return payload; // don't return all the user info if the token was signed with is2fa
+    } else {
+      this.logger.log(`findUserByAccessToken - payload.id = ${payload.id}`);
+      const user = this.userService.findById(payload.id);
+      this.logger.log(`findUserByAccessToken - user = ${JSON.stringify(user)}`);
+      return user;
+    }
   }
-
-  public async logout(userID) {}
 }

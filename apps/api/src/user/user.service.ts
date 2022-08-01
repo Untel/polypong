@@ -41,8 +41,11 @@ export class UserService {
   }
 
   async findById(id: string | number): Promise<User> {
+    this.logger.log(`findById - id = ${id}`);
     if (id) {
-      return this.userRepository.findOne({ where: { id: +id } });
+      const res = await this.userRepository.findOne({ where: { id: +id } });
+      this.logger.log(`findById - res = ${JSON.stringify(res)}`);
+      return res;
     }
     return null;
   }
@@ -62,15 +65,18 @@ export class UserService {
   }
 
   // save the 2fa secret in the database
-  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-    return this.userRepository.update(userId, {
+  async setTwoFactorAuthenticationSecret(secret: string, id: number) {
+    this.logger.log(
+      `setTwoFactorAuthenticationSecret - secret : ${secret}, id: ${id}`,
+    );
+    return this.userRepository.update(id, {
       twoFactorAuthenticationSecret: secret,
     });
   }
 
   // activate 2fa
-  async turnOnTwoFactorAuthentication(userId: number) {
-    return this.userRepository.update(userId, {
+  async turnOnTwoFactorAuthentication(id: number) {
+    return this.userRepository.update(id, {
       isTwoFactorAuthenticationEnabled: true,
     });
   }
@@ -84,6 +90,7 @@ export class UserService {
     const {
       name,
       email,
+      isTwoFactorAuthenticationEnabled,
       password,
       coalition,
       avatar,
@@ -94,6 +101,8 @@ export class UserService {
     const newUser = await this.userRepository.create({
       name,
       email,
+      isTwoFactorAuthenticationEnabled:
+        isTwoFactorAuthenticationEnabled || false,
       coalition,
       password: password,
       avatar:
@@ -108,7 +117,9 @@ export class UserService {
   async updateUser(id: string | number, properties: any) {
     const user = await this.findById(id);
     this.logger.log(`in updateUser, user.name = ${user.name}`);
-    this.logger.log(`in updateUser, properties = ${JSON.stringify(properties)}`);
+    this.logger.log(
+      `in updateUser, properties = ${JSON.stringify(properties)}`,
+    );
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -130,17 +141,28 @@ export class UserService {
     let res = null;
     this.logger.log(`updateSelf - properties.name = ${properties.name}`);
     this.logger.log(`updateSelf - user.name = ${user.name}`);
-    this.logger.log(`updateSelf - user.name !== properties.name = ` + properties.name != user.name);
-    this.logger.log(`updateSelf - properties.hasOwnProperty('name') = ${properties.hasOwnProperty('name')}`);
-    if (properties.hasOwnProperty('name')) {
-      try {
+    try {
+      if (properties.hasOwnProperty('name')) {
         res = await this.setName(user, properties.name);
         this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
-      } catch (error) {
-        this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
-        this.logger.log(`updateSelf - rethrowing error`);
-        throw error;
       }
+      this.logger.log(
+        `properties.hasOwnProperty('isTwoFactorAuthenticationEnabled')) = ${properties.hasOwnProperty(
+          'isTwoFactorAuthenticationEnabled',
+        )}`,
+      );
+      if (properties.hasOwnProperty('isTwoFactorAuthenticationEnabled')) {
+        this.logger.log('lala');
+        res = await this.set2fa(
+          user,
+          properties.isTwoFactorAuthenticationEnabled,
+        );
+        this.logger.log(`updateSelf - res = ${JSON.stringify(res)}`);
+      }
+    } catch (error) {
+      this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
+      this.logger.log(`updateSelf - rethrowing error`);
+      throw error;
     }
     this.logger.log(`updateSelf - returning res = ${JSON.stringify(res)}`);
     if (!res) {
@@ -170,16 +192,35 @@ export class UserService {
     this.logger.log(`in setName, name = ${name}`);
     this.logger.log(`in setName, existingName = ${existingName}`);
     if (existingName) {
-      this.logger.log(`in setName, existingName found, throwing error : name already taken`);
+      this.logger.log(
+        `in setName, existingName found, throwing error : name already taken`,
+      );
       throw new ConflictException('Name already taken');
     }
     if (name.length < 3) {
-      this.logger.log(`in setName, existingName found, throwing error : name too short`);
+      this.logger.log(
+        `in setName, existingName found, throwing error : name too short`,
+      );
       throw new BadRequestException('Name needs to be at least 3 letters long');
     }
     const email = user.email;
     const localUser = await this.find({ email });
     const res = await this.updateUser(localUser.id, { name: name });
+    return res;
+  }
+
+  /**
+   * set 2fa on or off
+   * @param user : the user interface
+   * @param isTwoFactorAuthenticationEnabled : 2fa status
+   * @returns : the updated user entity
+   */
+  async set2fa(user: UserInterface, isTwoFactorAuthenticationEnabled: boolean) {
+    const email = user.email;
+    const localUser = await this.find({ email });
+    const res = await this.updateUser(localUser.id, {
+      isTwoFactorAuthenticationEnabled: isTwoFactorAuthenticationEnabled,
+    });
     return res;
   }
 

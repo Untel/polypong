@@ -18,6 +18,7 @@ import { TwoFactorAuthenticationCodeDto } from '../dtos/two-factor-authenticatio
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import { AuthService } from '../services/auth.service';
 import { TwoFactorAuthenticationService } from '../services/twoFactorAuthentication.service';
+import { toDataURL } from 'qrcode';
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -31,17 +32,24 @@ export class TwoFactorAuthenticationController {
 
   @Get('generate')
   @UseGuards(JwtGuard)
-  async register(@Res() res, @Req() req: RequestWithUser) {
-    const { user } = req;
+  async register(@Req() req: RequestWithUser, @Res() res) {
+    console.log('GET GENERATE');
+    // this.logger.log(`generate - req.user = ${JSON.stringify(req.user)}`);
     const { otpauthUrl } =
       await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
-        user,
+        req.user,
       );
 
-    this.twoFactorAuthenticationService.sendQrCodeAsDataURL(res, otpauthUrl);
-    //		return this.twoFactorAuthenticationService.pipeQrCodeStream(
-    //			res, otpauthUrl
-    //		);
+    this.logger.log(`generate - otpauthUrl = ${otpauthUrl}`);
+    const qrAsDataUrl = await new Promise((resolve, reject) => {
+      toDataURL(otpauthUrl, [], (error, result) => {
+        resolve(result);
+        console.log('result resolved', result);
+      });
+    });
+    this.logger.log(`generate - qrAsDataUrl = ${qrAsDataUrl}`);
+
+    res.send({ qrAsDataUrl });
   }
 
   @Post('activate')
@@ -75,17 +83,16 @@ export class TwoFactorAuthenticationController {
     @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
     @Res() res,
   ) {
-    this.logger.log("@Post('authenticate')");
+    this.logger.log(`authenticate`);
     const isValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
         req.user,
       );
-    this.logger.log(`@Post('authenticate') - isValid = ${isValid}`);
+    this.logger.log(`authenticate - isValid = ${isValid}`);
     const user = req.user;
     // create a jwt access token with the property is2fa set to true
     if (isValid) {
-      this.logger.log(`BEFORE REWORK PASSORT: about to set cookie`);
       res.send(user);
     } else {
       throw new UnauthorizedException('2fa code not valid');

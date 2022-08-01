@@ -18,7 +18,6 @@ export interface ILobbyConfig {
 }
 
 export default class Lobby implements ILobby, ILobbyConfig {
-
   id: LobbyId;
   name: string;
   playersMax: number;
@@ -34,7 +33,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   spectators: Spectator[];
   game: Game | null;
 
-  constructor(host: Player, name: string = 'Unamed lobby') {
+  constructor(host: Player, name = 'Unamed lobby') {
     this.id = host.id;
     this.name = name;
     this.host = host;

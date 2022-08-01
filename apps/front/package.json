@@ -23,6 +23,7 @@
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",
     "socket.io-client": "^4.5.0",
+    "util-inspect": "^0.1.8",
     "vite": "^2.9.9",
     "vue": "^3.0.0",
     "vue-filepond": "^7.0.3",
