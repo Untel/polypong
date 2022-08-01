@@ -4,6 +4,7 @@ import { UserService } from 'src/user/user.service';
 import { AuthService, UserJwtPayload } from 'src/auth/services/auth.service';
 import { User } from 'src/user';
 import { JwtPayload } from 'jsonwebtoken';
+import { UnauthorizedException } from '@nestjs/common';
 
 export interface AuthSocket extends Socket {
   user: UserJwtPayload;
@@ -25,16 +26,10 @@ export const WSAuthMiddleware = (
         socket.user = userResult;
         next();
       } else {
-        next({
-          name: 'Unauthorizaed',
-          message: 'Unauthorizaed',
-        });
+        next(new Error('unauthorized'));
       }
     } catch (error) {
-      next({
-        name: 'Unauthorizaed',
-        message: 'Unauthorizaed',
-      });
+      next(new Error('unauthorized'));
     }
   };
 };

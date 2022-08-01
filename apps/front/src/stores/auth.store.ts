@@ -6,19 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:24:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 20:29:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { defineStore } from 'pinia';
-import { useQuasar, Notify } from 'quasar';
+import { defineStore, Pinia } from 'pinia';
+import { Notify } from 'quasar';
 
 import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
 import { mande, defaults, MandeError } from 'mande';
-import { useApi } from 'src/utils/api';
 import { User } from 'src/types/user';
-import { decode } from 'querystring';
+import router from 'src/router';
+import { NavigationGuardNext, Router } from 'vue-router';
 
 export const authApi = mande('/api/auth');
 export const twoFactorApi = mande('/api/2fa');
@@ -47,22 +47,36 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     connectToSocket() {
-      this.socket = io(SOCKET_BASE_URL, {
-        path: '/socket',
-        transports: ['websocket'],
-        withCredentials: true,
-        auth: { token: `${this.user.token}` },
-      });
-
-      this.socket.on('online', ({ name, type }) => {
-        Notify.create({
-          message: `${name} just is now ${
-            type === 'connect' ? 'connected' : 'disconnected'
-          }`,
+      return new Promise((resolve, reject) => {
+        this.socket = io(SOCKET_BASE_URL, {
+          path: '/socket',
+          transports: ['websocket'],
+          withCredentials: true,
+          auth: { token: `${localStorage.getItem('token')}` },
         });
-        this.fetchConnectedUsers();
+        this.socket.once('connect_error', (err) => {
+          console.log('Socket connect error', err);
+          Notify.create({
+            type: 'negative',
+            message: `Connection to socket error: ${err.message}`,
+          });
+          localStorage.removeItem('token');
+          this.socket?.off('connect');
+          reject();
+        });
+        this.socket.once('connect', () => {
+          this.socket?.off('connect_error');
+          resolve(true);
+        });
+        this.socket.on('online', ({ name, type }) => {
+          Notify.create({
+            message: `${name} just is now ${
+              type === 'connect' ? 'connected' : 'disconnected'
+            }`,
+          });
+          this.fetchConnectedUsers();
+        });
       });
-      console.log(this.socket);
     },
     async login(email: string, password: string) {
       this.user = await authApi.post('login', { email, password });

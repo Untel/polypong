@@ -77,5 +77,4 @@ const linksList = [{
 
 const miniState = ref(true);
 const auth = useAuthStore();
-
 </script>
