@@ -8,6 +8,7 @@
     </q-card>
 
     <br>
+
     <q-card> <!-- 2FA -->
       <q-div v-if="authStore.user.isTwoFactorAuthenticationEnabled === true">
         <pre>2fa is required</pre>
@@ -17,10 +18,8 @@
         <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
       </q-div>
       <br>
-      <q-div>{{qrCode}}</q-div>
-      <pre>QrCode requested : {{qrCode.requested}}</pre>
       <q-btn @click="requestQrCode()">request QrCode</q-btn>
-
+      <q-img :src=qrCode.imageBytes width="50%"></q-img>
     </q-card>
 
     <br>
@@ -36,7 +35,9 @@
         @finish="authStore.fetchUser()"
       />
     </q-card>
+
     <br>
+
   </q-page>
 </template>
 
@@ -76,8 +77,10 @@ const qrCode = ref({
 
 async function requestQrCode() {
   const res = await authStore.requestQrCode();
-  console.log(`SettingsPage - requestQrCode - res = ${res}`);
-  // TODO : FIX RES = UNDEFINED
+  console.log(`SettingsPage - requestQrCode - res = ${JSON.stringify(res)}`);
+  console.log(`SettingsPage - requestQrCode - res = ${res.qrAsDataUrl}`);
+  qrCode.value.requested = true;
+  qrCode.value.imageBytes = res.qrAsDataUrl;
 }
 
 // avatar change

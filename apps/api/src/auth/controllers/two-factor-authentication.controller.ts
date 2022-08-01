@@ -48,7 +48,7 @@ export class TwoFactorAuthenticationController {
 		});
     this.logger.log(`generate - qrAsDataUrl = ${qrAsDataUrl}`);
 
-    res.send(qrAsDataUrl);
+    res.send({ qrAsDataUrl });
   }
 
   @Post('activate')
