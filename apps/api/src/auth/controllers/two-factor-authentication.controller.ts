@@ -93,7 +93,6 @@ export class TwoFactorAuthenticationController {
     const user = req.user;
     // create a jwt access token with the property is2fa set to true
     if (isValid) {
-      this.logger.log(`BEFORE REWORK PASSORT: about to set cookie`);
       res.send(user);
     } else {
       throw new UnauthorizedException('2fa code not valid');

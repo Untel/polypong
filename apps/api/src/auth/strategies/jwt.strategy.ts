@@ -20,10 +20,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   logger = new Logger('JwtStrategy');
 
-  validate(userJwtPayload: JwtPayload) {
+  async validate(userJwtPayload: JwtPayload) {
     this.logger.log(`validate - userJWtPayload = ${JSON.stringify(userJwtPayload)}`);
     // Ya un soucis si on delete pas ca, a check
     delete userJwtPayload.exp;
-    return userJwtPayload;
+    const user = await this.userService.findById(userJwtPayload.id);
+    return user;
   }
 }

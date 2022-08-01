@@ -9,13 +9,13 @@ export class IntraOAuthGuard extends AuthGuard('intra') {
   async canActivate(context: ExecutionContext) {
     this.logger.log('entered oauthguard');
     const request = context.switchToHttp().getRequest();
-    this.logger.log(`zero - request.query = ${JSON.stringify(request.query)}`);
+    this.logger.log(`zero - after getRequest() - request.query = ${JSON.stringify(request.query)}`);
 
     const redirect = { ...request.query };
-    this.logger.log(`one - redirect = ${JSON.stringify(redirect)}`);
+    this.logger.log(`one - { ...request.query } = ${JSON.stringify(redirect)}`);
 
     const activate = (await super.canActivate(context)) as boolean;
-    this.logger.log(`two - activate = ${JSON.stringify(activate)}`);
+    this.logger.log(`two - super. = ${JSON.stringify(activate)}`);
 
     this.logger.log(`three - redirect = ${JSON.stringify(redirect)}`);
     return activate;

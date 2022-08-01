@@ -18,6 +18,7 @@ import { CoalitionChoice } from 'src/types';
 import { mande, defaults, MandeError } from 'mande';
 import { useApi } from 'src/utils/api';
 import { User } from 'src/types/user';
+import { decode } from 'querystring';
 
 export const authApi = mande('/api/auth');
 export const twoFactorApi = mande('/api/2fa');
@@ -108,6 +109,29 @@ export const useAuthStore = defineStore('auth', {
         console.log(error); return;
       }
       this.user = res;
+    },
+
+    async requestQrCode() {
+      let res = null;
+      try {
+        res = await twoFactorApi.get('generate');
+        console.log(`authStore - requestQrCode - res = ${res}`);
+      } catch (error) {
+        console.log(error);
+      }
+      return res;
+    },
+
+    async verifyQrCodeValue(decodedValue: number) {
+      console.log(`authStore - verifyQrCodeValue - decodedValue = ${decodedValue}`);
+      let res = null;
+      try {
+        res = await twoFactorApi.post('authenticate', { decodedValue });
+        console.log(`authStore - verifyQrCodeValue - res = ${res}`);
+      } catch (error) {
+        console.log(error);
+      }
+      return res;
     },
 
   },

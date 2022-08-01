@@ -90,13 +90,6 @@ export class AuthController {
     return res.send({ ...user, token });
   }
 
-  @UseGuards(JwtGuard)
-  @Post('logout')
-  async logOut(@Req() req, @Res() res) {
-    this.authService.logout(req.user.id);
-    return res.sendStatus(200);
-  }
-
   /**
    * Get data of the current user.
    * @param {Request} req : The request object.
@@ -105,18 +98,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @Get('user')
   async getUser(@Request() req): Promise<any> {
-    delete req.user.password;
-
-    this.logger.log(`user - req.user = ${JSON.stringify(req.user)}`);
-    const id = req.user.id;
-    this.logger.log(`user - req.user.id = ${id}`);
-    const user = await this.userService.findById(id);
-    this.logger.log(`user - findById = ${JSON.stringify(user)}`);
-    // Ici on ajoute le jwt token au payload car on en aura besoin pour authentifier le websocket
-    return {
-      ...user,
-      token: this.authService.getToken({ ...req.user }),
-    };
+    return req.user;
   }
 
   // verify JWT and return user data, so the browser can check the validity

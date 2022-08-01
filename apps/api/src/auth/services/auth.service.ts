@@ -150,17 +150,6 @@ export class AuthService {
     });
   }
 
-  // Check that a client's 2FA QR code matches the secret in the db
-  public isTwoFactorAuthenticationCodeValid(
-    twoFactorAuthenticationCode: string,
-    user: User,
-  ) {
-    return authenticator.verify({
-      token: twoFactorAuthenticationCode,
-      secret: user.twoFactorAuthenticationSecret,
-    });
-  }
-
   public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
     this.logger.log(`findUserByAccessToken - token = ${token}`);
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
@@ -177,7 +166,4 @@ export class AuthService {
     }
   }
 
-  public async logout(id) {
-
-  }
 }

@@ -40,9 +40,9 @@ export default class JwtGuard
   }
 
   handleRequest(err, user, info) {
-    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     // console.log("===> JWT HANDLE");
     // console.log('Handling the request', err, user, info);
+    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     if (err || !user) {
       throw err || new Error();
     }
