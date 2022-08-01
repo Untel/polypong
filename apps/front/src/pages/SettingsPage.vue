@@ -61,6 +61,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 // name change
 const newName = ref('');
@@ -88,8 +89,9 @@ async function requestQrCode() {
 }
 async function turnOn2fa() {
   await authStore.updateUser({ isTwoFactorAuthenticationEnabled: true });
-  qrCode.value.imageBytes = ''; qrCode.value.decoded = '';
-  await requestQrCode();
+  router.push({ name: 'home' });
+//  qrCode.value.imageBytes = ''; qrCode.value.decoded = '';
+//  await requestQrCode();
 }
 async function turnOff2fa() {
   await authStore.updateUser({ isTwoFactorAuthenticationEnabled: false });
@@ -115,11 +117,9 @@ function factoryFn(file: any): Promise<any> {
 }
 
 // logout
-const router = useRouter();
 function logOut(): void {
-  const redirect = { name: 'login' };
   localStorage.setItem('token', '');
-  router.push(redirect);
+  router.push({ name: 'login' });
 }
 
 </script>
