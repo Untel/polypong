@@ -5,10 +5,13 @@ import { AuthService, UserJwtPayload } from 'src/auth/services/auth.service';
 import { User } from 'src/user';
 import { JwtPayload } from 'jsonwebtoken';
 import { UnauthorizedException } from '@nestjs/common';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
-export interface AuthSocket extends Socket {
-  user: UserJwtPayload;
-}
+// export interface AuthSocket extends Socket {
+//   user: UserJwtPayload;
+// }
+export type SocketData = { user: AuthSocket };
+export type AuthSocket = Socket<DefaultEventsMap, DefaultEventsMap, SocketData>;
 export type SocketMiddleware = (
   socket: Socket,
   next: (err?: Error) => void,
@@ -19,11 +22,12 @@ export const WSAuthMiddleware = (
   return async (socket: AuthSocket, next) => {
     try {
       const token = socket.handshake.auth.token ?? '';
-      const userResult: UserJwtPayload =
-        await authService.findUserByAccessToken(token);
+      const userResult: User = (await authService.findUserByAccessToken(
+        token,
+      )) as User;
       console.log('Socket middleware', userResult);
       if (userResult) {
-        socket.user = userResult;
+        socket.data.user = userResult;
         next();
       } else {
         next(new Error('unauthorized'));

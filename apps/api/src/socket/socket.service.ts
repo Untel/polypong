@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 19:38:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 22:11:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,18 @@ export class SocketService {
   }
 
   public get connectedUsers() {
-    const users = this.sockets.map((el: AuthSocket) => el.user);
+    const users = this.sockets.map((el) => el.data.user);
     return users;
   }
 
+  async getUsersInRoom(room: string) {
+    const sockets = await this.socketio.in(room).fetchSockets();
+    const usrs = sockets.map((s) => s.data.user);
+    return usrs;
+  }
+
   getUserSocket(userID) {
-    return this.sockets.find((el: AuthSocket) => el.user.id === userID);
+    return this.sockets.find((el) => el.data.user.id === userID);
   }
 
   sendNewLobby(lobby: Lobby) {

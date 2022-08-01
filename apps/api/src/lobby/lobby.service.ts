@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 17:50:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 21:47:18 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ export class LobbyService {
       console.log('This should never happen if socket is connected');
     }
     socketOfJoiner.join(`lobby-${lobby.id}`);
-    console.log('User ', user.id, 'joined the lobby', lobby.id);
+    this.socketService.getUsersInRoom(`lobby-${lobby.id}`);
     return lobby;
   }
 
