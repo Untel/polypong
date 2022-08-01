@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/20 02:11:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 18:10:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,13 @@ export class LobbyController {
 
   @Post()
   createLobby(@CurrentUser() user, @Body('name') name) {
-    const lobby = this.lobbyService.createLobby(user);
+    const lobby = this.lobbyService.createLobby(user, name);
     return lobby;
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Put()
+  @Put('/:id')
   updateLobby(@CurrentUser() user, @Param('id') id: LobbyId, @Body() lobby) {
-    console.log("Updating", user, lobby);
+    console.log("Updating", id, typeof id);
     const _lobby = this.lobbyService.updateLobby(id, lobby);
     return _lobby;
     // this.lobbyService.updateLobby(host.id);

@@ -5,7 +5,7 @@ COMPOSE       = ${CMP} -f compose.tools.yml
 c			        =
 
 all:
-	$(COMPOSE) up --attach front --attach api --attach postgres --attach redis
+	$(COMPOSE) up
 
 detach:
 	$(COMPOSE) up -d

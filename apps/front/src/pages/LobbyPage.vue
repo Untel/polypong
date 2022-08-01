@@ -5,11 +5,24 @@
     <q-btn @click="start">Start game</q-btn>
 
     <section>
+
+      <pre>
+        {{ lobby }}
+      </pre>
+
+      <q-card
+        v-for="user in lobby.players"
+        :key="user.user.id"
+      >
+        {{ user.user.id }}
+      </q-card>
+
       <q-form
         ref="lobbyForm"
         @validationSuccess="onFormChange"
         >
         <q-slider
+          :disable="!canUpdate"
           name="playersMax"
           v-model="lobby.playersMax"
           :min="2"
@@ -22,6 +35,7 @@
           label
         />
         <q-input v-model="lobby.name" label="Lobby name"
+          :disable="!canUpdate"
           name="name"
           lazy-rules
           :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
@@ -48,7 +62,7 @@ export default {
     try {
       const response = await $lobbies.fetchAndJoinLobby(id);
       $lobbies.activeLobby = response;
-    } catch(err) {
+    } catch (err) {
       Notify.create({
         type: 'negative',
         message: 'Error while joining lobby',
@@ -71,6 +85,7 @@ const props = defineProps({
 });
 
 const $lobbies = useLobbiesStore();
+const $auth = useAuthStore();
 const lobby = $lobbies.getActiveLobby as Lobby;
 
 const lobbyForm = ref();
@@ -81,8 +96,13 @@ const start = () => {
 };
 
 watch(lobby, (newVal, oldVal) => {
-  console.log('Watching lobby', newVal);
-  $lobbies.updateLobby(newVal);
+  console.log('Watching lobby', newVal, newVal.id);
+  $lobbies.updateLobby(newVal.id, newVal);
+});
+
+const canUpdate = computed(() => {
+  const can = lobby.host.user.id === $auth.user.id;
+  return can;
 });
 
 const onFormChange = (evt) => {

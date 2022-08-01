@@ -34,9 +34,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
   spectators: Spectator[];
   game: Game | null;
 
-  constructor(host: Player) {
+  constructor(host: Player, name: string = 'Unamed lobby') {
     this.id = host.id;
-    this.name = 'Unamed lobby';
+    this.name = name;
     this.host = host;
     this.players = new Map<number, Player>();
     this.addPlayer(host);

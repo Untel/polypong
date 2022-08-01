@@ -6,11 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/20 00:05:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 17:50:38 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable, Inject, forwardRef, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, UseInterceptors, ClassSerializerInterceptor, UnprocessableEntityException } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
 import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
@@ -67,11 +67,11 @@ export class LobbyService {
     this.lobbies.clear();
   }
 
-  createLobby(host: User): Lobby {
+  createLobby(host: User, name: string): Lobby {
     console.log('Host', host.id);
     // await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
     const player = new Player(host);
-    this.lobbies.set(host.id, new Lobby(player));
+    this.lobbies.set(host.id, new Lobby(player, name));
     const lobby: Lobby = this.getLobby(host.id);
     this.socketService.sendNewLobby(lobby);
     return lobby;
@@ -80,16 +80,13 @@ export class LobbyService {
   updateLobby(id: LobbyId, lobby: Lobby): Lobby {
     console.log("Updating value", lobby);
     const old = this.lobbies.get(id);
-    console.log("YOLOOOO", old, lobby);
+    if (!old) {
+      throw new UnprocessableEntityException('Unfoundable lobby');
+    }
     Object.assign(old, lobby);
-    // this.lobbies.set(lobby.id, {
-    //   ...old,
-    //   ...lobby,
-    // });
-    const oldold = this.lobbies.get(id);
-    console.log("Oldold", oldold);
-    // this.socketService.sendNewLobby(lobby);
-    return lobby;
+    const updatedLobby = this.lobbies.get(id);
+    this.socketService.sendNewLobby(updatedLobby);
+    return updatedLobby;
   }
   // addLobby(client: Socket, lobbyConfig: ILobbyConfig) {
   // }

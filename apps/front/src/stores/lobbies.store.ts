@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/19 21:42:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 17:43:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,9 @@ export const useLobbiesStore = defineStore('lobbies', {
         return null;
       }
     },
-    async updateLobby(lobby: Lobby) {
+    async updateLobby(lobbyId: number, lobby: Lobby) {
       try {
-        const newLobby: Lobby = await lobbiesApi.put('', { name: 'haha' });
+        const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, { name: 'haha' });
         return newLobby;
       } catch (err) {
         console.log("err", err);
