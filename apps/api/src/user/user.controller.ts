@@ -28,6 +28,7 @@ import {
   Get,
   Res,
 } from '@nestjs/common';
+import { File } from 'multer';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
@@ -117,7 +118,7 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post('setAvatar')
   @UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
-  async setAvatar(@Req() req, @UploadedFile() avatar: Express.Multer.File) {
+  async setAvatar(@Req() req, @UploadedFile() avatar: File) {
     this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
     this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
     return await this.userService.setAvatar(
