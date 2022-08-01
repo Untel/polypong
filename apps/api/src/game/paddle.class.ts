@@ -56,7 +56,10 @@ export class Paddle {
     // On cree un sous line sur laquelle le paddle va pouvoir glisser
     // qui correspond a 1 - width% de la line actuelle (+ width% de taille du Paddle)
     const preInterpolate = lineInterpolate(this.axis);
-    const effectiveAxisStart: Line = [this.axis[0], preInterpolate(1 - relSize)];
+    const effectiveAxisStart: Line = [
+      this.axis[0],
+      preInterpolate(1 - relSize),
+    ];
     const effectiveAxisEnd: Line = [preInterpolate(relSize), this.axis[1]];
     this.interpolationStart = lineInterpolate(effectiveAxisStart);
     this.interpolationEnd = lineInterpolate(effectiveAxisEnd);

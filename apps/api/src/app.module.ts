@@ -4,7 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
-import { AppService, AuthModule, UserModule, MailModule, PongModule, LobbyModule } from '.';
+import {
+  AppService,
+  AuthModule,
+  UserModule,
+  MailModule,
+  PongModule,
+  LobbyModule,
+} from '.';
 
 import { PassportModule } from '@nestjs/passport';
 

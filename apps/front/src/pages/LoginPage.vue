@@ -16,6 +16,7 @@
   aria-autocomplete="off"
 >
   <q-input
+    dark
     v-model="login"
     class="full-width"
     filled
@@ -25,6 +26,7 @@
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   />
   <q-input
+    dark
     v-model="password"
     class="full-width"
     filled

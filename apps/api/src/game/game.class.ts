@@ -3,52 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 10:08:43 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/07/14 01:49:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { Server, Socket } from 'socket.io';
-import Redis from 'ioredis';
-import RedisBridge from './redis.bridge';
+import { Server } from 'socket.io';
 import Store from 'redis-json';
 import { Bot } from '.';
-import { debounce } from 'lodash';
-import {
-  lineInterpolate,
-  polygonRegular,
-  lineAngle,
-  angleToDegrees,
-  pointOnLine,
-  pointWithLine,
-  Line,
-  pointInPolygon,
-  angleReflect,
-  Point,
-  polygonCentroid,
-  lineLength,
-  lineIntersectsLine,
-  angleToRadians,
-} from 'geometric';
-
-import { Box, Circle, Polygon, Collider2d, Vector } from 'collider2d';
-
+import { pointOnLine, Line, angleToDegrees } from 'geometric';
+import { Collider2d, Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
-
 import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
 
 const FRAME_RATE = 30;
-
-const col = new Collider2d();
-// col.testCirclePolygon
-// col.testPolygonCircle
-
 const TEST_MODE = true;
 
 export enum MODE {
@@ -61,15 +35,13 @@ export default class Game {
   store: Store;
 
   balls: Ball[] = [];
-  nBall: number = 1;
+  nBall = 1;
   bots: Bot[] = [];
   nPlayers: number;
   nBots: number;
   paddles: Paddle[] = [];
   walls: Wall[] = [];
   powers: Power[] = [];
-  speed = 10;
-  edges: any;
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
 
@@ -78,11 +50,13 @@ export default class Game {
   intervalPowers: NodeJS.Timer;
 
   constructor(socket: Server, store: Store, lobby: Lobby) {
+    console.log("Angle: ", angleToDegrees(6.28));
     this.lobby = lobby;
     this.socket = socket;
     this.store = store;
-    this.nPlayers = 5;
-    this.nBots = 4;
+    const rand = GameTools.getRandomArbitrary(2, 20);
+    this.nPlayers = rand;
+    this.nBots = rand - 1;
     this.generateMap(this.nPlayers);
     this.spawnBots(this.nBots);
   }
@@ -95,14 +69,11 @@ export default class Game {
     this.balls.push(ball);
   }
 
-
   generateMap(nPlayers: number) {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
-    // console.log('Generating a new map');
-    // console.log('Edges', this.edges);
-    // this.edges = new Polygon(polygonRegular(nEdges, 2000, [50, 50]))
+
     this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
     this.paddles = [];
     this.walls = this.map.edges.map((line: Line, index) => {
@@ -113,19 +84,14 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    // this.paddles = playerEdges.map((line, idx) => {
-    //   return new Paddle(line, idx, 0.4);
-    // });
-    for (let i = 0; i < this.nBall; i++)
-      this.addBall();
+    for (let i = 0; i < this.nBall; i++) this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
   }
 
   spawnBots(botNb: number) {
-
     for (let i = 0; i < botNb; i++) {
-      const tmp: Bot = new Bot(this.walls[i], i)
+      const tmp: Bot = new Bot(this.walls[i], i);
       this.bots.push(tmp);
     }
   }
@@ -146,7 +112,7 @@ export default class Game {
   updatePaddlePercent(percent: number) {
     // console.log("here is percent", percent);
     // this.paddles.forEach((paddle) => {
-    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent)
+    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent);
     // paddle.updatePercentOnAxis(percent);
     // });
     // if (this.isPaused) debounce(
@@ -155,10 +121,7 @@ export default class Game {
     // );
   }
 
-
-
   runPhysics() {
-
     this.balls.forEach((ball) => {
       if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle: Paddle = ball.target.wall.paddle;
@@ -173,7 +136,11 @@ export default class Game {
             ball.bouncePaddle(paddle, this.walls);
           } else {
             // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+            if (
+              TEST_MODE ||
+              (this.mode === MODE.Coalition &&
+                paddle.color === ball.lastHitten.color)
+            ) {
               ball.bounceTargetWall(this.walls);
             } else {
               this.reduce();
@@ -189,16 +156,15 @@ export default class Game {
   }
 
   runBots() {
-    this.bots.forEach(e => {
+    this.bots.forEach((e) => {
       e.think();
-    })
+    });
   }
 
   public reduce() {
     this.stop();
     // if (this.nPlayers > 4)
-    if (this.nPlayers > 2)
-      this.nPlayers--;
+    if (this.nPlayers > 2) this.nPlayers--;
     // if (this.nPlayers < 3) this.nPlayers = 3;
     this.generateMap(this.nPlayers);
     const timer = 1000;
@@ -209,13 +175,13 @@ export default class Game {
   }
 
   public reset() {
-    // this.nPlayers = 1;
+    this.nPlayers = GameTools.getRandomArbitrary(3, 6);
+    this.nBots = this.nPlayers;
     this.generateMap(this.nPlayers);
     while (this.bots.length != 0) {
       this.bots.pop();
     }
     this.spawnBots(this.nBots);
-
   }
   // Getters
   public get isPaused() {
@@ -244,6 +210,7 @@ export default class Game {
       wallWith: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
+      inradius: this.map.inradius,
     };
   }
 
@@ -279,19 +246,31 @@ export default class Game {
         if (power.collideWithBall(currBall)) {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
-          console.log("removing power", this.powers.length);
-          this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+          console.log('removing power', this.powers.length);
+          this.socket.emit(
+            'powers',
+            this.powers.map((p) => p.netScheme),
+          );
         }
       }
     }
   }
 
   public addRandomPower() {
-    const powerClass = PowerList[GameTools.getRandomArbitrary(0, PowerList.length)]
+    const powerClass =
+      PowerList[GameTools.getRandomArbitrary(0, PowerList.length)];
     const powerObj: Power = new powerClass(this, this.map.randomPosition());
     this.powers.push(powerObj);
-    console.log("Adding new power", powerObj.name, Object.keys(powerObj), typeof powerObj);
-    this.socket.emit('powers', this.powers.map((p) => p.netScheme));
+    console.log(
+      'Adding new power',
+      powerObj.name,
+      Object.keys(powerObj),
+      typeof powerObj,
+    );
+    this.socket.emit(
+      'powers',
+      this.powers.map((p) => p.netScheme),
+    );
   }
 
   public tick() {

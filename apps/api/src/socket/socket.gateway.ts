@@ -38,7 +38,9 @@ import { SocketService } from 'src';
   cors: true,
   transports: ['websocket'],
 })
-export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class SocketGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
@@ -81,18 +83,22 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
    */
   afterInit(server: Server) {
     const middle = WSAuthMiddleware(this.authService);
-    server.use(middle)
+    server.use(middle);
     this.pongService.socketServer = server;
     this.logger.log(`Gateway initialized`);
   }
 
   handleDisconnect(client: AuthSocket) {
-    this.logger.log(`Client disconnected: ${client.id} Name ${client.user.username}`);
+    this.logger.log(
+      `Client disconnected: ${client.id} Name ${client.user.username}`,
+    );
     this.server.emit('online', { name: client.user.name, type: 'disconnect' });
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id} Name ${client.user.username}`);
+    this.logger.log(
+      `Client connected: ${client.id} Name ${client.user.username}`,
+    );
     this.server.emit('online', { name: client.user.name, type: 'connect' });
   }
 }

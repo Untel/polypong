@@ -16,12 +16,10 @@ import { SocketService } from './socket.service';
 
 @Controller('online')
 export class SocketController {
-  constructor(
-    private readonly socketService: SocketService,
-  ) {}
+  constructor(private readonly socketService: SocketService) {}
 
   @Get()
   getConnectedUsers() {
-    return this.socketService.connectedUsers.map(u => u);
+    return this.socketService.connectedUsers.map((u) => u);
   }
 }

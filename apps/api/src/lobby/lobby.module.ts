@@ -5,9 +5,10 @@ import { LobbyService } from './lobby.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { PongModule } from 'src/pong';
+import { SocketModule } from 'src/socket';
 
 @Module({
-  imports: [AuthModule, UserModule, PongModule],
+  imports: [AuthModule, UserModule, PongModule, SocketModule],
   controllers: [LobbyController],
   providers: [LobbyService],
   exports: [LobbyService],

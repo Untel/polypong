@@ -10,7 +10,7 @@
     v-bind="fssSettings"
     :shouldAnimate="!settings.getIsLowPerf"
   >
-    <slot  />
+    <slot />
   </FlatSurfaceShader>
 </template>
 

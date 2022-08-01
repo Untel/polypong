@@ -1,22 +1,40 @@
 <style>cardinput
   .lobby-card {
-    min-width: 250px;
+    display: flex;
+    flex-grow: 1;
   }
 </style>
 
 <template>
-  <q-card class="lobby-card">
-    <q-card-section>
-      <div class="text-h6">{{ name }}</div>
-    </q-card-section>
+  <q-card flat bordered class="lobby-card" :color="'primary'">
     <q-form ref="form">
+
+      <q-item>
+        <q-item-section avatar>
+          <q-avatar>
+            <img :src="avatar">
+          </q-avatar>
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label>{{ name }}</q-item-label>
+          <q-item-label caption>
+            {{ subhead }}
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+
+      <q-separator />
       <q-card-section>
-        <q-img :src="avatar"></q-img>
-        <!-- <PasswordInput dense filled v-model="password"/> -->
+        <slot />
       </q-card-section>
       <q-separator />
-      <q-card-actions class="q-pa-md row flex-center q-gutter-md">
-        <q-btn class="col" @click="emit('joinLobby')">{{ joinText }}</q-btn>
+      <q-card-actions class="q-pa-md row q-gutter-md">
+        <q-btn
+          :color="!isPrivate ? 'primary' : 'negative'"
+          class="col" @click="emit('joinLobby')"
+          :icon="!isPrivate ? 'sports_tennis' : 'lock'"
+          :label="joinText" />
       </q-card-actions>
     </q-form>
   </q-card>
@@ -28,8 +46,16 @@ import { CoalitionChoice } from "src/types/coalition";
 import allianceLogo from "src/assets/alliance_logo.svg"
 import PasswordInput from "src/components/PasswordInput.vue"
 const props = defineProps({
+  id: {
+    type: Number,
+  },
   name: {
     type: String,
+    default: '',
+  },
+  subhead: {
+    type: String,
+    default: '',
   },
   joinText: {
     type: String,
@@ -48,8 +74,8 @@ const props = defineProps({
   host: {
     type: Object as PropType<any>
   },
-  password: {
-    type: String,
+  isPrivate: {
+    type: Boolean,
   },
 });
 

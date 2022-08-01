@@ -16,9 +16,7 @@ import { PongService } from './pong.service';
 
 @Controller('pong')
 export class PongController {
-  constructor(
-    private readonly pongService: PongService,
-  ) {}
+  constructor(private readonly pongService: PongService) {}
 
   @Get('pause')
   togglePause(): boolean {

@@ -36,5 +36,5 @@ export const WSAuthMiddleware = (
         message: 'Unauthorizaed',
       });
     }
-  }
-}
+  };
+};

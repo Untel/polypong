@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:35:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/07/14 02:57:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,18 @@ export class PongService {
   tmpGame: Game = null;
 
   constructor(
-    @InjectRedis() private readonly redis: Redis,
-    // @Inject(forwardRef(() => SocketGateway))
-    // private readonly socketGateway: SocketGateway,
-
-    // private readonly userService: UserService,
+    @InjectRedis() private readonly redis: Redis, // @Inject(forwardRef(() => SocketGateway)) // private readonly socketGateway: SocketGateway, // private readonly userService: UserService,
   ) {
     // this.socketServer = socketGateway.server;
     this.store = new Store<typeof Game>(redis, { prefix: 'game:' });
-    setTimeout(() => {
-      // console.log('In constrcutor service', this.socketServer);
-      this.tmpGame = new Game(
-        this.socketServer,
-        this.store,
-        new Lobby('sdfsd', new Player(0)),
-      );
-    }, 3000);
+    // setTimeout(() => {
+    //   // console.log('In constrcutor service', this.socketServer);
+    //   this.tmpGame = new Game(
+    //     this.socketServer,
+    //     this.store,
+    //     new Lobby(0, new Player(0)),
+    //   );
+    // }, 3000);
   }
 
   generateId() {

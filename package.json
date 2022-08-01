@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "collider2d": "^1.1.1",
-    "triangle-solver": "^1.1.1"
-  }
-}

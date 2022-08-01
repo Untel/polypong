@@ -4,10 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
 
 @Injectable()
-export default class JwtGuard
-  extends AuthGuard('jwt')
-  implements CanActivate
-{
+export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   constructor() {
     super();
   }
@@ -25,8 +22,8 @@ export default class JwtGuard
       case 'http':
         return context.switchToHttp().getRequest();
       default:
-        console.log("Unhandled execution context", context.getType());
-        break ;
+        console.log('Unhandled execution context', context.getType());
+        break;
     }
   }
 

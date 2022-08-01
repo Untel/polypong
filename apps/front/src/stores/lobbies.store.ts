@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/06 17:07:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/01 17:43:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,50 +15,89 @@ import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
 import { useAuthStore } from './auth.store';
 import { LoadingBar, Notify } from 'quasar';
+import { mande } from 'mande';
+import router from 'src/router';
 
-type Lobby = {
+export const lobbiesApi = mande(`/api/lobbies`);
+
+export type Lobby = {
   id: number;
   name: string;
-  players: Map<string, object>;
+  players: Array<any>;
   playersMax: number;
   spectators: Array<any>;
   spectatorsMax: number;
+  description: string;
+  isPrivate?: boolean;
+  host: {
+    user: {
+      avatar: string,
+      name: string,
+      id: number,
+    }
+  }
 };
 
 type LobbiesState = {
   lobbies: Lobby[],
+  activeLobby: Lobby | null,
 };
+
+export const onlineApi = mande(`/api/online`);
+
 
 export const useLobbiesStore = defineStore('lobbies', {
   state: () => ({
     lobbies: [],
+    activeLobby: null
   } as LobbiesState),
   getters: {
     getLobbies: (state) => state.lobbies,
+    getActiveLobby: (state) => state.activeLobby,
   },
   actions: {
     async fetchLobbies() {
-      const { data, error } = await useApi<Lobby[]>('lobbies').get().json();
-
-      if (!error) {
-        console.log('Lobbies fetched', data.value, this.lobbies);
-        this.lobbies = data.value || [];
-      } else {
+      try {
+        this.lobbies = await lobbiesApi.get('');
+      } catch (err) {
+        console.log("err", err);
         Notify.create({
           type: 'negative',
-          message: "Error while fetching lobbies"
+          message: 'Error while fetching lobbies',
         });
       }
     },
+    async fetchAndJoinLobby(lobbyId: number | string): Promise<Lobby> {
+      const lobby = await lobbiesApi.get(`${lobbyId}/join`);
+      return lobby;
+    },
     async createLobby(lobbyName: string) {
-      const { socket, getIsConnected } = useAuthStore();
-      console.log('I will create a room');
-      if (!getIsConnected) {
-        console.log('Socket not connected', socket);
-        return;
+      try {
+        const newLobby: Lobby = await lobbiesApi.post('', {
+          name: lobbyName,
+        });
+        return newLobby;
+      } catch (err) {
+        console.log("err", err);
+        Notify.create({
+          type: 'negative',
+          message: "Error while creating lobby",
+        });
+        return null;
       }
-      socket?.emit('createLobby', { name: lobbyName });
-      console.log('Emited');
+    },
+    async updateLobby(lobbyId: number, lobby: Lobby) {
+      try {
+        const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, { name: 'haha' });
+        return newLobby;
+      } catch (err) {
+        console.log("err", err);
+        Notify.create({
+          type: 'negative',
+          message: "Error while updating lobby",
+        });
+        return null;
+      }
     },
     async joinLobby(lobbyId: number) {
       const { socket, getIsConnected } = useAuthStore();

@@ -1,8 +1,8 @@
-import { Circle, Collider2d, Vector } from "collider2d";
-import { Paddle } from "src";
-import { Ball } from "./ball.class";
-import Game from "./game.class";
-import GameTools from "./gametools.class";
+import { Circle, Collider2d, Vector } from 'collider2d';
+import { Paddle } from 'src';
+import { Ball } from './ball.class';
+import Game from './game.class';
+import GameTools from './gametools.class';
 
 const collider = new Collider2d();
 
@@ -26,7 +26,7 @@ export abstract class Power extends Circle {
         y: position.y,
       },
       name,
-    }
+    };
   }
 
   abstract name;
@@ -64,7 +64,7 @@ export class ReduceAllOtherPaddlesPower extends Power {
   effect(ball: Ball) {
     this.game.paddles.forEach((paddle) => {
       if (paddle.color != ball.lastHitten?.color) {
-        paddle.setRelativeSize(.15);
+        paddle.setRelativeSize(0.15);
         paddle.affectPower(this);
       }
     });
@@ -88,7 +88,7 @@ export class AugmentPaddlePower extends Power {
   effect(ball: Ball) {
     this.game.paddles.forEach((paddle) => {
       if (paddle.color === ball.lastHitten?.color) {
-        paddle.setRelativeSize(.7);
+        paddle.setRelativeSize(0.7);
         paddle.affectPower(this);
       }
     });
@@ -105,11 +105,9 @@ export class SeeTrajectories extends Power {
     this.timeout = 15000;
   }
 
-  fade(paddle: Paddle) {
-  }
+  fade(paddle: Paddle) {}
 
-  effect(ball: Ball) {
-  }
+  effect(ball: Ball) {}
 }
 
 export class SadiSlap extends Power {
@@ -133,4 +131,4 @@ export const PowerList = [
   SadiSlap,
   ReduceAllOtherPaddlesPower,
   AugmentPaddlePower,
-]
+];

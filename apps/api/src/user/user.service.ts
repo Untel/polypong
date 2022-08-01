@@ -29,13 +29,14 @@ export class UserService {
     return true;
   }
   setSocketAsDisconnected(socketId: string) {
-    const user = [...this.connectedUsers.entries()]
-      .find(([uId, sId]) => sId === socketId);
+    const user = [...this.connectedUsers.entries()].find(
+      ([uId, sId]) => sId === socketId,
+    );
     if (user) {
-      this.connectedUsers.delete(user[0])
+      this.connectedUsers.delete(user[0]);
     }
   }
-  userConnectedSocketId(id: number) : string {
+  userConnectedSocketId(id: number): string {
     return this.connectedUsers.get(id);
   }
 
@@ -199,6 +200,17 @@ export class UserService {
     return res;
   }
 
-  setIsConnected() {
+  /**
+   * get the avatar of an user
+   * @param user : the user interface
+   * @returns : the user avatar
+   */
+  async getAvatar(user: UserInterface) {
+    this.logger.log(`in getAvatar, user.email = ${user.email}`);
+    const email = user.email;
+    const localUser = await this.find({ email });
+    return localUser.avatar;
   }
+
+  setIsConnected() {}
 }
