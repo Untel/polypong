@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from 'src/stores/auth.store';
+import { twoFactorApi, useAuthStore } from 'src/stores/auth.store';
 import { Notify } from 'quasar';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -52,6 +52,7 @@ const router = useRouter();
 
 // name change
 const newName = ref('');
+const new2fa = ref('');
 const changeName = async (newName) => {
   try {
     await authStore.updateUser({ name: newName });

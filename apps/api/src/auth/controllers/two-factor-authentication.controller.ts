@@ -33,19 +33,20 @@ export class TwoFactorAuthenticationController {
   @Get('generate')
   @UseGuards(JwtGuard)
   async register(@Req() req: RequestWithUser, @Res() res) {
-    this.logger.log(`generate - req.user = ${JSON.stringify(req.user)}`);
+    console.log('GET GENERATE');
+    // this.logger.log(`generate - req.user = ${JSON.stringify(req.user)}`);
     const { otpauthUrl } =
       await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
         req.user,
       );
 
     this.logger.log(`generate - otpauthUrl = ${otpauthUrl}`);
-
     const qrAsDataUrl = await new Promise((resolve, reject) => {
-			toDataURL(otpauthUrl, [], (error, result) => {
-				resolve(result);
-			});
-		});
+      toDataURL(otpauthUrl, [], (error, result) => {
+        resolve(result);
+        console.log('result resolved', result);
+      });
+    });
     this.logger.log(`generate - qrAsDataUrl = ${qrAsDataUrl}`);
 
     res.send({ qrAsDataUrl });
