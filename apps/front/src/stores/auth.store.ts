@@ -99,7 +99,7 @@ export const useAuthStore = defineStore('auth', {
         throw new Error('No token, no need to query the api');
       }
       defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-      this.user = await authApi.get('user');
+      this.user = await userApi.get('user');
     },
 
     async fetchConnectedUsers() {
@@ -136,16 +136,25 @@ export const useAuthStore = defineStore('auth', {
       return res;
     },
 
-    async verifyQrCodeValue(decodedValue: number) {
-      console.log(`authStore - verifyQrCodeValue - decodedValue = ${decodedValue}`);
+    async activate2fa(decodedValue: number) {
+      console.log(`authStore - activate2fa - decodedValue = ${decodedValue}`);
       let res = null;
-      try {
-        res = await twoFactorApi.post('authenticate', { decodedValue });
-        console.log(`authStore - verifyQrCodeValue - res = ${res}`);
-      } catch (error) {
-        console.log(error);
-      }
+      res = await twoFactorApi.post('activate', {
+        twoFactorAuthenticationCode: decodedValue,
+      });
+      console.log(`authStore - activate2fa - res = ${res}`);
       return res;
+    },
+
+    async authenticateCode(value: number) {
+      console.log(`authStore - authenticateCode = ${value}`);
+      let res = null;
+      res = await twoFactorApi.post('authenticate', {
+        twoFactorAuthenticationCode: value,
+      });
+      console.log('authStore - authenticateCode - res = ', res);
+      console.log('authStore - authenticateCode - res.token = ', res.token);
+      localStorage.setItem('token', res.token);
     },
 
   },
