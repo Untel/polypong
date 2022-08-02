@@ -6,19 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 17:43:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 18:32:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { useApi } from 'src/utils/api';
-import { useAuthStore } from './auth.store';
 import { LoadingBar, Notify } from 'quasar';
 import { mande } from 'mande';
 import router from 'src/router';
+import { useAuthStore } from './auth.store';
 
-export const lobbiesApi = mande(`/api/lobbies`);
+export const lobbiesApi = mande('/api/lobbies');
 
 export type Lobby = {
   id: number;
@@ -43,13 +43,12 @@ type LobbiesState = {
   activeLobby: Lobby | null,
 };
 
-export const onlineApi = mande(`/api/online`);
-
+export const onlineApi = mande('/api/online');
 
 export const useLobbiesStore = defineStore('lobbies', {
   state: () => ({
     lobbies: [],
-    activeLobby: null
+    activeLobby: null,
   } as LobbiesState),
   getters: {
     getLobbies: (state) => state.lobbies,
@@ -60,7 +59,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       try {
         this.lobbies = await lobbiesApi.get('');
       } catch (err) {
-        console.log("err", err);
+        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while fetching lobbies',
@@ -78,23 +77,23 @@ export const useLobbiesStore = defineStore('lobbies', {
         });
         return newLobby;
       } catch (err) {
-        console.log("err", err);
+        console.log('err', err);
         Notify.create({
           type: 'negative',
-          message: "Error while creating lobby",
+          message: 'Error while creating lobby',
         });
         return null;
       }
     },
     async updateLobby(lobbyId: number, lobby: Lobby) {
       try {
-        const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, { name: 'haha' });
+        const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, lobby);
         return newLobby;
       } catch (err) {
-        console.log("err", err);
+        console.log('err', err);
         Notify.create({
           type: 'negative',
-          message: "Error while updating lobby",
+          message: 'Error while updating lobby',
         });
         return null;
       }

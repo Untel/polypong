@@ -1,22 +1,42 @@
+<style>
+  .user-list {
+    display: grid;
+    /* grid-auto-flow: column; */
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px
+  }
+</style>
+
 <template>
   <q-page padding>
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
     <q-btn @click="start">Start game</q-btn>
 
-    <section>
-
-      <pre>
-        {{ lobby }}
-      </pre>
-
-      <q-card
-        v-for="user in lobby.players"
-        :key="user.user.id"
+    <section class="user-list">
+      <UserCard
+        v-for="player in lobby.players"
+        :key="`player-${player.user.id}`"
+        :avatar="player.user.avatar"
+        :name="player.user.name"
+        :caption="player.user.email"
       >
-        {{ user.user.id }}
-      </q-card>
+        <q-btn>Add friend</q-btn>
+      </UserCard>
+      <UserCard
+        v-for="slotNum in missingPlayers"
+        :key="`slot-${slotNum}`"
+        avatar="https://pbs.twimg.com/media/D9b5gbcWkAUrKAc.jpg"
+        :name="`Beep Beep Robot n°${slotNum}`"
+        caption="Invite someone to replace this bot"
+      >
+        <q-btn>Invite</q-btn>
+      </UserCard>
+    </section>
 
+    <section>
       <q-form
         ref="lobbyForm"
         @validationSuccess="onFormChange"
@@ -44,21 +64,26 @@
       </q-form>
     </section>
     <section>
+      <pre>
+        {{ lobby }}
+      </pre>
     </section>
   </q-page>
 </template>
 
 <script lang="ts">
-import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { Notify } from 'quasar';
+import { PreFetchOptions } from '@quasar/app-vite';
 import { useAuthStore } from 'src/stores/auth.store';
+import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
 
 export default {
-  async preFetch(ctx: PreFetchOptions<any>) {
-    const { store, currentRoute, previousRoute, redirect, urlPath, publicPath } = ctx;
+  async preFetch(ctx: PreFetchOptions<unknown>) {
+    const {
+      currentRoute, redirect,
+    } = ctx;
     const $lobbies = useLobbiesStore();
-    const $auth = useAuthStore();
-    const id = currentRoute.params['id'] as string;
+    const id = currentRoute.params.id as string;
     try {
       const response = await $lobbies.fetchAndJoinLobby(id);
       $lobbies.activeLobby = response;
@@ -67,16 +92,22 @@ export default {
         type: 'negative',
         message: 'Error while joining lobby',
       });
-      return redirect({ name: 'lobbies' });
+      redirect({ name: 'lobbies' });
     }
   },
-}
+};
 </script>
 <script lang="ts" setup>
-import { defineProps, computed, ref, reactive, watch, onMounted } from 'vue';
-import { Lobby } from 'src/stores/lobbies.store';
-import { PreFetchOptions } from '@quasar/app-vite';
+import {
+  defineProps, computed, ref, watch, defineComponent,
+} from 'vue';
+import UserCard from 'src/components/UserCard.vue';
 
+defineComponent({
+  components: {
+    UserCard,
+  },
+});
 const props = defineProps({
   id: {
     type: String,
@@ -96,7 +127,6 @@ const start = () => {
 };
 
 watch(lobby, (newVal, oldVal) => {
-  console.log('Watching lobby', newVal, newVal.id);
   $lobbies.updateLobby(newVal.id, newVal);
 });
 
@@ -109,7 +139,5 @@ const onFormChange = (evt) => {
   // $lobbies.up
 };
 
-const missingPlayers = computed(() => {
-  // return (lobby.playerMax - Object.values(lobby.spectateur))
-})
+const missingPlayers = computed(() => (lobby && (lobby.playersMax - lobby.players.length)));
 </script>

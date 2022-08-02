@@ -41,10 +41,11 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref } from "vue";
-import { CoalitionChoice } from "src/types/coalition";
-import allianceLogo from "src/assets/alliance_logo.svg"
-import PasswordInput from "src/components/PasswordInput.vue"
+import { PropType, ref } from 'vue';
+import { CoalitionChoice } from 'src/types/coalition';
+import allianceLogo from 'src/assets/alliance_logo.svg';
+import PasswordInput from 'src/components/PasswordInput.vue';
+
 const props = defineProps({
   id: {
     type: Number,
@@ -72,7 +73,7 @@ const props = defineProps({
     type: Number,
   },
   host: {
-    type: Object as PropType<any>
+    type: Object as PropType<any>,
   },
   isPrivate: {
     type: Boolean,

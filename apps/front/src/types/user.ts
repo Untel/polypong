@@ -1,6 +1,9 @@
-import { CoalitionChoice } from "./coalition";
+import { CoalitionChoice } from './coalition';
 
 export interface User {
-  username: string,
+  id: number,
+  name: string,
   coalition: CoalitionChoice,
+  email: string,
+  avatar: string,
 }

@@ -42,7 +42,7 @@ export default async (
   try {
     await auth.whoAmI();
     await auth.connectToSocket();
-    next();
+    return next();
   } catch (error) {
     // if (error.statusCode === _HTTPCODEFOR2FA_ ) {
     //  redirect2fa =

@@ -53,16 +53,18 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, onMounted, StyleValue, Ref, watch, computed, VueElement } from 'vue';
+import {
+  defineProps, ref, onMounted, StyleValue, Ref, watch, computed, VueElement,
+} from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
 import { Position, Paddle, Ball } from 'src/utils/game';
-import { MaybeElementRef, useMouseInElement } from '@vueuse/core'
+import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
 import { Notify } from 'quasar';
-const { socket } = useAuthStore();
 
+const { socket } = useAuthStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
@@ -79,7 +81,6 @@ const {
   execute: togglePause,
   // afterFetch: (ctx: any) => ({ data: ctx.data === 'true', ...ctx }),
 } = useApi<string>('pong/pause', { immediate: false });
-
 
 const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
 const ratio = computed(() => {
@@ -124,7 +125,7 @@ const mapChange = (res) => {
 };
 
 const powersUpdate = (res) => {
-  console.log("powers update", res);
+  console.log('powers update', res);
   powers.value = res;
 };
 
@@ -133,7 +134,7 @@ const printTimer = ({ timer }: { timer: number }) => {
     timeout: timer,
     progress: true,
     position: 'top',
-    message: `New round will start`,
+    message: 'New round will start',
   });
 };
 
@@ -151,6 +152,5 @@ const {
   data: test,
   execute: reset,
 } = useApi('pong/reset', { immediate: false });
-
 
 </script>

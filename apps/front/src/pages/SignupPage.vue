@@ -68,25 +68,26 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onBeforeUnmount, defineEmits } from 'vue';
+import {
+  ref, watch, onBeforeUnmount, defineEmits,
+} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Notify } from 'quasar';
 
 import CoalitionSelector from 'src/components/CoalitionSelector.vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import LogoCoalition from 'src/components/LogoCoalition.vue';
-import PasswordInput from "src/components/PasswordInput.vue"
+import PasswordInput from 'src/components/PasswordInput.vue';
 import { CoalitionChoice } from 'src/types';
 
-
-const email           = ref<string>(''),
-      name            = ref<string>(''),
-      password        = ref<string>(''),
-      repeatPassword  = ref<string>(''),
-      coalition       = ref<CoalitionChoice>(''),
-      router          = useRouter(),
-      route           = useRoute(),
-      auth            = useAuthStore();
+const email = ref<string>('');
+const name = ref<string>('');
+const password = ref<string>('');
+const repeatPassword = ref<string>('');
+const coalition = ref<CoalitionChoice>('');
+const router = useRouter();
+const route = useRoute();
+const auth = useAuthStore();
 
 const onSignUp = async (form: Event) => {
   try {
@@ -98,9 +99,9 @@ const onSignUp = async (form: Event) => {
     );
     const redirect = route.query.redirect
       ? JSON.parse((route.query.redirect) as string)
-      : { name: 'home' }
+      : { name: 'home' };
     router.push(redirect);
-  } catch({ response, body }) {
+  } catch ({ response, body }) {
     Notify.create({
       type: 'negative',
       message: (body as any).message,
@@ -111,7 +112,7 @@ const onSignUp = async (form: Event) => {
 const isValidEmail = (val: string): any => {
   const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
   return emailPattern.test(val) || 'Seems to be an incorrect email';
-}
+};
 
 const emit = defineEmits(['changeBackground']);
 

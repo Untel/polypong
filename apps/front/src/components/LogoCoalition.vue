@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, computed } from "vue";
-import { CoalitionChoice } from "src/types/coalition";
+import { PropType, ref, computed } from 'vue';
+import { CoalitionChoice } from 'src/types/coalition';
 
 const props = defineProps({
   coalition: {
@@ -16,7 +16,7 @@ const props = defineProps({
   color: {
     type: String,
     default: 'white',
-  }
+  },
 });
 const val = ref(false);
 const paths = {

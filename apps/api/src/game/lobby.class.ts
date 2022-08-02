@@ -1,7 +1,7 @@
 import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
-import { Transform, Type } from 'class-transformer';
+import { Exclude, Transform, Type } from 'class-transformer';
 
 export type LobbyId = number;
 
@@ -33,12 +33,15 @@ export default class Lobby implements ILobby, ILobbyConfig {
   spectators: Spectator[];
   game: Game | null;
 
-  constructor(host: Player, name = 'Unamed lobby') {
+  @Exclude()
+  socket;
+
+  constructor(socket, host: Player, name = 'Unamed lobby') {
     this.id = host.id;
     this.name = name;
     this.host = host;
     this.players = new Map<number, Player>();
-    this.addPlayer(host);
+    // this.addPlayer(host);
     this.spectators = [];
     this.playersMax = 8;
     this.spectatorsMax = 10;

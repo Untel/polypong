@@ -19,13 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-import { CoalitionChoice, coalitions } from 'src/types'
+import { CoalitionChoice, coalitions } from 'src/types';
 import FssFallback from 'src/components/FssFallback.vue';
 import { User } from 'src/types/user';
 
 const defaultUser: User = {
   username: 'Untel',
-  coalition: CoalitionChoice.ALLIANCE
+  coalition: CoalitionChoice.ALLIANCE,
 };
 
 </script>

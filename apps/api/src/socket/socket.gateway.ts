@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 22:09:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 14:49:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,12 @@ export class SocketGateway
   }
 
   handleDisconnect(client: Socket) {
-    const { user } = client.data;
+    const { user, lobby } = client.data;
+    if (lobby) {
+      console.log('==================> Disconnected user was in lobby', lobby);
+    } else {
+      console.log('==================> OOps', lobby);
+    }
     this.logger.log(`Client disconnected: ${client.id} Name ${user.name}`);
     this.server.emit('online', {
       name: user.name,
@@ -98,8 +103,11 @@ export class SocketGateway
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
-    const { user } = client.data;
+    const { user, lobby } = client.data;
     this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
+    if (lobby) {
+      console.log('Disconnected user was in lobby', lobby);
+    }
     this.server.emit('online', {
       name: user.name,
       type: 'connect',

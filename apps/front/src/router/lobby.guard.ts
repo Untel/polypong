@@ -9,15 +9,15 @@ export default async (
 ) => {
   try {
     const lobbies = useLobbiesStore();
-    const id = to.params['id'] as string;
+    const id = to.params.id as string;
     const response = await lobbies.fetchAndJoinLobby(id);
-    console.log("retrieved values", response);
-    next(vm => vm.setData(response));
+    console.log('retrieved values', response);
+    next((vm) => vm.setData(response));
   } catch (error) {
-    console.log("Error", error);
+    console.log('Error', error);
     Notify.create({
-      message: "Requested lobby does not exist",
-      type: 'negative'
+      message: 'Requested lobby does not exist',
+      type: 'negative',
     });
     return next({ name: 'lobbies' });
   }

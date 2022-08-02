@@ -20,7 +20,7 @@
       :width="200"
       :breakpoint="500"
     >
-      <Logo :size="miniState && '2rem' || '5rem'" />
+      <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
       <q-list>
         <EssentialLink
           v-for="link in linksList"
@@ -37,11 +37,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import EssentialLink from 'components/EssentialLink.vue';
-import Logo from 'src/components/Logo.vue';
-import { useAuthStore } from 'src/stores/auth.store';
-import { Notify } from 'quasar';
+import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
+import { defineComponent, ref } from 'vue';
+
+defineComponent({
+  components: {
+    EssentialLink,
+    FourtyTwoLogo,
+  },
+});
 
 const linksList = [{
   title: 'Home',
@@ -74,7 +79,5 @@ const linksList = [{
   icon: 'fa-solid fa-gear',
   to: 'settings',
 }];
-
 const miniState = ref(true);
-const auth = useAuthStore();
 </script>

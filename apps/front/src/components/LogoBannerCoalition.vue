@@ -15,9 +15,9 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, PropType, ref } from "vue";
-import { CoalitionChoice } from "src/types/coalition";
-import LogoCoalition from "./LogoCoalition.vue";
+import { defineComponent, PropType, ref } from 'vue';
+import { CoalitionChoice } from 'src/types/coalition';
+import LogoCoalition from './LogoCoalition.vue';
 
 const props = defineProps({
   coalition: {
@@ -27,7 +27,7 @@ const props = defineProps({
   showBanner: {
     type: Boolean,
     default: true,
-  }
+  },
 });
 const val = ref(false);
 const colors = {
@@ -38,7 +38,6 @@ const colors = {
   [CoalitionChoice.ORDER]: 'var(--clr-order)',
 };
 </script>
-
 
 <style lang="scss" scoped>
 

@@ -20,7 +20,6 @@
       <q-fab-action v-if="props.website" padding="5px" color="red"
         icon="public"
         :to="`/external?url=${props.website}`"
-      
       />
       <q-fab-action v-if="props.linkedin" padding="5px" color="blue"
         icon="fab fa-linkedin"
@@ -41,6 +40,7 @@
 
 <script setup>
 import { defineComponent } from 'vue';
+
 defineComponent({
   name: 'BgSocial',
 });
@@ -50,5 +50,5 @@ const props = defineProps({
   website: String,
   linkedin: String,
   login: String,
-})
+});
 </script>

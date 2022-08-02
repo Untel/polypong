@@ -1,8 +1,4 @@
 import { Light, Mesh, ShaderConfig } from 'src/types/shaders';
-import { useSettingsStore } from 'src/stores/settings';
-import { CoalitionChoice, Coalition } from 'src/types/coalition';
-
-const settings = useSettingsStore();
 
 const type = 'canvas';
 
@@ -17,7 +13,7 @@ export const defaultLoginLight = {
   count: 3,
   draw: false,
   zOffset: 100,
-  autopilot: false
+  autopilot: false,
 };
 
 export const useLoginShaders = () => {
@@ -28,20 +24,20 @@ export const useLoginShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
     ambient: '#00a07a',
     diffuse: '#8baf19',
     ...defaultLoginLight,
-  }
+  };
   return {
     type,
     mesh,
-    light
-  } as ShaderConfig;;
-}
+    light,
+  } as ShaderConfig;
+};
 
 export const useLoginLightShaders = () => {
   const mesh: Mesh = {
@@ -51,7 +47,7 @@ export const useLoginLightShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
@@ -60,14 +56,14 @@ export const useLoginLightShaders = () => {
     count: 3,
     draw: true,
     zOffset: 100,
-    autopilot: false
-  }
+    autopilot: false,
+  };
   return {
     type,
     mesh,
-    light
-  } as ShaderConfig;;
-}
+    light,
+  } as ShaderConfig;
+};
 
 export const useAllianceShaders = () => {
   const mesh: Mesh = {
@@ -77,20 +73,20 @@ export const useAllianceShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
     ambient: '#0e1b0b',
     diffuse: '#37460a',
     ...defaultCoalitionLight,
-  }
+  };
   return {
     type,
     mesh,
-    light
+    light,
   } as ShaderConfig;
-}
+};
 
 export const useAssemblyShaders = () => {
   const mesh: Mesh = {
@@ -100,20 +96,20 @@ export const useAssemblyShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
     ambient: '#a74685',
     diffuse: '#c768d4',
     ...defaultCoalitionLight,
-  }
+  };
   return {
     type,
     mesh,
-    light
+    light,
   } as ShaderConfig;
-}
+};
 
 export const useFederationShaders = () => {
   const mesh: Mesh = {
@@ -123,20 +119,20 @@ export const useFederationShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
     ambient: '#284859',
     diffuse: '#845e4a',
     ...defaultCoalitionLight,
-  }
+  };
   return {
     type,
     mesh,
-    light
+    light,
   } as ShaderConfig;
-}
+};
 
 export const useOrderShaders = () => {
   const mesh: Mesh = {
@@ -146,17 +142,17 @@ export const useOrderShaders = () => {
     segments: 16,
     slices: 8,
     width: 1.2,
-    height: 1.2
+    height: 1.2,
   };
 
   const light: Light = {
     ambient: '#3e3020',
     diffuse: '#a48d86',
     ...defaultCoalitionLight,
-  }
+  };
   return {
     type,
     mesh,
-    light
+    light,
   } as ShaderConfig;
-}
+};

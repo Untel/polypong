@@ -70,7 +70,7 @@ import { useApi } from 'src/utils/api';
 import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import LobbyCard from 'src/components/LobbyCard.vue';
-import PasswordInput from "src/components/PasswordInput.vue"
+import PasswordInput from 'src/components/PasswordInput.vue';
 import { useRouter, useRoute } from 'vue-router';
 import { onMounted, onBeforeUnmount, ref } from 'vue';
 

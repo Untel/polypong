@@ -61,18 +61,17 @@ import { mande, defaults, MandeError } from 'mande';
 
 const auth = useAuthStore();
 
-const login         = ref<string>('');
-const password      = ref<string>('');
-const showPassword  = ref<boolean>(false);
-const router        = useRouter();
-const route         = useRoute();
-
+const login = ref<string>('');
+const password = ref<string>('');
+const showPassword = ref<boolean>(false);
+const router = useRouter();
+const route = useRoute();
 
 const connectWithLocal = async (form: Event) => {
   try {
     const redirect = route.query.redirect
       ? JSON.parse((route.query.redirect as string))
-      : { name: 'home' }
+      : { name: 'home' };
     await auth.login(login.value, password.value);
     router.push(redirect);
   } catch (error: MandeError) {
