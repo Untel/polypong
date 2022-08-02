@@ -13,20 +13,19 @@
       <q-card-section>
         <q-div v-if="authStore.user.isTwoFactorAuthenticationEnabled === true">
           <pre> 2fa is required </pre>
-          <q-btn @click="requestQrCode()">refresh QrCode</q-btn><br>
+          <q-btn @click="turnOff2fa()">turn off 2fa</q-btn><br>
+        </q-div><q-div v-else>
+          <pre> 2fa is not required </pre>
+          <q-btn @click="requestQrCode()">request QrCode</q-btn><br>
           <q-img :src=qrCode.imageBytes width="50%"></q-img><br>
           <q-input
             label="Scan with Google Authenticator and enter code here"
             v-model="qrCode.decoded"
           >
             <template v-slot:append>
-              <q-btn @click="verifyQrCodeValue(qrCode.decoded)">verify QrCode</q-btn><br>
+              <q-btn @click="activate2fa(qrCode.decoded)">activate 2FA</q-btn><br>
             </template>
           </q-input><br>
-          <q-btn @click="turnOff2fa()">turn off 2fa</q-btn><br>
-        </q-div><q-div v-else>
-          <pre> 2fa is not required </pre>
-          <q-btn @click="turnOn2fa()">turn on 2fa</q-btn>
         </q-div>
       </q-card-section>
     </q-card><br>
@@ -61,12 +60,13 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 // name change
 const newName = ref('');
-const changeName = async (newName) => {
+const changeName = async (name) => {
   try {
-    await authStore.updateUser({ name: newName });
+    await authStore.updateUser({ name });
   } catch ({ response, body }) {
     Notify.create({
       type: 'negative',
@@ -86,17 +86,20 @@ async function requestQrCode() {
   qrCode.value.requested = true;
   qrCode.value.imageBytes = res.qrAsDataUrl;
 }
-async function turnOn2fa() {
-  await authStore.updateUser({ isTwoFactorAuthenticationEnabled: true });
-  qrCode.value.imageBytes = ''; qrCode.value.decoded = '';
-  await requestQrCode();
-}
 async function turnOff2fa() {
   await authStore.updateUser({ isTwoFactorAuthenticationEnabled: false });
   qrCode.value.imageBytes = ''; qrCode.value.decoded = '';
 }
-async function verifyQrCodeValue(value: number) {
-  await authStore.verifyQrCodeValue(value);
+async function activate2fa(value: any) {
+  try {
+    await authStore.activate2fa(value);
+    router.push({ name: '2fa' });
+  } catch ({ response, body }) {
+    Notify.create({
+      type: 'negative',
+      message: (body as any).message,
+    });
+  }
 }
 
 // avatar change
@@ -115,11 +118,9 @@ function factoryFn(file: any): Promise<any> {
 }
 
 // logout
-const router = useRouter();
 function logOut(): void {
-  const redirect = { name: 'login' };
   localStorage.setItem('token', '');
-  router.push(redirect);
+  router.push({ name: 'login' });
 }
 
 </script>
