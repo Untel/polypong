@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 10:09:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/02 23:56:49 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ export class Paddle {
     this.axis = axis;
     this.effects = {};
     // this.color = GameTools.colors[index % GameTools.colors.length];
-    this.color = `#${GameTools.genRanHex(6)}`;
     this.angle = lineAngle(axis);
     this.bounceAngle = bounce;
     this.setRelativeSize(relativeSize);

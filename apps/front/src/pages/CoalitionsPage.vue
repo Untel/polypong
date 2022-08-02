@@ -9,6 +9,7 @@
   <q-page>
     <FssFallback
       v-for="coalition in coalitions"
+      :key="`coalition-${coalition}`"
       class="coalition-box"
       :fss-settings="coalition.shaderConfig"
       :fallback-url="coalition.fssFallback"

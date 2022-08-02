@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 18:32:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 23:35:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ export const useLobbiesStore = defineStore('lobbies', {
   } as LobbiesState),
   getters: {
     getLobbies: (state) => state.lobbies,
-    getActiveLobby: (state) => state.activeLobby,
+    getActiveLobby: (state): Lobby => (state.activeLobby as Lobby),
   },
   actions: {
     async fetchLobbies() {
@@ -66,9 +66,11 @@ export const useLobbiesStore = defineStore('lobbies', {
         });
       }
     },
-    async fetchAndJoinLobby(lobbyId: number | string): Promise<Lobby> {
-      const lobby = await lobbiesApi.get(`${lobbyId}/join`);
-      return lobby;
+    async fetchAndJoinLobby(lobbyId: number | string) {
+      this.activeLobby = await lobbiesApi.get(`${lobbyId}/join`);
+    },
+    async fetchCurrentLobby(lobbyId: number | string) {
+      this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
     },
     async createLobby(lobbyName: string) {
       try {
@@ -85,7 +87,7 @@ export const useLobbiesStore = defineStore('lobbies', {
         return null;
       }
     },
-    async updateLobby(lobbyId: number, lobby: Lobby) {
+    async updateLobby(lobbyId: number, lobby: Lobby | Record<string, unknown>) {
       try {
         const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, lobby);
         return newLobby;

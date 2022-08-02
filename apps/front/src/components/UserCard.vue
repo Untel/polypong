@@ -17,6 +17,8 @@
         <q-item-label>{{ name }}</q-item-label>
         <q-item-label caption>
           {{ caption }}
+          <!-- <q-avatar icon="signal_wifi_off" text-color="primary" /> -->
+
         </q-item-label>
       </q-item-section>
       <q-item-section>
@@ -35,6 +37,7 @@ defineProps({
   avatar: String,
   name: String,
   caption: String,
+  color: String,
 });
 
 </script>

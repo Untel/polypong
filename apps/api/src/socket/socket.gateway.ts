@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 14:49:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 21:32:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
 import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { SocketService } from 'src';
+import { LobbyService, SocketService } from 'src';
 
 /**
  * Ne pas utiliser ce AuthGuard. La protection de l'auth se fait grace au Middleware dans afterInit
@@ -45,6 +45,8 @@ export class SocketGateway
     @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
     private readonly pongService: PongService,
+    @Inject(forwardRef(() => LobbyService))
+    private readonly lobbyService: LobbyService,
     private readonly authService: AuthService,
   ) {}
 
@@ -91,9 +93,8 @@ export class SocketGateway
   handleDisconnect(client: Socket) {
     const { user, lobby } = client.data;
     if (lobby) {
-      console.log('==================> Disconnected user was in lobby', lobby);
-    } else {
-      console.log('==================> OOps', lobby);
+      lobby.removePlayer(user);
+      this.lobbyService.updateLobby(lobby.id, lobby);
     }
     this.logger.log(`Client disconnected: ${client.id} Name ${user.name}`);
     this.server.emit('online', {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 18:10:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 22:07:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,10 @@ export class LobbyController {
     @CurrentUser() user,
     @Param('id') id: LobbyId,
   ): Promise<Lobby> {
-    console.log('Joining lobby', id, user);
     const lobby = this.lobbyService.getAndJoinLobby(id, user);
     if (!lobby) {
       throw new UnauthorizedException('Unknown lobby');
     }
-    // const socketOfJoiningUser = this.so
-    console.log('GEt looby and join', lobby);
     return lobby;
   }
 

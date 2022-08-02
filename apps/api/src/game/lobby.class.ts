@@ -1,7 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lobby.class.ts                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/03 00:18:14 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
 import { Exclude, Transform, Type } from 'class-transformer';
+import { BroadcastOperator } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { SocketData } from 'src/socket';
 
 export type LobbyId = number;
 
@@ -34,7 +49,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
   game: Game | null;
 
   @Exclude()
-  socket;
+  socket = null;
+  // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
 
   constructor(socket, host: Player, name = 'Unamed lobby') {
     this.id = host.id;
@@ -50,6 +66,14 @@ export default class Lobby implements ILobby, ILobbyConfig {
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     player.inLobby = this.id;
+    // this.socket.emit('room_connect', [...this.players.values()]);
+  }
+
+  removePlayer(player: Player) {
+    console.log('SHould unset player  from plater', this.players, this.players.delete);
+    this.players.delete(player.id);
+    player.inLobby = null;
+    // this.socket.emit('room_connect', [...this.players.values()]);
   }
 
   start(): Game {
@@ -61,5 +85,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
     if (opts.name) this.name = opts.name;
     if (opts.playersMax) this.playersMax = opts.playersMax;
     if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
+  }
+
+  public get roomId() {
+    return `lobby-${this.id}`;
   }
 }

@@ -17,13 +17,19 @@
 
     <section class="user-list">
       <UserCard
-        v-for="player in lobby.players"
+        v-for="player in $lobbies.getActiveLobby.players"
         :key="`player-${player.user.id}`"
         :avatar="player.user.avatar"
         :name="player.user.name"
         :caption="player.user.email"
+        :color="player.color"
       >
-        <q-btn>Add friend</q-btn>
+        <q-btn v-if="!(player.user.id === $auth.user.id)">Add friend</q-btn>
+        <q-icon name="colorize" class="cursor-pointer">
+          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+            <q-color v-model="player.color" />
+          </q-popup-proxy>
+        </q-icon>
       </UserCard>
       <UserCard
         v-for="slotNum in missingPlayers"
@@ -41,20 +47,25 @@
         ref="lobbyForm"
         @validationSuccess="onFormChange"
         >
-        <q-slider
-          :disable="!canUpdate"
-          name="playersMax"
-          v-model="lobby.playersMax"
-          :min="2"
-          :max="16"
-          snap
-          vertical
-          reverse
-          markers
-          label-always
-          label
-        />
-        <q-input v-model="lobby.name" label="Lobby name"
+        <q-field
+          label="Players max">
+          <q-slider
+            :disable="!canUpdate"
+            name="playersMax"
+            :model-value="$lobbies.activeLobby?.playersMax"
+            @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
+            :min="$lobbies.getActiveLobby.players.length > 2 && lobby.players.length || 2"
+            :max="16"
+            snap
+            markers
+            label-always
+            label
+          />
+        </q-field>
+        <q-input
+          :model-value="$lobbies.getActiveLobby.name"
+          label="Lobby name"
+          @change="(evt) => $lobbies.updateLobby(lobby.id, { name: evt })"
           :disable="!canUpdate"
           name="name"
           lazy-rules
@@ -85,8 +96,7 @@ export default {
     const $lobbies = useLobbiesStore();
     const id = currentRoute.params.id as string;
     try {
-      const response = await $lobbies.fetchAndJoinLobby(id);
-      $lobbies.activeLobby = response;
+      await $lobbies.fetchAndJoinLobby(id);
     } catch (err) {
       Notify.create({
         type: 'negative',
@@ -99,9 +109,10 @@ export default {
 </script>
 <script lang="ts" setup>
 import {
-  defineProps, computed, ref, watch, defineComponent,
+  defineProps, computed, ref, watch, defineComponent, onMounted,
 } from 'vue';
 import UserCard from 'src/components/UserCard.vue';
+import { useRoute } from 'vue-router';
 
 defineComponent({
   components: {
@@ -117,7 +128,8 @@ const props = defineProps({
 
 const $lobbies = useLobbiesStore();
 const $auth = useAuthStore();
-const lobby = $lobbies.getActiveLobby as Lobby;
+const { getActiveLobby: lobby } = $lobbies;
+const $route = useRoute();
 
 const lobbyForm = ref();
 
@@ -125,10 +137,6 @@ const start = () => {
   // props.lobbyId =
   // lobby.resolve()
 };
-
-watch(lobby, (newVal, oldVal) => {
-  $lobbies.updateLobby(newVal.id, newVal);
-});
 
 const canUpdate = computed(() => {
   const can = lobby.host.user.id === $auth.user.id;
@@ -139,5 +147,14 @@ const onFormChange = (evt) => {
   // $lobbies.up
 };
 
-const missingPlayers = computed(() => (lobby && (lobby.playersMax - lobby.players.length)));
+onMounted(() => {
+  const id = +($route.params.id as string);
+  $auth.socket?.on('lobby_change', (evt) => {
+    $lobbies.fetchCurrentLobby(id);
+  });
+});
+
+const missingPlayers = computed(() => (
+  ($lobbies.getActiveLobby.playersMax || 0) - ($lobbies.getActiveLobby.players.length || 0)
+));
 </script>
