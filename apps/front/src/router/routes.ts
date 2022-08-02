@@ -27,7 +27,7 @@ const routes: RouteRecordRaw[] = [
       children: [
         { name: 'login', path: '', component: () => import('pages/LoginPage.vue') },
         { name: 'signup', path: 'signup', component: () => import('pages/SignupPage.vue') },
-        { name: '2fa', path: 'TwoFactor', component: () => import('pages/TwoFactor.vue') },
+        { name: '2fa', path: 'twofactor', component: () => import('pages/TwoFactor.vue') },
       ],
     }, {
       path: '',
@@ -61,8 +61,9 @@ const routes: RouteRecordRaw[] = [
     path: '/external',
     name: 'external',
     component: () => import('pages/LoginPage.vue'),
-    beforeEnter(to, from, next) {
+    beforeEnter(to) {
       const url: string = to.query.url as string;
+      // eslint-disable-next-line no-restricted-globals, no-alert
       const wantTo = confirm(`You are about to leave polypong to go to ${url}, are you sur?`);
       if (wantTo) { window.location.href = url; }
     },

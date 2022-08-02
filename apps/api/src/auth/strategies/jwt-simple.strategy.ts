@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
-export class JwtSimpleStrategy extends PassportStrategy(Strategy) {
+export class JwtSimpleStrategy extends PassportStrategy(Strategy, 'jwt-simple') {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,

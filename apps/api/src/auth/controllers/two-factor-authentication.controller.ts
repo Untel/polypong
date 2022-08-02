@@ -19,6 +19,7 @@ import { AuthService } from '../services/auth.service';
 import { TwoFactorAuthenticationService } from '../services/twoFactorAuthentication.service';
 import { toDataURL } from 'qrcode';
 import JwtSimpleGuard from 'src/guards/jwt-simple.guard';
+import url from 'url';
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -76,7 +77,6 @@ export class TwoFactorAuthenticationController {
   }
 
   @Post('authenticate')
-  @HttpCode(201)
   @UseGuards(JwtSimpleGuard)
   async authenticate(
     @Req() req,
@@ -92,9 +92,17 @@ export class TwoFactorAuthenticationController {
       );
     this.logger.log(`authenticate - isValid = ${isValid}`);
     const user = req.user;
-    // create a jwt access token with the property is2fa set to true
     if (isValid) {
-      res.send(user);
+      const token = this.authService.getToken({
+        id: user.id,
+        is2fa: true, // means this token was signed after a successful 2fa auth
+      });
+      this.logger.log(`authenticate - redirecting to front 'home' with token ${token} in query url`);
+      res.send({ token });
+//      return res.redirect(url.format({
+//        pathname: '/',
+//        query: { token }
+//      }));
     } else {
       throw new UnauthorizedException('2FA');
     }

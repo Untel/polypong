@@ -85,7 +85,7 @@ export const useAuthStore = defineStore('auth', {
         throw new Error('No token, no need to query the api');
       }
       defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-      this.user = await authApi.get('user');
+      this.user = await userApi.get('user');
     },
 
     async fetchConnectedUsers() {
@@ -132,14 +132,15 @@ export const useAuthStore = defineStore('auth', {
       return res;
     },
 
-    async authenticateQrCode(value: number) {
-      console.log(`authStore - authenticateQrCode = ${value}`);
+    async authenticateCode(value: number) {
+      console.log(`authStore - authenticateCode = ${value}`);
       let res = null;
       res = await twoFactorApi.post('authenticate', {
         twoFactorAuthenticationCode: value,
       });
-      console.log(`authStore - authenticateQrCode - res = ${res}`);
-      return res;
+      console.log('authStore - authenticateCode - res = ', res);
+      console.log('authStore - authenticateCode - res.token = ', res.token);
+      localStorage.setItem('token', res.token);
     },
 
   },

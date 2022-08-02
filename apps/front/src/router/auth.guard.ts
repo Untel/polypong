@@ -33,6 +33,7 @@ export default async (
    * Si un token est passe en params query, alors on tente de s'auto connect via se token
    */
   const autoToken: string = to.query.token as string;
+  console.log(`authguard - parsed token from URI : ${autoToken}`);
   if (autoToken) {
     localStorage.setItem('token', autoToken);
     delete to.query.token;
@@ -42,15 +43,18 @@ export default async (
   try {
     await auth.whoAmI();
     await auth.connectToSocket();
-    next();
+    return next();
   } catch (error: any) {
+    console.log(`authguard - caught exception - error = ${error}`);
     console.log(`authguard - caught exception - error = ${JSON.stringify(error)}`);
     console.log(`authguard - caught exception - error = ${JSON.stringify(error.body)}`);
-    if (error.body.statusCode === 401) {
-      console.log('authguard - lala');
-      if (error.body.message === '2FA') {
-        console.log('authguard - lele');
-        return next({ name: '2fa' });
+    if (Object.hasOwn(error, 'body')) {
+      if (error.body.statusCode === 401) {
+        console.log('authguard - lala');
+        if (error.body.message === '2FA') {
+          console.log('authguard - lele');
+          return next({ name: '2fa' });
+        }
       }
     }
     const redirect = buildRedirectObject(to);

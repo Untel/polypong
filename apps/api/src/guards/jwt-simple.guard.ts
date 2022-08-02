@@ -2,10 +2,11 @@ import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/commo
 import { HttpArgumentsHost, WsArgumentsHost } from '@nestjs/common/interfaces';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
+import { JwtSimpleStrategy } from 'src/auth';
 
 @Injectable()
 export default class JwtSimpleGuard
-  extends AuthGuard('jwt')
+  extends AuthGuard('jwt-simple')
   implements CanActivate
 {
   constructor() {
@@ -40,8 +41,6 @@ export default class JwtSimpleGuard
   }
 
   handleRequest(err, user, info) {
-    // console.log("===> JWT HANDLE");
-    // console.log('Handling the request', err, user, info);
     this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     if (err || !user) {
       throw err || new Error();

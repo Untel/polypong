@@ -64,9 +64,9 @@ const router = useRouter();
 
 // name change
 const newName = ref('');
-const changeName = async (newName) => {
+const changeName = async (name) => {
   try {
-    await authStore.updateUser({ name: newName });
+    await authStore.updateUser({ name });
   } catch ({ response, body }) {
     Notify.create({
       type: 'negative',
