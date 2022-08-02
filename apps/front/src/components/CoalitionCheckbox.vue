@@ -13,14 +13,15 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref } from "vue";
-import { CoalitionChoice } from "src/types/coalition";
-import allianceLogo from "src/assets/alliance_logo.svg"
+import { PropType, ref } from 'vue';
+import { CoalitionChoice } from 'src/types/coalition';
+import allianceLogo from 'src/assets/alliance_logo.svg';
+
 const props = defineProps({
   coalition: {
     type: String as PropType<CoalitionChoice>,
     default: CoalitionChoice.ALLIANCE,
-  }
+  },
 });
 const val = ref(false);
 </script>

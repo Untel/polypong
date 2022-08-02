@@ -21,5 +21,6 @@
 
 <script setup lang="ts">
 import { ref, Ref } from 'vue';
+
 const showPassword: Ref<boolean> = ref(false);
 </script>

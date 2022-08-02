@@ -24,7 +24,7 @@
       v-bind="backgroundParams"
     >
       <div class="form-container">
-        <Logo size="100px" style="justify-self: center;" />
+        <FourtyTwoLogo size="100px" style="justify-self: center;" />
         <q-tabs>
           <q-route-tab
             to="/auth"
@@ -47,9 +47,8 @@
 import FssFallback from 'src/components/FssFallback.vue';
 import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
 import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';
-import Logo from 'src/components/Logo.vue';
-import { ref, Ref } from 'vue';
-import { useAuthStore } from 'src/stores/auth.store';
+import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
+import { ref } from 'vue';
 
 const defaultBackgroundParams = {
   fssSettings: useLoginShaders(),

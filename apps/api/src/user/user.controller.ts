@@ -28,7 +28,7 @@ import {
   Get,
   Res,
 } from '@nestjs/common';
-import { File } from 'multer';
+// import * as Express from 'multer';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
@@ -53,7 +53,6 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get('user')
   async getUser(@Req() req): Promise<any> {
-    this.logger.log(`user = req.user = ${JSON.stringify(req.user)}`);
     return this.userService.findById(req.user.id);
   }
 
@@ -65,20 +64,20 @@ export class UserController {
    */
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  @Put(':id')
+  @Put(':userId')
   async updateUser(
     @Body() updateUserDto: updateUserDto,
-    @Param('id') id,
+    @Param('userId') userId,
     @Req() req,
   ) {
-    this.logger.log(`updateUser - id = ${id}`);
+    this.logger.log(`updateUser - userId = ${userId}`);
     this.logger.log(
       `updateUser - updateUserDto = ${JSON.stringify(updateUserDto)}`,
     );
     this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
-    const isSelf = id == req.user.id ? true : false;
+    const isSelf = userId == req.user.id ? true : false;
     this.logger.log(
-      `updateUser - req.user.id = ${req.user.id}, id = ${id}, isSelf = ${isSelf}`,
+      `updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`,
     );
     let updatedUser = null;
     try {
@@ -91,20 +90,12 @@ export class UserController {
         updatedUser = await this.userService.updateOther(
           req.user,
           updateUserDto,
-          id,
+          userId,
         );
       }
     } catch (error) {
-      this.logger.log(`updateUser - caught error = ${JSON.stringify(error)}`);
-      this.logger.log(`updateUser - rethrowing error`);
       throw error;
-      //      return {
-      //        message: error.error.message,
-      //        area: error.area,
-      //        statusCode: error.error.statusCode,
-      //      };
     }
-    this.logger.log(`updateUser - ret = ${JSON.stringify(updatedUser)}`);
     return { user: updatedUser, statusCode: 201 };
     // check properties and redirect to the right controllers ? Or do stuff in the service ?
   }
@@ -119,7 +110,7 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Post('setAvatar')
   @UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
-  async setAvatar(@Req() req, @UploadedFile() avatar: File) {
+  async setAvatar(@Req() req, @UploadedFile() avatar: Express.Multer.File) {
     this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
     this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
     return await this.userService.setAvatar(

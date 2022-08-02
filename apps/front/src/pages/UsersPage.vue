@@ -7,7 +7,7 @@
 
 <template>
   <q-page class="row">
-    <pre v-for="user in auth.getConnectedUsers">
+    <pre v-for="user in auth.getConnectedUsers" :key="`user-${user.id}`">
       {{ user }}
     </pre>
   </q-page>

@@ -16,19 +16,25 @@
 <script setup lang="ts">
 import LogoBannerCoalition from 'src/components/LogoBannerCoalition.vue';
 import { CoalitionChoice } from 'src/types';
-import { PropType } from "vue";
+import { defineComponent, PropType } from 'vue';
+
+defineComponent({
+  components: {
+    LogoBannerCoalition,
+  },
+});
 
 const props = defineProps({
   modelValue: {
     type: String as PropType<CoalitionChoice>,
     required: false,
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+  },
+});
+const emit = defineEmits(['update:modelValue']);
 
 const updateValue = (coalition: CoalitionChoice) => {
-  emit('update:modelValue', coalition != props.modelValue ? coalition : '');
-}
+  emit('update:modelValue', coalition !== props.modelValue ? coalition : '');
+};
 </script>
 
 <style lang="scss" scoped>

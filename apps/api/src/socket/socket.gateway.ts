@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:21:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 14:49:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
-import { AuthSocket, WSAuthMiddleware } from './ws-auth.middleware';
+import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketService } from 'src';
 
@@ -52,7 +52,7 @@ export class SocketGateway
     DefaultEventsMap,
     DefaultEventsMap,
     DefaultEventsMap,
-    AuthSocket
+    SocketData
   >;
   private logger: Logger = new Logger('PongGateway');
 
@@ -88,17 +88,29 @@ export class SocketGateway
     this.logger.log(`Gateway initialized`);
   }
 
-  handleDisconnect(client: AuthSocket) {
-    this.logger.log(
-      `Client disconnected: ${client.id} Name ${client.user.username}`,
-    );
-    this.server.emit('online', { name: client.user.name, type: 'disconnect' });
+  handleDisconnect(client: Socket) {
+    const { user, lobby } = client.data;
+    if (lobby) {
+      console.log('==================> Disconnected user was in lobby', lobby);
+    } else {
+      console.log('==================> OOps', lobby);
+    }
+    this.logger.log(`Client disconnected: ${client.id} Name ${user.name}`);
+    this.server.emit('online', {
+      name: user.name,
+      type: 'disconnect',
+    });
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
-    this.logger.log(
-      `Client connected: ${client.id} Name ${client.user.username}`,
-    );
-    this.server.emit('online', { name: client.user.name, type: 'connect' });
+    const { user, lobby } = client.data;
+    this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
+    if (lobby) {
+      console.log('Disconnected user was in lobby', lobby);
+    }
+    this.server.emit('online', {
+      name: user.name,
+      type: 'connect',
+    });
   }
 }

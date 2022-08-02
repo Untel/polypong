@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 17:50:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 18:34:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,15 @@ export class LobbyService {
   getAndJoinLobby(id: LobbyId, user: User): Lobby {
     // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
-    console.log('Searching lobby', lobby, this.lobbies);
     if (!lobby) return null;
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
     if (!socketOfJoiner) {
       console.log('This should never happen if socket is connected');
     }
     socketOfJoiner.join(`lobby-${lobby.id}`);
-    console.log('User ', user.id, 'joined the lobby', lobby.id);
+    socketOfJoiner.data.lobby = lobby;
+    lobby.addPlayer(new Player(user));
+    // lobby.users = this.socketService.getUsersInRoom(`lobby-${lobby.id}`);
     return lobby;
   }
 
@@ -78,8 +79,12 @@ export class LobbyService {
     console.log('Host', host.id);
     // await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
     const player = new Player(host);
-    this.lobbies.set(host.id, new Lobby(player, name));
-    const lobby: Lobby = this.getLobby(host.id);
+    const lobby = new Lobby(
+      this.socketService.getRoom(`lobby-${host.id}`),
+      player,
+      name,
+    );
+    this.lobbies.set(host.id, lobby);
     this.socketService.sendNewLobby(lobby);
     return lobby;
   }

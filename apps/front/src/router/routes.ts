@@ -6,15 +6,13 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/18 22:08:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/02 18:04:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { RouteRecordRaw } from 'vue-router';
-// import PongPage from 'pages/PongPage.vue';
-import AuthGuard from './auth.guard';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
-import LobbyGuard from './lobby.guard';
+import AuthGuard from './auth.guard';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -40,11 +38,11 @@ const routes: RouteRecordRaw[] = [
         { name: 'profile', path: 'profile', component: () => import('pages/ProfilePage.vue') },
         { name: 'lobbies', path: 'lobbies', component: () => import('pages/LobbiesPage.vue') },
         {
-          // beforeEnter: LobbyGuard,
-          props: true,
-          name: 'lobby', path: 'lobby/:id', component: () => import('pages/LobbyPage.vue'),
+          name: 'lobby', path: 'lobby/:id', props: true, component: () => import('pages/LobbyPage.vue'),
         },
-        { name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue') },
+        {
+          name: 'game', path: 'game/:id', props: true, component: () => import('pages/GamePage.vue'),
+        },
         { name: 'users', path: 'users', component: () => import('pages/UsersPage.vue') },
         { name: 'settings', path: 'settings', component: () => import('pages/SettingsPage.vue') },
       ],
@@ -61,8 +59,9 @@ const routes: RouteRecordRaw[] = [
     path: '/external',
     name: 'external',
     component: () => import('pages/LoginPage.vue'),
-    beforeEnter(to, from, next) {
+    beforeEnter(to) {
       const url: string = to.query.url as string;
+      // eslint-disable-next-line no-restricted-globals, no-alert
       const wantTo = confirm(`You are about to leave polypong to go to ${url}, are you sur?`);
       if (wantTo) { window.location.href = url; }
     },

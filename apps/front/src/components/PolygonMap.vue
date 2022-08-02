@@ -107,7 +107,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, PropType, StyleValue, watch, ref } from 'vue';
+import {
+  onMounted, computed, PropType, StyleValue, watch, ref,
+} from 'vue';
 import { Position, Paddle, Ball } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
@@ -177,11 +179,11 @@ const ratio = computed(() => {
   let r = elementX.value / elementWidth.value;
   if (r > 1) r = 1;
   else if (r < 0) r = 0;
-  console.log("Changed");
+  console.log('Changed');
   return 1 - r;
 });
 watch(ratio, (val) => {
-  console.log("Emit");
+  console.log('Emit');
   emit('paddleMove', val);
 });
 
@@ -207,6 +209,6 @@ watch(() => props.map, (map, oldMap) => {
 }, { immediate: false });
 
 onMounted(() => {
-  console.log("Mounted polygon");
+  console.log('Mounted polygon');
 });
 </script>
