@@ -16,25 +16,29 @@
   <q-tab-panel name="online">
     <q-card v-for="user in auth.getConnectedUsers" :key="`user-${user.id}`">
       <q-card-section>
-        <q-avatar><img :src=user.avatar /></q-avatar>
-        <q-btn-group push>
+        <div class="q-gutter-none">
+          <q-avatar><img :src=user.avatar /></q-avatar>
           <q-btn :label=user.name @click="toggleGutter(user.name)"/>
           <q-btn v-if="showGutter === user.name"
             label="invite to lobby" @click="inviteToLobby(user.id)"
-            push icon="fa-solid fa-table-tennis-paddle-ball"
+            icon="fa-solid fa-table-tennis-paddle-ball"
           />
           <q-btn v-if="showGutter == user.name"
             label="message" @click="message(user.id)"
-            push icon="fa-solid fa-paper-plane" />
+            icon="fa-solid fa-paper-plane" />
           <q-btn v-if="showGutter == user.name"
             label="add friend" @click="addFriend(user.id)"
-            push icon="fa-solid fa-user-group"
+            icon="fa-solid fa-user-group"
+          />
+          <q-btn v-if="showGutter == user.name"
+            label="stats" @click="stats(user.id)"
+            icon="fa-solid fa-chart-line"
           />
           <q-btn v-if="showGutter == user.name"
             label="block" @click="block(user.id)"
-            push icon="fa-solid fa-ban"
+            icon="fa-solid fa-ban" color="red"
           />
-        </q-btn-group>
+        </div>
       </q-card-section>
     </q-card>
   </q-tab-panel>
@@ -69,14 +73,17 @@ function toggleGutter(name: string) {
 async function inviteToLobby(id: number) {
   console.log(`invite to lobby ${id}`);
 }
+async function message(id: number) {
+  console.log(`message ${id}`);
+}
 async function addFriend(id: number) {
   console.log(`add friend ${id}`);
 }
+async function stats(id: number) {
+  console.log(`stats ${id}`);
+}
 async function block(id: number) {
   console.log(`block ${id}`);
-}
-async function message(id: number) {
-  console.log(`message ${id}`);
 }
 
 </script>
