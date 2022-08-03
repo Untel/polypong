@@ -7,9 +7,6 @@
 
 <template>
 <!--
-<pre v-for="user in auth.getConnectedUsers" :key="`user-${user.id}`">
-  {{ user }}
-</pre>
 -->
 
 <q-tabs
@@ -30,7 +27,6 @@
 <q-tab-panels v-model="tab" animated>
   <q-tab-panel name="online">
     <div class="text-h6">online</div>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit.
   </q-tab-panel>
 
   <q-tab-panel name="friends">
