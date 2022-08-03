@@ -69,8 +69,8 @@ const linksList = [{
   icon: 'fab fa-forumbee',
   to: 'lobbies',
 }, {
-  title: 'Users',
-  caption: 'See all connected users',
+  title: 'Community',
+  caption: 'out and about',
   icon: 'fa-solid fa-users',
   to: 'users',
 }, {
