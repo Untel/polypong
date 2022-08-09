@@ -1,19 +1,22 @@
-export class Position {
-  x = 0;
-
-  y = 0;
+export interface Position {
+  x: number;
+  y: number;
 }
 
-export class Paddle {
-  pos: Position = { x: 0, y: 0 };
-
-  angle = 0;
-
-  line: Array<Array<number>> = [[0, 0], [0, 0]];
+export type Line = Array<Array<number>>;
+export interface Paddle {
+  line: Line;
+  color: string;
 }
 
-export class Ball {
-  position: Position = { x: 0, y: 0 };
+export interface Ball {
+  color: string;
+  position: Position;
+  target: {
+    hit: Position;
+  };
+}
 
-  target: any;
+export interface Power {
+  position: Position;
 }

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 22:07:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 12:43:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import { CurrentUser } from 'src/auth/user.decorator';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
+import InLobbyGuard, { CurrentLobby } from './in-lobby.guard';
 import { LobbyService } from './lobby.service';
 
 @UseGuards(JwtGuard)
@@ -43,8 +44,13 @@ export class LobbyController {
   }
 
   @Get('/:id')
-  async getLobby(@Param('id') id: LobbyId): Promise<Lobby> {
-    const lobby = this.lobbyService.getLobby(id);
+  @UseGuards(InLobbyGuard)
+  async getLobby(
+    // @Param('id') id: LobbyId
+    @CurrentLobby() lobby,
+  ): Promise<Lobby> {
+    // const lobby = this.lobbyService.getLobby(id);
+    console.log('Lobby guard protected', lobby);
     return lobby;
   }
 
@@ -60,6 +66,12 @@ export class LobbyController {
     return lobby;
   }
 
+  @Get('/:id/start')
+  startGame(@Param('id') id: LobbyId): boolean {
+    this.lobbyService.startGame(id);
+    return true;
+  }
+
   @Post()
   createLobby(@CurrentUser() user, @Body('name') name) {
     const lobby = this.lobbyService.createLobby(user, name);
@@ -73,9 +85,4 @@ export class LobbyController {
     return _lobby;
     // this.lobbyService.updateLobby(host.id);
   }
-
-  // @Get('/createLobby')
-  // create() : Lobby {
-  //   return this.lobbyService.createLobby();
-  // }
 }

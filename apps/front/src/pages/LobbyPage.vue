@@ -112,7 +112,7 @@ import {
   defineProps, computed, ref, watch, defineComponent, onMounted,
 } from 'vue';
 import UserCard from 'src/components/UserCard.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -130,12 +130,12 @@ const $lobbies = useLobbiesStore();
 const $auth = useAuthStore();
 const { getActiveLobby: lobby } = $lobbies;
 const $route = useRoute();
+const $router = useRouter();
 
 const lobbyForm = ref();
 
 const start = () => {
-  // props.lobbyId =
-  // lobby.resolve()
+  $lobbies.startGame($route.params.id);
 };
 
 const canUpdate = computed(() => {
@@ -151,6 +151,9 @@ onMounted(() => {
   const id = +($route.params.id as string);
   $auth.socket?.on('lobby_change', (evt) => {
     $lobbies.fetchCurrentLobby(id);
+  });
+  $auth.socket?.on('start', (evt) => {
+    $router.push(`/lobby/${id}/game`);
   });
 });
 

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/03 00:18:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/04 08:28:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,17 +46,22 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   spectatorsMax: number;
   spectators: Spectator[];
+
+  @Exclude()
   game: Game | null;
 
   @Exclude()
-  socket = null;
+  sock = null;
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
 
   constructor(socket, host: Player, name = 'Unamed lobby') {
     this.id = host.id;
     this.name = name;
     this.host = host;
+    console.log('Socket instance', socket);
+    this.sock = socket;
     this.players = new Map<number, Player>();
+    // No need to add the host as player because he will automatically join it
     // this.addPlayer(host);
     this.spectators = [];
     this.playersMax = 8;
@@ -66,18 +71,18 @@ export default class Lobby implements ILobby, ILobbyConfig {
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     player.inLobby = this.id;
-    // this.socket.emit('room_connect', [...this.players.values()]);
+    this.sock.emit('room_connect', [...this.players.values()]);
   }
 
   removePlayer(player: Player) {
-    console.log('SHould unset player  from plater', this.players, this.players.delete);
     this.players.delete(player.id);
     player.inLobby = null;
-    // this.socket.emit('room_connect', [...this.players.values()]);
+    this.sock.emit('room_connect', [...this.players.values()]);
   }
 
   start(): Game {
-    // this.game = new Game(this);
+    this.game = new Game(this);
+    this.sock.emit('start');
     return this.game;
   }
 

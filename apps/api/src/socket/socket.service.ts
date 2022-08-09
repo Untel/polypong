@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 21:27:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/04 07:48:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,6 @@ export class SocketService {
   }
 
   sendNewLobby(lobby: Lobby) {
-    this.socketio.emit('refreshedLobbies', lobby);
+    this.socketio.emit('refreshedLobbies', null);
   }
 }

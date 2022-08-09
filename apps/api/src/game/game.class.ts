@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 01:49:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/04 08:02:45 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { Server } from 'socket.io';
+import { BroadcastOperator, Server } from 'socket.io';
 import Store from 'redis-json';
 import { Bot } from '.';
 import { pointOnLine, Line, angleToDegrees } from 'geometric';
@@ -21,6 +21,8 @@ import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
 
 import GameTools from './gametools.class';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { SocketData } from 'src/socket';
 
 const FRAME_RATE = 30;
 const TEST_MODE = true;
@@ -29,10 +31,10 @@ export enum MODE {
   Coalition = 'coalition',
   Battleground = 'battleground',
 }
+
+type S = BroadcastOperator<DefaultEventsMap, SocketData>;
 export default class Game {
   lobby: Lobby;
-  socket: Server;
-  store: Store;
 
   balls: Ball[] = [];
   nBall = 1;
@@ -49,11 +51,8 @@ export default class Game {
   interval: NodeJS.Timer;
   intervalPowers: NodeJS.Timer;
 
-  constructor(socket: Server, store: Store, lobby: Lobby) {
-    console.log('Angle: ', angleToDegrees(6.28));
+  constructor(lobby: Lobby) {
     this.lobby = lobby;
-    this.socket = socket;
-    this.store = store;
     const rand = GameTools.getRandomArbitrary(2, 20);
     this.nPlayers = rand;
     this.nBots = rand - 1;
@@ -107,6 +106,18 @@ export default class Game {
     clearInterval(this.intervalPowers);
     this.interval = null;
     this.intervalPowers = null;
+  }
+
+  newRound() {
+    let timer = 5;
+    const intervalId = setInterval(() => {
+      this.socket.emit('timer', timer);
+      timer -= 1;
+      if (timer === 0) {
+        this.run();
+        clearInterval(intervalId);
+      }
+    }, 1000);
   }
 
   updatePaddlePercent(percent: number) {
@@ -279,5 +290,9 @@ export default class Game {
     this.runPhysics();
     this.runBots();
     this.socket.emit('gameUpdate', this.networkState);
+  }
+
+  public get socket() {
+    return this.lobby.sock;
   }
 }

@@ -24,7 +24,13 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls" :powers="powers"
+      <PolygonMap
+        class="map"
+        ref="mapEl"
+        :map="mapProps"
+        :paddles="paddles"
+        :balls="balls"
+        :powers="powers"
         @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
@@ -39,37 +45,27 @@
     <q-btn dense @click="reset()">
       reset
     </q-btn>
-    <pre>
-      {{ tickValue }}
-    </pre>
-    <pre style="background-color: grey;">
-      <!-- El : {{ usedRatio }}
-      Pause : {{ isPaused }} {{ typeof (isPaused) }}
-      Ball : {{ balls }}
-      Paddle : {{ paddles }}
-      Info : {{ info }} -->
-    </pre>
   </q-page>
 </template>
 
 <script lang="ts" setup>
 import {
-  defineProps, ref, onMounted, StyleValue, Ref, watch, computed, VueElement,
+  defineProps, ref, onMounted, Ref, computed,
 } from 'vue';
+import { Notify } from 'quasar';
+import { useMouseInElement } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
-import { Position, Paddle, Ball } from 'src/utils/game';
-import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
+import { Paddle, Ball } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
-import { Notify } from 'quasar';
+import { mande } from 'mande';
 
 const { socket } = useAuthStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
 const powers: Ref<any[]> = ref([]);
-const info: Ref<object> = ref();
 const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
 const props = defineProps({
@@ -152,5 +148,11 @@ const {
   data: test,
   execute: reset,
 } = useApi('pong/reset', { immediate: false });
+
+const gameApi = mande('/api/pong');
+onMounted(async () => {
+  const gameInfos = await gameApi.get('/');
+  console.log('Game infos', gameInfos);
+});
 
 </script>
