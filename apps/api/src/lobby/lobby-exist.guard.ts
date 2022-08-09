@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   in-lobby.guard.ts                                  :+:      :+:    :+:   */
+/*   lobby-exist.guard.ts                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 13:55:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 14:03:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,37 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
+  UnprocessableEntityException,
+  createParamDecorator,
 } from '@nestjs/common';
-import LobbyExistGuard from './lobby-exist.guard';
+import Lobby from 'src/game/lobby.class';
+import { LobbyService } from './lobby.service';
 
 @Injectable()
-export default class InLobbyGuard
-  extends LobbyExistGuard
-  implements CanActivate
-{
+export default class LobbyExistGuard implements CanActivate {
+  constructor(private readonly lobbyService: LobbyService) {}
+
   canActivate(context: ExecutionContext) {
-    if (!super.canActivate(context)) {
-      return false;
-    }
     const req = context.switchToHttp().getRequest();
-    if (!req.lobby.players.has(req.user.id)) {
-      throw new UnauthorizedException();
+    const params = req.params;
+    const lobbyId = +params.id;
+    const user = req.user;
+
+    const lobby = this.lobbyService.getLobby(lobbyId);
+    if (!lobby) {
+      throw new UnprocessableEntityException();
     }
+    req.lobby = lobby;
     return true;
   }
 }
+
+export const CurrentLobby = createParamDecorator<
+  unknown,
+  ExecutionContext,
+  Lobby
+>((data: unknown, ctx: ExecutionContext): Lobby => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.lobby as Lobby;
+  },
+);

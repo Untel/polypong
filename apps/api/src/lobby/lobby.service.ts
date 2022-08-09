@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/04 08:05:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 13:58:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,13 +98,5 @@ export class LobbyService {
     const updatedLobby = this.lobbies.get(id);
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
     return updatedLobby;
-  }
-
-  startGame(id: LobbyId) {
-    const lobby = this.lobbies.get(id);
-    if (!lobby) {
-      throw new UnprocessableEntityException('Unfoundable lobby');
-    }
-    lobby.start();
   }
 }

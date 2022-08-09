@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   in-lobby.guard.ts                                  :+:      :+:    :+:   */
+/*   is-lobby-host.guard.ts                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 13:55:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 13:55:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ import {
 import LobbyExistGuard from './lobby-exist.guard';
 
 @Injectable()
-export default class InLobbyGuard
+export default class IsLobbyHost
   extends LobbyExistGuard
   implements CanActivate
 {
@@ -28,8 +28,8 @@ export default class InLobbyGuard
       return false;
     }
     const req = context.switchToHttp().getRequest();
-    if (!req.lobby.players.has(req.user.id)) {
-      throw new UnauthorizedException();
+    if (!(req.lobby.host.user.id === req.user.id)) {
+      throw new UnauthorizedException('Only host can do that');
     }
     return true;
   }

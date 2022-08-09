@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 12:43:53 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 16:20:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,14 @@ import {
   ClassSerializerInterceptor,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import { CurrentUser } from 'src/auth/user.decorator';
+import Game from 'src/game/game.class';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
-import InLobbyGuard, { CurrentLobby } from './in-lobby.guard';
+import InLobbyGuard from './in-lobby.guard';
+import IsLobbyHost from './is-lobby-host.guard';
+import LobbyExistGuard, { CurrentLobby } from './lobby-exist.guard';
+
 import { LobbyService } from './lobby.service';
 
 @UseGuards(JwtGuard)
@@ -55,21 +57,31 @@ export class LobbyController {
   }
 
   @Get('/:id/join')
+  @UseGuards(LobbyExistGuard)
   async getLobbyAndJoin(
     @CurrentUser() user,
-    @Param('id') id: LobbyId,
+    @CurrentLobby() lobby: Lobby,
   ): Promise<Lobby> {
-    const lobby = this.lobbyService.getAndJoinLobby(id, user);
-    if (!lobby) {
-      throw new UnauthorizedException('Unknown lobby');
-    }
     return lobby;
   }
 
   @Get('/:id/start')
-  startGame(@Param('id') id: LobbyId): boolean {
-    this.lobbyService.startGame(id);
+  @UseGuards(IsLobbyHost)
+  startGame(
+    // @Param('id') id: LobbyId,
+    @CurrentLobby('lobby') lobby: Lobby,
+  ): boolean {
+    lobby.start();
     return true;
+  }
+
+  @Get('/:id/game')
+  @UseGuards(InLobbyGuard)
+  gameInfos(
+    @Param('id') id: LobbyId,
+    @CurrentLobby('lobby') lobby: Lobby,
+  ): Game {
+    return lobby.game;
   }
 
   @Post()
