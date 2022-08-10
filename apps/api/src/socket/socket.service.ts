@@ -18,13 +18,13 @@ import { AuthSocket } from './ws-auth.middleware';
 @Injectable()
 export class SocketService {
   constructor(private readonly socketGateway: SocketGateway) {
-    setInterval(() => {
-      console.log(
-        'Connected users',
-        this.connectedUsers.map((u) => u.id),
-        [...this.socketio.sockets.sockets.values()].length,
-      );
-    }, 1000);
+//    setInterval(() => {
+//      console.log(
+//        'Connected users',
+//        this.connectedUsers.map((u) => u.id),
+//        [...this.socketio.sockets.sockets.values()].length,
+//      );
+//    }, 1000);
   }
 
   public get socketio() {

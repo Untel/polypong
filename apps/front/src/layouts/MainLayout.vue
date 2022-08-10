@@ -21,13 +21,17 @@
       :breakpoint="500"
     >
       <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
-      <q-list>
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      <EssentialLink title="Home" caption="Home page" icon="fas fa-igloo" to="home"/>
+      <EssentialLink title="Login" caption="Login page" icon="fab fa-connectdevelop" to="login"/>
+      <EssentialLink title="Coalitions" caption="Coalitions page"
+        icon="fas fa-group-arrows-rotate" to="coalitions"/>
+      <EssentialLink title="Lobbies" caption="Find a lobby of ppl to play with"
+        icon="fab fa-forumbee" to="lobbies"/>
+      <EssentialLink title="Community" caption="out and about"
+        icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
+      <EssentialLink title="Settings" caption="Your account settings"
+        icon="fa-solid fa-gear" to="settings" />
+        {{ soc.getNotifCount }}
     </q-drawer>
 
     <q-page-container>
@@ -39,6 +43,8 @@
 <script lang="ts" setup>
 import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
+import { useAuthStore } from 'src/stores/auth.store';
+import { useSocialStore } from 'src/stores/social.store';
 import { defineComponent, ref } from 'vue';
 
 defineComponent({
@@ -48,36 +54,12 @@ defineComponent({
   },
 });
 
-const linksList = [{
-  title: 'Home',
-  caption: 'Home page',
-  icon: 'fas fa-igloo',
-  to: 'home',
-}, {
-  title: 'Login',
-  caption: 'Login page',
-  icon: 'fab fa-connectdevelop',
-  to: 'login',
-}, {
-  title: 'Coalitions',
-  caption: 'Coalitions page',
-  icon: 'fas fa-group-arrows-rotate',
-  to: 'coalitions',
-}, {
-  title: 'Lobbies',
-  caption: 'Find a lobby of ppl to play with',
-  icon: 'fab fa-forumbee',
-  to: 'lobbies',
-}, {
-  title: 'Community',
-  caption: 'out and about',
-  icon: 'fa-solid fa-users',
-  to: 'users',
-}, {
-  title: 'Settings',
-  caption: 'Your account settings',
-  icon: 'fa-solid fa-gear',
-  to: 'settings',
-}];
 const miniState = ref(true);
+
+const auth = useAuthStore(); const soc = useSocialStore();
+
+auth.socket?.on('friendship', () => {
+  soc.fetchRelationships();
+});
+
 </script>
