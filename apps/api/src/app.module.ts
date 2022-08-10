@@ -19,6 +19,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
+import { RelationshipModule } from './relationship/relationship.module';
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],
@@ -42,6 +43,7 @@ const asyncConfig = (moduleName) => ({
     SocketModule,
     PongModule,
     LobbyModule,
+    RelationshipModule,
   ],
   controllers: [AppController],
   providers: [AppService],
