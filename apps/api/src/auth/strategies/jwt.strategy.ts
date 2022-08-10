@@ -20,13 +20,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   logger = new Logger('JwtStrategy');
 
   async validate(userJwtPayload: JwtPayload) {
-    // this.logger.log(
-    //   `validate - userJWtPayload = ${JSON.stringify(userJwtPayload)}`,
-    // );
     // Ya un soucis si on delete pas ca, a check
     delete userJwtPayload.exp;
     const user = await this.userService.findById(userJwtPayload.id);
-    this.logger.log(`validate - user = ${JSON.stringify(user)}`);
+    // this.logger.log(`validate - user = ${JSON.stringify(user)}`);
     // if 2fa not required, just return the user
     if (user.isTwoFactorAuthenticationEnabled == false) {
       return user;

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 14:02:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 18:34:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
+import { RouterModule } from '@nestjs/core';
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],

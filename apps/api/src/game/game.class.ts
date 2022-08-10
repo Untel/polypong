@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/04 08:02:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:05:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,11 @@ import { Collider2d, Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
-
+import { shuffle } from 'lodash';
 import GameTools from './gametools.class';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketData } from 'src/socket';
+import Player from './player.class';
 
 const FRAME_RATE = 30;
 const TEST_MODE = true;
@@ -32,15 +33,14 @@ export enum MODE {
   Battleground = 'battleground',
 }
 
-type S = BroadcastOperator<DefaultEventsMap, SocketData>;
 export default class Game {
   lobby: Lobby;
 
   balls: Ball[] = [];
   nBall = 1;
-  bots: Bot[] = [];
   nPlayers: number;
-  nBots: number;
+  players: Map<number, Player> = new Map();
+  bots: Bot[];
   paddles: Paddle[] = [];
   walls: Wall[] = [];
   powers: Power[] = [];
@@ -53,11 +53,10 @@ export default class Game {
 
   constructor(lobby: Lobby) {
     this.lobby = lobby;
-    const rand = GameTools.getRandomArbitrary(2, 20);
-    this.nPlayers = rand;
-    this.nBots = rand - 1;
-    this.generateMap(this.nPlayers);
-    this.spawnBots(this.nBots);
+    this.nPlayers = lobby.playersMax;
+    this.players = Object.assign(new Map<string, Player>(), lobby.players);
+    this.bots = [];
+    this.generateMap();
   }
 
   addBall() {
@@ -68,16 +67,21 @@ export default class Game {
     this.balls.push(ball);
   }
 
-  generateMap(nPlayers: number) {
+  generateMap(n = 0) {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
 
-    this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
+    this.map = new PolygonMap((this.nPlayers === 2 && 4) || this.nPlayers);
     this.paddles = [];
+
+    // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
+    // const randomIndex: Array<number> = shuffle(arrayIndex);
+    const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
+    const randomPlayers = shuffle(playersAndBotsToAssign);
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
-      if (nPlayers > 2 || !(index % 2)) {
+      if (this.nPlayers > 2 || !(index % 2)) {
         paddle = new Paddle(line, index);
         this.paddles.push(paddle);
       }
@@ -86,13 +90,6 @@ export default class Game {
     for (let i = 0; i < this.nBall; i++) this.addBall();
     this.socket.emit('mapChange', this.networkMap);
     this.socket.emit('gameUpdate', this.networkState);
-  }
-
-  spawnBots(botNb: number) {
-    for (let i = 0; i < botNb; i++) {
-      const tmp: Bot = new Bot(this.walls[i], i);
-      this.bots.push(tmp);
-    }
   }
 
   run() {
@@ -187,12 +184,12 @@ export default class Game {
 
   public reset() {
     this.nPlayers = GameTools.getRandomArbitrary(3, 6);
-    this.nBots = this.nPlayers;
+    // this.nBots = this.nPlayers;
     this.generateMap(this.nPlayers);
     while (this.bots.length != 0) {
       this.bots.pop();
     }
-    this.spawnBots(this.nBots);
+    // this.spawnBots(this.nBots);
   }
   // Getters
   public get isPaused() {

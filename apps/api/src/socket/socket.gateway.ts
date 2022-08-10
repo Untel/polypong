@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 21:32:31 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 19:48:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,11 @@ export class SocketGateway
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
-    const { user, lobby } = client.data;
+    const { user } = client.data;
     this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
-    if (lobby) {
-      console.log('Disconnected user was in lobby', lobby);
+    const inLobby = this.lobbyService.userIsInLobby(user);
+    if (inLobby) {
+      client.data.lobby = inLobby;
     }
     this.server.emit('online', {
       name: user.name,

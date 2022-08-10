@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/04 09:00:22 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 18:23:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,28 +17,41 @@ import { useAuthStore } from './auth.store';
 
 export const lobbiesApi = mande('/api/lobbies');
 
-export type Lobby = {
+export interface BasePlayer {
+  name: string;
+  avatar: string;
+  color: string;
+}
+export interface User extends BasePlayer {
+  id: number;
+  email: string;
+}
+export interface Bot extends BasePlayer {
+  level: number;
+}
+
+export interface Player {
+  user: User;
+  color: string;
+}
+
+export interface Lobby {
   id: number;
   name: string;
-  players: Array<any>;
+  players: Array<Player>;
+  bots: Array<Bot>;
   playersMax: number;
   spectators: Array<any>;
   spectatorsMax: number;
   description: string;
   isPrivate?: boolean;
-  host: {
-    user: {
-      avatar: string,
-      name: string,
-      id: number,
-    }
-  }
-};
+  host: User
+}
 
-type LobbiesState = {
-  lobbies: Lobby[],
-  activeLobby: Lobby | null,
-};
+interface LobbiesState {
+  lobbies: Lobby[];
+  activeLobby: Lobby | null;
+}
 
 export const onlineApi = mande('/api/online');
 

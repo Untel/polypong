@@ -17,15 +17,15 @@ export class Bot {
   edge: Line;
   wall: Wall;
   tasks: Ball[] = [];
-  id: number;
   dir: number;
-  constructor(wall: Wall, id: number) {
-    // super(id);
-    // this.botPaddle = paddle;
-    // this.wall = paddle.
+  name: string;
+
+  constructor() {
+    this.name = 'Beep boop';
+  }
+  attachWall(wall: Wall) {
     this.wall = wall;
     this.wall.addBot(this);
-    this.id = id;
   }
   think() {
     // console.log("thinking")

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:08 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 13:34:09 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/09 18:47:18 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,6 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
           },
         };
       case 'http':
-        this.logger.log(
-          `getRequest - http - returning context.switchToHttp().getRequest()`,
-        );
         return context.switchToHttp().getRequest();
       default:
         console.log('Unhandled execution context', context.getType());
@@ -50,15 +47,10 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
   }
 
   canActivate(context: ExecutionContext) {
-    this.logger.log(`canActivate - context = ${context}`);
-    // console.log("Parent activate ctx");
     return super.canActivate(context) as boolean;
   }
 
-  handleRequest(err, user, info) {
-    // console.log("===> JWT HANDLE");
-    // console.log('Handling the request', err, user, info);
-    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
+  handleRequest(err, user) {
     if (err || !user) {
       throw err || new Error();
     }

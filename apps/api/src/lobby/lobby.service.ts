@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 13:58:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:46:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   UnprocessableEntityException,
+  Logger,
 } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import Game from 'src/game/game.class';
@@ -33,7 +34,7 @@ import { pick } from 'lodash';
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
   store: Store<Lobby>;
-
+  logger = new Logger('LobbyService');
   constructor(
     // @InjectRedis() private readonly redis: Redis,
     // @Inject(forwardRef(() => SocketService))
@@ -43,9 +44,7 @@ export class LobbyService {
   }
 
   getLobbies(): Lobby[] {
-    // const lobbies: any = (await this.store.get('game:*')) || [];
     const lobbies = this.lobbies.values();
-    console.log('Lobbies', lobbies);
     return [...lobbies];
   }
 
@@ -55,48 +54,56 @@ export class LobbyService {
     return lobby;
   }
 
+  userIsInLobby(user: User) {
+    const lobbyPresent = this.getLobbies().find((l: Lobby) =>
+      [...l.players.values()].find((p: Player) => p.user.id === user.id),
+    );
+    console.log('After reconnect, user found in lobby', lobbyPresent && lobbyPresent.id);
+    return lobbyPresent;
+  }
+
+  userJoinLobby(lobby: Lobby, user: User) {
+    const socketOfJoiner = this.socketService.getUserSocket(user.id);
+    lobby.addPlayer(new Player(user));
+    if (!socketOfJoiner) {
+      this.logger.error('User socket from user never found');
+    } else {
+      this.logger.log(`User socket ${user.id} joined the lobby ${lobby.id}`);
+      socketOfJoiner.data.lobby = lobby;
+      socketOfJoiner.join(lobby.roomId);
+    }
+    this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
+  }
+
   getAndJoinLobby(id: LobbyId, user: User): Lobby {
     // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
     if (!lobby) return null;
-    const socketOfJoiner = this.socketService.getUserSocket(user.id);
-    if (!socketOfJoiner) {
-      console.log('This should never happen if socket is connected');
-    }
-    lobby.addPlayer(new Player(user));
-    socketOfJoiner.data.lobby = lobby;
-    socketOfJoiner.join(lobby.roomId);
-    console.log('Lobby change', lobby.roomId);
-    this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
+
 
     // lobby.users = this.socketService.getUsersInRoom(`lobby-${lobby.id}`);
     return lobby;
   }
 
   clearLobbies() {
-    // this.store.clearAll();
     this.lobbies.clear();
   }
 
   createLobby(host: User, name: string): Lobby {
     console.log('Host', host.id);
     // await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
-    const player = new Player(host);
     const channel = this.socketService.getRoom(`lobby-${host.id}`);
-    const lobby = new Lobby(channel, player, name);
+    const lobby = new Lobby(channel, host, name);
     this.lobbies.set(host.id, lobby);
     this.socketService.sendNewLobby(lobby);
     return lobby;
   }
 
-  updateLobby(id: LobbyId, datas: Lobby): Lobby {
-    const lobby = this.lobbies.get(id);
-    if (!lobby) {
-      throw new UnprocessableEntityException('Unfoundable lobby');
-    }
-    Object.assign(lobby, pick(datas, ['name', 'playersMax', 'spectatorsMax']));
-    const updatedLobby = this.lobbies.get(id);
+  updateLobby(lobby: Lobby, datas: Partial<Lobby>): Lobby {
+    console.log('WHERE I COME FROM');
+    return ;
+    lobby.configure(datas);
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
-    return updatedLobby;
+    return lobby;
   }
 }

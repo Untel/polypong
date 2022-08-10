@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 16:20:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:48:09 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,44 +28,41 @@ import { CurrentUser } from 'src/auth/user.decorator';
 import Game from 'src/game/game.class';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
+import SocketGuard, { CurrentSocket } from 'src/guards/socket.guard';
+import { AuthSocket } from 'src/socket/ws-auth.middleware';
 import InLobbyGuard from './in-lobby.guard';
 import IsLobbyHost from './is-lobby-host.guard';
 import LobbyExistGuard, { CurrentLobby } from './lobby-exist.guard';
 
 import { LobbyService } from './lobby.service';
 
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, LobbyExistGuard)
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller('lobbies')
+@Controller('/lobbies/:id')
 export class LobbyController {
   constructor(private readonly lobbyService: LobbyService) {}
-
   @Get()
-  async lobbies(): Promise<Lobby[]> {
-    return this.lobbyService.getLobbies();
-  }
-
-  @Get('/:id')
   @UseGuards(InLobbyGuard)
-  async getLobby(
+  getLobby(
     // @Param('id') id: LobbyId
     @CurrentLobby() lobby,
-  ): Promise<Lobby> {
-    // const lobby = this.lobbyService.getLobby(id);
-    console.log('Lobby guard protected', lobby);
+  ): Lobby {
     return lobby;
   }
 
-  @Get('/:id/join')
-  @UseGuards(LobbyExistGuard)
+  @Get('join')
+  @UseGuards(SocketGuard)
   async getLobbyAndJoin(
+    // @Param('id') id,
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
+    @CurrentSocket() socket: AuthSocket,
   ): Promise<Lobby> {
+    this.lobbyService.userJoinLobby(lobby, user);
     return lobby;
   }
 
-  @Get('/:id/start')
+  @Get('start')
   @UseGuards(IsLobbyHost)
   startGame(
     // @Param('id') id: LobbyId,
@@ -75,7 +72,7 @@ export class LobbyController {
     return true;
   }
 
-  @Get('/:id/game')
+  @Get('game')
   @UseGuards(InLobbyGuard)
   gameInfos(
     @Param('id') id: LobbyId,
@@ -84,17 +81,17 @@ export class LobbyController {
     return lobby.game;
   }
 
-  @Post()
-  createLobby(@CurrentUser() user, @Body('name') name) {
-    const lobby = this.lobbyService.createLobby(user, name);
-    return lobby;
-  }
-
-  @Put('/:id')
-  updateLobby(@CurrentUser() user, @Param('id') id: LobbyId, @Body() lobby) {
+  @Put()
+  @UseGuards(IsLobbyHost)
+  updateLobby(
+    @Param('id') id: LobbyId,
+    @CurrentLobby('lobby') lobby: Lobby,
+    @Body() datas,
+  ) {
     console.log('Updating', id, typeof id);
-    const _lobby = this.lobbyService.updateLobby(id, lobby);
-    return _lobby;
+    lobby.configure(datas);
+    // const _lobby = this.lobbyService.updateLobby(lobby, datas);
+    return lobby;
     // this.lobbyService.updateLobby(host.id);
   }
 }

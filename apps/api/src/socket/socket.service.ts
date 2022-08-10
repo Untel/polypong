@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/04 07:48:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 13:34:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ export class SocketService {
         this.connectedUsers.map((u) => u.id),
         [...this.socketio.sockets.sockets.values()].length,
       );
-    }, 1000);
+    }, 5000);
   }
 
   public get socketio() {
