@@ -52,11 +52,12 @@
       </template>
     </q-input>
     <q-card v-for="rel in soc.relationships" :key="`rel-${rel.id}`">
-      {{ rel }}
       <q-card-section>
         <div class="q-gutter-none">
           <q-avatar><img :src=rel.to.avatar /></q-avatar>
-          <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)"/>
+          <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)"
+            :color="rel.friendship_received && rel.friendship_sent ? 'green' : ''"
+          />
           <span v-if="showGutter == rel.to.name">
             <q-btn
               label="invite" @click="inviteToLobby(rel.to.id)"
@@ -67,15 +68,27 @@
             /><q-btn
               label="stats" @click="stats(rel.to.id)"
               icon="fa-solid fa-chart-line"
-            /><q-btn v-if="rel.friendship_received == false"
+            /><q-btn v-if="rel.friendship_received == false && rel.friendship_sent == false"
               label="add friend" @click="addFriend(rel.to.name)"
               icon="fa-solid fa-user-group"
-            /><q-btn v-if="rel.friendship_received == true && rel.friendship_sent == false"
-              label="accept friend invite" @click="addFriend(rel.to.name)"
-              icon="fa-solid fa-user-group" color="green"
+            />
+
+            <q-btn-group
+              v-if="rel.friendship_received == true && rel.friendship_sent == false"
+
+            >
+              <q-btn  label="accept" @click="addFriend(rel.to.name)"
+                icon="fa-solid fa-heart" color="green"/>
+              <q-btn label="decline" @click="unfriend(rel.to.name)"
+                icon="fas fa-heart-broken" color="orange"/>
+            </q-btn-group>
+
+            <q-btn v-if="rel.friendship_sent == true && rel.friendship_received == false"
+              label="cancel" @click="unfriend(rel.to.name)"
+              icon="fa-solid fa-user" color="blue"
             /><q-btn v-if="rel.friendship_sent == true && rel.friendship_received == true"
               label="unfriend" @click="unfriend(rel.to.name)"
-              icon="fa-solid fa-user-group" color="orange"
+              icon="fas fa-sad-tear" color="orange"
             /><q-btn
               label="block" @click="block(rel.to.id)"
               icon="fa-solid fa-ban" color="red"
