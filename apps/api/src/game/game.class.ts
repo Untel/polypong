@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 02:37:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 16:39:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,7 @@ export default class Game {
   constructor(lobby: Lobby) {
     this.lobby = lobby;
     this.nPlayers = lobby.playersMax;
-    this.players = Object.assign(new Map<string, Player>(), lobby.players);
-    this.bots = [];
+    this.bots = lobby.bots.map((v) => new Bot(v));
     this.generateMap();
   }
 
@@ -79,13 +78,32 @@ export default class Game {
 
     // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
     // const randomIndex: Array<number> = shuffle(arrayIndex);
-    const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
-    const randomPlayers = shuffle(playersAndBotsToAssign);
+    const playersAndBotsToAssign = [
+      ...this.lobby.players.values(),
+      ...this.bots,
+    ];
+    // console.log('playersAndBotsToAssign', playersAndBotsToAssign);
+
+    const randomPlayers = playersAndBotsToAssign;
+    // const randomPlayers = shuffle(playersAndBotsToAssign);
+    // console.log('Shuffled', randomPlayers);
+    // if (this.nPlayers > 2)
+    //   for (let i = 0; i < this.nPlayers; i++) {
+    //     const line = this.map.edges[i];
+    //     const paddle =
+    //   }
+    // else {
+    // }
+
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
       if (this.nPlayers > 2 || !(index % 2)) {
-        paddle = new Paddle(line, index);
+        const player = randomPlayers.pop();
+        paddle = new Paddle(line, player.color);
         this.paddles.push(paddle);
+        const wall = new Wall(line, paddle, player);
+        if (player instanceof Bot) player.attachWall(wall);
+        return wall;
       }
       return new Wall(line, paddle);
     });
@@ -119,10 +137,11 @@ export default class Game {
     }, 1000);
   }
 
-  updatePaddlePercent(percent: number) {
+  updatePaddlePercent(userId, percent: number) {
     // console.log("here is percent", percent);
     // this.paddles.forEach((paddle) => {
-    this.paddles[this.paddles.length - 1].updatePercentOnAxis(percent);
+    const wall = this.walls.find((w) => w?.player?.user.id === userId);
+    wall.paddle.updatePercentOnAxis(percent);
     // paddle.updatePercentOnAxis(percent);
     // });
     // if (this.isPaused) debounce(

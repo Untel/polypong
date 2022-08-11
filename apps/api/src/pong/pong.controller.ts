@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 00:42:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:39:29 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,19 @@ export class PongController {
   togglePause(@CurrentLobby() lobby: Lobby): boolean {
     console.log('Lobby is', lobby.name);
     if (lobby.game.isPaused) lobby.game.run();
-    else lobby.game.run();
+    else lobby.game.stop();
     return lobby.game.isPaused;
   }
 
   @Get('tick')
-  tick() {
-    // this.pongService.updatePaddlePercent(null, 0.5);
-    return this.pongService.tick();
+  tick(@CurrentLobby() lobby: Lobby) {
+    lobby.game.stop();
+    return lobby.game.tick();
   }
-
   @Get('reset')
-  reset() {
-    this.pongService.reset();
+  reset(@CurrentLobby() lobby: Lobby) {
+    lobby.game.stop();
+    lobby.game.reset();
+    return lobby;
   }
 }
