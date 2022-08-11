@@ -44,7 +44,9 @@ const routes: RouteRecordRaw[] = [
         {
           name: 'game', path: 'lobby/:id/game', props: true, component: () => import('pages/GamePage.vue'),
         },
-        { name: 'users', path: 'users', component: () => import('pages/UsersPage.vue') },
+        {
+          name: 'users', path: 'users', props: true, component: () => import('pages/UsersPage.vue'),
+        },
         { name: 'settings', path: 'settings', component: () => import('pages/SettingsPage.vue') },
       ],
     }, {
