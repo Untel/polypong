@@ -13,7 +13,7 @@
   <q-page padding>
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
-    <q-btn @click="start">Start game</q-btn>
+    <q-btn @click="$lobbies.startGame(+$route.params.id);">Start game</q-btn>
 
     <section class="user-list">
       <UserCard
@@ -138,9 +138,6 @@ const minPlayers = computed(() => {
   if (present < 2) return 2;
   return present;
 });
-const start = () => {
-  $lobbies.startGame(+$route.params.id);
-};
 
 const canUpdate = computed(() => {
   const can = lobby.host.id === $auth.user.id;

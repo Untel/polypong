@@ -20,20 +20,37 @@
   justify-content: center;
   align-items: center;
 }
+
+.mouse-zone {
+  height: 100%;
+
+}
 </style>
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      Balls => {{ $game.getBalls }}
-      <PolygonMap
-        class="map"
-        ref="mapEl"
-        :map="mapProps"
-        :paddles="paddles"
-        :balls="balls"
-        :powers="powers"
-        @paddleMove="updatePaddlePercent">
-      </PolygonMap>
+      <!-- Balls => {{ elementX }} % {{ percentage }} -->
+      <!-- <pre>
+        element X {{ elementX }}
+        element -X {{ elementWidth - elementX }}
+        element width {{ elementWidth }}
+        wall size {{ mapProps.wallWidth }}
+        TEST: {{ percentage }}
+      </pre> -->
+      <!-- <pre>|| {{ Object.keys(mapProps) }} {{ mapProps.wallWidth }}</pre> -->
+      <div class="mouse-zone" ref="mouseZone">
+        <PolygonMap
+          class="map"
+          ref="mapEl"
+          :map="mapProps"
+          :paddles="paddles"
+          :balls="balls"
+          :powers="powers"
+          @paddleMove="updatePaddlePercent"
+        >
+          <!-- <q-slider :modelValue="0"></q-slider> -->
+        </PolygonMap>
+      </div>
     </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
@@ -95,50 +112,19 @@ import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
 import { useRoute, useRouter } from 'vue-router';
 
+const props = defineProps({
+  lobbyId: Number,
+});
+
 const $route = useRoute();
 const { socket } = useAuthStore();
-const id = $route.params.id as string;
 const $game = useGameStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
 const powers: Ref<Power[]> = ref([]);
-const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
-
-const props = defineProps({
-  lobbyId: Number,
-});
-
-const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
-const ratio = computed(() => {
-  let r = elementX.value / elementWidth.value;
-  if (r > 1) r = 1;
-  else if (r < 0) r = 0;
-  return r;
-});
-const forcedRatio = ref(null);
-
-const usedRatio = computed(() => {
-  const val = isOutside.value && ($game.isPaused) ? forcedRatio.value : ratio.value;
-  // console.log("Ratio update", val);
-  return val;
-});
-
-const updatePaddlePercent = (percent: number) => {
-  socket?.emit('paddlePercent', percent);
-};
-// watch(usedRatio, (val) => {
-//   updatePaddlePercent((val as number));
-// });
-
-const update = (evt: any) => {
-  const { balls: b, paddles: p, ...rest } = evt;
-  console.log('Updating ?');
-  if (b) $game.balls = b;
-  if (p) $game.paddles = p;
-  // if (rest) console.log('Updating rest is', rest);
-};
-
+const mapEl: Ref<InstanceType<typeof PolygonMap> | null> = ref(null);
+const mouseZone = ref();
 const mapProps: Ref<PolyMap> = ref({
   verticles: [],
   angles: [],
@@ -146,59 +132,53 @@ const mapProps: Ref<PolyMap> = ref({
   inradius: 0,
 });
 
-const mapChange = (res) => {
-  mapProps.value = res;
+const { elementX, elementWidth, isOutside } = useMouseInElement(mouseZone);
+
+const percentage = computed(() => {
+  const size = mapProps.value.wallWidth;
+  const middle = elementWidth.value / 2;
+  const right = elementWidth.value - elementX.value;
+  const left = elementWidth.value;
+
+  const x = right / left;
+  return x;
+});
+// const ratio = computed(() => {
+//   let r = elementX.value / elementWidth.value;
+//   if (r > 1) r = 1;
+//   else if (r < 0) r = 0;
+//   return r;
+// });
+// const forcedRatio = ref(null);
+
+// const usedRatio = computed(() => {
+//   const val = isOutside.value && ($game.isPaused) ? forcedRatio.value : ratio.value;
+//   // console.log("Ratio update", val);
+//   return val;
+// });
+
+const updatePaddlePercent = (percent: number) => {
+  socket?.emit('paddlePercent', percent);
 };
-
-const powersUpdate = (res) => {
-  console.log('powers update', res);
-  powers.value = res;
-};
-
-const printTimer = ({ timer }: { timer: number }) => {
-  Notify.create({
-    timeout: timer,
-    progress: true,
-    position: 'top',
-    message: 'New round will start',
-  });
-};
-
-// socket?.on('gameUpdate', update);
-// socket?.on('mapChange', mapChange);
-// socket?.on('powers', powersUpdate);
-// socket?.on('timer', printTimer);
-
-const {
-  data: test,
-  execute: reset,
-} = useApi('pong/reset', { immediate: false });
 
 onMounted(async () => {
-  // const gameInfos: any = await lobbyApi.get('/game');
-  // console.log('Game infos', gameInfos);
   paddles.value = $game.paddles;
   mapProps.value = $game.map;
   balls.value = $game.balls;
-  // isPaused.value = gameInfos.isPaused;
+
   socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
-    // $game.$patch({ balls: b, paddles: p });
     paddles.value = p;
     balls.value = b;
-    // console.log('Game up', $game.balls[0]?.position, b[0]?.position);
   });
   socket?.on('mapChange', (map) => {
     mapProps.value = map;
     powers.value = [];
-    // $game.map = map;
   });
   socket?.on('powers', (pow) => {
     powers.value = pow;
-    // $game.powers = pow;
   });
 
   socket?.once('end', (winner = { name: 'Error' }) => {
-    console.log('Winner', winner);
     Notify.create({
       message: `Chicken chiken dinner we have a winner ${winner.name}`,
     });

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 20:26:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 22:19:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,7 +266,7 @@ export default class Game {
   public get mapNetScheme() {
     return {
       walls: this.walls.map((w) => w.netScheme),
-      wallWith: this.walls[0].width,
+      wallWidth: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
       inradius: this.map.inradius,

@@ -21,6 +21,7 @@ export interface PolygonMap {
   verticles: number[];
   angles: number[];
   walls: Wall[];
+  wallWidth: number;
 }
 export interface Ball {
   color: string;
