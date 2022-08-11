@@ -51,7 +51,7 @@ export const useSocialStore = defineStore('social', {
 
     async addRel(name: string) {
       try {
-        await relsApi.post('addRel', { name });
+        this.relationships = await relsApi.post('addRel', { name });
       } catch (error) {
         console.log('error', error);
         Notify.create({
@@ -85,6 +85,34 @@ export const useSocialStore = defineStore('social', {
       }
       Notify.create({
         type: 'positive', message: 'friendship has been revoked',
+      });
+    },
+
+    async send_block(name: string) {
+      try {
+        this.relationships = await relsApi.post('sendBlock', { name });
+      } catch (error) {
+        console.log('error', error);
+        Notify.create({
+          type: 'negative', message: 'Error while blocking',
+        });
+      }
+      Notify.create({
+        type: 'positive', message: `${name} has been blocked`,
+      });
+    },
+
+    async unsend_block(name: string) {
+      try {
+        this.relationships = await relsApi.post('unsendBlock', { name });
+      } catch (error) {
+        console.log('error', error);
+        Notify.create({
+          type: 'negative', message: 'Error while unblocking',
+        });
+      }
+      Notify.create({
+        type: 'positive', message: `${name} has been revoked`,
       });
     },
 
