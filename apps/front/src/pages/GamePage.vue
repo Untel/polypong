@@ -189,6 +189,7 @@ onMounted(async () => {
   });
   socket?.on('mapChange', (map) => {
     mapProps.value = map;
+    powers.value = [];
     // $game.map = map;
   });
   socket?.on('powers', (pow) => {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 20:09:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 20:26:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ export default class Game {
   intervalPowers: NodeJS.Timer;
   @Exclude()
   waitTimeout: NodeJS.Timeout;
+  @Exclude()
+  sayInterval: NodeJS.Timeout;
 
   constructor(lobby: Lobby) {
     this.lobby = lobby;
@@ -128,19 +130,24 @@ export default class Game {
     clearTimeout(this.waitTimeout);
     clearInterval(this.interval);
     clearInterval(this.intervalPowers);
+    clearInterval(this.sayInterval);
     this.interval = null;
     this.intervalPowers = null;
     this.waitTimeout = null;
+    this.sayInterval = null;
   }
 
   newRound() {
     let timer = 5;
-    const intervalId = setInterval(() => {
-      this.socket.emit('timer', timer);
+    this.sayInterval = setInterval(() => {
       timer -= 1;
       if (timer === 0) {
+        this.socket.emit('message', `Goo oo ooo ooo o o o o o o`);
         this.run();
-        clearInterval(intervalId);
+        clearInterval(this.sayInterval);
+        this.sayInterval = null;
+      } else {
+        this.socket.emit('message', `New round will start in ${timer}s`);
       }
     }, 1000);
   }
@@ -214,11 +221,9 @@ export default class Game {
       return;
     }
     this.generateMap();
-    const timer = 1000;
-    this.socket.emit('timer', { timer });
-    this.waitTimeout = setTimeout(() => {
-      if (this.isPaused) this.run();
-    }, timer + 1000);
+    // const timer = 1000;
+    // this.socket.emit('timer', { timer });
+    this.newRound();
   }
 
   public reset() {
