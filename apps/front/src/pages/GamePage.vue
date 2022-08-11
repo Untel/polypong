@@ -39,6 +39,9 @@
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
+    <q-btn @click="$game.restart()" icon="fas fa-arrows-rotate">
+      restart
+    </q-btn>
     <pre>
       {{ mapProps }}
     </pre>

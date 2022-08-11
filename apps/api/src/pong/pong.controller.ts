@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 14:39:29 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 19:56:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,17 @@ export class PongController {
     lobby.game.stop();
     return lobby.game.tick();
   }
+
+  @Get('restart')
+  restart(@CurrentLobby() lobby: Lobby) {
+    lobby.start();
+    return lobby.game;
+  }
+
   @Get('reset')
   reset(@CurrentLobby() lobby: Lobby) {
     lobby.game.stop();
     lobby.game.reset();
-    return lobby;
+    return lobby.game;
   }
 }

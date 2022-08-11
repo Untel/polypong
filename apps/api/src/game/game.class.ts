@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 18:23:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 20:09:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ export default class Game {
   interval: NodeJS.Timer;
   @Exclude()
   intervalPowers: NodeJS.Timer;
+  @Exclude()
+  waitTimeout: NodeJS.Timeout;
 
   constructor(lobby: Lobby) {
     this.lobby = lobby;
@@ -123,10 +125,12 @@ export default class Game {
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
+    clearTimeout(this.waitTimeout);
     clearInterval(this.interval);
     clearInterval(this.intervalPowers);
     this.interval = null;
     this.intervalPowers = null;
+    this.waitTimeout = null;
   }
 
   newRound() {
@@ -212,7 +216,7 @@ export default class Game {
     this.generateMap();
     const timer = 1000;
     this.socket.emit('timer', { timer });
-    setTimeout(() => {
+    this.waitTimeout = setTimeout(() => {
       if (this.isPaused) this.run();
     }, timer + 1000);
   }
