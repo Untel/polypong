@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 22:19:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 01:37:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ export default class Game {
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
   timeElapsed = 0;
+  paused = false;
 
   @Exclude()
   interval: NodeJS.Timer;
@@ -62,6 +63,8 @@ export default class Game {
     this.players = new Map(this.lobby.players);
     console.log('New game', this.bots.length, this.players.size);
     this.generateMap();
+    this.run();
+    this.newRound(15);
   }
 
   addBall() {
@@ -79,25 +82,8 @@ export default class Game {
 
     this.map = new PolygonMap((this.nPlayers === 2 && 4) || this.nPlayers);
     this.paddles = [];
-
-    // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
-    // const randomIndex: Array<number> = shuffle(arrayIndex);
-    const playersAndBotsToAssign = [
-      ...this.players.values(),
-      ...this.bots,
-    ];
-    // console.log('playersAndBotsToAssign', playersAndBotsToAssign);
-
-    // const randomPlayers = playersAndBotsToAssign;
+    const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
     const randomPlayers = shuffle(playersAndBotsToAssign);
-    console.log('Shuffled', randomPlayers);
-    // if (this.nPlayers > 2)
-    //   for (let i = 0; i < this.nPlayers; i++) {
-    //     const line = this.map.edges[i];
-    //     const paddle =
-    //   }
-    // else {
-    // }
 
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
@@ -117,14 +103,10 @@ export default class Game {
   }
 
   run() {
-    if (this.lobby.winner) {
-      console.log('Cant run ended game');
-      return;
-    }
     // this.generateMap(this.nPlayers);
-    // this.socket.emit('mapChange', this.mapNetScheme);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    this.newRound();
   }
   stop() {
     clearTimeout(this.waitTimeout);
@@ -137,13 +119,16 @@ export default class Game {
     this.sayInterval = null;
   }
 
-  newRound() {
-    let timer = 5;
+  newRound(timer = 5) {
+    this.paused = true;
+    this.socket.emit('mapChange', this.mapNetScheme);
+    clearInterval(this.sayInterval);
     this.sayInterval = setInterval(() => {
       timer -= 1;
       if (timer === 0) {
         this.socket.emit('message', `Goo oo ooo ooo o o o o o o`);
-        this.run();
+        // this.run();
+        this.paused = false;
         clearInterval(this.sayInterval);
         this.sayInterval = null;
       } else {
@@ -153,16 +138,8 @@ export default class Game {
   }
 
   updatePaddlePercent(userId, percent: number) {
-    // console.log("here is percent", percent);
-    // this.paddles.forEach((paddle) => {
     const wall = this.walls.find((w) => w?.player?.user.id === userId);
     wall.paddle.updatePercentOnAxis(percent);
-    // paddle.updatePercentOnAxis(percent);
-    // });
-    // if (this.isPaused) debounce(
-    //   this.socket.emit('gameUpdate', this.networkState),
-    //   500
-    // );
   }
 
   runPhysics() {
@@ -211,8 +188,9 @@ export default class Game {
     } else if (wall.player) {
       this.players.delete(wall.player.user.id);
     }
-    this.stop();
+    // this.stop();
     if (this.nPlayers === 1 || this.players.size === 0) {
+      this.stop();
       let winner: Player | Bot | null = null;
       if (this.bots.length) winner = this.bots.pop();
       else winner = [...this.players.values()].pop();
@@ -244,9 +222,7 @@ export default class Game {
   }
 
   public get paddlesNetScheme() {
-    return this.paddles
-      .map((b) => b.netScheme)
-      .map((b, i) => ({ ...b, name: i }));
+    return this.paddles.map((b) => b.netScheme);
   }
 
   public get powersNetScheme() {
@@ -339,10 +315,12 @@ export default class Game {
   }
 
   public tick() {
-    this.timeElapsed += 1 / FRAME_RATE;
-    this.ballsCollides();
-    this.runPhysics();
-    this.runBots();
+    if (!this.paused) {
+      this.timeElapsed += 1 / FRAME_RATE;
+      this.ballsCollides();
+      this.runPhysics();
+      this.runBots();
+    }
     this.socket.emit('gameUpdate', this.networkState);
   }
 

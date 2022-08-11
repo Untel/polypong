@@ -3,7 +3,8 @@
   width: 100%;
   height: 100%;
   position: relative;
-
+  display: flex;
+  flex-direction: column;
   svg {
     margin: 20px;
     height: 70%;
@@ -24,8 +25,7 @@
     }
 
     .wall {
-      fill: rgba(46, 164, 38, 0.9);
-      stroke: rgba(46, 164, 38, 0.9);
+      stroke: rgba(46, 164, 38, 0.7);
 
       &.mine {
         fill: rgba(24, 32, 145, 0.9);
@@ -42,21 +42,26 @@
       viewBox="-50 -50 100 100"
       ref="svgRef"
     >
-      <polygon ref="polygonRef">
-      </polygon>
+      <polygon ref="polygonRef" />
       <circle
         fill="#ff00001a"
         :r="map.inradius"
         :x="0" :y="0"
       />
-      <line
+      <!-- <line
         v-for="(wall, idx) in map.walls || []"
         :key="`wall-${idx}`"
-        :class="{ 'mine': idx === 0 }"
         ref="wallsRef"
         class="wall"
         stroke-width=".1px"
         v-bind="formatLine(wall.line)"
+      /> -->
+      <line
+        v-if="myWall"
+        ref="myWallRef"
+        class="wall"
+        stroke-width="1px"
+        v-bind="formatLine(myWall.line)"
       />
       <line
         class="paddle"
@@ -94,11 +99,9 @@
       />
     </svg>
     <slot />
-
-    <!-- <pre v-if="balls && balls[0]">
-      {{ balls[0].pos }}
-    </pre> -->
-    <!-- <q-btn @click="test">test</q-btn> -->
+    <pre>
+      Ratio: {{ ratio }}
+    </pre>
   </div>
 </template>
 
@@ -143,6 +146,10 @@ const props = defineProps({
 });
 const emit = defineEmits(['paddleMove']);
 
+const scaleRatio = computed(() => {
+  const x = 1;
+  return x;
+});
 function formatBallTrajectoryPoints(ball: Ball) {
   return {
     x1: ball.position.x,
@@ -170,34 +177,26 @@ function formatCirclePosition(position: Position) {
 }
 
 const polygonRef = ref<HTMLElement>();
-const svgRef = ref<HTMLElement>();
-const wallsRef = ref<HTMLElement[]>();
-const myWallRef = ref<HTMLElement | null>();
+const svgRef = ref<SVGSVGElement>();
 
-const myWall: MaybeElementRef = computed(() => {
-  const m = wallsRef.value?.at(0);
-  // console.log('M is', m);
-  return m;
+const $auth = useAuthStore();
+const myWallIdx = computed(() => {
+  const idx = props.map.walls.findIndex((w) => w.player?.user.id === $auth.user.id);
+  return idx;
 });
-
-const { elementX, elementWidth, isOutside } = useMouseInElement(myWall);
+const myWall = computed(() => props.map.walls[myWallIdx.value]);
+const myWallRef = ref<HTMLElement | null>();
+const { elementX, elementWidth, isOutside } = useMouseInElement(myWallRef);
 const ratio = computed(() => {
-  let r = elementX.value / elementWidth.value;
-  if (r > 1) r = 1;
-  else if (r < 0) r = 0;
-  return 1 - r;
+  const r = elementX.value / elementWidth.value;
+  return 1 - (r < 0 ? 0 : r > 1 ? 1 : r);
 });
 watch(ratio, (val) => {
   emit('paddleMove', val);
 });
 
-const $auth = useAuthStore();
-
 watch(() => props.map, (map, oldMap) => {
   const { verticles, angles, walls } = map;
-  const myWallIdx = walls.findIndex((w) => w.player?.user.id === $auth.user.id);
-  console.log('My wall idx is ', myWallIdx);
-  myWallRef.value = wallsRef.value?.at(myWallIdx);
   (anime.timeline as any)({
     targets: polygonRef.value,
     easing: 'easeInOutExpo',
@@ -207,9 +206,9 @@ watch(() => props.map, (map, oldMap) => {
       targets: svgRef.value,
       keyframes: [
         { rotate: 0 },
-        { rotate: 360 - angles[myWallIdx] + 180 },
+        { rotate: 360 - angles[myWallIdx.value] + 180 },
       ],
     });
-}, { immediate: false });
+}, { immediate: true });
 
 </script>

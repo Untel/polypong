@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 20:02:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 01:33:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
   start(): Game {
     // if (this.winner) return;
     if (this.game) {
-      this.game.stop();
       this.winner = null;
+      this.game.stop();
       delete this.game;
     }
     this.game = new Game(this);
