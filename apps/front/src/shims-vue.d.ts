@@ -10,3 +10,29 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+// declare module "pinia" {
+  //   export interface PiniaCustomProperties {
+    //     router: Router;
+    //   }
+    // }
+
+import 'pinia';
+import type { Router } from "vue-router"; // is it correct ?
+declare module 'pinia' {
+  export interface PiniaCustomProperties {
+      router: Router
+  }
+}
+
+
+// declare module 'pinia' {
+//   export interface PiniaCustomProperties {
+//     // by using a setter we can allow both strings and refs
+//     set hello(value: string)
+//     get hello(): string
+
+//     // you can define simpler values too
+//     simpleNumber: number
+//   }
+// }

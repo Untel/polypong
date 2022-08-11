@@ -6,42 +6,52 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 23:35:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 18:23:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { UseFetchReturn } from '@vueuse/core';
 import { defineStore } from 'pinia';
-import { useApi } from 'src/utils/api';
-import { LoadingBar, Notify } from 'quasar';
+import { Notify } from 'quasar';
 import { mande } from 'mande';
-import router from 'src/router';
 import { useAuthStore } from './auth.store';
 
 export const lobbiesApi = mande('/api/lobbies');
 
-export type Lobby = {
+export interface BasePlayer {
+  name: string;
+  avatar: string;
+  color: string;
+}
+export interface User extends BasePlayer {
+  id: number;
+  email: string;
+}
+export interface Bot extends BasePlayer {
+  level: number;
+}
+
+export interface Player {
+  user: User;
+  color: string;
+}
+
+export interface Lobby {
   id: number;
   name: string;
-  players: Array<any>;
+  players: Array<Player>;
+  bots: Array<Bot>;
   playersMax: number;
   spectators: Array<any>;
   spectatorsMax: number;
   description: string;
   isPrivate?: boolean;
-  host: {
-    user: {
-      avatar: string,
-      name: string,
-      id: number,
-    }
-  }
-};
+  host: User
+}
 
-type LobbiesState = {
-  lobbies: Lobby[],
-  activeLobby: Lobby | null,
-};
+interface LobbiesState {
+  lobbies: Lobby[];
+  activeLobby: Lobby | null;
+}
 
 export const onlineApi = mande('/api/online');
 
@@ -79,7 +89,6 @@ export const useLobbiesStore = defineStore('lobbies', {
         });
         return newLobby;
       } catch (err) {
-        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while creating lobby',
@@ -102,13 +111,13 @@ export const useLobbiesStore = defineStore('lobbies', {
     },
     async joinLobby(lobbyId: number) {
       const { socket, getIsConnected } = useAuthStore();
-      console.log('I will join room', lobbyId);
       if (!getIsConnected) {
-        console.log('Socket not connected', socket);
         return;
       }
       socket?.emit('joinLobby', lobbyId);
-      console.log('Emited');
+    },
+    startGame(lobbyId: number) {
+      lobbiesApi.get(`${lobbyId}/start`);
     },
   },
 });

@@ -15,14 +15,8 @@
       // stroke: black;
     }
 
-      // .ball {
-      //   fill: rgba(81, 5, 5, 0.9);
-      // }
-
     .paddle {
-      // transform-origin: -5px -5px;
-      // transform: translate3d(10px);
-      // stroke: red;
+
     }
 
     .ball {
@@ -44,26 +38,20 @@
 
 <template>
   <div class="svg-test wrapper">
-    <!-- <pre>
-      pow {{ powers }}
-    </pre> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
     >
-      <!-- <defs>
-        <clipPath id="clip">
-          <use xlink:href="#ld"/>
-        </clipPath>
-      </defs>
-      <use xlink:href="#ld" stroke="#0081C6" stroke-width="160" fill="#00D2B8" clip-path="url(#clip)"/> -->
-
       <polygon ref="polygonRef">
       </polygon>
-      <circle fill="#ff00001a" :r="map.inradius" :x="0" :y="0"/>
-
+      <circle
+        fill="#ff00001a"
+        :r="map.inradius"
+        :x="0" :y="0"
+      />
       <line
         v-for="(wall, idx) in map.walls || []"
+        :key="`wall-${idx}`"
         :class="{ 'mine': idx === 0 }"
         ref="wallsRef"
         class="wall"
@@ -72,29 +60,37 @@
       />
       <line
         class="paddle"
-        v-for="paddle in paddles"
+        v-for="(paddle, idx) in paddles"
+        :key="`paddle-${idx}`"
         :stroke="paddle.color || 'red'"
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <circle class="ball" :fill="ball.color || 'yellow'" r="2"
-        v-for="ball in balls"
-        v-bind="formatCirclePosition(ball.position)"
-      />
-      <circle :fill="ball.color || 'yellow'" r=".5"
-        v-for="ball in balls.filter((b: any) => b.target?.hit)"
-        v-bind="formatCirclePosition(ball.target.hit)"
-      />
-      <circle stroke="yellow" r="2"
-        v-for="power in powers"
+      <g v-for="(ball, idx) in balls"
+        :key="`ball-${idx}`"
+        >
+        <circle
+          class="ball"
+          :fill="ball.color || 'yellow'" r="2"
+          v-bind="formatCirclePosition(ball.position)"
+        />
+        <line
+          :stroke="ball.color || 'red'"
+          stroke-width="0.25px"
+          stroke-dasharray="2"
+          v-bind="formatBallTrajectoryPoints(ball)"
+        />
+        <circle
+          v-if="ball.target"
+          :fill="ball.color || 'yellow'" r=".5"
+          v-bind="formatCirclePosition(ball.target.hit)"
+        />
+      </g>
+      <circle
+        v-for="(power, idx) in powers"
+        :key="`power-${idx}`"
+        stroke="yellow" r="2"
         v-bind="formatCirclePosition(power.position)"
-      />
-      <line
-        :stroke="ball.color || 'red'"
-        stroke-width="0.25px"
-        stroke-dasharray="2"
-        v-for="ball in balls"
-        v-bind="formatBallTrajectoryPoints(ball)"
       />
     </svg>
     <slot />
@@ -108,30 +104,38 @@
 
 <script setup lang="ts">
 import {
-  onMounted, computed, PropType, StyleValue, watch, ref,
+  onMounted, computed, PropType, watch, ref,
 } from 'vue';
-import { Position, Paddle, Ball } from 'src/utils/game';
+import {
+  Position,
+  Paddle,
+  Ball,
+  Power,
+  Line,
+  PolygonMap,
+} from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
 
 const props = defineProps({
   map: {
-    type: Object as PropType<{ inradius: number, verticles: number[], angles: number[] }>,
+    type: Object as PropType<PolygonMap>,
     default: () => ({
       verticles: [],
       angles: [],
+      inradius: 50,
     }),
   },
   paddles: {
-    type: Array as any,
+    type: Array as PropType<Array<Paddle>>,
     default: () => [],
   },
   balls: {
-    type: Array as any,
+    type: Array as PropType<Array<Ball>>,
     default: () => [],
   },
   powers: {
-    type: Array as any,
+    type: Array as PropType<Array<Power>>,
     default: () => [],
   },
 });
@@ -146,7 +150,7 @@ function formatBallTrajectoryPoints(ball: Ball) {
   };
 }
 
-function formatLine(line) {
+function formatLine(line: Line) {
   return {
     x1: line[0][0],
     x2: line[1][0],
@@ -179,21 +183,15 @@ const ratio = computed(() => {
   let r = elementX.value / elementWidth.value;
   if (r > 1) r = 1;
   else if (r < 0) r = 0;
-  console.log('Changed');
   return 1 - r;
 });
 watch(ratio, (val) => {
-  console.log('Emit');
   emit('paddleMove', val);
 });
 
 watch(() => props.map, (map, oldMap) => {
   const { verticles, angles } = map;
-
   myWallRef.value = wallsRef.value?.at(0);
-  console.log('All walls ref', wallsRef.value, myWallRef.value);
-  // const { verticles: oldVerticles } = oldMap;
-
   (anime.timeline as any)({
     targets: polygonRef.value,
     easing: 'easeInOutExpo',

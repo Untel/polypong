@@ -6,6 +6,7 @@ export * from './app.service';
 export * from './main';
 export * from './auth';
 export * from './config';
+export * from './decorators';
 export * from './game';
 export * from './guards';
 export * from './lobby';

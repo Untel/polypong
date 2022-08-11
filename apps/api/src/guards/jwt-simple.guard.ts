@@ -26,22 +26,19 @@ export default class JwtSimpleGuard
           },
         };
       case 'http':
-        this.logger.log(`getRequest - http - returning context.switchToHttp().getRequest()`);
         return context.switchToHttp().getRequest();
       default:
-        console.log("Unhandled execution context", context.getType());
-        break ;
+        this.logger.warn('Unhandled execution context' + context.getType());
+        break;
     }
   }
 
   canActivate(context: ExecutionContext) {
-    this.logger.log(`canActivate - context = ${context}`);
-    // console.log("Parent activate ctx");
+    this.logger.verbose(`canActivate - context = ${context}`);
     return super.canActivate(context) as boolean;
   }
 
   handleRequest(err, user, info) {
-    this.logger.log(`handleRequest - user = ${JSON.stringify(user)}`);
     if (err || !user) {
       throw err || new Error();
     }

@@ -38,8 +38,11 @@
 
 <script lang="ts" setup>
 import EssentialLink from 'components/EssentialLink.vue';
+import { Notify } from 'quasar';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
-import { defineComponent, ref } from 'vue';
+import { useAuthStore } from 'src/stores/auth.store';
+import { defineComponent, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -80,4 +83,27 @@ const linksList = [{
   to: 'settings',
 }];
 const miniState = ref(true);
+
+// const auth = useAuthStore();
+// const router = useRouter();
+
+// onMounted(() => {
+//   auth.socket.on('online', ({ name, type }) => {
+//     Notify.create({
+//       message: `${name} just is now ${
+//         type === 'connect' ? 'connected' : 'disconnected'
+//       }`,
+//     });
+//     auth.fetchConnectedUsers();
+//   });
+//   auth.socket.on('message', (message) => {
+//     Notify.create({
+//       message: `Server say ${message}`,
+//     });
+//   });
+//   auth.socket.on('redirect', (url) => {
+//     console.log('Shoudl redirect', url, this, (this as any).router);
+//     setTimeout(() => router.push(url), 2000);
+//   });
+// });
 </script>

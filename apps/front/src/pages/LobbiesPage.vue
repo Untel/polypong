@@ -43,20 +43,20 @@
         v-for="lobby of lobbies.getLobbies"
         :key="`lobby-${lobby.id}`"
         :name="lobby.name || 'Unamed lobby'"
-        :subhead="`${lobby.host.user.name}'s party`"
-        :avatar="lobby.host.user.avatar"
+        :subhead="`${lobby.host.name}'s party`"
+        :avatar="lobby.host.avatar"
         :is-private="lobby.isPrivate"
         @joinLobby="router.push({ name: 'lobby', params: { id: lobby.id } })"
       >
         <q-circular-progress
           show-value
           class="text-light-blue q-ma-md"
-          :value="lobby.players.length || 6"
+          :value="lobby.players.length"
           :max="lobby.playersMax"
           size="50px"
           color="light-blue"
         >
-          {{ lobby.players.length || 6 }}/{{lobby.playersMax}}
+          {{ lobby.players.length }}/{{lobby.playersMax}}
         </q-circular-progress>
         Players
       </LobbyCard>
@@ -72,7 +72,19 @@ import { useAuthStore } from 'src/stores/auth.store';
 import LobbyCard from 'src/components/LobbyCard.vue';
 import PasswordInput from 'src/components/PasswordInput.vue';
 import { useRouter, useRoute } from 'vue-router';
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+import {
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  defineComponent,
+} from 'vue';
+
+defineComponent({
+  components: {
+    LobbyCard,
+    PasswordInput,
+  },
+});
 
 const lobbies = useLobbiesStore();
 const { socket } = useAuthStore();

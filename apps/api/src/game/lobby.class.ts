@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/03 00:18:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 04:30:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@ import { Exclude, Transform, Type } from 'class-transformer';
 import { BroadcastOperator } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketData } from 'src/socket';
+import { User } from 'src/user';
+import { Bot } from './bot.class';
+import { UnprocessableEntityException } from '@nestjs/common';
+import { LobbyBot } from './lobbyBot.class';
 
 export type LobbyId = number;
 
@@ -37,54 +41,95 @@ export default class Lobby implements ILobby, ILobbyConfig {
   name: string;
   playersMax: number;
 
-  @Type(() => Player)
-  host: Player;
+  @Type(() => User)
+  host: User;
 
   @Type(() => Player)
-  @Transform(({ value }) => [...value.values()], { toPlainOnly: true })
+  @Transform(({ value }) => [...value.values()])
   players: Map<number, Player>;
+
+  @Type(() => LobbyBot)
+  bots: LobbyBot[];
 
   spectatorsMax: number;
   spectators: Spectator[];
+
+  @Exclude()
   game: Game | null;
 
   @Exclude()
-  socket = null;
+  sock = null;
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
 
-  constructor(socket, host: Player, name = 'Unamed lobby') {
+  constructor(socket, host: User, name = 'Unamed lobby') {
     this.id = host.id;
     this.name = name;
     this.host = host;
+    console.log('Socket instance', socket);
+    this.sock = socket;
     this.players = new Map<number, Player>();
-    // this.addPlayer(host);
     this.spectators = [];
     this.playersMax = 8;
     this.spectatorsMax = 10;
+    this.bots = [];
+    this.fillBots();
+    console.log('Bots are', this.bots);
   }
 
   addPlayer(player: Player) {
     this.players.set(player.id, player);
-    player.inLobby = this.id;
-    // this.socket.emit('room_connect', [...this.players.values()]);
+    this.fillBots();
+    this.sock.emit('lobby_change');
   }
 
-  removePlayer(player: Player) {
-    console.log('SHould unset player  from plater', this.players, this.players.delete);
+  removePlayer(player: Player | User) {
     this.players.delete(player.id);
-    player.inLobby = null;
-    // this.socket.emit('room_connect', [...this.players.values()]);
+    this.fillBots();
+    this.sock.emit('lobby_change');
   }
 
   start(): Game {
-    // this.game = new Game(this);
+    this.game = new Game(this);
+    this.sock.emit('start');
     return this.game;
   }
 
-  configure(opts: ILobbyConfig) {
+  configure(opts: Partial<Lobby>) {
     if (opts.name) this.name = opts.name;
-    if (opts.playersMax) this.playersMax = opts.playersMax;
     if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
+    if (opts.bots)
+      Object.keys(opts.bots).forEach((key) => {
+        Object.assign(this.bots[key], opts.bots[key]);
+      });
+    if (opts.players)
+      Object.keys(opts.players).forEach((key) => {
+        const pl = this.players.get(+key);
+        console.log('FOund player to update', key, pl, opts[key]);
+        Object.assign(pl, opts.players[key]);
+      });
+    if (opts.playersMax) {
+      this.playersMax = opts.playersMax;
+      this.fillBots();
+    }
+    this.sock.emit('lobby_change', null);
+  }
+
+  fillBots() {
+    const missingPlayers = this.playersMax - this.players.size;
+    if (missingPlayers < 0) {
+      throw new UnprocessableEntityException('You need to kick somone');
+    }
+    this.bots = this.bots.slice(0, missingPlayers);
+    if (missingPlayers > 0) {
+      while (this.bots.length < missingPlayers) {
+        this.bots.push(new LobbyBot());
+      }
+    }
+  }
+
+  say(message) {
+    console.log('Wanna say', this.sock);
+    this.sock.emit('message', message);
   }
 
   public get roomId() {

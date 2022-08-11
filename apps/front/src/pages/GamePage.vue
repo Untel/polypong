@@ -24,63 +24,79 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      <PolygonMap class="map" ref="mapEl" :map="mapProps" :paddles="paddles" :balls="balls" :powers="powers"
+      Balls => {{ $game.getBalls }}
+      <PolygonMap
+        class="map"
+        ref="mapEl"
+        :map="$game.map"
+        :paddles="$game.paddles"
+        :balls="$game.balls"
+        :powers="$game.powers"
         @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
-    <q-btn @click="togglePause()" :icon="isPaused === 'true' ? 'play_arrow' : 'pause'">
-      {{ isPaused === 'true' ? 'Play' : 'Pause' }}
+    <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
+      {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
-    <q-btn dense @click="tick()">
+    <!-- <q-btn dense @click="tick()">
       tick
-    </q-btn>
+    </q-btn> -->
     <!-- <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/> -->
-    <q-btn dense @click="reset()">
+    <!-- <q-btn dense @click="reset()">
       reset
-    </q-btn>
-    <pre>
-      {{ tickValue }}
-    </pre>
-    <pre style="background-color: grey;">
-      <!-- El : {{ usedRatio }}
-      Pause : {{ isPaused }} {{ typeof (isPaused) }}
-      Ball : {{ balls }}
-      Paddle : {{ paddles }}
-      Info : {{ info }} -->
-    </pre>
+    </q-btn> -->
   </q-page>
 </template>
+<script lang="ts">
+import { Notify } from 'quasar';
+import { PreFetchOptions } from '@quasar/app-vite';
+import { useGameStore } from 'src/stores/game.store';
 
+export default {
+  async preFetch(ctx: PreFetchOptions<unknown>) {
+    const {
+      currentRoute, redirect,
+    } = ctx;
+    const $game = useGameStore();
+    const id = currentRoute.params.id as string;
+    try {
+      await $game.fetchCurrentGame(id);
+    } catch (err) {
+      Notify.create({
+        type: 'negative',
+        message: 'Error while joining game',
+      });
+      redirect({ name: 'lobbies' });
+    }
+  },
+};
+</script>
 <script lang="ts" setup>
 import {
-  defineProps, ref, onMounted, StyleValue, Ref, watch, computed, VueElement,
+  defineProps, ref, onMounted, Ref, computed, onUnmounted,
 } from 'vue';
+import { useMouseInElement } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
-import { Position, Paddle, Ball } from 'src/utils/game';
-import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
+import { Paddle, Ball } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
-import { Notify } from 'quasar';
+import { useRoute, useRouter } from 'vue-router';
 
+const $route = useRoute();
 const { socket } = useAuthStore();
+const id = $route.params.id as string;
+const $game = useGameStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
 const powers: Ref<any[]> = ref([]);
-const info: Ref<object> = ref();
 const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
 const props = defineProps({
   lobbyId: Number,
 });
-
-const {
-  data: isPaused,
-  execute: togglePause,
-  // afterFetch: (ctx: any) => ({ data: ctx.data === 'true', ...ctx }),
-} = useApi<string>('pong/pause', { immediate: false });
 
 const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
 const ratio = computed(() => {
@@ -92,7 +108,7 @@ const ratio = computed(() => {
 const forcedRatio = ref(null);
 
 const usedRatio = computed(() => {
-  const val = isOutside.value && (isPaused.value === 'true') ? forcedRatio.value : ratio.value;
+  const val = isOutside.value && ($game.isPaused) ? forcedRatio.value : ratio.value;
   // console.log("Ratio update", val);
   return val;
 });
@@ -106,15 +122,11 @@ const updatePaddlePercent = (percent: number) => {
 
 const update = (evt: any) => {
   const { balls: b, paddles: p, ...rest } = evt;
-  if (b) balls.value = b;
-  if (p) paddles.value = p;
+  console.log('Updating ?');
+  if (b) $game.balls = b;
+  if (p) $game.paddles = p;
   // if (rest) console.log('Updating rest is', rest);
 };
-
-onMounted(() => {
-  // console.log(ball_ref.value, world.value, paddle1_ref.value, paddle2_ref.value);
-  // window.addEventListener('keydown', onKeyDown);
-});
 
 const mapProps: Ref<{ verticles: number[], angles: number[] }> = ref({
   verticles: [],
@@ -138,19 +150,41 @@ const printTimer = ({ timer }: { timer: number }) => {
   });
 };
 
-socket?.on('gameUpdate', update);
-socket?.on('mapChange', mapChange);
-socket?.on('powers', powersUpdate);
-socket?.on('timer', printTimer);
-
-const {
-  data: tickValue,
-  execute: tick,
-} = useApi('pong/tick', { immediate: false }).json();
+// socket?.on('gameUpdate', update);
+// socket?.on('mapChange', mapChange);
+// socket?.on('powers', powersUpdate);
+// socket?.on('timer', printTimer);
 
 const {
   data: test,
   execute: reset,
 } = useApi('pong/reset', { immediate: false });
+
+onMounted(async () => {
+  // const gameInfos: any = await lobbyApi.get('/game');
+  // console.log('Game infos', gameInfos);
+  // paddles.value = gameInfos.paddles;
+  // mapProps.value = gameInfos.map;
+  // isPaused.value = gameInfos.isPaused;
+  console.log('Mounting');
+  await $game.fetchCurrentGame(id);
+  socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
+    // $game.$patch({ balls: b, paddles: p });
+    $game.balls = b;
+    $game.paddles = p;
+    console.log('Game up', $game.balls[0]?.position, b[0]?.position);
+  });
+  socket?.on('mapChange', (map) => {
+    $game.map = map;
+  });
+  socket?.on('powers', (pow) => {
+    $game.powers = pow;
+  });
+});
+onUnmounted(() => {
+  socket?.off('gameUpdate');
+  socket?.off('mapChange');
+  socket?.off('powers');
+});
 
 </script>

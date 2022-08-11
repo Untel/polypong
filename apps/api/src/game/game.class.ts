@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 01:49:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 02:37:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { Server } from 'socket.io';
+import { BroadcastOperator, Server } from 'socket.io';
 import Store from 'redis-json';
 import { Bot } from '.';
 import { pointOnLine, Line, angleToDegrees } from 'geometric';
@@ -19,8 +19,12 @@ import { Collider2d, Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
-
+import { shuffle } from 'lodash';
 import GameTools from './gametools.class';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { SocketData } from 'src/socket';
+import Player from './player.class';
+import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
 const TEST_MODE = true;
@@ -29,36 +33,32 @@ export enum MODE {
   Coalition = 'coalition',
   Battleground = 'battleground',
 }
+
 export default class Game {
   lobby: Lobby;
-  socket: Server;
-  store: Store;
-
   balls: Ball[] = [];
   nBall = 1;
-  bots: Bot[] = [];
   nPlayers: number;
-  nBots: number;
+  players: Map<number, Player> = new Map();
+  bots: Bot[];
   paddles: Paddle[] = [];
   walls: Wall[] = [];
   powers: Power[] = [];
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
-
   timeElapsed = 0;
+
+  @Exclude()
   interval: NodeJS.Timer;
+  @Exclude()
   intervalPowers: NodeJS.Timer;
 
-  constructor(socket: Server, store: Store, lobby: Lobby) {
-    console.log('Angle: ', angleToDegrees(6.28));
+  constructor(lobby: Lobby) {
     this.lobby = lobby;
-    this.socket = socket;
-    this.store = store;
-    const rand = GameTools.getRandomArbitrary(2, 20);
-    this.nPlayers = rand;
-    this.nBots = rand - 1;
-    this.generateMap(this.nPlayers);
-    this.spawnBots(this.nBots);
+    this.nPlayers = lobby.playersMax;
+    this.players = Object.assign(new Map<string, Player>(), lobby.players);
+    this.bots = [];
+    this.generateMap();
   }
 
   addBall() {
@@ -69,44 +69,54 @@ export default class Game {
     this.balls.push(ball);
   }
 
-  generateMap(nPlayers: number) {
+  generateMap(n = 0) {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
 
-    this.map = new PolygonMap((nPlayers === 2 && 4) || nPlayers);
+    this.map = new PolygonMap((this.nPlayers === 2 && 4) || this.nPlayers);
     this.paddles = [];
+
+    // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
+    // const randomIndex: Array<number> = shuffle(arrayIndex);
+    const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
+    const randomPlayers = shuffle(playersAndBotsToAssign);
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
-      if (nPlayers > 2 || !(index % 2)) {
+      if (this.nPlayers > 2 || !(index % 2)) {
         paddle = new Paddle(line, index);
         this.paddles.push(paddle);
       }
       return new Wall(line, paddle);
     });
     for (let i = 0; i < this.nBall; i++) this.addBall();
-    this.socket.emit('mapChange', this.networkMap);
+    this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
-  }
-
-  spawnBots(botNb: number) {
-    for (let i = 0; i < botNb; i++) {
-      const tmp: Bot = new Bot(this.walls[i], i);
-      this.bots.push(tmp);
-    }
   }
 
   run() {
     // this.generateMap(this.nPlayers);
-    // this.socket.emit('mapChange', this.networkMap);
+    // this.socket.emit('mapChange', this.mapNetScheme);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
-    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    // this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);
-    clearInterval(this.intervalPowers);
+    // clearInterval(this.intervalPowers);
     this.interval = null;
     this.intervalPowers = null;
+  }
+
+  newRound() {
+    let timer = 5;
+    const intervalId = setInterval(() => {
+      this.socket.emit('timer', timer);
+      timer -= 1;
+      if (timer === 0) {
+        this.run();
+        clearInterval(intervalId);
+      }
+    }, 1000);
   }
 
   updatePaddlePercent(percent: number) {
@@ -176,14 +186,15 @@ export default class Game {
 
   public reset() {
     this.nPlayers = GameTools.getRandomArbitrary(3, 6);
-    this.nBots = this.nPlayers;
+    // this.nBots = this.nPlayers;
     this.generateMap(this.nPlayers);
     while (this.bots.length != 0) {
       this.bots.pop();
     }
-    this.spawnBots(this.nBots);
+    // this.spawnBots(this.nBots);
   }
-  // Getters
+
+  @Expose()
   public get isPaused() {
     return !this.interval;
   }
@@ -198,19 +209,33 @@ export default class Game {
       .map((b, i) => ({ ...b, name: i }));
   }
 
+  public get powersNetScheme() {
+    return this.powers.map((p) => p.netScheme);
+
+  }
+
   public get networkState() {
     return {
       balls: this.ballsNetScheme,
       paddles: this.paddlesNetScheme,
     };
   }
-  public get networkMap() {
+  public get mapNetScheme() {
     return {
       walls: this.walls.map((w) => w.netScheme),
       wallWith: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
       inradius: this.map.inradius,
+    };
+  }
+
+  public get netScheme() {
+    return {
+      map: this.mapNetScheme,
+      balls: this.ballsNetScheme,
+      paddles: this.paddlesNetScheme,
+      powers: this.powersNetScheme,
     };
   }
 
@@ -247,10 +272,7 @@ export default class Game {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
           console.log('removing power', this.powers.length);
-          this.socket.emit(
-            'powers',
-            this.powers.map((p) => p.netScheme),
-          );
+          this.socket.emit('powers', this.powersNetScheme);
         }
       }
     }
@@ -279,5 +301,9 @@ export default class Game {
     this.runPhysics();
     this.runBots();
     this.socket.emit('gameUpdate', this.networkState);
+  }
+
+  public get socket() {
+    return this.lobby.sock;
   }
 }

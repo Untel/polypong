@@ -23,30 +23,43 @@
         :name="player.user.name"
         :caption="player.user.email"
         :color="player.color"
+        :canUpdate="canUpdate"
+        @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
       >
         <q-btn v-if="!(player.user.id === $auth.user.id)">Add friend</q-btn>
-        <q-icon name="colorize" class="cursor-pointer">
-          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-            <q-color v-model="player.color" />
-          </q-popup-proxy>
-        </q-icon>
       </UserCard>
       <UserCard
-        v-for="slotNum in missingPlayers"
-        :key="`slot-${slotNum}`"
-        avatar="https://pbs.twimg.com/media/D9b5gbcWkAUrKAc.jpg"
-        :name="`Beep Beep Robot n°${slotNum}`"
+        v-for="(bot, index) in $lobbies.getActiveLobby.bots"
+        :key="`bot-${index}`"
+        :avatar="bot.avatar"
+        :color="bot.color"
+        :name="bot.name"
+        :canUpdate="canUpdate"
+        @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: evt } })"
         caption="Invite someone to replace this bot"
       >
         <q-btn>Invite</q-btn>
+        <!-- :model-value="bot.level" -->
+        <q-slider
+          :disable="!canUpdate"
+          v-model="bot.level"
+          @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: { level: evt } } })"
+          name="strength"
+          :min="0"
+          :max="2"
+          :color="botLevels[bot.level || 0].color"
+          track-color="green"
+          selection-color="red"
+          markers
+          label-always
+          :label-value="botLevels[bot.level || 0].label"
+          label
+        />
       </UserCard>
     </section>
 
     <section>
-      <q-form
-        ref="lobbyForm"
-        @validationSuccess="onFormChange"
-        >
+      <q-form ref="lobbyForm">
         <q-field
           label="Players max">
           <q-slider
@@ -71,21 +84,13 @@
           lazy-rules
           :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
         />
-      <!-- <q-btn color="primary" type="submit" label="Validate" /> -->
       </q-form>
-    </section>
-    <section>
-      <pre>
-        {{ lobby }}
-      </pre>
     </section>
   </q-page>
 </template>
-
 <script lang="ts">
 import { Notify } from 'quasar';
 import { PreFetchOptions } from '@quasar/app-vite';
-import { useAuthStore } from 'src/stores/auth.store';
 import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
 
 export default {
@@ -109,10 +114,11 @@ export default {
 </script>
 <script lang="ts" setup>
 import {
-  defineProps, computed, ref, watch, defineComponent, onMounted,
+  defineProps, computed, ref, watch, defineComponent, onMounted, onUnmounted,
 } from 'vue';
+import { useAuthStore } from 'src/stores/auth.store';
 import UserCard from 'src/components/UserCard.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -130,31 +136,37 @@ const $lobbies = useLobbiesStore();
 const $auth = useAuthStore();
 const { getActiveLobby: lobby } = $lobbies;
 const $route = useRoute();
+const $router = useRouter();
 
 const lobbyForm = ref();
 
 const start = () => {
-  // props.lobbyId =
-  // lobby.resolve()
+  $lobbies.startGame(+$route.params.id);
 };
 
 const canUpdate = computed(() => {
-  const can = lobby.host.user.id === $auth.user.id;
+  const can = lobby.host.id === $auth.user.id;
   return can;
 });
-
-const onFormChange = (evt) => {
-  // $lobbies.up
-};
 
 onMounted(() => {
   const id = +($route.params.id as string);
   $auth.socket?.on('lobby_change', (evt) => {
     $lobbies.fetchCurrentLobby(id);
   });
+  $auth.socket?.on('start', (evt) => {
+    $router.push(`/lobby/${id}/game`);
+  });
 });
 
-const missingPlayers = computed(() => (
-  ($lobbies.getActiveLobby.playersMax || 0) - ($lobbies.getActiveLobby.players.length || 0)
-));
+onUnmounted(() => {
+  $auth.socket?.off('start');
+  $auth.socket?.off('lobby_change');
+});
+
+const botLevels = [
+  { color: 'green', label: 'easy' },
+  { color: 'orange', label: 'medium' },
+  { color: 'red', label: 'hard' },
+];
 </script>

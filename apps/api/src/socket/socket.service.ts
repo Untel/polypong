@@ -6,25 +6,28 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 21:27:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 20:22:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import Lobby from 'src/game/lobby.class';
 import { SocketGateway } from './socket.gateway';
 import { AuthSocket } from './ws-auth.middleware';
 
 @Injectable()
 export class SocketService {
-  constructor(private readonly socketGateway: SocketGateway) {
+  constructor(
+    @Inject(forwardRef(() => SocketGateway))
+    private readonly socketGateway: SocketGateway,
+  ) {
     setInterval(() => {
       console.log(
         'Connected users',
         this.connectedUsers.map((u) => u.id),
         [...this.socketio.sockets.sockets.values()].length,
       );
-    }, 1000);
+    }, 5000);
   }
 
   public get socketio() {
@@ -55,6 +58,6 @@ export class SocketService {
   }
 
   sendNewLobby(lobby: Lobby) {
-    this.socketio.emit('refreshedLobbies', lobby);
+    this.socketio.emit('refreshedLobbies', null);
   }
 }

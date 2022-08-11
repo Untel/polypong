@@ -10,7 +10,10 @@ services:
       - "./compose/nginx/templates:/etc/nginx/templates"
       - "./compose/nginx/snippets:/etc/nginx/snippets"
     ports:
-      - "${PORT:-9999}:80"
+      - "8080:80"
+      - "8081:81"
+      - "8082:82"
+      - "8083:83"
       - "${SSL_PORT:-9998}:443"
     environment:
       - NGINX_PORT=80
