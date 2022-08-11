@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 20:29:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 05:43:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,23 @@ export const useAuthStore = defineStore('auth', {
             }`,
           });
           this.fetchConnectedUsers();
+        });
+        this.socket.on('message', (message) => {
+          Notify.create({
+            message: `Server say ${message}`,
+          });
+        });
+        this.socket.on('redirect', (url) => {
+          Notify.create({
+            message: 'You have an active lobby, rejoin it',
+            actions: [{
+              label: 'go',
+              color: 'danger',
+              handler: () => {
+                this.router.push(url);
+              },
+            }],
+          });
         });
       });
     },

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 21:45:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 05:34:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,14 @@ import {
 import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { PongService } from 'src/pong/pong.service';
-import { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
 
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
 import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { LobbyService, SocketService } from 'src';
+import { LobbyService, SocketService, User } from 'src';
+import { cp } from 'fs';
 
 /**
  * Ne pas utiliser ce AuthGuard. La protection de l'auth se fait grace au Middleware dans afterInit
@@ -91,10 +92,19 @@ export class SocketGateway
   }
 
   handleDisconnect(client: Socket) {
-    const { user, lobby } = client.data;
+    const user: User = client.data.user;
+    const lobby: Lobby = this.lobbyService.userIsInLobby(user);
     if (lobby) {
-      lobby.removePlayer(user);
-      this.lobbyService.updateLobby(lobby.id, lobby);
+      if (lobby.game) {
+        console.log('Has lobby game');
+        lobby.game.stop();
+        // eslint-disable-next-line prettier/prettier
+        lobby.say(`${user.name} has disconnected. Pausing game until he reconnect`);
+      } else {
+        console.log('Has not lobby game');
+        lobby.removePlayer(user);
+        // this.lobbyService.updateLobby(lobby.id, lobby);
+      }
     }
     this.logger.log(`Client disconnected: ${client.id} Name ${user.name}`);
     this.server.emit('online', {
@@ -108,11 +118,16 @@ export class SocketGateway
     this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
     const inLobby = this.lobbyService.userIsInLobby(user);
     if (inLobby) {
-      client.data.lobby = inLobby;
+      // client.data.lobby = inLobby;
+      console.log('Reconnected in lobby');
+      client.join(inLobby.roomId);
+      // client.emit('redirect', `/lobbies/${inLobby.id}/game`);
+      client.emit('redirect', { name: 'game', params: { id: inLobby.id } });
+    } else {
+      this.server.emit('online', {
+        name: user.name,
+        type: 'connect',
+      });
     }
-    this.server.emit('online', {
-      name: user.name,
-      type: 'connect',
-    });
   }
 }

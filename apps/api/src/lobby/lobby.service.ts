@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 21:31:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 04:34:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,9 @@ export class LobbyService {
       this.logger.error('User socket from user never found');
     } else {
       this.logger.log(`User socket ${user.id} joined the lobby ${lobby.id}`);
-      socketOfJoiner.data.lobby = lobby;
+      // socketOfJoiner.data.lobby = lobby;
       socketOfJoiner.join(lobby.roomId);
+      socketOfJoiner.send(`Welcome in lobby ${lobby.name}`);
     }
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
   }

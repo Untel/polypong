@@ -30,7 +30,7 @@
         ref="mapEl"
         :map="$game.map"
         :paddles="$game.paddles"
-        :balls="$game.getBalls"
+        :balls="$game.balls"
         :powers="$game.powers"
         @paddleMove="updatePaddlePercent">
       </PolygonMap>
@@ -48,21 +48,41 @@
     </q-btn> -->
   </q-page>
 </template>
+<script lang="ts">
+import { Notify } from 'quasar';
+import { PreFetchOptions } from '@quasar/app-vite';
+import { useGameStore } from 'src/stores/game.store';
 
+export default {
+  async preFetch(ctx: PreFetchOptions<unknown>) {
+    const {
+      currentRoute, redirect,
+    } = ctx;
+    const $game = useGameStore();
+    const id = currentRoute.params.id as string;
+    try {
+      await $game.fetchCurrentGame(id);
+    } catch (err) {
+      Notify.create({
+        type: 'negative',
+        message: 'Error while joining game',
+      });
+      redirect({ name: 'lobbies' });
+    }
+  },
+};
+</script>
 <script lang="ts" setup>
 import {
   defineProps, ref, onMounted, Ref, computed, onUnmounted,
 } from 'vue';
-import { Notify } from 'quasar';
 import { useMouseInElement } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
-import { useGameStore } from 'src/stores/game.store';
 import { useApi } from 'src/utils/api';
 import { Paddle, Ball } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
 import { useRoute, useRouter } from 'vue-router';
-import { mande } from 'mande';
 
 const $route = useRoute();
 const { socket } = useAuthStore();

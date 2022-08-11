@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 23:31:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 04:30:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,14 +78,12 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   addPlayer(player: Player) {
     this.players.set(player.id, player);
-    player.inLobby = this.id;
     this.fillBots();
     this.sock.emit('lobby_change');
   }
 
-  removePlayer(player: Player) {
+  removePlayer(player: Player | User) {
     this.players.delete(player.id);
-    player.inLobby = null;
     this.fillBots();
     this.sock.emit('lobby_change');
   }
@@ -127,6 +125,11 @@ export default class Lobby implements ILobby, ILobbyConfig {
         this.bots.push(new LobbyBot());
       }
     }
+  }
+
+  say(message) {
+    console.log('Wanna say', this.sock);
+    this.sock.emit('message', message);
   }
 
   public get roomId() {
