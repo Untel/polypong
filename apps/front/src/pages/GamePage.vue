@@ -24,7 +24,7 @@
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      {{ $game.getBalls }}
+      Balls => {{ $game.getBalls }}
       <PolygonMap
         class="map"
         ref="mapEl"
@@ -149,7 +149,10 @@ onMounted(async () => {
   console.log('Mounting');
   await $game.fetchCurrentGame(id);
   socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
-    $game.$patch({ balls: b, paddles: p });
+    // $game.$patch({ balls: b, paddles: p });
+    $game.balls = b;
+    $game.paddles = p;
+    console.log('Game up', $game.balls[0]?.position, b[0]?.position);
   });
   socket?.on('mapChange', (map) => {
     $game.map = map;
