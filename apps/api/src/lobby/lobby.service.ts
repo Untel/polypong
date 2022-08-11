@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 05:51:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 05:51:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ export class LobbyService {
 
   updateLobby(lobby: Lobby, datas: Partial<Lobby>): Lobby {
     console.log('WHERE I COME FROM');
-    return ;
+    return;
     lobby.configure(datas);
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
     return lobby;

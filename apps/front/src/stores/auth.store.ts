@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 05:43:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:25:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ type AuthState = {
   connectedUsers: User[],
 }
 
-const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || 'localhost:9999'}`;
+const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || window.location.host}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
