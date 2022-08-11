@@ -6,13 +6,18 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 02:53:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:47:44 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
 import { mande } from 'mande';
-import { Paddle, Ball, PolygonMap } from 'src/utils/game';
+import {
+  Paddle,
+  Ball,
+  PolygonMap,
+  Power,
+} from 'src/utils/game';
 import { useAuthStore } from './auth.store';
 
 export interface GameState {
@@ -20,7 +25,7 @@ export interface GameState {
   paddles: Paddle[],
   balls: Ball[],
   map: PolygonMap,
-  powers: unknown,
+  powers: Power[],
   isPaused: boolean;
 }
 

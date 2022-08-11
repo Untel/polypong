@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/02 23:56:49 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 15:00:42 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,11 @@ export class Paddle {
 
   effects: { [key: string]: { count: number } };
 
-  constructor(axis: Line, index: number, relativeSize = 0.4, bounce = 45) {
+  constructor(axis: Line, color: string, relativeSize = 0.4, bounce = 45) {
     this.initialSize = relativeSize;
-    this.index = index;
     this.axis = axis;
     this.effects = {};
-    // this.color = GameTools.colors[index % GameTools.colors.length];
+    this.color = color;
     this.angle = lineAngle(axis);
     this.bounceAngle = bounce;
     this.setRelativeSize(relativeSize);

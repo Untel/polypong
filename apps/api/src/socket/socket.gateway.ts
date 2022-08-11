@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 05:34:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 16:38:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,15 @@ export class SocketGateway
 
   @SubscribeMessage('paddlePercent')
   async paddlePercent(client: AuthSocket, percent: number) {
-    // const socks  = (this.server.sockets.sockets.values());
-    // console.log("Socks", socks);
-    // const usrs = [...socks.values()];
-    // console.log("Sockets", usrs);
-    // console.log("SOCKET Input", client.user);
-    // this.pongService.updatePaddlePercent(client, percent);
+    const user: User = client.data.user;
+    const lobby = this.lobbyService.userIsInLobby(user);
+    const game = lobby.game;
+    if (game) {
+      if (!game.isPaused) game.updatePaddlePercent(user.id, percent);
+      else console.log('Game found but paused', user.id);
+    } else {
+      console.log('Game not found', lobby.game);
+    }
   }
 
   /**
@@ -118,7 +121,7 @@ export class SocketGateway
     this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
     const inLobby = this.lobbyService.userIsInLobby(user);
     if (inLobby) {
-      // client.data.lobby = inLobby;
+      client.data.lobby = inLobby;
       console.log('Reconnected in lobby');
       client.join(inLobby.roomId);
       // client.emit('redirect', `/lobbies/${inLobby.id}/game`);

@@ -116,6 +116,7 @@ import {
 } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
+import { useAuthStore } from 'src/stores/auth.store';
 
 const props = defineProps({
   map: {
@@ -123,6 +124,7 @@ const props = defineProps({
     default: () => ({
       verticles: [],
       angles: [],
+      walls: [],
       inradius: 50,
     }),
   },
@@ -189,9 +191,13 @@ watch(ratio, (val) => {
   emit('paddleMove', val);
 });
 
+const $auth = useAuthStore();
+
 watch(() => props.map, (map, oldMap) => {
-  const { verticles, angles } = map;
-  myWallRef.value = wallsRef.value?.at(0);
+  const { verticles, angles, walls } = map;
+  const myWallIdx = walls.findIndex((w) => w.player?.user.id === $auth.user.id);
+  console.log('My wall idx is ', myWallIdx);
+  myWallRef.value = wallsRef.value?.at(myWallIdx);
   (anime.timeline as any)({
     targets: polygonRef.value,
     easing: 'easeInOutExpo',
@@ -201,12 +207,9 @@ watch(() => props.map, (map, oldMap) => {
       targets: svgRef.value,
       keyframes: [
         { rotate: 0 },
-        { rotate: 360 - angles[0] + 180 },
+        { rotate: 360 - angles[myWallIdx] + 180 },
       ],
     });
 }, { immediate: false });
 
-onMounted(() => {
-  console.log('Mounted polygon');
-});
 </script>

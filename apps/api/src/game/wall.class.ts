@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wall.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 10:06:03 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/11 16:00:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@ import { Line, lineLength, lineAngle } from 'geometric';
 import { Ball } from './ball.class';
 import { Bot } from './bot.class';
 import { Paddle } from './paddle.class';
+import Player from './player.class';
 
 export class Wall {
   paddle: Paddle | null;
@@ -22,10 +23,13 @@ export class Wall {
   line: Line;
   width: number;
   angle: number;
+  player: Player | null;
 
-  constructor(line: Line, paddle?: Paddle) {
+  constructor(line: Line, paddle?: Paddle, player?: Player | Bot) {
     this.paddle = paddle;
-    // this.bot = bot;
+    console.log('New wall with paddle', paddle);
+    if (player instanceof Player) this.player = player;
+    else if (player instanceof Bot) this.bot = player;
     this.angle = lineAngle(line); //degrees
     this.line = line;
     this.width = lineLength(line);
@@ -48,6 +52,7 @@ export class Wall {
     return {
       width: this.width,
       line: this.line,
+      player: this.player,
     };
   }
 }

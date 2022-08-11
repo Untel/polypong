@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:58:11 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 02:57:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 16:31:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ export class PongService {
   // }
 
   updatePaddlePercent(client: Socket, percent: number) {
-    this.tmpGame.updatePaddlePercent(percent);
+    // this.tmpGame.updatePaddlePercent(percent);
   }
 
   togglePause() {

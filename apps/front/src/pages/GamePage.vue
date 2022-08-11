@@ -28,13 +28,16 @@
       <PolygonMap
         class="map"
         ref="mapEl"
-        :map="$game.map"
-        :paddles="$game.paddles"
-        :balls="$game.balls"
-        :powers="$game.powers"
+        :map="mapProps"
+        :paddles="paddles"
+        :balls="balls"
+        :powers="powers"
         @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
+    <pre>
+      {{ mapProps }}
+    </pre>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
@@ -79,7 +82,12 @@ import {
 import { useMouseInElement } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useApi } from 'src/utils/api';
-import { Paddle, Ball } from 'src/utils/game';
+import {
+  Paddle,
+  Ball,
+  Power,
+  PolygonMap as PolyMap,
+} from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -91,7 +99,7 @@ const $game = useGameStore();
 
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
-const powers: Ref<any[]> = ref([]);
+const powers: Ref<Power[]> = ref([]);
 const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
 const props = defineProps({
@@ -128,10 +136,13 @@ const update = (evt: any) => {
   // if (rest) console.log('Updating rest is', rest);
 };
 
-const mapProps: Ref<{ verticles: number[], angles: number[] }> = ref({
+const mapProps: Ref<PolyMap> = ref({
   verticles: [],
   angles: [],
+  walls: [],
+  inradius: 0,
 });
+
 const mapChange = (res) => {
   mapProps.value = res;
 };
@@ -163,22 +174,23 @@ const {
 onMounted(async () => {
   // const gameInfos: any = await lobbyApi.get('/game');
   // console.log('Game infos', gameInfos);
-  // paddles.value = gameInfos.paddles;
-  // mapProps.value = gameInfos.map;
+  paddles.value = $game.paddles;
+  mapProps.value = $game.map;
+  balls.value = $game.balls;
   // isPaused.value = gameInfos.isPaused;
-  console.log('Mounting');
-  await $game.fetchCurrentGame(id);
   socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
     // $game.$patch({ balls: b, paddles: p });
-    $game.balls = b;
-    $game.paddles = p;
-    console.log('Game up', $game.balls[0]?.position, b[0]?.position);
+    paddles.value = p;
+    balls.value = b;
+    // console.log('Game up', $game.balls[0]?.position, b[0]?.position);
   });
   socket?.on('mapChange', (map) => {
-    $game.map = map;
+    mapProps.value = map;
+    // $game.map = map;
   });
   socket?.on('powers', (pow) => {
-    $game.powers = pow;
+    powers.value = pow;
+    // $game.powers = pow;
   });
 });
 onUnmounted(() => {

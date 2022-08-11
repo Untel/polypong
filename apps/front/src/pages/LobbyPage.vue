@@ -67,7 +67,7 @@
             name="playersMax"
             :model-value="$lobbies.activeLobby?.playersMax"
             @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
-            :min="$lobbies.getActiveLobby.players.length > 2 && lobby.players.length || 2"
+            :min="minPlayers"
             :max="16"
             snap
             markers
@@ -120,11 +120,6 @@ import { useAuthStore } from 'src/stores/auth.store';
 import UserCard from 'src/components/UserCard.vue';
 import { useRoute, useRouter } from 'vue-router';
 
-defineComponent({
-  components: {
-    UserCard,
-  },
-});
 const props = defineProps({
   id: {
     type: String,
@@ -138,8 +133,11 @@ const { getActiveLobby: lobby } = $lobbies;
 const $route = useRoute();
 const $router = useRouter();
 
-const lobbyForm = ref();
-
+const minPlayers = computed(() => {
+  const present = $lobbies.getActiveLobby.players.length;
+  if (present < 2) return 2;
+  return present;
+});
 const start = () => {
   $lobbies.startGame(+$route.params.id);
 };

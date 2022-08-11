@@ -19,9 +19,10 @@ export class Bot {
   tasks: Ball[] = [];
   dir: number;
   name: string;
+  color: string;
 
-  constructor() {
-    this.name = 'Beep boop';
+  constructor(datas: Partial<Bot> = {}) {
+    Object.assign(this, datas);
   }
   attachWall(wall: Wall) {
     this.wall = wall;
