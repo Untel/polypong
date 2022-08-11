@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 16:48:09 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 01:36:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ import {
   ClassSerializerInterceptor,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CurrentUser } from 'src/auth/user.decorator';
+import { CurrentLobby, CurrentUser } from 'src/decorators';
+import { CurrentSocket } from 'src/decorators/socket.decorator';
 import Game from 'src/game/game.class';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
-import SocketGuard, { CurrentSocket } from 'src/guards/socket.guard';
 import { AuthSocket } from 'src/socket/ws-auth.middleware';
-import InLobbyGuard from './in-lobby.guard';
-import IsLobbyHost from './is-lobby-host.guard';
-import LobbyExistGuard, { CurrentLobby } from './lobby-exist.guard';
-
+import InLobbyGuard from './guards/in-lobby.guard';
+import IsLobbyHost from './guards/is-lobby-host.guard';
+import LobbyExistGuard from './guards/lobby-exist.guard';
+import SocketGuard from './guards/socket.guard';
 import { LobbyService } from './lobby.service';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
@@ -43,17 +43,13 @@ export class LobbyController {
   constructor(private readonly lobbyService: LobbyService) {}
   @Get()
   @UseGuards(InLobbyGuard)
-  getLobby(
-    // @Param('id') id: LobbyId
-    @CurrentLobby() lobby,
-  ): Lobby {
+  getLobby(@CurrentLobby() lobby): Lobby {
     return lobby;
   }
 
   @Get('join')
   @UseGuards(SocketGuard)
   async getLobbyAndJoin(
-    // @Param('id') id,
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
     @CurrentSocket() socket: AuthSocket,
@@ -64,33 +60,21 @@ export class LobbyController {
 
   @Get('start')
   @UseGuards(IsLobbyHost)
-  startGame(
-    // @Param('id') id: LobbyId,
-    @CurrentLobby('lobby') lobby: Lobby,
-  ): boolean {
+  startGame(@CurrentLobby() lobby: Lobby): boolean {
     lobby.start();
     return true;
   }
 
   @Get('game')
   @UseGuards(InLobbyGuard)
-  gameInfos(
-    @Param('id') id: LobbyId,
-    @CurrentLobby('lobby') lobby: Lobby,
-  ): Game {
-    return lobby.game;
+  gameInfos(@CurrentLobby() lobby: Lobby) {
+    return lobby.game.netScheme;
   }
 
   @Put()
   @UseGuards(IsLobbyHost)
-  updateLobby(
-    @Param('id') id: LobbyId,
-    @CurrentLobby('lobby') lobby: Lobby,
-    @Body() datas,
-  ) {
-    console.log('Updating', id, typeof id);
+  updateLobby(@CurrentLobby() lobby: Lobby, @Body() datas) {
     lobby.configure(datas);
-    // const _lobby = this.lobbyService.updateLobby(lobby, datas);
     return lobby;
     // this.lobbyService.updateLobby(host.id);
   }

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 19:01:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 01:48:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,15 @@ import {
   ClassSerializerInterceptor,
   Delete,
 } from '@nestjs/common';
-import { Roles } from 'src/auth/roles.decorator';
-import { CurrentUser } from 'src/auth/user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { CurrentUser } from 'src/decorators';
+import { Roles } from 'src/decorators/roles.decorator';
 import Lobby from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
 
 import { LobbyService } from './lobby.service';
 
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('lobbies')
@@ -44,9 +46,10 @@ export class LobbiesController {
     return lobby;
   }
 
-  @Roles('admin')
+  // @Roles('admin')
   @Delete()
   clear() {
+    console.log('Clearing lobbies');
     this.lobbyService.clearLobbies();
   }
 }

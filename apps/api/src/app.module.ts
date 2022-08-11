@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 18:34:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 21:47:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ const asyncConfig = (moduleName) => ({
     MailModule,
     AuthModule,
     SocketModule,
-    PongModule,
     LobbyModule,
+    PongModule,
   ],
   controllers: [AppController],
   providers: [AppService],

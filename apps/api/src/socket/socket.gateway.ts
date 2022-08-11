@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 19:48:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 21:45:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ export class SocketGateway
   constructor(
     @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
-    private readonly pongService: PongService,
+    // private readonly pongService: PongService,
     @Inject(forwardRef(() => LobbyService))
     private readonly lobbyService: LobbyService,
     private readonly authService: AuthService,
@@ -77,7 +77,7 @@ export class SocketGateway
     // const usrs = [...socks.values()];
     // console.log("Sockets", usrs);
     // console.log("SOCKET Input", client.user);
-    this.pongService.updatePaddlePercent(client, percent);
+    // this.pongService.updatePaddlePercent(client, percent);
   }
 
   /**
@@ -86,7 +86,7 @@ export class SocketGateway
   afterInit(server: Server) {
     const middle = WSAuthMiddleware(this.authService);
     server.use(middle);
-    this.pongService.socketServer = server;
+    // this.pongService.socketServer = server;
     this.logger.log(`Gateway initialized`);
   }
 

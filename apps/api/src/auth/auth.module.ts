@@ -46,7 +46,6 @@ import { PongModule } from 'src/pong';
   imports: [
     forwardRef(() => UserModule),
     MailModule,
-    PongModule,
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => config.get('jwt'),
       inject: [ConfigService],

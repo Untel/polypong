@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 16:05:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 02:37:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ import GameTools from './gametools.class';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketData } from 'src/socket';
 import Player from './player.class';
+import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
 const TEST_MODE = true;
@@ -35,7 +36,6 @@ export enum MODE {
 
 export default class Game {
   lobby: Lobby;
-
   balls: Ball[] = [];
   nBall = 1;
   nPlayers: number;
@@ -46,9 +46,11 @@ export default class Game {
   powers: Power[] = [];
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
-
   timeElapsed = 0;
+
+  @Exclude()
   interval: NodeJS.Timer;
+  @Exclude()
   intervalPowers: NodeJS.Timer;
 
   constructor(lobby: Lobby) {
@@ -88,19 +90,19 @@ export default class Game {
       return new Wall(line, paddle);
     });
     for (let i = 0; i < this.nBall; i++) this.addBall();
-    this.socket.emit('mapChange', this.networkMap);
+    this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
   }
 
   run() {
     // this.generateMap(this.nPlayers);
-    // this.socket.emit('mapChange', this.networkMap);
+    // this.socket.emit('mapChange', this.mapNetScheme);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
-    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    // this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);
-    clearInterval(this.intervalPowers);
+    // clearInterval(this.intervalPowers);
     this.interval = null;
     this.intervalPowers = null;
   }
@@ -191,7 +193,8 @@ export default class Game {
     }
     // this.spawnBots(this.nBots);
   }
-  // Getters
+
+  @Expose()
   public get isPaused() {
     return !this.interval;
   }
@@ -206,19 +209,33 @@ export default class Game {
       .map((b, i) => ({ ...b, name: i }));
   }
 
+  public get powersNetScheme() {
+    return this.powers.map((p) => p.netScheme);
+
+  }
+
   public get networkState() {
     return {
       balls: this.ballsNetScheme,
       paddles: this.paddlesNetScheme,
     };
   }
-  public get networkMap() {
+  public get mapNetScheme() {
     return {
       walls: this.walls.map((w) => w.netScheme),
       wallWith: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
       inradius: this.map.inradius,
+    };
+  }
+
+  public get netScheme() {
+    return {
+      map: this.mapNetScheme,
+      balls: this.ballsNetScheme,
+      paddles: this.paddlesNetScheme,
+      powers: this.powersNetScheme,
     };
   }
 
@@ -255,10 +272,7 @@ export default class Game {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
           console.log('removing power', this.powers.length);
-          this.socket.emit(
-            'powers',
-            this.powers.map((p) => p.netScheme),
-          );
+          this.socket.emit('powers', this.powersNetScheme);
         }
       }
     }

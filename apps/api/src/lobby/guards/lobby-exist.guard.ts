@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/09 18:43:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 22:03:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,32 @@ import {
   Injectable,
   UnprocessableEntityException,
   createParamDecorator,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import Lobby from 'src/game/lobby.class';
-import { LobbyService } from './lobby.service';
+import { LobbyService } from 'src/lobby/lobby.service';
 
 @Injectable()
 export default class LobbyExistGuard implements CanActivate {
   constructor(private readonly lobbyService: LobbyService) {}
+
+  getRequest(context: ExecutionContext) {
+    switch (context.getType()) {
+      case 'ws':
+        return context.switchToWs().getClient();
+      case 'http':
+        return context.switchToHttp().getRequest();
+      default:
+        console.log('Unhandled execution context', context.getType());
+        break;
+    }
+  }
+
+  getUser(context: ExecutionContext) {
+    const req = this.getRequest(context);
+    return req.user;
+  }
 
   canActivate(context: ExecutionContext) {
     console.log('LOBBY EXIST');
@@ -37,12 +56,3 @@ export default class LobbyExistGuard implements CanActivate {
     return true;
   }
 }
-
-export const CurrentLobby = createParamDecorator<
-  unknown,
-  ExecutionContext,
-  Lobby
->((data: unknown, ctx: ExecutionContext): Lobby => {
-  const request = ctx.switchToHttp().getRequest();
-  return request.lobby as Lobby;
-});

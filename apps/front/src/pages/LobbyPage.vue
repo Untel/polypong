@@ -84,13 +84,7 @@
           lazy-rules
           :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
         />
-      <!-- <q-btn color="primary" type="submit" label="Validate" /> -->
       </q-form>
-    </section>
-    <section>
-      <pre>
-        {{ lobby }}
-      </pre>
     </section>
   </q-page>
 </template>

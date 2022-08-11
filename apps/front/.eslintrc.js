@@ -10,7 +10,7 @@ module.exports = {
   // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
   parserOptions: {
     parser: require.resolve('@typescript-eslint/parser'),
-    extraFileExtensions: ['.vue']
+    extraFileExtensions: ['.vue'],
   },
 
   env: {
@@ -37,10 +37,6 @@ module.exports = {
     // 'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
     'airbnb-base',
-
-    '@vue/typescript/recommended',
-    'plugin:vue/vue3-recommended',
-    '@vue/standard',
   ],
 
   plugins: [

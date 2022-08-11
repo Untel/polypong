@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 16:46:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 21:31:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ export class LobbyService {
   logger = new Logger('LobbyService');
   constructor(
     // @InjectRedis() private readonly redis: Redis,
-    // @Inject(forwardRef(() => SocketService))
+    @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });

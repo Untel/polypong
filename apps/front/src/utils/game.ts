@@ -9,6 +9,11 @@ export interface Paddle {
   color: string;
 }
 
+export interface PolygonMap {
+  inradius: number;
+  verticles: number[];
+  angles: number[];
+}
 export interface Ball {
   color: string;
   position: Position;

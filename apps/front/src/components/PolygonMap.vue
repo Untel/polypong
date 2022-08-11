@@ -38,9 +38,6 @@
 
 <template>
   <div class="svg-test wrapper">
-    <!-- <pre>
-      pow {{ powers }}
-    </pre> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
@@ -69,8 +66,7 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <group
-        v-for="(ball, idx) in balls"
+      <g v-for="(ball, idx) in balls"
         :key="`ball-${idx}`"
         >
         <circle
@@ -89,7 +85,7 @@
           :fill="ball.color || 'yellow'" r=".5"
           v-bind="formatCirclePosition(ball.target.hit)"
         />
-      </group>
+      </g>
       <circle
         v-for="(power, idx) in powers"
         :key="`power-${idx}`"
@@ -116,13 +112,14 @@ import {
   Ball,
   Power,
   Line,
+  PolygonMap,
 } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
 
 const props = defineProps({
   map: {
-    type: Object as PropType<{ inradius: number, verticles: number[], angles: number[] }>,
+    type: Object as PropType<PolygonMap>,
     default: () => ({
       verticles: [],
       angles: [],

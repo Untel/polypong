@@ -16,11 +16,10 @@ async function bootstrap() {
     .setTitle('Polypong')
     .setDescription('Polypong API description')
     .setVersion('1.0')
-    .addTag('polypong')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
   app.enableCors();
 
   await app.listen(3000);

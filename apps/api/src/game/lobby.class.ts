@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 18:36:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/10 23:31:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,23 +72,22 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.playersMax = 8;
     this.spectatorsMax = 10;
     this.bots = [];
-    this.fillBots(this.playersMax);
+    this.fillBots();
     console.log('Bots are', this.bots);
   }
 
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     player.inLobby = this.id;
-    this.sock.emit('room_connect', [...this.players.values()]);
-
-    this.bots.pop();
+    this.fillBots();
+    this.sock.emit('lobby_change');
   }
 
   removePlayer(player: Player) {
     this.players.delete(player.id);
     player.inLobby = null;
-    this.bots.push(new LobbyBot());
-    this.sock.emit('room_connect', [...this.players.values()]);
+    this.fillBots();
+    this.sock.emit('lobby_change');
   }
 
   start(): Game {
@@ -112,17 +111,18 @@ export default class Lobby implements ILobby, ILobbyConfig {
       });
     if (opts.playersMax) {
       this.playersMax = opts.playersMax;
-      const missingPlayers = this.playersMax - this.players.size;
-      this.fillBots(missingPlayers);
+      this.fillBots();
     }
     this.sock.emit('lobby_change', null);
   }
 
-  fillBots(missingPlayers = 0) {
+  fillBots() {
+    const missingPlayers = this.playersMax - this.players.size;
     if (missingPlayers < 0) {
       throw new UnprocessableEntityException('You need to kick somone');
-    } else if (missingPlayers > 0) {
-      this.bots = this.bots.slice(0, missingPlayers);
+    }
+    this.bots = this.bots.slice(0, missingPlayers);
+    if (missingPlayers > 0) {
       while (this.bots.length < missingPlayers) {
         this.bots.push(new LobbyBot());
       }
