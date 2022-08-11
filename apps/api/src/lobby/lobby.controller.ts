@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 01:36:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 05:46:49 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ export class LobbyController {
   async getLobbyAndJoin(
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
-    @CurrentSocket() socket: AuthSocket,
   ): Promise<Lobby> {
     this.lobbyService.userJoinLobby(lobby, user);
     return lobby;

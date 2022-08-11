@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 04:34:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 05:51:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,16 @@ export class LobbyService {
   }
 
   userJoinLobby(lobby: Lobby, user: User) {
+    const stillInLobby = this.userIsInLobby(user);
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
-    lobby.addPlayer(new Player(user));
-    if (!socketOfJoiner) {
-      this.logger.error('User socket from user never found');
-    } else {
-      this.logger.log(`User socket ${user.id} joined the lobby ${lobby.id}`);
-      // socketOfJoiner.data.lobby = lobby;
-      socketOfJoiner.join(lobby.roomId);
-      socketOfJoiner.send(`Welcome in lobby ${lobby.name}`);
+
+    if (stillInLobby) {
+      socketOfJoiner.leave(stillInLobby.roomId);
+      stillInLobby.removePlayer(user);
     }
+    lobby.addPlayer(new Player(user));
+    socketOfJoiner.join(lobby.roomId);
+    socketOfJoiner.send(`Welcome in lobby ${lobby.name}`);
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
   }
 
@@ -80,9 +80,6 @@ export class LobbyService {
     // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
     if (!lobby) return null;
-
-
-    // lobby.users = this.socketService.getUsersInRoom(`lobby-${lobby.id}`);
     return lobby;
   }
 
