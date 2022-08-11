@@ -112,7 +112,7 @@ module.exports = configure((/* ctx */) => ({
     publicPath: '/',
     historyApiFallback: true,
     // public: 'https://dev.host.to/$project',
-    // port: 9999,
+    // port: 8080,
   },
 
   // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Relationship } from 'src/relationship/relationship.entity';
 // import Message from 'src/chat/entities/message.entity';
 
 export enum CoalitionChoice {
@@ -31,9 +33,6 @@ export class User {
   @Column({ type: 'text', unique: true })
   name: string;
 
-  @Column({ type: 'text', nullable: true })
-  status: string;
-
   @Column({ unique: true })
   email: string;
 
@@ -47,9 +46,6 @@ export class User {
   @Exclude()
   @Column({ nullable: true })
   password: string;
-
-  @Column({ default: true })
-  isActive: boolean;
 
   @Column({ default: false })
   emailVerified: boolean;
@@ -67,6 +63,12 @@ export class User {
   @Exclude()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Relationship, (relationship) => relationship.from)
+  relationships: Relationship[];
+
+  @OneToMany(() => Relationship, (relationship) => relationship.to)
+  related: Relationship[];
 
   // @OneToMany(() => Message, message => message.author)
   // public message: Message;

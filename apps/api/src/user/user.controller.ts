@@ -115,7 +115,7 @@ export class UserController {
     this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
     return await this.userService.setAvatar(
       req.user,
-      `http://localhost:9999/api/user/${avatar.path}`,
+      `http://localhost:8080/api/user/${avatar.path}`,
     );
   }
 

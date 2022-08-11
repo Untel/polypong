@@ -10,6 +10,9 @@
       avatar
     >
       <q-icon :name="icon" />
+      <q-badge v-if="notif!= 0" color="orange" rounded transparent floating>
+        {{ notif }}
+      </q-badge>
     </q-item-section>
 
     <q-item-section>
@@ -20,10 +23,12 @@
 </template>
 
 <script lang="ts">
+import { number } from '@intlify/core-base';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'EssentialLink',
+  notifCount: 0,
   props: {
     title: {
       type: String,
@@ -44,6 +49,10 @@ export default defineComponent({
     icon: {
       type: String,
       default: 'icon',
+    },
+    notif: {
+      type: Number,
+      default: 0,
     },
   },
 });
