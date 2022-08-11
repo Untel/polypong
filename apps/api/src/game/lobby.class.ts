@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 04:30:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 18:19:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
   game: Game | null;
 
   @Exclude()
+  winner: Player | Bot;
+
+  @Exclude()
   sock = null;
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
 
@@ -89,6 +92,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   }
 
   start(): Game {
+    if (this.winner) return;
     this.game = new Game(this);
     this.sock.emit('start');
     return this.game;
@@ -130,6 +134,14 @@ export default class Lobby implements ILobby, ILobbyConfig {
   say(message) {
     console.log('Wanna say', this.sock);
     this.sock.emit('message', message);
+  }
+
+  setWinner(winner) {
+    this.winner = winner;
+    this.sock.emit('end', {
+      name: this.winner.color,
+      color: this.winner.color,
+    });
   }
 
   public get roomId() {

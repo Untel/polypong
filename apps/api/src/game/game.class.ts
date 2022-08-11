@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 16:39:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 18:23:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -38,7 +38,6 @@ export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
   nBall = 1;
-  nPlayers: number;
   players: Map<number, Player> = new Map();
   bots: Bot[];
   paddles: Paddle[] = [];
@@ -55,8 +54,9 @@ export default class Game {
 
   constructor(lobby: Lobby) {
     this.lobby = lobby;
-    this.nPlayers = lobby.playersMax;
     this.bots = lobby.bots.map((v) => new Bot(v));
+    this.players = new Map(this.lobby.players);
+    console.log('New game', this.bots.length, this.players.size);
     this.generateMap();
   }
 
@@ -79,14 +79,14 @@ export default class Game {
     // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
     // const randomIndex: Array<number> = shuffle(arrayIndex);
     const playersAndBotsToAssign = [
-      ...this.lobby.players.values(),
+      ...this.players.values(),
       ...this.bots,
     ];
     // console.log('playersAndBotsToAssign', playersAndBotsToAssign);
 
-    const randomPlayers = playersAndBotsToAssign;
-    // const randomPlayers = shuffle(playersAndBotsToAssign);
-    // console.log('Shuffled', randomPlayers);
+    // const randomPlayers = playersAndBotsToAssign;
+    const randomPlayers = shuffle(playersAndBotsToAssign);
+    console.log('Shuffled', randomPlayers);
     // if (this.nPlayers > 2)
     //   for (let i = 0; i < this.nPlayers; i++) {
     //     const line = this.map.edges[i];
@@ -113,14 +113,18 @@ export default class Game {
   }
 
   run() {
+    if (this.lobby.winner) {
+      console.log('Cant run ended game');
+      return;
+    }
     // this.generateMap(this.nPlayers);
     // this.socket.emit('mapChange', this.mapNetScheme);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
-    // this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);
-    // clearInterval(this.intervalPowers);
+    clearInterval(this.intervalPowers);
     this.interval = null;
     this.intervalPowers = null;
   }
@@ -172,7 +176,7 @@ export default class Game {
             ) {
               ball.bounceTargetWall(this.walls);
             } else {
-              this.reduce();
+              this.reduce(ball.target.wall);
             }
           }
         } else {
@@ -190,12 +194,22 @@ export default class Game {
     });
   }
 
-  public reduce() {
+  public reduce(wall: Wall) {
+    if (wall.bot) {
+      this.bots = this.bots.filter((b) => b !== wall.bot);
+    } else if (wall.player) {
+      this.players.delete(wall.player.user.id);
+    }
     this.stop();
-    // if (this.nPlayers > 4)
-    if (this.nPlayers > 2) this.nPlayers--;
-    // if (this.nPlayers < 3) this.nPlayers = 3;
-    this.generateMap(this.nPlayers);
+    if (this.nPlayers === 1 || this.players.size === 0) {
+      let winner: Player | Bot | null = null;
+      if (this.bots.length) winner = this.bots.pop();
+      else winner = [...this.players.values()].pop();
+      console.log('THERE IS A WINNER', winner, this.bots, this.players);
+      this.lobby.setWinner(winner);
+      return;
+    }
+    this.generateMap();
     const timer = 1000;
     this.socket.emit('timer', { timer });
     setTimeout(() => {
@@ -204,9 +218,7 @@ export default class Game {
   }
 
   public reset() {
-    this.nPlayers = GameTools.getRandomArbitrary(3, 6);
-    // this.nBots = this.nPlayers;
-    this.generateMap(this.nPlayers);
+    this.generateMap();
     while (this.bots.length != 0) {
       this.bots.pop();
     }
@@ -230,7 +242,10 @@ export default class Game {
 
   public get powersNetScheme() {
     return this.powers.map((p) => p.netScheme);
+  }
 
+  public get nPlayers() {
+    return this.players.size + this.bots.length;
   }
 
   public get networkState() {

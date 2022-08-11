@@ -35,13 +35,13 @@
         @paddleMove="updatePaddlePercent">
       </PolygonMap>
     </FssFallback>
-    <pre>
-      {{ mapProps }}
-    </pre>
     <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
+    <pre>
+      {{ mapProps }}
+    </pre>
     <!-- <q-btn dense @click="tick()">
       tick
     </q-btn> -->
@@ -191,6 +191,13 @@ onMounted(async () => {
   socket?.on('powers', (pow) => {
     powers.value = pow;
     // $game.powers = pow;
+  });
+
+  socket?.once('end', (winner = { name: 'Error' }) => {
+    console.log('Winner', winner);
+    Notify.create({
+      message: `Chicken chiken dinner we have a winner ${winner.name}`,
+    });
   });
 });
 onUnmounted(() => {
