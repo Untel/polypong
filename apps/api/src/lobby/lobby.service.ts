@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 16:21:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 17:03:45 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ export class LobbyService {
     private userService: UserService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });
-    this.mock();
+    // this.mock();
   }
 
   async mock() {
