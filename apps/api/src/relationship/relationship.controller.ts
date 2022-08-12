@@ -56,7 +56,7 @@ export class RelationshipController {
   @UseGuards(JwtGuard)
   @Post('sendFriendship')
   async sendFriendship(@Req() req, @Body() body: SendFriendRequestDto) {
-    this.logger.log(`In sendFriendship`);
+    this.logger.log('In sendFriendship');
     return this.relService.sendFriendship(req.user, body.name);
   }
   /**
@@ -67,7 +67,7 @@ export class RelationshipController {
   @UseGuards(JwtGuard)
   @Post('unsendFriendship')
   async unsendFriendship(@Req() req, @Body() body: SendFriendRequestDto) {
-    this.logger.log(`In unsendFriendship`);
+    this.logger.log('In unsendFriendship');
     return this.relService.unsendFriendship(req.user, body.name);
   }
 }

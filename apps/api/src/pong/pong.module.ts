@@ -6,10 +6,7 @@ import { LobbyModule } from 'src/lobby';
 
 @Module({
   // eslint-disable-next-line prettier/prettier
-  imports: [
-    UserModule,
-    forwardRef(() => LobbyModule)
-  ],
+  imports: [UserModule, forwardRef(() => LobbyModule)],
   controllers: [PongController],
   providers: [PongService],
   exports: [PongService],

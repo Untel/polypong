@@ -91,7 +91,7 @@ export class SocketGateway
     const middle = WSAuthMiddleware(this.authService);
     server.use(middle);
     // this.pongService.socketServer = server;
-    this.logger.log(`Gateway initialized`);
+    this.logger.log('Gateway initialized');
   }
 
   handleDisconnect(client: Socket) {
@@ -102,7 +102,9 @@ export class SocketGateway
         console.log('Has lobby game');
         lobby.game.stop();
         // eslint-disable-next-line prettier/prettier
-        lobby.say(`${user.name} has disconnected. Pausing game until he reconnect`);
+        lobby.say(
+          `${user.name} has disconnected. Pausing game until he reconnect`,
+        );
       } else {
         console.log('Has not lobby game');
         lobby.removePlayer(user);

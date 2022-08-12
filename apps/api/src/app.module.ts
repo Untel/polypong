@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 21:47:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 18:05:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,16 @@ import {
   MailModule,
   PongModule,
   LobbyModule,
+  ChatModule,
 } from '.';
 
 import { PassportModule } from '@nestjs/passport';
 
 import { RedisModule } from '@liaoliaots/nestjs-redis';
-
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
 import { RelationshipModule } from './relationship/relationship.module';
-import { RouterModule } from '@nestjs/core';
+
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],
@@ -57,6 +57,7 @@ const asyncConfig = (moduleName) => ({
     PongModule,
     LobbyModule,
     RelationshipModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

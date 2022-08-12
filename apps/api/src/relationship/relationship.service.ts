@@ -20,7 +20,7 @@ export class RelationshipService {
     private relRepo: Repository<Relationship>,
   ) {}
 
-  logger = new Logger(`relationshipService`);
+  logger = new Logger('relationshipService');
 
   // find a relationship between two Users
   async findRel(from: User, to: User): Promise<Relationship> | null {
@@ -45,7 +45,7 @@ export class RelationshipService {
       this.logger.log(`in fetchRels, res = ${JSON.stringify(res)}`);
       return res;
     } catch (error) {
-      this.logger.log(`in fetchRels, error: ` + error);
+      this.logger.log('in fetchRels, error: ' + error);
       return null;
     }
   }
@@ -134,10 +134,10 @@ export class RelationshipService {
     this.logger.log(`in sendFriendship, toRel = ${JSON.stringify(toRel)}`);
     await this.updateRel(fromRel, { friendship_sent: true });
     await this.updateRel(toRel, { friendship_received: true });
-    this.logger.log(`in sendFriendship, about to emit event`);
+    this.logger.log('in sendFriendship, about to emit event');
     this.logger.log(`in sendFriendship, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
-    console.log(`in sendFriendship, sock = `, sock);
+    console.log('in sendFriendship, sock = ', sock);
     sock?.emit('friendship', from.id, 'received');
     return await this.fetchRels(from);
   }

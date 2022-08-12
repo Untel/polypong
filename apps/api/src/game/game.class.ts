@@ -126,7 +126,7 @@ export default class Game {
     this.sayInterval = setInterval(() => {
       timer -= 1;
       if (timer === 0) {
-        this.socket.emit('message', `Goo oo ooo ooo o o o o o o`);
+        this.socket.emit('message', 'Goo oo ooo ooo o o o o o o');
         // this.run();
         this.paused = false;
         clearInterval(this.sayInterval);

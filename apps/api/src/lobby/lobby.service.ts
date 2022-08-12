@@ -73,7 +73,10 @@ export class LobbyService {
     const lobbyPresent = this.getLobbies().find((l: Lobby) =>
       [...l.players.values()].find((p: Player) => p.user.id === user.id),
     );
-    console.log('After reconnect, user found in lobby', lobbyPresent && lobbyPresent.id);
+    console.log(
+      'After reconnect, user found in lobby',
+      lobbyPresent && lobbyPresent.id,
+    );
     return lobbyPresent;
   }
 
