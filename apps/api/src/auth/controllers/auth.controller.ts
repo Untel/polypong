@@ -85,7 +85,7 @@ export class AuthController {
       });
     }
 
-    this.logger.log(`@Post(login), returning user`);
+    this.logger.log('@Post(login), returning user');
     return res.send({ ...user, token });
   }
 
@@ -133,7 +133,7 @@ export class AuthController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('email/verify/:token')
   async verifyEmail(@Param() params: VerifyEmailTokenDto) {
-    this.logger.log(`in email/verify/:token`);
+    this.logger.log('in email/verify/:token');
     return this.authService.verifyEmail(params.token);
   }
 

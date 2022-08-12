@@ -33,8 +33,8 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   }
 
   async getUserProfile(accessToken: string) {
-    this.logger.log(`validate - getUserProfile`);
-    const { data } = await axios.get(`https://api.intra.42.fr/v2/me`, {
+    this.logger.log('validate - getUserProfile');
+    const { data } = await axios.get('https://api.intra.42.fr/v2/me', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -43,7 +43,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   }
 
   async getUserCoalition(id: number, accessToken: string) {
-    this.logger.log(`validate - getUserCoalition`);
+    this.logger.log('validate - getUserCoalition');
     const { data } = await axios.get(
       `https://api.intra.42.fr/v2/users/${id}/coalitions`,
       {
@@ -56,7 +56,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   }
 
   async validate(accessToken: string, redirect: string): Promise<any> {
-    this.logger.log(`validate`);
+    this.logger.log('validate');
     this.logger.log(`validate - accessToken = ${accessToken}`);
     this.logger.log(`validate - redirect = ${redirect}`);
     const data = await this.getUserProfile(accessToken);

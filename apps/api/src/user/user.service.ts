@@ -21,7 +21,7 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  logger = new Logger(`UserService`);
+  logger = new Logger('UserService');
   connectedUsers = new Map<number, string>();
 
   setUserAsConnected(id: number, socketId: string) {
@@ -161,7 +161,7 @@ export class UserService {
       }
     } catch (error) {
       this.logger.log(`updateSelf - caught error = ${JSON.stringify(error)}`);
-      this.logger.log(`updateSelf - rethrowing error`);
+      this.logger.log('updateSelf - rethrowing error');
       throw error;
     }
     this.logger.log(`updateSelf - returning res = ${JSON.stringify(res)}`);
@@ -193,13 +193,13 @@ export class UserService {
     this.logger.log(`in setName, existingName = ${existingName}`);
     if (existingName) {
       this.logger.log(
-        `in setName, existingName found, throwing error : name already taken`,
+        'in setName, existingName found, throwing error : name already taken',
       );
       throw new ConflictException('Name already taken');
     }
     if (name.length < 3) {
       this.logger.log(
-        `in setName, existingName found, throwing error : name too short`,
+        'in setName, existingName found, throwing error : name too short',
       );
       throw new BadRequestException('Name needs to be at least 3 letters long');
     }

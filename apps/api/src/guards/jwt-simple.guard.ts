@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { HttpArgumentsHost, WsArgumentsHost } from '@nestjs/common/interfaces';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';

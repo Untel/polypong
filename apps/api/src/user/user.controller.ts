@@ -128,7 +128,7 @@ export class UserController {
   @Get('avatars/:fileId')
   async serveAvatar(@Param('fileId') fileId, @Res() res) {
     this.logger.log(`in serveAvatar, fileId = ${fileId}`);
-    this.logger.log(`in serveAvatar, about to res.sendfile`);
+    this.logger.log('in serveAvatar, about to res.sendfile');
     res.sendfile(fileId, { root: 'avatars' });
   }
 }

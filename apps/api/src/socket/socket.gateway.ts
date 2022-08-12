@@ -18,17 +18,14 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { PongService } from 'src/pong/pong.service';
-import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+import Lobby, {  } from 'src/game/lobby.class';
 
-import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
 import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { LobbyService, SocketService, User } from 'src';
-import { cp } from 'fs';
 
 /**
  * Ne pas utiliser ce AuthGuard. La protection de l'auth se fait grace au Middleware dans afterInit
@@ -91,7 +88,7 @@ export class SocketGateway
     const middle = WSAuthMiddleware(this.authService);
     server.use(middle);
     // this.pongService.socketServer = server;
-    this.logger.log(`Gateway initialized`);
+    this.logger.log('Gateway initialized');
   }
 
   handleDisconnect(client: Socket) {
@@ -102,7 +99,9 @@ export class SocketGateway
         console.log('Has lobby game');
         lobby.game.stop();
         // eslint-disable-next-line prettier/prettier
-        lobby.say(`${user.name} has disconnected. Pausing game until he reconnect`);
+        lobby.say(
+          `${user.name} has disconnected. Pausing game until he reconnect`,
+        );
       } else {
         console.log('Has not lobby game');
         lobby.removePlayer(user);
@@ -126,11 +125,10 @@ export class SocketGateway
       client.join(inLobby.roomId);
       // client.emit('redirect', `/lobbies/${inLobby.id}/game`);
       client.emit('redirect', { name: 'game', params: { id: inLobby.id } });
-    } else {
-      this.server.emit('online', {
-        name: user.name,
-        type: 'connect',
-      });
     }
+    this.server.emit('online', {
+      name: user.name,
+      type: 'connect',
+    });
   }
 }

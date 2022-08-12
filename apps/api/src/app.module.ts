@@ -32,7 +32,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
 import { RelationshipModule } from './relationship/relationship.module';
-import { RouterModule } from '@nestjs/core';
+
 const asyncConfig = (moduleName) => ({
   useFactory: (configService: ConfigService) => configService.get(moduleName),
   inject: [ConfigService],

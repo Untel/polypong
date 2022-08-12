@@ -13,13 +13,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   async validate(username: string, password: string) {
     this.logger.log(
-      `in LocalStrategy - validate, about to call authService.validateUser`,
+      'in LocalStrategy - validate, about to call authService.validateUser',
     );
     const user = await this.authService.validateUser(username, password);
     this.logger.log(`in LocalStrategy - validate, user.name = ${user.name}`);
 
     if (!user) {
-      this.logger.log(`in LocalStrategy, !user doesnt exist`);
+      this.logger.log('in LocalStrategy, !user doesnt exist');
       throw new UnauthorizedException();
     }
 

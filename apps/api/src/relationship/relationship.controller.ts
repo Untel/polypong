@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import JwtGuard from 'src/guards/jwt.guard';
-import { SocketService } from 'src/socket';
 import { UserService } from 'src/user';
 import { AddRelationDto } from './dtos/add-relation.dto';
 import { SendFriendRequestDto } from './dtos/send-friend-request.dto';
@@ -56,7 +55,7 @@ export class RelationshipController {
   @UseGuards(JwtGuard)
   @Post('sendFriendship')
   async sendFriendship(@Req() req, @Body() body: SendFriendRequestDto) {
-    this.logger.log(`In sendFriendship`);
+    this.logger.log('In sendFriendship');
     return this.relService.sendFriendship(req.user, body.name);
   }
   /**
@@ -67,7 +66,30 @@ export class RelationshipController {
   @UseGuards(JwtGuard)
   @Post('unsendFriendship')
   async unsendFriendship(@Req() req, @Body() body: SendFriendRequestDto) {
-    this.logger.log(`In unsendFriendship`);
+    this.logger.log('In unsendFriendship');
     return this.relService.unsendFriendship(req.user, body.name);
+  }
+
+  /**
+   * block someone
+   * @param {Request} req : The request object.
+   * @param {SendFriendRequestDto} body : other user's name
+   */
+  @UseGuards(JwtGuard)
+  @Post('sendBlock')
+  async sendBlock(@Req() req, @Body() body: SendFriendRequestDto) {
+    this.logger.log('In sendBlock');
+    return this.relService.sendBlock(req.user, body.name);
+  }
+  /**
+   * unblock someone
+   * @param {Request} req : The request object.
+   * @param {SendFriendRequestDto} body : other user's name
+   */
+  @UseGuards(JwtGuard)
+  @Post('unsendBlock')
+  async unsendBlock(@Req() req, @Body() body: SendFriendRequestDto) {
+    this.logger.log('In unsendBlock');
+    return this.relService.unsendBlock(req.user, body.name);
   }
 }
