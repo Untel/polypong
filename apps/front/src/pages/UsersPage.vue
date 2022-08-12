@@ -5,9 +5,12 @@
   indicator-color="primary" narrow-indicator
 >
   <q-tab name="online" label="online"/>
-  <q-tab name="browse" label="browse"/>
-  <q-tab name="friends" label="friends"/>
-  <q-tab name="blocked" label="blocked"/>
+  <q-tab name="friendlist" label="friendlist">
+    <q-badge v-if="soc.getNotifCount" color="orange" rounded transparent floating>
+      {{ soc.getNotifCount }}
+    </q-badge>
+  </q-tab>
+  <q-tab name="blocklist" label="blocklist"/>
 </q-tabs>
 
 <q-separator />
@@ -35,7 +38,7 @@
               label="add friend" @click="addFriend(user.name)"
               icon="fa-solid fa-user-group"
             /><q-btn
-              label="block" @click="block(user.id)"
+              label="block" @click="block(user.name)"
               icon="fa-solid fa-ban" color="red"
             />
           </span>
@@ -44,14 +47,72 @@
     </q-card>
   </q-tab-panel>
 
-  <!-- RELS -->
-  <q-tab-panel name="browse">
-    <q-input filled v-model="relName" label="Enter a name" stack-label dense>
-      <template v-slot:append>
-        <q-btn @click="addRel(relName)">search</q-btn>
-      </template>
-    </q-input>
+  <!-- FRIENDLIST -->
+  <q-tab-panel name="friendlist">
+    <pre>find people</pre>
+    <rel-search-bar @add-friend="(name) => addFriend(name)"/>
+    <pre>your rels</pre>
     <q-card v-for="rel in soc.getRelationships" :key="`rel-${rel.id}`">
+      <q-card-section>
+        <social-gutter :rel="rel"
+          @invite-to-lobby="(id) => inviteToLobby(id)"
+          @message="(id) => message(id)"
+          @stats="(id) => stats(id)"
+          @add-friend="(name) => addFriend(name)"
+          @unfriend="(name) => unfriend(name)"
+          @block="(name) => block(name)"
+          @unblock="(name) => unblock(name)"
+        />
+      </q-card-section>
+    </q-card>
+    <pre v-if="soc.getFriendsRelationships.length">your friends</pre>
+    <q-card label="friends" v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`">
+      <q-card-section>
+        <social-gutter :rel="rel"
+          @invite-to-lobby="(id) => inviteToLobby(id)"
+          @message="(id) => message(id)"
+          @stats="(id) => stats(id)"
+          @add-friend="(name) => addFriend(name)"
+          @unfriend="(name) => unfriend(name)"
+          @block="(name) => block(name)"
+          @unblock="(name) => unblock(name)"
+        />
+      </q-card-section>
+    </q-card>
+    <pre v-if="soc.getReceivedFriendships.length">friend requests received</pre>
+    <q-card label="received" v-for="rel in soc.getReceivedFriendships" :key="`rel-${rel.id}`">
+      <q-card-section>
+        <social-gutter :rel="rel"
+          @invite-to-lobby="(id) => inviteToLobby(id)"
+          @message="(id) => message(id)"
+          @stats="(id) => stats(id)"
+          @add-friend="(name) => addFriend(name)"
+          @unfriend="(name) => unfriend(name)"
+          @block="(name) => block(name)"
+          @unblock="(name) => unblock(name)"
+        />
+      </q-card-section>
+    </q-card>
+    <pre v-if="soc.getSentFriendships.length">friend requests sent</pre>
+    <q-card label="received" v-for="rel in soc.getSentFriendships" :key="`rel-${rel.id}`">
+      <q-card-section>
+        <social-gutter :rel="rel"
+          @invite-to-lobby="(id) => inviteToLobby(id)"
+          @message="(id) => message(id)"
+          @stats="(id) => stats(id)"
+          @add-friend="(name) => addFriend(name)"
+          @unfriend="(name) => unfriend(name)"
+          @block="(name) => block(name)"
+          @unblock="(name) => unblock(name)"
+        />
+      </q-card-section>
+    </q-card>
+  </q-tab-panel>
+
+  <!-- BLOCKLIST -->
+  <q-tab-panel name="blocklist">
+    <div class="text-h6">blocked</div>
+    <q-card v-for="rel in soc.getBlockSentRelations" :key="`rel-${rel.id}`">
       <q-card-section>
         <div class="q-gutter-none">
           <q-avatar><img :src=rel.to.avatar /></q-avatar>
@@ -59,57 +120,13 @@
             :color=friendOrNot(rel)
           />
           <span v-if="showGutter == rel.to.name">
-            <span v-if="!rel.block_received">
-              <q-btn
-                label="invite" @click="inviteToLobby(rel.to.id)"
-                icon="fa-solid fa-table-tennis-paddle-ball"
-              /><q-btn
-                label="message" @click="message(rel.to.id)"
-                icon="fa-solid fa-paper-plane"
-              /><q-btn
-                label="stats" @click="stats(rel.to.id)"
-                icon="fa-solid fa-chart-line"
-              /><q-btn v-if="rel.friendship_received == false && rel.friendship_sent == false"
-                label="add friend" @click="addFriend(rel.to.name)"
-                icon="fa-solid fa-user-group"
-              />
-
-              <q-btn-group v-if="rel.friendship_received && !rel.friendship_sent">
-                <q-btn  label="accept" @click="addFriend(rel.to.name)"
-                  icon="fa-solid fa-heart" color="green"/>
-                <q-btn label="decline" @click="unfriend(rel.to.name)"
-                  icon="fas fa-heart-broken" color="orange"/>
-              </q-btn-group>
-
-              <q-btn v-if="rel.friendship_sent && !rel.friendship_received"
-                label="cancel" @click="unfriend(rel.to.name)"
-                icon="fa-solid fa-user" color="blue"
-              /><q-btn v-if="rel.friendship_sent && rel.friendship_received"
-                label="unfriend" @click="unfriend(rel.to.name)"
-                icon="fas fa-sad-tear" color="orange"
-              />
-            </span><span v-else>
-              <q-btn label="has blocked you" color="red"/>
-            </span>
-            <q-btn v-if="!rel.block_sent" label="block"
-              @click="block(rel.to.name)" icon="fa-solid fa-ban" color="red"
-            /><q-btn v-if="rel.block_sent" label="unblock"
+            <q-btn v-if="rel.block_sent" label="unblock"
               @click="unblock(rel.to.name)" icon="fa-solid fa fa-unlock" color="red"
             />
           </span>
         </div>
       </q-card-section>
     </q-card>
-  </q-tab-panel>
-
-  <q-tab-panel name="friends">
-    <div class="text-h6">friends</div>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-  </q-tab-panel>
-
-  <q-tab-panel name="blocked">
-    <div class="text-h6">blocked</div>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit.
   </q-tab-panel>
 </q-tab-panels>
 
@@ -119,22 +136,22 @@
 import { useAuthStore } from 'src/stores/auth.store';
 import { Relationship, useSocialStore } from 'src/stores/social.store';
 import { ref } from 'vue';
+import SocialGutter from 'src/components/SocialGutter.vue';
+import RelSearchBar from 'src/components/RelSearchBar.vue';
 
-const tab = ref('browse');
+const tab = ref('friendlist');
 const showGutter = ref('');
 function toggleGutter(name: string) {
   if (showGutter.value === name) { showGutter.value = ''; } else { showGutter.value = name; }
 }
-const auth = useAuthStore(); auth.fetchConnectedUsers();
-const soc = useSocialStore(); soc.fetchRelationships();
-
-const relName = ref('');
 function friendOrNot(rel: Relationship): string {
   if (rel.friendship_sent && rel.friendship_received) { return 'green'; }
   if (rel.block_sent || rel.block_received) { return 'red'; }
   return '';
 }
-// const rels = ref(); rels.value = soc.getRelationships;
+
+const auth = useAuthStore(); auth.fetchConnectedUsers();
+const soc = useSocialStore(); soc.fetchRelationships();
 
 async function inviteToLobby(id: number) {
   console.log(`invite to lobby ${id}`);
@@ -145,7 +162,6 @@ async function message(id: number) {
 async function stats(id: number) {
   console.log(`stats ${id}`);
 }
-async function addRel(name: string) { await soc.addRel(name); }
 async function addFriend(name: string) { await soc.send_friendship(name); }
 async function unfriend(name: string) { await soc.unsend_friendship(name); }
 async function block(name: string) { await soc.send_block(name); }

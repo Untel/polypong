@@ -61,6 +61,9 @@ export class RelationshipService {
     this.logger.log(
       `in createRelationship, from.email = ${from.email}, to.email = ${to.email}`,
     );
+    if (from.id === to.id) {
+      throw new BadRequestException('Cannot create relationship with yourself');
+    }
     const newRel = await this.relRepo.create({
       from: from,
       to: to,
@@ -79,7 +82,7 @@ export class RelationshipService {
     );
     const to = await this.userService.find({ name });
     if (!to) {
-      throw new BadRequestException(`No matching user for name = ${name}`);
+      throw new BadRequestException(`no results for ${name}`);
     }
     const existingRel = await this.findRel(from, to);
     if (existingRel) {
@@ -196,8 +199,12 @@ export class RelationshipService {
       toRel = await this.createRelationship(to, from);
     }
     this.logger.log(`in sendBlock, toRel = ${JSON.stringify(toRel)}`);
-    await this.updateRel(fromRel, { block_sent: true });
-    await this.updateRel(toRel, { block_received: true });
+    await this.updateRel(fromRel, {
+      block_sent: true, friendship_sent: false, friendship_received: false,
+    });
+    await this.updateRel(toRel, {
+      block_received: true, friendship_sent: false, friendship_received: false,
+    });
     this.logger.log(`in sendBlock, about to emit event`);
     this.logger.log(`in sendBlock, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
