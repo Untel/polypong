@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 14:47:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 19:47:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,9 @@ export const useGameStore = defineStore('game', {
     },
     async pauseGame() {
       await this.gameApi.get('pause');
+    },
+    async restart() {
+      await this.gameApi.get('restart');
     },
   },
 });

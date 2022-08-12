@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 04:30:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 01:33:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
-import { Exclude, Transform, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { BroadcastOperator } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketData } from 'src/socket';
@@ -54,8 +54,16 @@ export default class Lobby implements ILobby, ILobbyConfig {
   spectatorsMax: number;
   spectators: Spectator[];
 
+  @Expose()
+  public get isStarted() {
+    return this.game && this.game.players.size;
+  }
+
   @Exclude()
   game: Game | null;
+
+  @Exclude()
+  winner: Player | Bot;
 
   @Exclude()
   sock = null;
@@ -89,6 +97,12 @@ export default class Lobby implements ILobby, ILobbyConfig {
   }
 
   start(): Game {
+    // if (this.winner) return;
+    if (this.game) {
+      this.winner = null;
+      this.game.stop();
+      delete this.game;
+    }
     this.game = new Game(this);
     this.sock.emit('start');
     return this.game;
@@ -130,6 +144,14 @@ export default class Lobby implements ILobby, ILobbyConfig {
   say(message) {
     console.log('Wanna say', this.sock);
     this.sock.emit('message', message);
+  }
+
+  setWinner(winner) {
+    this.winner = winner;
+    this.sock.emit('end', {
+      name: this.winner.color,
+      color: this.winner.color,
+    });
   }
 
   public get roomId() {

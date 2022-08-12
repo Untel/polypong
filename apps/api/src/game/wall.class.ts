@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 16:00:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/11 17:35:29 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ export class Wall {
 
   constructor(line: Line, paddle?: Paddle, player?: Player | Bot) {
     this.paddle = paddle;
-    console.log('New wall with paddle', paddle);
+    // console.log('New wall with paddle', paddle);
     if (player instanceof Player) this.player = player;
     else if (player instanceof Bot) this.bot = player;
-    this.angle = lineAngle(line); //degrees
     this.line = line;
+    this.angle = lineAngle(line); //degrees
     this.width = lineLength(line);
   }
   addBot(bot: Bot) {

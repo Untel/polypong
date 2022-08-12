@@ -46,21 +46,22 @@
         :subhead="`${lobby.host.name}'s party`"
         :avatar="lobby.host.avatar"
         :is-private="lobby.isPrivate"
+        :join-text="lobby.isStarted ? 'Spectate' : 'Join'"
         @joinLobby="router.push({ name: 'lobby', params: { id: lobby.id } })"
       >
         <q-circular-progress
           show-value
+          :indeterminate="!!lobby.isStarted"
           class="text-light-blue q-ma-md"
-          :value="lobby.players.length"
+          :value="lobby.isStarted || lobby.players.length"
           :max="lobby.playersMax"
           size="50px"
-          color="light-blue"
+          :color="lobby.isStarted ? 'accent' : 'primary'"
         >
-          {{ lobby.players.length }}/{{lobby.playersMax}}
+          <span v-if="lobby.isStarted">{{ lobby.isStarted }}/{{ lobby.playersMax }}</span>
+          <span v-else>{{ lobby.players.length }}/{{lobby.playersMax}}</span>
         </q-circular-progress>
-        Players
       </LobbyCard>
-
     </div>
   </q-page>
 </template>
