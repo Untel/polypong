@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   typeorm.config.ts                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/12 21:54:43 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/12 21:54:44 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { registerAs } from '@nestjs/config';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 export const TypeormConfig = registerAs('typeorm', () => ({
   type: 'postgres',
@@ -13,6 +26,8 @@ export const TypeormConfig = registerAs('typeorm', () => ({
 
   migrationsTableName: 'migration',
   migrations: ['src/migration/*.ts'],
+
+  namingStrategy: new SnakeNamingStrategy(),
 
   ssl: false,
 }));

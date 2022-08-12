@@ -8,6 +8,7 @@ export * from './auth';
 export * from './chat';
 export * from './config';
 export * from './decorators';
+export * from './entities';
 export * from './game';
 export * from './guards';
 export * from './lobby';

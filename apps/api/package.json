@@ -66,6 +66,7 @@
     "swagger-ui-express": "^4.4.0",
     "triangle-solver": "^1.1.1",
     "typeorm": "^0.3.6",
+    "typeorm-naming-strategies": "^4.1.0",
     "yy-angle": "^2.0.1"
   },
   "devDependencies": {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 20:22:36 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 21:48:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ export class SocketService {
     @Inject(forwardRef(() => SocketGateway))
     private readonly socketGateway: SocketGateway,
   ) {
-    setInterval(() => {
-      console.log(
-        'Connected users',
-        this.connectedUsers.map((u) => u.id),
-        [...this.socketio.sockets.sockets.values()].length,
-      );
-    }, 5000);
+    // setInterval(() => {
+    //   console.log(
+    //     'Connected users',
+    //     this.connectedUsers.map((u) => u.id),
+    //     [...this.socketio.sockets.sockets.values()].length,
+    //   );
+    // }, 5000);
   }
 
   public get socketio() {
