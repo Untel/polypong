@@ -76,19 +76,19 @@ export class AuthService {
     // Accounts that are registered via oAuth should not be accessible via local signin.
     if (user.socialChannel) {
       this.logger.log(
-        `accounts registered with oauth are not accessible via local login`,
+        'accounts registered with oauth are not accessible via local login',
       );
       throw new UnauthorizedException('Email or password incorrect.');
     }
 
-    this.logger.log(`in validateUser, checking password`);
+    this.logger.log('in validateUser, checking password');
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     this.logger.log(
       `in validateUser, isPasswordCorrect = ${isPasswordCorrect}`,
     );
     if (!isPasswordCorrect) {
       this.logger.log(
-        `in validateUser, password incorrect. Throwing Unauthorized exception`,
+        'in validateUser, password incorrect. Throwing Unauthorized exception',
       );
       throw new UnauthorizedException('Email or password incorrect.');
     }

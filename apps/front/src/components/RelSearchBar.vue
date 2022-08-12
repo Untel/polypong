@@ -37,11 +37,8 @@ const soc = useSocialStore();
 async function searchRel(name: string) {
   curRel.value = soc.getRelByName(name);
   if (curRel.value === undefined) {
-    console.log('could not find rel locally, calling API');
     await soc.addRel(name);
     curRel.value = soc.getRelByName(name);
-  } else {
-    console.log('found rel locally');
   }
 }
 

@@ -1,9 +1,11 @@
 <template>
   <div class="q-gutter-none">
-    <q-avatar><img :src=rel.to.avatar /></q-avatar>
-    <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)"
-      :color=friendOrNot(rel)
-    />
+    <q-avatar>
+      <img :src="rel.to.avatar"/>
+    </q-avatar>
+    <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)">
+      <status-badge :id="rel.toId"/>
+    </q-btn>
     <span v-if="showGutter == rel.to.name">
       <span v-if="!rel.block_received && !rel.block_sent">
         <q-btn
@@ -48,9 +50,8 @@
 
 <script lang="ts" setup>
 import { defineComponent, PropType, ref } from 'vue';
-import { Relationship, useSocialStore } from '../stores/social.store';
-
-const soc = useSocialStore();
+import { Relationship } from '../stores/social.store';
+import StatusBadge from './StatusBadge.vue';
 
 defineComponent({ name: 'SocialGutter' });
 defineProps({

@@ -13,13 +13,22 @@
 import { Controller, Get, Delete, Param } from '@nestjs/common';
 import { AuthSocket } from './ws-auth.middleware';
 import { SocketService } from './socket.service';
+import { User } from 'src/user';
+import Lobby from 'src/game/lobby.class';
+
+export class UserWithLobby extends User {
+  inLobby: boolean;
+  inGame: boolean;
+}
 
 @Controller('online')
 export class SocketController {
   constructor(private readonly socketService: SocketService) {}
 
   @Get()
-  getConnectedUsers() {
-    return this.socketService.connectedUsers.map((u) => u);
+  getConnectedUsers(): UserWithLobby[] {
+    const res = this.socketService.connectedUsers.map((u) => u);
+    console.log(`In getConnectedUsers res = `, res);
+    return res;
   }
 }

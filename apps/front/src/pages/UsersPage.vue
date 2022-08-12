@@ -111,7 +111,7 @@
 
   <!-- BLOCKLIST -->
   <q-tab-panel name="blocklist">
-    <div class="text-h6">blocked</div>
+    <pre v-if="!soc.getBlockSentRelations.length">people you blocked will be displayed here</pre>
     <q-card v-for="rel in soc.getBlockSentRelations" :key="`rel-${rel.id}`">
       <q-card-section>
         <div class="q-gutter-none">

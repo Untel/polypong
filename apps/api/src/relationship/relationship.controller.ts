@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import JwtGuard from 'src/guards/jwt.guard';
-import { SocketService } from 'src/socket';
 import { UserService } from 'src/user';
 import { AddRelationDto } from './dtos/add-relation.dto';
 import { SendFriendRequestDto } from './dtos/send-friend-request.dto';

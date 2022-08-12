@@ -29,7 +29,7 @@ export class TwoFactorAuthenticationController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
-  logger = new Logger(`2fa Controller`);
+  logger = new Logger('2fa Controller');
 
   @Get('generate')
   @UseGuards(JwtSimpleGuard)
@@ -72,7 +72,9 @@ export class TwoFactorAuthenticationController {
     if (isValid) {
       await this.userService.turnOnTwoFactorAuthentication(req.user.id);
     } else {
-      throw new UnauthorizedException('2FA activation code invalid, check your google authenticator');
+      throw new UnauthorizedException(
+        '2FA activation code invalid, check your google authenticator',
+      );
     }
   }
 
@@ -84,7 +86,9 @@ export class TwoFactorAuthenticationController {
     @Res() res,
   ) {
     this.logger.log(`authenticate - req.user : ${JSON.stringify(req.user)}`);
-    this.logger.log(`authenticate - 2fa secret : ${TwoFactorAuthenticationCodeDto}`);
+    this.logger.log(
+      `authenticate - 2fa secret : ${TwoFactorAuthenticationCodeDto}`,
+    );
     const isValid =
       this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         twoFactorAuthenticationCode,
@@ -97,12 +101,14 @@ export class TwoFactorAuthenticationController {
         id: user.id,
         is2fa: true, // means this token was signed after a successful 2fa auth
       });
-      this.logger.log(`authenticate - redirecting to front 'home' with token ${token} in query url`);
+      this.logger.log(
+        `authenticate - redirecting to front 'home' with token ${token} in query url`,
+      );
       res.send({ token });
-//      return res.redirect(url.format({
-//        pathname: '/',
-//        query: { token }
-//      }));
+      //      return res.redirect(url.format({
+      //        pathname: '/',
+      //        query: { token }
+      //      }));
     } else {
       throw new UnauthorizedException('2FA');
     }

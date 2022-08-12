@@ -230,7 +230,6 @@ export default class Game {
 
   public get powersNetScheme() {
     return this.powers.map((p) => p.netScheme);
-
   }
 
   public get networkState() {

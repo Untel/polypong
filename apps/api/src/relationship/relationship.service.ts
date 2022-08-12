@@ -20,7 +20,7 @@ export class RelationshipService {
     private relRepo: Repository<Relationship>,
   ) {}
 
-  logger = new Logger(`relationshipService`);
+  logger = new Logger('relationshipService');
 
   // find a relationship between two Users
   async findRel(from: User, to: User): Promise<Relationship> | null {
@@ -45,7 +45,7 @@ export class RelationshipService {
       this.logger.log(`in fetchRels, res = ${JSON.stringify(res)}`);
       return res;
     } catch (error) {
-      this.logger.log(`in fetchRels, error: ` + error);
+      this.logger.log('in fetchRels, error: ' + error);
       return null;
     }
   }
@@ -137,10 +137,10 @@ export class RelationshipService {
     this.logger.log(`in sendFriendship, toRel = ${JSON.stringify(toRel)}`);
     await this.updateRel(fromRel, { friendship_sent: true });
     await this.updateRel(toRel, { friendship_received: true });
-    this.logger.log(`in sendFriendship, about to emit event`);
+    this.logger.log('in sendFriendship, about to emit event');
     this.logger.log(`in sendFriendship, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
-    console.log(`in sendFriendship, sock = `, sock);
+    console.log('in sendFriendship, sock = ', sock);
     sock?.emit('friendship', from.id, 'received');
     return await this.fetchRels(from);
   }
@@ -181,9 +181,7 @@ export class RelationshipService {
   }
 
   async sendBlock(from: User, name: string) {
-    this.logger.log(
-      `in sendBlock, from.name = ${from.name}, name = ${name}`,
-    );
+    this.logger.log(`in sendBlock, from.name = ${from.name}, name = ${name}`);
     const to = await this.userService.find({ name });
     this.logger.log(`in sendBlock, found user 'to' : ${to.name}`);
     if (!to) {
@@ -200,23 +198,25 @@ export class RelationshipService {
     }
     this.logger.log(`in sendBlock, toRel = ${JSON.stringify(toRel)}`);
     await this.updateRel(fromRel, {
-      block_sent: true, friendship_sent: false, friendship_received: false,
+      block_sent: true,
+      friendship_sent: false,
+      friendship_received: false,
     });
     await this.updateRel(toRel, {
-      block_received: true, friendship_sent: false, friendship_received: false,
+      block_received: true,
+      friendship_sent: false,
+      friendship_received: false,
     });
-    this.logger.log(`in sendBlock, about to emit event`);
+    this.logger.log('in sendBlock, about to emit event');
     this.logger.log(`in sendBlock, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
-    console.log(`in sendBlock, sock = `, sock);
+    console.log('in sendBlock, sock = ', sock);
     sock?.emit('block', from.id, 'received');
     return await this.fetchRels(from);
   }
 
   async unsendBlock(from: User, name: string) {
-    this.logger.log(
-      `in unsendBlock, from.name = ${from.name}, name = ${name}`,
-    );
+    this.logger.log(`in unsendBlock, from.name = ${from.name}, name = ${name}`);
     const to = await this.userService.find({ name });
     this.logger.log(`in unsendBlock, found user 'to' : ${to.name}`);
     if (!to) {
@@ -226,9 +226,7 @@ export class RelationshipService {
     if (!fromRel) {
       fromRel = await this.createRelationship(from, to);
     }
-    this.logger.log(
-      `in unsendBlock, fromRel = ${JSON.stringify(fromRel)}`,
-    );
+    this.logger.log(`in unsendBlock, fromRel = ${JSON.stringify(fromRel)}`);
     let toRel = await this.findRel(to, from);
     if (!toRel) {
       toRel = await this.createRelationship(to, from);

@@ -13,5 +13,6 @@ export * from './lobby';
 export * from './mail';
 export * from './pong';
 export * from './providers';
+export * from './relationship';
 export * from './socket';
 export * from './user';

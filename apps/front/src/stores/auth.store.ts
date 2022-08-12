@@ -174,5 +174,9 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('token', res.token);
     },
 
+    killws() {
+      this.socket?.close();
+    },
+
   },
 });

@@ -27,7 +27,7 @@ export class TwoFactorAuthenticationService {
     );
     await this.userService.setTwoFactorAuthenticationSecret(secret, user.id);
     this.logger.log(
-      `generateTwoFactorAuthenticationSecret - after = setTwoFactorAuthenticationSecret`,
+      'generateTwoFactorAuthenticationSecret - after = setTwoFactorAuthenticationSecret',
     );
     return { secret, otpauthUrl };
   }
@@ -39,7 +39,7 @@ export class TwoFactorAuthenticationService {
   }
 
   public async qrCodeAsDataURL(otpauthUrl: string) {
-    this.logger.log(`qrCodeAsDataURL`);
+    this.logger.log('qrCodeAsDataURL');
     const qrAsDataUrl = await new Promise((resolve, reject) => {
       toDataURL(otpauthUrl, [], (error, result) => {
         resolve(result);
@@ -54,7 +54,7 @@ export class TwoFactorAuthenticationService {
     twoFactorAuthenticationCode: string,
     user: User,
   ) {
-    this.logger.log(`isTwoFactorAuthenticationCodeValid`);
+    this.logger.log('isTwoFactorAuthenticationCodeValid');
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFactorAuthenticationSecret,

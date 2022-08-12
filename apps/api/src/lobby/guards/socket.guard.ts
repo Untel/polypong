@@ -10,7 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import Lobby from 'src/game/lobby.class';
 import { AuthSocket, SocketService } from 'src/socket';
 

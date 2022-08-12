@@ -42,12 +42,10 @@
 
 <script lang="ts" setup>
 import EssentialLink from 'components/EssentialLink.vue';
-import { Notify } from 'quasar';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 defineComponent({
   components: {

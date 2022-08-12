@@ -37,7 +37,7 @@ export class IntraOAuthController {
   @Get('callback')
   @UseGuards(IntraOAuthGuard)
   async intraAuthRedirect(@Request() req: RequestWithUser, @Res() res) {
-    this.logger.log(`callback`);
+    this.logger.log('callback');
     this.logger.log(`callback - Auth inner query 2 - req.query = ${req.query}`);
 
     const user = req.user;
