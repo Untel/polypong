@@ -108,7 +108,7 @@ function factoryFn(file: any): Promise<any> {
   return new Promise((resolve, reject) => {
     // Retrieve JWT token from your store.
     resolve({
-      url: 'http://localhost:8080/api/user/setAvatar',
+      url: '/api/user/setAvatar',
       method: 'POST',
       headers: [
         { name: 'Authorization', value: `Bearer ${localStorage.getItem('token')}` },

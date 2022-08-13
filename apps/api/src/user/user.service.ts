@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/UserInterface';
 import { User } from './user.entity';
 import * as gravatar from 'gravatar';
@@ -40,6 +40,7 @@ export class UserService {
     return this.connectedUsers.get(id);
   }
 
+
   async findById(id: string | number): Promise<User> {
     // this.logger.log(`findById - id = ${id}`);
     if (id) {
@@ -62,6 +63,10 @@ export class UserService {
       delete user.password;
     }
     return user;
+  }
+
+  async findMany(ids: number[]) {
+    return await this.userRepository.find({ where: { id: In(ids) } });
   }
 
   // save the 2fa secret in the database

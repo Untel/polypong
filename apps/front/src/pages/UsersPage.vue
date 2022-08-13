@@ -49,19 +49,16 @@
 
   <!-- FRIENDLIST -->
   <q-tab-panel name="friendlist">
-    <social-expander>
-
-    </social-expander>
     <pre>find people</pre>
     <rel-search-bar @add-friend="(name) => addFriend(name)"/>
-    <!-- rels (TEMP, for debug purposes) -->
+    <!-- rels (TEMP, for debug purposes)-->
     <pre>your rels</pre>
     <q-card>
-      <div class="q-pa-md row items-start q-gutter-md">
         <q-card-section
           v-for="rel in soc.getRelationships" :key="`rel-${rel.id}`" horizontal
         >
-          <social-gutter :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
+          <social-card :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
+            @toggle-gutter="(name) => toggleGutter(name)"
             @invite-to-lobby="(id) => inviteToLobby(id)"
             @message="(id) => message(id)"
             @stats="(id) => stats(id)"
@@ -71,12 +68,10 @@
             @unblock="(name) => unblock(name)"
           />
         </q-card-section>
-      </div>
     </q-card>
     <!-- actual friends -->
     <pre v-if="soc.getFriendsRelationships.length">your friends</pre>
     <q-card label="friends">
-      <div class="q-pa-md row items-start q-gutter-md">
         <q-card-section
           v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
         >
@@ -91,16 +86,15 @@
             @unblock="(name) => unblock(name)"
           />
         </q-card-section>
-      </div>
     </q-card>
     <!-- received friends invites -->
     <pre v-if="soc.getReceivedFriendships.length">friend requests received</pre>
     <q-card label="received">
-      <div class="q-pa-md row items-start q-gutter-md">
         <q-card-section
           v-for="rel in soc.getReceivedFriendships" :key="`rel-${rel.id}`" horizontal
         >
           <social-gutter :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
+            @toggle-gutter="(name) => toggleGutter(name)"
             @invite-to-lobby="(id) => inviteToLobby(id)"
             @message="(id) => message(id)"
             @stats="(id) => stats(id)"
@@ -110,16 +104,15 @@
             @unblock="(name) => unblock(name)"
           />
         </q-card-section>
-      </div>
     </q-card>
     <!-- sent friends invites -->
     <pre v-if="soc.getSentFriendships.length">friend requests received</pre>
     <q-card label="sent">
-      <div class="q-pa-md row items-start q-gutter-md">
         <q-card-section
           v-for="rel in soc.getSentFriendships" :key="`rel-${rel.id}`" horizontal
         >
           <social-gutter :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
+            @toggle-gutter="(name) => toggleGutter(name)"
             @invite-to-lobby="(id) => inviteToLobby(id)"
             @message="(id) => message(id)"
             @stats="(id) => stats(id)"
@@ -129,7 +122,6 @@
             @unblock="(name) => unblock(name)"
           />
         </q-card-section>
-      </div>
     </q-card>
   </q-tab-panel>
 
@@ -162,7 +154,7 @@ import { Relationship, useSocialStore } from 'src/stores/social.store';
 import { ref } from 'vue';
 import SocialGutter from 'src/components/SocialGutter.vue';
 import RelSearchBar from 'src/components/RelSearchBar.vue';
-import SocialExpander from 'src/components/SocialExpander.vue';
+import SocialCard from 'src/components/SocialCard.vue';
 
 const tab = ref('friendlist');
 const showGutter = ref('');
