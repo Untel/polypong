@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 21:48:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 00:51:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@ export class SocketService {
   constructor(
     @Inject(forwardRef(() => SocketGateway))
     private readonly socketGateway: SocketGateway,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    @Inject(forwardRef(() => LobbyService))
     private readonly lobbyService: LobbyService,
   ) {
     // setInterval(() => {
@@ -44,11 +46,12 @@ export class SocketService {
   public async connectedUsers() {
     const usersIds = this.sockets
       .map((el) => el.data.user?.id)
-      .filter((el) => el);
+      .filter((el) => el)
+      .map((el) => +el);
     const users = await this.userService.findMany(usersIds);
     const usersWithLobbies = users.map((u) => {
       const lobby = this.lobbyService.userIsInLobby(u);
-      return { ...u, inLobby: !!lobby.id, inGame: !!lobby.game };
+      return { ...u, inLobby: !!lobby?.id, inGame: !!lobby?.game };
     });
     return usersWithLobbies;
   }
