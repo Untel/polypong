@@ -9,6 +9,3 @@ openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
   -keyout ${SSL_PATH}.key \
   -subj "/C=FR/ST=Paris/L=Paris/O=42 School/OU=adda-sil/CN=${DOMAIN_NAME}/subjectAltName=DNS:${DOMAIN_NAME}/keyUsage=digitalSignature/extendedKeyUsage=serverAuth"
 
-printf "${RED}"
-ls -la /etc/ssl/certs
-printf "I ${NC}"
