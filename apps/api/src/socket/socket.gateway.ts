@@ -20,7 +20,7 @@ import {
 } from '@nestjs/websockets';
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import Lobby, {  } from 'src/game/lobby.class';
+import Lobby from 'src/game/lobby.class';
 
 import { AuthService } from 'src/auth';
 import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
