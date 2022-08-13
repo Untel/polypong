@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 16:39:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/12 01:37:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -38,7 +38,6 @@ export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
   nBall = 1;
-  nPlayers: number;
   players: Map<number, Player> = new Map();
   bots: Bot[];
   paddles: Paddle[] = [];
@@ -47,17 +46,25 @@ export default class Game {
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
   timeElapsed = 0;
+  paused = false;
 
   @Exclude()
   interval: NodeJS.Timer;
   @Exclude()
   intervalPowers: NodeJS.Timer;
+  @Exclude()
+  waitTimeout: NodeJS.Timeout;
+  @Exclude()
+  sayInterval: NodeJS.Timeout;
 
   constructor(lobby: Lobby) {
     this.lobby = lobby;
-    this.nPlayers = lobby.playersMax;
     this.bots = lobby.bots.map((v) => new Bot(v));
+    this.players = new Map(this.lobby.players);
+    console.log('New game', this.bots.length, this.players.size);
     this.generateMap();
+    this.run();
+    this.newRound(15);
   }
 
   addBall() {
@@ -75,25 +82,8 @@ export default class Game {
 
     this.map = new PolygonMap((this.nPlayers === 2 && 4) || this.nPlayers);
     this.paddles = [];
-
-    // const arrayIndex = Array.from(Array(this.map.edges.length).keys());
-    // const randomIndex: Array<number> = shuffle(arrayIndex);
-    const playersAndBotsToAssign = [
-      ...this.lobby.players.values(),
-      ...this.bots,
-    ];
-    // console.log('playersAndBotsToAssign', playersAndBotsToAssign);
-
-    const randomPlayers = playersAndBotsToAssign;
-    // const randomPlayers = shuffle(playersAndBotsToAssign);
-    // console.log('Shuffled', randomPlayers);
-    // if (this.nPlayers > 2)
-    //   for (let i = 0; i < this.nPlayers; i++) {
-    //     const line = this.map.edges[i];
-    //     const paddle =
-    //   }
-    // else {
-    // }
+    const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
+    const randomPlayers = shuffle(playersAndBotsToAssign);
 
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
@@ -114,40 +104,42 @@ export default class Game {
 
   run() {
     // this.generateMap(this.nPlayers);
-    // this.socket.emit('mapChange', this.mapNetScheme);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
-    // this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    this.newRound();
   }
   stop() {
+    clearTimeout(this.waitTimeout);
     clearInterval(this.interval);
-    // clearInterval(this.intervalPowers);
+    clearInterval(this.intervalPowers);
+    clearInterval(this.sayInterval);
     this.interval = null;
     this.intervalPowers = null;
+    this.waitTimeout = null;
+    this.sayInterval = null;
   }
 
-  newRound() {
-    let timer = 5;
-    const intervalId = setInterval(() => {
-      this.socket.emit('timer', timer);
+  newRound(timer = 5) {
+    this.paused = true;
+    this.socket.emit('mapChange', this.mapNetScheme);
+    clearInterval(this.sayInterval);
+    this.sayInterval = setInterval(() => {
       timer -= 1;
       if (timer === 0) {
-        this.run();
-        clearInterval(intervalId);
+        this.socket.emit('message', `Goo oo ooo ooo o o o o o o`);
+        // this.run();
+        this.paused = false;
+        clearInterval(this.sayInterval);
+        this.sayInterval = null;
+      } else {
+        this.socket.emit('message', `New round will start in ${timer}s`);
       }
     }, 1000);
   }
 
   updatePaddlePercent(userId, percent: number) {
-    // console.log("here is percent", percent);
-    // this.paddles.forEach((paddle) => {
     const wall = this.walls.find((w) => w?.player?.user.id === userId);
     wall.paddle.updatePercentOnAxis(percent);
-    // paddle.updatePercentOnAxis(percent);
-    // });
-    // if (this.isPaused) debounce(
-    //   this.socket.emit('gameUpdate', this.networkState),
-    //   500
-    // );
   }
 
   runPhysics() {
@@ -172,7 +164,7 @@ export default class Game {
             ) {
               ball.bounceTargetWall(this.walls);
             } else {
-              this.reduce();
+              this.reduce(ball.target.wall);
             }
           }
         } else {
@@ -190,23 +182,30 @@ export default class Game {
     });
   }
 
-  public reduce() {
-    this.stop();
-    // if (this.nPlayers > 4)
-    if (this.nPlayers > 2) this.nPlayers--;
-    // if (this.nPlayers < 3) this.nPlayers = 3;
-    this.generateMap(this.nPlayers);
-    const timer = 1000;
-    this.socket.emit('timer', { timer });
-    setTimeout(() => {
-      if (this.isPaused) this.run();
-    }, timer + 1000);
+  public reduce(wall: Wall) {
+    if (wall.bot) {
+      this.bots = this.bots.filter((b) => b !== wall.bot);
+    } else if (wall.player) {
+      this.players.delete(wall.player.user.id);
+    }
+    // this.stop();
+    if (this.nPlayers === 1 || this.players.size === 0) {
+      this.stop();
+      let winner: Player | Bot | null = null;
+      if (this.bots.length) winner = this.bots.pop();
+      else winner = [...this.players.values()].pop();
+      console.log('THERE IS A WINNER', winner, this.bots, this.players);
+      this.lobby.setWinner(winner);
+      return;
+    }
+    this.generateMap();
+    // const timer = 1000;
+    // this.socket.emit('timer', { timer });
+    this.newRound();
   }
 
   public reset() {
-    this.nPlayers = GameTools.getRandomArbitrary(3, 6);
-    // this.nBots = this.nPlayers;
-    this.generateMap(this.nPlayers);
+    this.generateMap();
     while (this.bots.length != 0) {
       this.bots.pop();
     }
@@ -223,13 +222,15 @@ export default class Game {
   }
 
   public get paddlesNetScheme() {
-    return this.paddles
-      .map((b) => b.netScheme)
-      .map((b, i) => ({ ...b, name: i }));
+    return this.paddles.map((b) => b.netScheme);
   }
 
   public get powersNetScheme() {
     return this.powers.map((p) => p.netScheme);
+  }
+
+  public get nPlayers() {
+    return this.players.size + this.bots.length;
   }
 
   public get networkState() {
@@ -241,7 +242,7 @@ export default class Game {
   public get mapNetScheme() {
     return {
       walls: this.walls.map((w) => w.netScheme),
-      wallWith: this.walls[0].width,
+      wallWidth: this.walls[0].width,
       angles: this.map.angles,
       verticles: this.map.verticles,
       inradius: this.map.inradius,
@@ -314,10 +315,12 @@ export default class Game {
   }
 
   public tick() {
-    this.timeElapsed += 1 / FRAME_RATE;
-    this.ballsCollides();
-    this.runPhysics();
-    this.runBots();
+    if (!this.paused) {
+      this.timeElapsed += 1 / FRAME_RATE;
+      this.ballsCollides();
+      this.runPhysics();
+      this.runBots();
+    }
     this.socket.emit('gameUpdate', this.networkState);
   }
 

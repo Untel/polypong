@@ -20,35 +20,35 @@
   justify-content: center;
   align-items: center;
 }
+
+.mouse-zone {
+  height: 100%;
+
+}
 </style>
 <template>
   <q-page>
     <FssFallback class="wrapper">
-      Balls => {{ $game.getBalls }}
-      <PolygonMap
-        class="map"
-        ref="mapEl"
-        :map="mapProps"
-        :paddles="paddles"
-        :balls="balls"
-        :powers="powers"
-        @paddleMove="updatePaddlePercent">
-      </PolygonMap>
+        <PolygonMap
+          class="map"
+          ref="mapEl"
+          :map="mapProps"
+          :paddles="paddles"
+          :balls="balls"
+          :powers="powers"
+          @paddleMove="updatePaddlePercent"
+        >
+        </PolygonMap>
     </FssFallback>
-    <pre>
-      {{ mapProps }}
-    </pre>
-    <!-- :icon="isPaused ? 'unpause' : 'play'" -->
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
-    <!-- <q-btn dense @click="tick()">
-      tick
-    </q-btn> -->
-    <!-- <q-slider label v-model="forcedRatio" :step="0" :min="0.0" :max="1.0" color="green"/> -->
-    <!-- <q-btn dense @click="reset()">
-      reset
-    </q-btn> -->
+    <q-btn @click="$game.restart()" icon="fas fa-arrows-rotate">
+      restart
+    </q-btn>
+    <pre>
+      {{ mapProps }}
+    </pre>
   </q-page>
 </template>
 <script lang="ts">
@@ -79,9 +79,7 @@ export default {
 import {
   defineProps, ref, onMounted, Ref, computed, onUnmounted,
 } from 'vue';
-import { useMouseInElement } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
-import { useApi } from 'src/utils/api';
 import {
   Paddle,
   Ball,
@@ -90,107 +88,48 @@ import {
 } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
-import { useRoute, useRouter } from 'vue-router';
-
-const $route = useRoute();
-const { socket } = useAuthStore();
-const id = $route.params.id as string;
-const $game = useGameStore();
-
-const paddles: Ref<Paddle[]> = ref([]);
-const balls: Ref<Ball[]> = ref([]);
-const powers: Ref<Power[]> = ref([]);
-const mapEl: Ref<InstanceType<typeof PolygonMap>> = ref();
 
 const props = defineProps({
   lobbyId: Number,
 });
-
-const { elementX, elementWidth, isOutside } = useMouseInElement(mapEl);
-const ratio = computed(() => {
-  let r = elementX.value / elementWidth.value;
-  if (r > 1) r = 1;
-  else if (r < 0) r = 0;
-  return r;
-});
-const forcedRatio = ref(null);
-
-const usedRatio = computed(() => {
-  const val = isOutside.value && ($game.isPaused) ? forcedRatio.value : ratio.value;
-  // console.log("Ratio update", val);
-  return val;
-});
-
-const updatePaddlePercent = (percent: number) => {
-  socket?.emit('paddlePercent', percent);
-};
-// watch(usedRatio, (val) => {
-//   updatePaddlePercent((val as number));
-// });
-
-const update = (evt: any) => {
-  const { balls: b, paddles: p, ...rest } = evt;
-  console.log('Updating ?');
-  if (b) $game.balls = b;
-  if (p) $game.paddles = p;
-  // if (rest) console.log('Updating rest is', rest);
-};
-
+const { socket } = useAuthStore();
+const $game = useGameStore();
+const paddles: Ref<Paddle[]> = ref([]);
+const balls: Ref<Ball[]> = ref([]);
+const powers: Ref<Power[]> = ref([]);
 const mapProps: Ref<PolyMap> = ref({
   verticles: [],
   angles: [],
   walls: [],
   inradius: 0,
+  wallWidth: 0,
 });
 
-const mapChange = (res) => {
-  mapProps.value = res;
+const updatePaddlePercent = (percent: number) => {
+  socket?.emit('paddlePercent', percent);
 };
-
-const powersUpdate = (res) => {
-  console.log('powers update', res);
-  powers.value = res;
-};
-
-const printTimer = ({ timer }: { timer: number }) => {
-  Notify.create({
-    timeout: timer,
-    progress: true,
-    position: 'top',
-    message: 'New round will start',
-  });
-};
-
-// socket?.on('gameUpdate', update);
-// socket?.on('mapChange', mapChange);
-// socket?.on('powers', powersUpdate);
-// socket?.on('timer', printTimer);
-
-const {
-  data: test,
-  execute: reset,
-} = useApi('pong/reset', { immediate: false });
 
 onMounted(async () => {
-  // const gameInfos: any = await lobbyApi.get('/game');
-  // console.log('Game infos', gameInfos);
   paddles.value = $game.paddles;
   mapProps.value = $game.map;
   balls.value = $game.balls;
-  // isPaused.value = gameInfos.isPaused;
+
   socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
-    // $game.$patch({ balls: b, paddles: p });
     paddles.value = p;
     balls.value = b;
-    // console.log('Game up', $game.balls[0]?.position, b[0]?.position);
   });
   socket?.on('mapChange', (map) => {
     mapProps.value = map;
-    // $game.map = map;
+    powers.value = [];
   });
   socket?.on('powers', (pow) => {
     powers.value = pow;
-    // $game.powers = pow;
+  });
+
+  socket?.once('end', (winner = { name: 'Error' }) => {
+    Notify.create({
+      message: `Chicken chiken dinner we have a winner ${winner.name}`,
+    });
   });
 });
 onUnmounted(() => {
