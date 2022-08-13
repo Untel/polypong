@@ -5,25 +5,23 @@ services:
   # Also, allow us to fake a same origin API/FRONT, to be closer of production environment
   nginx:
     image: nginx
+    # build: ./compose/nginx
     container_name: nginx
     volumes:
-      - "./compose/nginx/templates:/etc/nginx/templates"
-      - "./compose/nginx/snippets:/etc/nginx/snippets"
+      - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/default.conf.template"
+      - "./compose/nginx/entrypoint/ssl.sh:/docker-entrypoint.d/ssl.sh"
     ports:
-      - "8080:80"
-      - "8081:81"
-      - "8082:82"
-      - "8083:83"
-      - "${SSL_PORT:-9998}:443"
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
     environment:
       - NGINX_PORT=80
       - NGINX_SSL_PORT=443
+      - SSL_PATH=/etc/ssl/certs/polypong
     networks:
       - proxy
     depends_on:
-      - front
       - api
-      - pgadmin
+      - front
 
   # Front end server for development, should not exist in production version
   # Built on top of Quasar

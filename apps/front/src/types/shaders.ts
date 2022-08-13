@@ -1,4 +1,4 @@
-import { FSS } from "src/libs/fss";
+import { FSS } from 'src/libs/fss';
 
 export interface Mesh {
   width?: number; // float

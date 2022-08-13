@@ -1,4 +1,4 @@
-import { Player } from "src/stores/lobbies.store";
+import { Player } from 'src/stores/lobbies.store';
 
 export interface Position {
   x: number;

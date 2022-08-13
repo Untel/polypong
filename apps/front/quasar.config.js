@@ -113,12 +113,17 @@ module.exports = configure((/* ctx */) => ({
     historyApiFallback: true,
     // public: 'https://dev.host.to/$project',
     // port: 8080,
+    // port: 80,
+    // host: "0.0.0.0",
+    hmr: {
+      clientPort: 443,
+    },
   },
 
   // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
   framework: {
     config: {
-      dark: true, // or Boolean true/false
+      dark: 'auto', // or Boolean true/false
       loadingBar: {
         position: 'bottom',
         color: 'primary',

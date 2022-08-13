@@ -31,11 +31,10 @@
         color="yellow"
         indeterminate-value="auto"
         toggle-indeterminate
-        :true-value="false"
-        :false-value="true"
+        :true-value="'light'"
+        :false-value="'dark'"
         icon-color="orange"
-        :model-value="$q.dark.mode"
-        @update:model-value="$q.dark.set"
+        v-model="settings.theme"
       />
     </q-page-sticky>
   </q-layout>

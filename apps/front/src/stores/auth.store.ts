@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 20:18:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/13 20:39:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ type AuthState = {
   connectedUsers: User[],
 }
 
-const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || window.location.host}`;
+// const SOCKET_BASE_URL = `ws://${process.env.DOMAIN_NAME || window.location.host}`;
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -48,8 +48,8 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     connectToSocket() {
       return new Promise((resolve, reject) => {
-        this.socket = io(SOCKET_BASE_URL, {
-          path: '/socket',
+        this.socket = io({
+          path: '/polysocket', // resolved via reverse proxy
           transports: ['websocket'],
           withCredentials: true,
           auth: { token: `${localStorage.getItem('token')}` },

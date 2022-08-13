@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 21:54:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/13 00:24:24 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,13 @@ import { Thread } from './entities';
 export class ThreadService {
   constructor(
     @InjectRepository(Thread)
-    private messageRep: Repository<Thread>,
+    private threadRep: Repository<Thread>,
   ) {}
 
-  create(createThreadDto: CreateThreadDto) {
-    return 'This action adds a new thread';
+  async create(createThreadDto: CreateThreadDto) {
+    const thread = this.threadRep.create(createThreadDto);
+    await this.threadRep.insert(thread);
+    return thread;
   }
 
   findAll() {

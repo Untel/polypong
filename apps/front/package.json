@@ -8,7 +8,7 @@
   "scripts": {
     "start": "quasar dev",
     "dev": "quasar dev",
-    "lint": "eslint --ext .js,.ts,.vue ./"
+    "lint": "eslint --ext .js,.ts,.vue ./ --fix"
   },
   "strict-peer-dependencies": false,
   "dependencies": {

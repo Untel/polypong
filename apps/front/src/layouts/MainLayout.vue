@@ -29,9 +29,10 @@
         icon="fab fa-forumbee" to="lobbies"/>
       <EssentialLink title="Community" caption="out and about"
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
+      <EssentialLink title="Inbox" caption="Your message threads"
+        icon="fa-solid fa-comments" to="inbox" />
       <EssentialLink title="Settings" caption="Your account settings"
         icon="fa-solid fa-gear" to="settings" />
-        {{ soc.getNotifCount }}
     </q-drawer>
 
     <q-page-container>
