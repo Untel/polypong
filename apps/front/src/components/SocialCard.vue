@@ -1,8 +1,18 @@
+<style lang="sass" scoped>
+.my-card
+  width: 100%
+  max-width: 300px
+</style>
+
 <template>
-  <div class="q-gutter-none">
-    <q-avatar>
-      <img :src="rel.to.avatar"/>
-    </q-avatar>
+  <q-card class="my-card">
+    <q-img :src="rel.to.avatar" height="280px" :ratio="4/3" fit="cover" />
+    <q-card-actions>
+      <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)">
+        <status-badge :id="rel.toId"/>
+      </q-btn>
+    </q-card-actions>
+<!--
     <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)">
       <status-badge :id="rel.toId"/>
     </q-btn>
@@ -45,7 +55,8 @@
         @click="unblock(rel.to.name)" icon="fa-solid fa fa-unlock" color="red"
       />
     </span>
-  </div>
+-->
+  </q-card>
 </template>
 
 <script lang="ts" setup>
@@ -54,7 +65,7 @@ import { defineComponent, PropType, ref } from 'vue';
 import { Relationship } from '../stores/social.store';
 import StatusBadge from './StatusBadge.vue';
 
-defineComponent({ name: 'SocialGutter' });
+defineComponent({ name: 'SocialCard' });
 defineProps({
   rel: {
     type: Object as PropType<Relationship>,

@@ -1,18 +1,15 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpException,
-  HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, In, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/UserInterface';
 import { User } from './user.entity';
 import * as gravatar from 'gravatar';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -62,6 +59,10 @@ export class UserService {
       delete user.password;
     }
     return user;
+  }
+
+  async findMany(ids: number[]) {
+    return await this.userRepository.find({ where: { id: In(ids) } });
   }
 
   // save the 2fa secret in the database

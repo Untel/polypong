@@ -11,7 +11,10 @@
           linkedin="adrienfernandes"
           website="http://fernandes.bzh"
           github="untel" />
-        <BgSocial login="lspiess" name="Lambert Spies" />
+        <BgSocial
+          login="lspiess" name="Lambert Spiess" github="lambertspiess"
+          linkedin="lambert-spiess-34493b173"
+        />
         <BgSocial login="edal--ce" name="Enzo Dal Cerro" github="endcerro" linkedin="enzodalcerro"/>
         <BgSocial login="gozsertt" name="Guillaume Ozserttas" />
 
