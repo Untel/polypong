@@ -3,10 +3,9 @@
 server {
   # listen 443 ssl;
   # listen [::]:443 ssl;
-  listen 80;
-  listen 81;
-  listen 82;
-  listen 83;
+  listen 80; listen 81; listen 82; listen 83;
+  listen 84; listen 85; listen 86; listen 87;
+  listen 88; listen 89; listen 90; listen 91;
   listen [::]:80;
   # ssl_certificate /etc/nginx/certs/cert.pem;
   # ssl_certificate_key /etc/nginx/certs/key.pem;
