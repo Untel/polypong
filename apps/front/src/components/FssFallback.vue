@@ -1,6 +1,7 @@
 <style scoped lang="scss">
   .fallback {
     height: 100%;
+    max-height: inherit;
     background-size: cover;
   }
 </style>

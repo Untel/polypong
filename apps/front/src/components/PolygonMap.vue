@@ -1,13 +1,11 @@
 <style lang="scss" scoped>
 .wrapper {
-  width: 100%;
-  height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
+  max-height: inherit;
   svg {
     margin: 20px;
-    height: 70%;
     width: auto;
     padding: 20px;
 

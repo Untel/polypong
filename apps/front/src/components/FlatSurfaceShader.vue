@@ -2,6 +2,7 @@
   .wrapper {
     position: relative;
     height: auto;
+    max-height: inherit;
   }
   .inner-content {
     position: absolute;
@@ -9,6 +10,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    max-height: inherit;
   }
 </style>
 

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 01:59:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 00:46:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,6 @@ export class Ball extends Circle {
     ];
     if (this.target) this.target.wall.clearBall(this);
     const [[x1, y1], [x2, y2]] = line;
-    let collided = false;
     for (let i = 0; i < walls.length; i++) {
       const wall: Wall = walls[i];
       const edge: Line = wall.line;
@@ -137,14 +136,8 @@ export class Ball extends Circle {
           edge,
           ...intersection,
         };
-        collided = true;
-
         break;
       }
-    }
-    if (!collided) {
-      console.log('something strange happened', this.angle);
-      // this.reset();
     }
   }
   move() {
@@ -185,7 +178,7 @@ export class Ball extends Circle {
   bouncePaddle(paddle: Paddle, walls: Wall[]) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
 
     /**
      * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
@@ -193,15 +186,17 @@ export class Ball extends Circle {
      * le paddle. Peut etre remettre ca en 1v1 only?
      */
     // const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // // x2 pour aller de -1 a 1;
-    // const percent = ((hitLen / paddle.width) - .5) * 2;
-    // const maxAngle = Math.abs(surfaceAngleDeg - incidenceAngleDeg);
-    // const addDeg = (maxAngle * percent);
+    // // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    // // // x2 pour aller de -1 a x1;
+    // const percent = (hitLen / paddle.width - 0.5) * 2;
+    // // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
+    // console.log('Hit percent', percent);
+    // const maxAngle = 25;
+    // const addDeg = maxAngle * percent;
     // newDegree += addDeg;
 
-    const newAngle = angleToRadians(newDegree % 360);
+    const newAngle = angleToRadians(newDegree);
     this.lastHitten = paddle;
     this.color = paddle.color;
     this.setAngle(newAngle);

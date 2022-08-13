@@ -21,34 +21,31 @@
   align-items: center;
 }
 
-.mouse-zone {
-  height: 100%;
-
+.max-heighted {
+  max-height: calc(100vh - 50px);
 }
 </style>
 <template>
-  <q-page>
+  <q-page class="max-heighted" full-height>
     <FssFallback class="wrapper">
-        <PolygonMap
-          class="map"
-          ref="mapEl"
-          :map="mapProps"
-          :paddles="paddles"
-          :balls="balls"
-          :powers="powers"
-          @paddleMove="updatePaddlePercent"
-        >
-        </PolygonMap>
+      <PolygonMap
+        class="map"
+        ref="mapEl"
+        :map="mapProps"
+        :paddles="paddles"
+        :balls="balls"
+        :powers="powers"
+        @paddleMove="updatePaddlePercent"
+      >
+      </PolygonMap>
     </FssFallback>
+
     <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
     <q-btn @click="$game.restart()" icon="fas fa-arrows-rotate">
       restart
     </q-btn>
-    <pre>
-      {{ mapProps }}
-    </pre>
   </q-page>
 </template>
 <script lang="ts">
