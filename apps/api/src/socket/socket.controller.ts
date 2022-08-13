@@ -26,9 +26,8 @@ export class SocketController {
   constructor(private readonly socketService: SocketService) {}
 
   @Get()
-  getConnectedUsers(): UserWithLobby[] {
-    const res = this.socketService.connectedUsers.map((u) => u);
-    console.log(`In getConnectedUsers res = `, res);
+  async getConnectedUsers(): Promise<UserWithLobby[]> {
+    const res = await this.socketService.connectedUsers();
     return res;
   }
 }

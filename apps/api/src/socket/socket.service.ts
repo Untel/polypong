@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { User } from 'src';
+import { LobbyService, User, UserService } from 'src';
 import Lobby from 'src/game/lobby.class';
 import { SocketGateway } from './socket.gateway';
 import { AuthSocket } from './ws-auth.middleware';
@@ -21,6 +21,8 @@ export class SocketService {
   constructor(
     @Inject(forwardRef(() => SocketGateway))
     private readonly socketGateway: SocketGateway,
+    private readonly userService: UserService,
+    private readonly lobbyService: LobbyService,
   ) {
     // setInterval(() => {
     //   console.log(
@@ -39,13 +41,16 @@ export class SocketService {
     return [...this.socketio.sockets.sockets.values()];
   }
 
-  public get connectedUsers() {
-    const users = this.sockets.map((el) => ({
-      ...el.data.user,
-      inLobby: !!el.data.lobby?.id,
-      inGame: !!el.data.lobby?.game,
-    }));
-    return users;
+  public async connectedUsers() {
+    const usersIds = this.sockets
+      .map((el) => el.data.user?.id)
+      .filter((el) => el);
+    const users = await this.userService.findMany(usersIds);
+    const usersWithLobbies = users.map((u) => {
+      const lobby = this.lobbyService.userIsInLobby(u);
+      return { ...u, inLobby: !!lobby.id, inGame: !!lobby.game };
+    });
+    return usersWithLobbies;
   }
 
   getRoom(room: string) {
