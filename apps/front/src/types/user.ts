@@ -6,4 +6,6 @@ export interface User {
   coalition: CoalitionChoice,
   email: string,
   avatar: string,
+  inLobby?: boolean,
+  inGame?: boolean,
 }

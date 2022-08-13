@@ -4,9 +4,6 @@ import {
   NestModule,
   forwardRef,
 } from '@nestjs/common';
-import RedisStore from 'connect-redis';
-import session from 'express-session';
-import passport from 'passport';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
@@ -30,7 +27,6 @@ import { TwoFactorAuthenticationService } from './services/twoFactorAuthenticati
 import { ConfigService } from '@nestjs/config';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
-import { PongModule } from 'src/pong';
 
 @Module({
   providers: [

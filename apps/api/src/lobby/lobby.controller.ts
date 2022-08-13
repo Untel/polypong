@@ -35,12 +35,16 @@ import IsLobbyHost from './guards/is-lobby-host.guard';
 import LobbyExistGuard from './guards/lobby-exist.guard';
 import SocketGuard from './guards/socket.guard';
 import { LobbyService } from './lobby.service';
+import { SocketService } from 'src/socket';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('/lobbies/:id')
 export class LobbyController {
-  constructor(private readonly lobbyService: LobbyService) {}
+  constructor(
+    private readonly lobbyService: LobbyService,
+    private readonly socketService: SocketService,
+  ) {}
   @Get()
   @UseGuards(InLobbyGuard)
   getLobby(@CurrentLobby() lobby): Lobby {
@@ -61,6 +65,7 @@ export class LobbyController {
   @UseGuards(IsLobbyHost)
   startGame(@CurrentLobby() lobby: Lobby): boolean {
     lobby.start();
+    this.socketService.socketio.emit('online', { type: 'join' });
     return true;
   }
 

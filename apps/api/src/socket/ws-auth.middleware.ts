@@ -11,7 +11,7 @@ import Lobby from 'src/game/lobby.class';
 // export interface AuthSocket extends Socket {
 //   user: UserJwtPayload;
 // }
-export type SocketData = { user: AuthSocket; lobby?: Lobby };
+export type SocketData = { user: User; lobby?: Lobby };
 export type AuthSocket = Socket<DefaultEventsMap, DefaultEventsMap, SocketData>;
 export type SocketMiddleware = (
   socket: Socket,

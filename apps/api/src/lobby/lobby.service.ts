@@ -14,22 +14,14 @@ import {
   Injectable,
   Inject,
   forwardRef,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-  UnprocessableEntityException,
   Logger,
 } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
-import Game from 'src/game/game.class';
-import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+import Lobby, { LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import Redis from 'ioredis';
 import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
-import { pick } from 'lodash';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
@@ -93,6 +85,7 @@ export class LobbyService {
     socketOfJoiner.data.lobby = lobby;
     socketOfJoiner.send(`Welcome in lobby ${lobby.name}`);
     this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
+    this.socketService.socketio.emit('online', { type: 'join' });
   }
 
   getAndJoinLobby(id: LobbyId, user: User): Lobby {

@@ -18,17 +18,14 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { PongService } from 'src/pong/pong.service';
-import Lobby, { ILobbyConfig, LobbyId } from 'src/game/lobby.class';
+import Lobby, {  } from 'src/game/lobby.class';
 
-import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth';
 import { AuthSocket, SocketData, WSAuthMiddleware } from './ws-auth.middleware';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { LobbyService, SocketService, User } from 'src';
-import { cp } from 'fs';
 
 /**
  * Ne pas utiliser ce AuthGuard. La protection de l'auth se fait grace au Middleware dans afterInit
@@ -128,11 +125,10 @@ export class SocketGateway
       client.join(inLobby.roomId);
       // client.emit('redirect', `/lobbies/${inLobby.id}/game`);
       client.emit('redirect', { name: 'game', params: { id: inLobby.id } });
-    } else {
-      this.server.emit('online', {
-        name: user.name,
-        type: 'connect',
-      });
     }
+    this.server.emit('online', {
+      name: user.name,
+      type: 'connect',
+    });
   }
 }

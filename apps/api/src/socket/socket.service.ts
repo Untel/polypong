@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { User } from 'src';
 import Lobby from 'src/game/lobby.class';
 import { SocketGateway } from './socket.gateway';
 import { AuthSocket } from './ws-auth.middleware';
@@ -39,7 +40,11 @@ export class SocketService {
   }
 
   public get connectedUsers() {
-    const users = this.sockets.map((el) => el.data.user);
+    const users = this.sockets.map((el) => ({
+      ...el.data.user,
+      inLobby: !!el.data.lobby?.id,
+      inGame: !!el.data.lobby?.game,
+    }));
     return users;
   }
 

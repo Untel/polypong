@@ -4,6 +4,11 @@ import { Notify } from 'quasar';
 
 export const relsApi = mande('/api/relationship');
 
+export interface otherInfo {
+  name: string,
+  avatar: string,
+}
+
 export interface Relationship {
   id: number, // the relationship's unique id
   fromId: number, // user id of self
@@ -12,7 +17,7 @@ export interface Relationship {
   friendship_received: boolean, // true if self received an invite from other to be friendly
   block_sent: boolean, // true if self has blocked other
   block_received: boolean, // true if other has blocked self
-  to: unknown, // some relevant data about the 'other' user
+  to: otherInfo, // some relevant data about the 'other' user
 }
 
 type SocialState = {
@@ -29,12 +34,23 @@ export const useSocialStore = defineStore('social', {
   } as SocialState),
   getters: {
     getRelationships(state): Relationship[] { return state.relationships; },
-    getPendingRelations(state): Relationship[] {
+    getBlockSentRelations(): Relationship[] {
+      return this.getRelationships.filter((r) => r.block_sent);
+    },
+    getFriendsRelationships(): Relationship[] {
+      return this.getRelationships
+        .filter((r) => r.friendship_sent && r.friendship_received);
+    },
+    getReceivedFriendships(): Relationship[] {
       return this.getRelationships
         .filter((r) => r.friendship_received && !r.friendship_sent);
     },
+    getSentFriendships(): Relationship[] {
+      return this.getRelationships
+        .filter((r) => !r.friendship_received && r.friendship_sent);
+    },
     getNotifCount(): number {
-      return this.getPendingRelations.length;
+      return this.getReceivedFriendships.length;
     },
   },
   actions: {
@@ -49,13 +65,16 @@ export const useSocialStore = defineStore('social', {
       }
     },
 
+    getRelationship(name: string) {
+      return this.getRelationships.find((r) => r.to.name === name);
+    },
+
     async addRel(name: string) {
       try {
-        await relsApi.post('addRel', { name });
-      } catch (error) {
-        console.log('error', error);
+        this.relationships = await relsApi.post('addRel', { name });
+      } catch (error: any) {
         Notify.create({
-          type: 'negative', message: 'Error while adding relationship',
+          type: 'warning', message: error.body.message,
         });
       }
     },
@@ -86,6 +105,38 @@ export const useSocialStore = defineStore('social', {
       Notify.create({
         type: 'positive', message: 'friendship has been revoked',
       });
+    },
+
+    async send_block(name: string) {
+      try {
+        this.relationships = await relsApi.post('sendBlock', { name });
+      } catch (error) {
+        console.log('error', error);
+        Notify.create({
+          type: 'negative', message: 'Error while blocking',
+        });
+      }
+      Notify.create({
+        type: 'positive', message: `${name} has been blocked`,
+      });
+    },
+
+    async unsend_block(name: string) {
+      try {
+        this.relationships = await relsApi.post('unsendBlock', { name });
+      } catch (error) {
+        console.log('error', error);
+        Notify.create({
+          type: 'negative', message: 'Error while unblocking',
+        });
+      }
+      Notify.create({
+        type: 'positive', message: `${name} has been unblocked`,
+      });
+    },
+
+    getRelByName(name: string): Relationship | undefined {
+      return this.getRelationships.find((r) => r.to.name === name);
     },
 
   },

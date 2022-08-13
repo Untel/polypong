@@ -61,6 +61,9 @@ export class RelationshipService {
     this.logger.log(
       `in createRelationship, from.email = ${from.email}, to.email = ${to.email}`,
     );
+    if (from.id === to.id) {
+      throw new BadRequestException('Cannot create relationship with yourself');
+    }
     const newRel = await this.relRepo.create({
       from: from,
       to: to,
@@ -79,7 +82,7 @@ export class RelationshipService {
     );
     const to = await this.userService.find({ name });
     if (!to) {
-      throw new BadRequestException(`No matching user for name = ${name}`);
+      throw new BadRequestException(`no results for ${name}`);
     }
     const existingRel = await this.findRel(from, to);
     if (existingRel) {
@@ -174,6 +177,66 @@ export class RelationshipService {
     await this.socketService
       .getUserSocket(to.id)
       ?.emit('friendship', from.id, 'revoked', false);
+    return await this.fetchRels(from);
+  }
+
+  async sendBlock(from: User, name: string) {
+    this.logger.log(`in sendBlock, from.name = ${from.name}, name = ${name}`);
+    const to = await this.userService.find({ name });
+    this.logger.log(`in sendBlock, found user 'to' : ${to.name}`);
+    if (!to) {
+      throw new BadRequestException(`No matching user for name = ${name}`);
+    }
+    let fromRel = await this.findRel(from, to);
+    if (!fromRel) {
+      fromRel = await this.createRelationship(from, to);
+    }
+    this.logger.log(`in sendBlock, fromRel = ${JSON.stringify(fromRel)}`);
+    let toRel = await this.findRel(to, from);
+    if (!toRel) {
+      toRel = await this.createRelationship(to, from);
+    }
+    this.logger.log(`in sendBlock, toRel = ${JSON.stringify(toRel)}`);
+    await this.updateRel(fromRel, {
+      block_sent: true,
+      friendship_sent: false,
+      friendship_received: false,
+    });
+    await this.updateRel(toRel, {
+      block_received: true,
+      friendship_sent: false,
+      friendship_received: false,
+    });
+    this.logger.log('in sendBlock, about to emit event');
+    this.logger.log(`in sendBlock, to = ${JSON.stringify(to)}`);
+    const sock = await this.socketService.getUserSocket(to.id);
+    console.log('in sendBlock, sock = ', sock);
+    sock?.emit('block', from.id, 'received');
+    return await this.fetchRels(from);
+  }
+
+  async unsendBlock(from: User, name: string) {
+    this.logger.log(`in unsendBlock, from.name = ${from.name}, name = ${name}`);
+    const to = await this.userService.find({ name });
+    this.logger.log(`in unsendBlock, found user 'to' : ${to.name}`);
+    if (!to) {
+      throw new BadRequestException(`No matching user for name = ${name}`);
+    }
+    let fromRel = await this.findRel(from, to);
+    if (!fromRel) {
+      fromRel = await this.createRelationship(from, to);
+    }
+    this.logger.log(`in unsendBlock, fromRel = ${JSON.stringify(fromRel)}`);
+    let toRel = await this.findRel(to, from);
+    if (!toRel) {
+      toRel = await this.createRelationship(to, from);
+    }
+    this.logger.log(`in unsendBlock, toRel = ${JSON.stringify(toRel)}`);
+    await this.updateRel(fromRel, { block_sent: false });
+    await this.updateRel(toRel, { block_received: false });
+    await this.socketService
+      .getUserSocket(to.id)
+      ?.emit('block', from.id, 'revoked', false);
     return await this.fetchRels(from);
   }
 }
