@@ -1,12 +1,12 @@
 <template>
-  <div class="q-gutter-none">
+  <div class="q-gutter-none" :class="toggle ? 'window-width' : ''">
     <q-avatar>
       <img :src="rel.to.avatar"/>
     </q-avatar>
     <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)">
       <status-badge :id="rel.toId"/>
     </q-btn>
-    <span v-if="showGutter == rel.to.name">
+    <span v-if="toggle">
       <span v-if="!rel.block_received && !rel.block_sent">
         <q-btn
           label="invite" @click="inviteToLobby(rel.toId)"
@@ -49,6 +49,7 @@
 </template>
 
 <script lang="ts" setup>
+import { stringLiteral } from '@babel/types';
 import { defineComponent, PropType, ref } from 'vue';
 import { Relationship } from '../stores/social.store';
 import StatusBadge from './StatusBadge.vue';
@@ -59,21 +60,32 @@ defineProps({
     type: Object as PropType<Relationship>,
     default: null,
   },
+  toggle: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits([
+  'toggleGutter', 'inviteToLobby', 'message', 'stats',
+  'addFriend', 'unfriend', 'block', 'unblock',
+]);
 
 function friendOrNot(rel: Relationship): string {
   if (rel.friendship_sent && rel.friendship_received) { return 'green'; }
   if (rel.block_sent || rel.block_received) { return 'red'; }
   return '';
 }
+
 const showGutter = ref('');
+const toggleWidth = ref('0');
+
 function toggleGutter(name: string) {
   showGutter.value = (showGutter.value === name ? '' : name);
+  toggleWidth.value = showGutter.value ? '1' : '0';
+  console.log(`emitting toggleGutter event, name = ${showGutter.value}`);
+  emit('toggleGutter', showGutter.value);
 }
-
-const emit = defineEmits([
-  'inviteToLobby', 'message', 'stats', 'addFriend', 'unfriend', 'block', 'unblock',
-]);
 
 function inviteToLobby(id: number) { emit('inviteToLobby', id); }
 function message(id: number) { emit('message', id); }
