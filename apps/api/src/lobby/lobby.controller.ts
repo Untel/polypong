@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:28:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:46:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ export class LobbyController {
   }
 
   @Get('join')
-  @UseGuards(SocketGuard)
+  // @UseGuards(SocketGuard)
   async getLobbyAndJoin(
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,

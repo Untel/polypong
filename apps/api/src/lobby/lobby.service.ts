@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:26:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:48:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,12 @@ import { SocketService } from 'src/socket';
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
   // store: Store<Lobby>;
-  // logger = new Logger('LobbyService');
+  logger = new Logger('LobbyService');
   constructor(
     // @InjectRedis() private readonly redis: Redis,
     @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });
@@ -66,14 +67,19 @@ export class LobbyService {
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       socketOfJoiner.join(lobby.roomId);
+      this.logger.warn(
+        `User ${user.id} already is in this lobby ${lobby.roomId}, rejoining the socket`,
+      );
       return;
     }
 
     const stillInLobby = this.userIsInLobby(user.id);
     if (stillInLobby) {
+      this.logger.warn(
+        `User ${user.id} already is in this lobby ${lobby.roomId}, leaving the socket and the lobby`,
+      );
       stillInLobby.removePlayer(user);
       socketOfJoiner.leave(stillInLobby.roomId);
-      return;
     }
 
     lobby.addPlayer(new Player(user));
@@ -85,6 +91,7 @@ export class LobbyService {
       .except(socketOfJoiner.id)
       .emit('lobby_change');
     this.socketService.socketio.emit('online', { type: 'join' });
+    this.logger.log(`User ${user.id} joined lobby ${lobby.roomId}`);
   }
 
   clearLobbies() {
@@ -92,8 +99,7 @@ export class LobbyService {
   }
 
   createLobby(host: User, name: string): Lobby {
-    const channel = this.socketService.getRoom(`lobby-${host.id}`);
-    const lobby = new Lobby(channel, host, name);
+    const lobby = new Lobby(this.socketService.socketio, host, name);
     this.lobbies.set(host.id, lobby);
     this.socketService.sendNewLobby(lobby);
     return lobby;

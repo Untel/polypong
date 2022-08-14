@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:28:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:48:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ import { User } from 'src/user';
 import { Bot } from './bot.class';
 import { UnprocessableEntityException } from '@nestjs/common';
 import { LobbyBot } from './lobbyBot.class';
+import { SocketService } from 'src/socket';
+import { Server } from 'socket.io';
 
 export type LobbyId = number;
 
@@ -62,15 +64,20 @@ export default class Lobby implements ILobby, ILobbyConfig {
   @Exclude()
   winner: Player | Bot;
 
-  @Exclude()
-  sock = null;
+  // @Exclude()
+  // private readonly socketService: SocketService;
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
+  @Exclude()
+  socketServer: Server;
+  public get sock() {
+    return this.socketServer.to(this.roomId);
+  }
 
-  constructor(socket, host: User, name = 'Unamed lobby') {
+  constructor(socket: Server, host: User, name = 'Unamed lobby') {
+    this.socketServer = socket;
     this.id = host.id;
     this.name = name;
     this.host = host;
-    this.sock = socket;
     this.players = new Map<number, Player>();
     this.spectators = [];
     this.playersMax = 8;

@@ -11,10 +11,9 @@ import LobbyExistGuard from './guards/lobby-exist.guard';
 @Module({
   // eslint-disable-next-line prettier/prettier
   imports: [
-    AuthModule,
-    UserModule,
-    // PongModule,
     forwardRef(() => SocketModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => UserModule),
   ],
   controllers: [LobbiesController, LobbyController],
   providers: [LobbyService],
