@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:29:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:29:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ export class SocketService {
       .map((el) => +el);
     const users = await this.userService.findMany(usersIds);
     const usersWithLobbies = users.map((u) => {
-      const lobby = this.lobbyService.userIsInLobby(u);
+      const lobby = this.lobbyService.userIsInLobby(u.id);
       return { ...u, inLobby: !!lobby?.id, inGame: !!lobby?.game };
     });
     return usersWithLobbies;

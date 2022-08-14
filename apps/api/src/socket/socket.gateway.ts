@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 01:53:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:30:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ export class SocketGateway
   @SubscribeMessage('paddlePercent')
   async paddlePercent(client: AuthSocket, percent: number) {
     const user: User = client.data.user;
-    const lobby = this.lobbyService.userIsInLobby(user);
+    const lobby = this.lobbyService.userIsInLobby(user.id);
     const game = lobby.game;
     if (game) {
       if (!game.isPaused) game.updatePaddlePercent(user.id, percent);
@@ -92,7 +92,7 @@ export class SocketGateway
 
   handleDisconnect(client: Socket) {
     const user: User = client.data.user;
-    const lobby: Lobby = this.lobbyService.userIsInLobby(user);
+    const lobby: Lobby = this.lobbyService.userIsInLobby(user.id);
     if (lobby) {
       if (lobby.game) {
         console.log('Has lobby game');
@@ -117,7 +117,7 @@ export class SocketGateway
   handleConnection(client: AuthSocket, ...args: any[]) {
     const { user } = client.data;
     this.logger.log(`Client connected: ${client.id} Name ${user.username}`);
-    const inLobby = this.lobbyService.userIsInLobby(user);
+    const inLobby = this.lobbyService.userIsInLobby(user.id);
     if (inLobby) {
       client.data.lobby = inLobby;
       client.join(inLobby.roomId);
