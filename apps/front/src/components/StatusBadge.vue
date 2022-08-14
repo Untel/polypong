@@ -1,7 +1,14 @@
 <template>
-      <q-badge floating rounded :color="StatusColor()">
-        {{badgeContent}}
-      </q-badge>
+  <q-fab
+    :label=badgeContent
+    label-position="left"
+    :color=StatusColor()
+    hide-icon
+    direction="left"
+  >
+    <q-fab-action color="primary" @click="onClick" hide-icon label="Email" />
+    <q-fab-action color="secondary" @click="onClick" hide-icon label="Alarm" />
+  </q-fab>
 </template>
 
 <script lang="ts" setup>
@@ -25,13 +32,21 @@ function StatusColor(): string {
   if (u) {
     if (u.inLobby === true) {
       if (u.inGame === true) {
+        badgeContent.value = 'in game';
         return 'orange';
       }
+      badgeContent.value = 'in lobby';
       return 'yellow';
     }
+    badgeContent.value = 'online';
     return 'green';
   }
+  badgeContent.value = 'offline';
   return 'grey';
+}
+
+function onClick() {
+  console.log('click');
 }
 
 </script>

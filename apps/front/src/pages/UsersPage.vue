@@ -54,20 +54,22 @@
     <!-- rels (TEMP, for debug purposes)-->
     <pre>your rels</pre>
     <q-card>
-        <q-card-section
-          v-for="rel in soc.getRelationships" :key="`rel-${rel.id}`" horizontal
-        >
-          <social-card :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
-            @toggle-gutter="(name) => toggleGutter(name)"
-            @invite-to-lobby="(id) => inviteToLobby(id)"
-            @message="(id) => message(id)"
-            @stats="(id) => stats(id)"
-            @add-friend="(name) => addFriend(name)"
-            @unfriend="(name) => unfriend(name)"
-            @block="(name) => block(name)"
-            @unblock="(name) => unblock(name)"
-          />
-        </q-card-section>
+        <div class="q-pa-md row items-start q-gutter-md">
+          <q-card-section
+            v-for="rel in soc.getRelationships" :key="`rel-${rel.id}`" horizontal
+          >
+            <social-card :rel="rel" :toggle="showGutter === rel.to.name ? true : false"
+              @toggle-gutter="(name) => toggleGutter(name)"
+              @invite-to-lobby="(id) => inviteToLobby(id)"
+              @message="(id) => message(id)"
+              @stats="(id) => stats(id)"
+              @add-friend="(name) => addFriend(name)"
+              @unfriend="(name) => unfriend(name)"
+              @block="(name) => block(name)"
+              @unblock="(name) => unblock(name)"
+            />
+          </q-card-section>
+        </div>
     </q-card>
     <!-- actual friends -->
     <pre v-if="soc.getFriendsRelationships.length">your friends</pre>
