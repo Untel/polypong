@@ -116,7 +116,7 @@ module.exports = configure((/* ctx */) => ({
     // port: 80,
     // host: "0.0.0.0",
     hmr: {
-      clientPort: 443,
+      clientPort: process.env.PORT_RANGE?.split('-')[0] || 443,
     },
   },
 

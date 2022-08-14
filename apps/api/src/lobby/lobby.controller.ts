@@ -6,30 +6,22 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 05:46:49 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:28:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import {
   Controller,
   Get,
-  Post,
   Put,
-  Delete,
-  Param,
   Body,
-  Req,
   UseGuards,
   UseInterceptors,
   ClassSerializerInterceptor,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CurrentLobby, CurrentUser } from 'src/decorators';
-import { CurrentSocket } from 'src/decorators/socket.decorator';
-import Game from 'src/game/game.class';
-import Lobby, { LobbyId } from 'src/game/lobby.class';
+import Lobby from 'src/game/lobby.class';
 import JwtGuard from 'src/guards/jwt.guard';
-import { AuthSocket } from 'src/socket/ws-auth.middleware';
 import InLobbyGuard from './guards/in-lobby.guard';
 import IsLobbyHost from './guards/is-lobby-host.guard';
 import LobbyExistGuard from './guards/lobby-exist.guard';
@@ -80,6 +72,5 @@ export class LobbyController {
   updateLobby(@CurrentLobby() lobby: Lobby, @Body() datas) {
     lobby.configure(datas);
     return lobby;
-    // this.lobbyService.updateLobby(host.id);
   }
 }

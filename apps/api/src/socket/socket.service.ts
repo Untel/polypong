@@ -6,15 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 00:51:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:29:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { LobbyService, User, UserService } from 'src';
+import { LobbyService, UserService } from 'src';
 import Lobby from 'src/game/lobby.class';
 import { SocketGateway } from './socket.gateway';
-import { AuthSocket } from './ws-auth.middleware';
 
 @Injectable()
 export class SocketService {
@@ -71,6 +70,7 @@ export class SocketService {
   }
 
   sendNewLobby(lobby: Lobby) {
+    // const serialized = instanceToPlain(lobby);
     this.socketio.emit('refreshedLobbies', null);
   }
 }

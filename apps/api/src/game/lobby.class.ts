@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 01:33:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:28:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@ import Game from './game.class';
 import Player from './player.class';
 import Spectator from './spectator.class';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { BroadcastOperator } from 'socket.io';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { SocketData } from 'src/socket';
 import { User } from 'src/user';
 import { Bot } from './bot.class';
 import { UnprocessableEntityException } from '@nestjs/common';
@@ -73,7 +70,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.id = host.id;
     this.name = name;
     this.host = host;
-    console.log('Socket instance', socket);
     this.sock = socket;
     this.players = new Map<number, Player>();
     this.spectators = [];
@@ -118,7 +114,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
     if (opts.players)
       Object.keys(opts.players).forEach((key) => {
         const pl = this.players.get(+key);
-        console.log('FOund player to update', key, pl, opts[key]);
         Object.assign(pl, opts.players[key]);
       });
     if (opts.playersMax) {
@@ -142,7 +137,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
   }
 
   say(message) {
-    console.log('Wanna say', this.sock);
     this.sock.emit('message', message);
   }
 

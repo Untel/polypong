@@ -6,27 +6,22 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 01:45:21 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 02:26:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import {
-  Injectable,
-  Inject,
-  forwardRef,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Inject, forwardRef, Logger } from '@nestjs/common';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
-import Store from 'redis-json';
+// import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
-  store: Store<Lobby>;
-  logger = new Logger('LobbyService');
+  // store: Store<Lobby>;
+  // logger = new Logger('LobbyService');
   constructor(
     // @InjectRedis() private readonly redis: Redis,
     @Inject(forwardRef(() => SocketService))
@@ -56,43 +51,40 @@ export class LobbyService {
   }
 
   getLobby(id: LobbyId): Lobby {
-    // return await this.store.get(`game:${id}`);
     const lobby = this.lobbies.get(id);
     return lobby;
   }
 
-  userIsInLobby(user: User) {
+  userIsInLobby(userId: number) {
     const lobbyPresent = this.getLobbies().find((l: Lobby) =>
-      [...l.players.values()].find((p: Player) => p.user.id === user.id),
-    );
-    console.log(
-      'After reconnect, user found in lobby',
-      lobbyPresent && lobbyPresent.id,
+      [...l.players.values()].find((p: Player) => p.user.id === userId),
     );
     return lobbyPresent;
   }
 
   userJoinLobby(lobby: Lobby, user: User) {
-    const stillInLobby = this.userIsInLobby(user);
     const socketOfJoiner = this.socketService.getUserSocket(user.id);
-
-    if (stillInLobby) {
-      socketOfJoiner.leave(stillInLobby.roomId);
-      stillInLobby.removePlayer(user);
+    if (lobby.players.has(user.id)) {
+      socketOfJoiner.join(lobby.roomId);
+      return;
     }
+
+    const stillInLobby = this.userIsInLobby(user.id);
+    if (stillInLobby) {
+      stillInLobby.removePlayer(user);
+      socketOfJoiner.leave(stillInLobby.roomId);
+      return;
+    }
+
     lobby.addPlayer(new Player(user));
     socketOfJoiner.join(lobby.roomId);
     socketOfJoiner.data.lobby = lobby;
-    socketOfJoiner.send(`Welcome in lobby ${lobby.name}`);
-    this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
+    socketOfJoiner.send(`Welcome in lobby ${lobby.name}, ${user.name}`);
+    this.socketService.socketio
+      .to(lobby.roomId)
+      .except(socketOfJoiner.id)
+      .emit('lobby_change');
     this.socketService.socketio.emit('online', { type: 'join' });
-  }
-
-  getAndJoinLobby(id: LobbyId, user: User): Lobby {
-    // return await this.store.get(`game:${id}`);
-    const lobby = this.lobbies.get(id);
-    if (!lobby) return null;
-    return lobby;
   }
 
   clearLobbies() {
@@ -100,20 +92,10 @@ export class LobbyService {
   }
 
   createLobby(host: User, name: string): Lobby {
-    console.log('Host', host.id);
-    // await this.store.set(`${hostId}`, new Lobby(hostId, new Player(hostId)));
     const channel = this.socketService.getRoom(`lobby-${host.id}`);
     const lobby = new Lobby(channel, host, name);
     this.lobbies.set(host.id, lobby);
     this.socketService.sendNewLobby(lobby);
-    return lobby;
-  }
-
-  updateLobby(lobby: Lobby, datas: Partial<Lobby>): Lobby {
-    console.log('WHERE I COME FROM');
-    return;
-    lobby.configure(datas);
-    this.socketService.socketio.to(lobby.roomId).emit('lobby_change');
     return lobby;
   }
 }

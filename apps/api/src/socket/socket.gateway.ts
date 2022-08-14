@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 16:38:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 01:53:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ export class SocketGateway
   afterInit(server: Server) {
     const middle = WSAuthMiddleware(this.authService);
     server.use(middle);
-    // this.pongService.socketServer = server;
     this.logger.log('Gateway initialized');
   }
 
@@ -121,10 +120,10 @@ export class SocketGateway
     const inLobby = this.lobbyService.userIsInLobby(user);
     if (inLobby) {
       client.data.lobby = inLobby;
-      console.log('Reconnected in lobby');
       client.join(inLobby.roomId);
-      // client.emit('redirect', `/lobbies/${inLobby.id}/game`);
-      client.emit('redirect', { name: 'game', params: { id: inLobby.id } });
+      if (inLobby.game && inLobby.game.players.has(user.id)) {
+        client.emit('redirect', { name: 'game', params: { id: inLobby.id } });
+      }
     }
     this.server.emit('online', {
       name: user.name,
