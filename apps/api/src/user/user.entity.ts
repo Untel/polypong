@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Relationship } from 'src/relationship/relationship.entity';
+import { NoIdBaseEntity } from 'src/entities';
 // import Message from 'src/chat/entities/message.entity';
 
 export enum CoalitionChoice {
@@ -18,7 +19,7 @@ export enum CoalitionChoice {
 }
 
 @Entity()
-export class User {
+export class User extends NoIdBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -56,20 +57,9 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Exclude()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Exclude()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @OneToMany(() => Relationship, (relationship) => relationship.from)
   relationships: Relationship[];
 
   @OneToMany(() => Relationship, (relationship) => relationship.to)
   related: Relationship[];
-
-  // @OneToMany(() => Message, message => message.author)
-  // public message: Message;
 }

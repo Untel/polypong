@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/28 21:53:26 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 20:39:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 22:24:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { defineStore, Pinia } from 'pinia';
 import { Notify } from 'quasar';
 
-import { io, Socket } from 'socket.io-client';
+import { io, Socket, Manager } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
 import { mande, defaults, MandeError } from 'mande';
 import { User } from 'src/types/user';
@@ -26,7 +26,7 @@ export const onlineApi = mande('/api/online');
 export const userApi = mande('/api/user');
 
 type AuthState = {
-  socket?: Socket | null,
+  socket: Socket,
   user: any,
   connectedUsers: User[],
 }
@@ -36,36 +36,36 @@ type AuthState = {
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: {},
-    socket: null,
+    socket: io({
+      path: '/polysocket', // resolved via reverse proxy
+      transports: ['websocket'],
+      withCredentials: true,
+      autoConnect: false,
+    }),
     connectedUsers: [],
-    error: {},
   } as AuthState),
   getters: {
-    getIsConnected: (state) => state.socket && state.socket.connected,
+    getIsConnected: (state) => state.socket.connected,
     getConnectedUsers: (state) => state.connectedUsers,
     getUser: (state) => state.user,
   },
   actions: {
     connectToSocket() {
+      this.socket.removeAllListeners();
+      this.socket.auth = { token: `${localStorage.getItem('token')}` };
+      this.socket.connect();
       return new Promise((resolve, reject) => {
-        this.socket = io({
-          path: '/polysocket', // resolved via reverse proxy
-          transports: ['websocket'],
-          withCredentials: true,
-          auth: { token: `${localStorage.getItem('token')}` },
-        });
         this.socket.once('connect_error', (err) => {
-          console.log('Socket connect error', err);
           Notify.create({
             type: 'negative',
             message: `Connection to socket error: ${err.message}`,
           });
           localStorage.removeItem('token');
-          this.socket?.off('connect');
+          this.socket.off('connect');
           reject();
         });
         this.socket.once('connect', () => {
-          this.socket?.off('connect_error');
+          this.socket.off('connect_error');
           resolve(true);
         });
         this.socket.on('online', ({ name, type }) => {
@@ -176,7 +176,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     killws() {
-      this.socket?.close();
+      this.socket.close();
     },
 
   },

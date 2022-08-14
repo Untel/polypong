@@ -59,8 +59,8 @@ const miniState = ref(true);
 
 const auth = useAuthStore(); const soc = useSocialStore();
 
-auth.socket?.on('friendship', () => { soc.fetchRelationships(); });
-auth.socket?.on('block', () => { soc.fetchRelationships(); });
+auth.socket.on('friendship', () => { soc.fetchRelationships(); });
+auth.socket.on('block', () => { soc.fetchRelationships(); });
 
 // const auth = useAuthStore();
 // const router = useRouter();

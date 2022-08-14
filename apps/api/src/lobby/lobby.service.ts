@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:48:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 00:17:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,22 @@ export class LobbyService {
   }
 
   userIsInLobby(userId: number) {
+    if (this.lobbies.has(userId)) return this.lobbies.get(userId);
     const lobbyPresent = this.getLobbies().find((l: Lobby) =>
       [...l.players.values()].find((p: Player) => p.user.id === userId),
     );
     return lobbyPresent;
+  }
+
+  removePlayer(lobbyId: number, user: User) {
+    console.log('Has not lobby game');
+    const lobby = this.getLobby(lobbyId);
+    lobby.removePlayer(user);
+    const leaverSocket = this.socketService.getUserSocket(user.id);
+    if (leaverSocket) {
+      leaverSocket.leave(lobby.roomId);
+      leaverSocket.send(`You left lobby ${lobby.roomId}`);
+    }
   }
 
   userJoinLobby(lobby: Lobby, user: User) {
@@ -76,10 +88,9 @@ export class LobbyService {
     const stillInLobby = this.userIsInLobby(user.id);
     if (stillInLobby) {
       this.logger.warn(
-        `User ${user.id} already is in this lobby ${lobby.roomId}, leaving the socket and the lobby`,
+        `User ${user.id} already is in this lobby ${stillInLobby.roomId}, leaving the socket and the lobby`,
       );
-      stillInLobby.removePlayer(user);
-      socketOfJoiner.leave(stillInLobby.roomId);
+      this.removePlayer(stillInLobby.id, user);
     }
 
     lobby.addPlayer(new Player(user));
@@ -101,7 +112,9 @@ export class LobbyService {
   createLobby(host: User, name: string): Lobby {
     const lobby = new Lobby(this.socketService.socketio, host, name);
     this.lobbies.set(host.id, lobby);
-    this.socketService.sendNewLobby(lobby);
+    this.socketService.serializeEmit('lobbies_update', [
+      ...this.lobbies.values(),
+    ]);
     return lobby;
   }
 }

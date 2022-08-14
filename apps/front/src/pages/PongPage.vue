@@ -21,5 +21,5 @@ const lobbies = useLobbiesStore();
 lobbies.fetchLobbies();
 const lobbyName = ref('');
 const { socket } = useAuthStore();
-socket?.on('refreshedLobbies', lobbies.fetchLobbies);
+socket.on('refreshedLobbies', lobbies.fetchLobbies);
 </script>

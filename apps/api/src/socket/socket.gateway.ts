@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:30:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 23:09:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,10 @@ export class SocketGateway
           `${user.name} has disconnected. Pausing game until he reconnect`,
         );
       } else {
-        console.log('Has not lobby game');
-        lobby.removePlayer(user);
+        this.lobbyService.removePlayer(lobby.id, user);
         // this.lobbyService.updateLobby(lobby.id, lobby);
       }
     }
-    this.logger.log(`Client disconnected: ${client.id} Name ${user.name}`);
-    this.server.emit('online', {
-      name: user.name,
-      type: 'disconnect',
-    });
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {

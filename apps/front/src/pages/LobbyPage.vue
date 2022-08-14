@@ -146,17 +146,17 @@ const canUpdate = computed(() => {
 
 onMounted(() => {
   const id = +($route.params.id as string);
-  $auth.socket?.on('lobby_change', (evt) => {
+  $auth.socket.on('lobby_change', (evt) => {
     $lobbies.fetchCurrentLobby(id);
   });
-  $auth.socket?.on('start', (evt) => {
+  $auth.socket.on('start', (evt) => {
     $router.push(`/lobby/${id}/game`);
   });
 });
 
 onUnmounted(() => {
-  $auth.socket?.off('start');
-  $auth.socket?.off('lobby_change');
+  $auth.socket.off('start');
+  $auth.socket.off('lobby_change');
 });
 
 const botLevels = [

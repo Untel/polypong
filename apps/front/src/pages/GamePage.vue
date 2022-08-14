@@ -103,7 +103,7 @@ const mapProps: Ref<PolyMap> = ref({
 });
 
 const updatePaddlePercent = (percent: number) => {
-  socket?.emit('paddlePercent', percent);
+  socket.emit('paddlePercent', percent);
 };
 
 onMounted(async () => {
@@ -111,28 +111,28 @@ onMounted(async () => {
   mapProps.value = $game.map;
   balls.value = $game.balls;
 
-  socket?.on('gameUpdate', ({ balls: b, paddles: p }) => {
+  socket.on('gameUpdate', ({ balls: b, paddles: p }) => {
     paddles.value = p;
     balls.value = b;
   });
-  socket?.on('mapChange', (map) => {
+  socket.on('mapChange', (map) => {
     mapProps.value = map;
     powers.value = [];
   });
-  socket?.on('powers', (pow) => {
+  socket.on('powers', (pow) => {
     powers.value = pow;
   });
 
-  socket?.once('end', (winner = { name: 'Error' }) => {
+  socket.once('end', (winner = { name: 'Error' }) => {
     Notify.create({
       message: `Chicken chiken dinner we have a winner ${winner.name}`,
     });
   });
 });
 onUnmounted(() => {
-  socket?.off('gameUpdate');
-  socket?.off('mapChange');
-  socket?.off('powers');
+  socket.off('gameUpdate');
+  socket.off('mapChange');
+  socket.off('powers');
 });
 
 </script>

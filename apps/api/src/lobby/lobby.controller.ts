@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:46:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 23:13:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,9 @@ export class LobbyController {
   @UseGuards(IsLobbyHost)
   startGame(@CurrentLobby() lobby: Lobby): boolean {
     lobby.start();
-    this.socketService.socketio.emit('online', { type: 'join' });
+    this.socketService.socketio
+      .except(lobby.roomId)
+      .emit('online', { type: 'game_start' });
     return true;
   }
 
