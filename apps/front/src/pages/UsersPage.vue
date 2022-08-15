@@ -34,7 +34,7 @@
     <pre>find people</pre>
     <rel-search-bar
       :submittedName="submitSearchName"
-      @searched="(name) => logthispls(name)"
+      @searched="(name) => searchedRel.value = soc.getRelByName(name)"
     />
     <!-- SEARCH RESULTS -->
     <pre>search results</pre>
@@ -207,12 +207,6 @@ async function searchRel(name: string) {
     await soc.addRel(name);
     searchedRel.value = soc.getRelByName(name);
   }
-}
-
-function logthispls(name: string) {
-  console.log(`caught emit, name = ${name}`);
-  searchedRel.value = soc.getRelByName(name);
-  console.log(`now searchedRel.value.to.name = ${searchedRel.value.to.name}`);
 }
 
 </script>

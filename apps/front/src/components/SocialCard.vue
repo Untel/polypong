@@ -81,56 +81,10 @@
           </span>
         </span>
       </q-card-actions>
-
-<!--
-    <q-btn :label=rel.to.name @click="toggleGutter(rel.to.name)">
-      <status-badge :id="rel.toId"/>
-    </q-btn>
-    <span v-if="toggle">
-      <span v-if="!rel.block_received && !rel.block_sent">
-        <q-btn
-          label="invite" @click="inviteToLobby(rel.toId)"
-          icon="fa-solid fa-table-tennis-paddle-ball"
-        /><q-btn
-          label="message" @click="message(rel.toId)"
-          icon="fa-solid fa-paper-plane"
-        /><q-btn
-          label="stats" @click="stats(rel.toId)"
-          icon="fa-solid fa-chart-line"
-        /><q-btn v-if="rel.friendship_received == false && rel.friendship_sent == false"
-          label="add friend" @click="addFriend(rel.to.name)"
-          icon="fa-solid fa-user-group"
-        />
-
-        <q-btn-group v-if="rel.friendship_received && !rel.friendship_sent">
-          <q-btn  label="accept" @click="addFriend(rel.to.name)"
-            icon="fa-solid fa-heart" color="green"/>
-          <q-btn label="decline" @click="unfriend(rel.to.name)"
-            icon="fas fa-heart-broken" color="orange"/>
-        </q-btn-group>
-
-        <q-btn v-if="rel.friendship_sent && !rel.friendship_received"
-          label="cancel" @click="unfriend(rel.to.name)"
-          icon="fa-solid fa-user" color="blue"
-        /><q-btn v-if="rel.friendship_sent && rel.friendship_received"
-          label="unfriend" @click="unfriend(rel.to.name)"
-          icon="fas fa-sad-tear" color="orange"
-        />
-      </span><span v-if="rel.block_received">
-        <q-btn label="has blocked you" color="red"/>
-      </span>
-      <q-btn v-if="!rel.block_sent" label="block"
-        @click="block(rel.to.name)" icon="fa-solid fa-ban" color="red"
-      /><q-btn v-if="rel.block_sent" label="unblock"
-        @click="unblock(rel.to.name)" icon="fa-solid fa fa-unlock" color="red"
-      />
-    </span>
--->
   </q-card>
 </template>
 
 <script lang="ts" setup>
-import { stringLiteral } from '@babel/types';
 import { defineComponent, PropType, ref } from 'vue';
 import { Relationship } from '../stores/social.store';
 import StatusBadge from './StatusBadge.vue';
