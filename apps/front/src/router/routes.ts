@@ -47,6 +47,11 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'users',
   component: () => import('pages/UsersPage.vue'),
 }, {
+  name: 'stats',
+  path: 'stats/:id?',
+  props: true,
+  component: () => import('pages/StatsPage.vue'),
+}, {
   name: 'settings',
   path: 'settings',
   component: () => import('pages/SettingsPage.vue'),
