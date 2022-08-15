@@ -4,6 +4,7 @@
   v-model="tab" dense class="text-grey" active-color="primary"
   indicator-color="primary" narrow-indicator
 >
+  <q-tab name="search" label="search"/>
   <q-tab name="friendlist" label="friendlist">
     <q-badge v-if="soc.getNotifCount" color="orange" rounded transparent floating>
       {{ soc.getNotifCount }}
@@ -16,8 +17,8 @@
 
 <q-tab-panels v-model="tab" animated>
 
-  <!-- FRIENDLIST -->
-  <q-tab-panel name="friendlist">
+  <!-- SEARCH -->
+  <q-tab-panel name="search">
     <q-card>
       <q-card-section horizontal>
         <div class="q-pa-md row items-start q-gutter-md"
@@ -53,7 +54,10 @@
           </q-card-section>
         </div>
     </q-card>
-    <!-- rels (TEMP, for debug purposes)-->
+  </q-tab-panel>
+  <!-- FRIENDLIST -->
+  <q-tab-panel name="friendlist">
+<!-- rels (TEMP, for debug purposes)
     <pre>rels</pre>
     <q-card>
         <div class="q-pa-md row items-start q-gutter-md">
@@ -73,23 +77,26 @@
           </q-card-section>
         </div>
     </q-card>
+-->
     <!-- actual friends -->
     <pre v-if="soc.getFriendsRelationships.length">your friends</pre>
     <q-card label="friends">
-        <q-card-section
-          v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
-        >
-          <social-card :rel="rel" :toggle="showCard === rel.to.name ? true : false"
-            @toggle-gutter="(name) => toggleCard(name)"
-            @invite-to-lobby="(id) => inviteToLobby(id)"
-            @message="(id) => message(id)"
-            @stats="(id) => stats(id)"
-            @add-friend="(name) => addFriend(name)"
-            @unfriend="(name) => unfriend(name)"
-            @block="(name) => block(name)"
-            @unblock="(name) => unblock(name)"
-          />
-        </q-card-section>
+        <div class="q-pa-md row items-start q-gutter-md">
+          <q-card-section
+            v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
+          >
+            <social-card :rel="rel" :toggle="showCard === rel.to.name ? true : false"
+              @toggle-gutter="(name) => toggleCard(name)"
+              @invite-to-lobby="(id) => inviteToLobby(id)"
+              @message="(id) => message(id)"
+              @stats="(id) => stats(id)"
+              @add-friend="(name) => addFriend(name)"
+              @unfriend="(name) => unfriend(name)"
+              @block="(name) => block(name)"
+              @unblock="(name) => unblock(name)"
+            />
+          </q-card-section>
+        </div>
     </q-card>
     <!-- received friends invites -->
     <pre v-if="soc.getReceivedFriendships.length">friend requests received</pre>
