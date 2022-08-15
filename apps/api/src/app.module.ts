@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 18:05:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 01:07:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
 import { RelationshipModule } from './relationship/relationship.module';
-
-const asyncConfig = (moduleName) => ({
-  useFactory: (configService: ConfigService) => configService.get(moduleName),
-  inject: [ConfigService],
-});
+import { asyncConfig } from './utils/config';
 
 @Module({
   imports: [
@@ -47,9 +43,6 @@ const asyncConfig = (moduleName) => ({
     RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
     PassportModule.registerAsync(asyncConfig('passport')),
-    MulterModule.register({
-      dest: './avatars',
-    }),
     UserModule,
     MailModule,
     AuthModule,

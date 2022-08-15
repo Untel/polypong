@@ -18,3 +18,4 @@ export * from './providers';
 export * from './relationship';
 export * from './socket';
 export * from './user';
+export * from './utils';

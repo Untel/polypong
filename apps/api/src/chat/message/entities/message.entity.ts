@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 07:31:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 02:13:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,18 @@ import { Thread } from 'src/chat/thread';
 import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.entity';
 import { BaseEntity } from 'src/entities/base.entity';
 import { User } from 'src/user/user.entity';
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, Tree, TreeChildren, TreeParent } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  Tree,
+  TreeChildren,
+  TreeParent,
+} from 'typeorm';
 
 @Entity()
-@Tree('materialized-path')
 export class Message extends BaseEntity {
   @Column('text')
   content: string;
@@ -39,10 +47,4 @@ export class Message extends BaseEntity {
   // reactions
   // attachments
   // -> link preview / image / video / voice / geoloc
-
-  @TreeChildren()
-  replies: Message[];
-
-  @TreeParent()
-  parent: Message;
 }

@@ -1,15 +1,19 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-} from 'typeorm';
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   user.entity.ts                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/15 01:10:24 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/15 02:15:14 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Relationship } from 'src/relationship/relationship.entity';
 import { NoIdBaseEntity } from 'src/entities';
-// import Message from 'src/chat/entities/message.entity';
 
 export enum CoalitionChoice {
   ALLIANCE = 'alliance',
