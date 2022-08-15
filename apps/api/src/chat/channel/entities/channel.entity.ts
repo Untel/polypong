@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 16:32:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:22:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { Message } from 'src/chat/message';
 import { Thread } from 'src/chat/thread';
 import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.entity';
-import { BaseEntity } from 'src/entities/base.entity';
+import { RootEntity } from 'src/entities/root.entity';
 import { User } from 'src/user';
 import {
   Entity,
@@ -36,7 +36,7 @@ export enum ChannelPrivacy {
 }
 
 @Entity()
-export class Channel extends BaseEntity {
+export class Channel extends RootEntity {
   @OneToMany(() => ChannelMember, (cm) => cm.user) members: ChannelMember[];
   @OneToOne(() => ThreadParticipant) initiator: ThreadParticipant;
   @OneToOne(() => Thread) thread: Thread;

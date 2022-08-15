@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:53:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 02:15:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:25:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ import { asyncConfig } from 'src/utils';
   exports: [UserService],
   imports: [
     TypeOrmModule.forFeature([User, ForgotPasswordToken]),
-    forwardRef(() => AuthModule),
     MulterModule.registerAsync(asyncConfig('multer')),
+    forwardRef(() => AuthModule),
   ],
   controllers: [UserController],
 })

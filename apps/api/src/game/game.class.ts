@@ -6,23 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:53:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:36:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { BroadcastOperator, Server } from 'socket.io';
-import Store from 'redis-json';
 import { Bot } from '.';
-import { pointOnLine, Line, angleToDegrees } from 'geometric';
-import { Collider2d, Vector } from 'collider2d';
+import { pointOnLine, Line } from 'geometric';
+import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
 import { shuffle } from 'lodash';
 import GameTools from './gametools.class';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { SocketData } from 'src/socket';
 import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
@@ -186,21 +182,18 @@ export default class Game {
     });
   }
 
-  public reduce(wall: Wall) {
+  public async reduce(wall: Wall) {
+    console.log('I AM REDUCINNNNG');
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
     } else if (wall.player) {
+      // this.lobby.service.rankUser(this.lobby, wall.player.id);
+      await this.lobby.createPlayerRank(wall.player, this.nPlayers);
       this.players.delete(wall.player.user.id);
     }
     // this.stop();
     if (this.nPlayers === 1 || this.players.size === 0) {
-      this.stop();
-      let winner: Player | Bot | null = null;
-      if (this.bots.length) winner = this.bots.pop();
-      else winner = [...this.players.values()].pop();
-      console.log('THERE IS A WINNER', winner, this.bots, this.players);
-      this.lobby.setWinner(winner);
-      return;
+      return this.lobby.service.closeLobby(this.lobby);
     }
     // const timer = 1000;
     // this.socket.emit('timer', { timer });

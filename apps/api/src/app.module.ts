@@ -6,24 +6,22 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 01:07:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:25:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Module } from '@nestjs/common';
-import { MulterModule } from '@nestjs/platform-express';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
-import { AppController } from './app.controller';
 import {
-  AppService,
   AuthModule,
   UserModule,
   MailModule,
   PongModule,
   LobbyModule,
   ChatModule,
+  MatchHistoryModule,
 } from '.';
 
 import { PassportModule } from '@nestjs/passport';
@@ -43,16 +41,15 @@ import { asyncConfig } from './utils/config';
     RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
     PassportModule.registerAsync(asyncConfig('passport')),
-    UserModule,
-    MailModule,
-    AuthModule,
-    SocketModule,
-    PongModule,
-    LobbyModule,
-    RelationshipModule,
-    ChatModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => MailModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => SocketModule),
+    forwardRef(() => PongModule),
+    forwardRef(() => LobbyModule),
+    forwardRef(() => RelationshipModule),
+    forwardRef(() => ChatModule),
+    forwardRef(() => MatchHistoryModule),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

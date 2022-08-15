@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:54:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 01:40:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:40:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
@@ -31,7 +30,6 @@ import { verify, JwtPayload, sign } from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
 import { RegisterUserDto } from '../dtos/register-user.dto';
 import TokenPayload from '../interfaces/tokenPayload.interface';
-import { authenticator } from 'otplib';
 
 export interface UserJwtPayload extends JwtPayload, User {}
 @Injectable()

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:55:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:26:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ import Player from 'src/game/player.class';
 // import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
+import { Match, MatchHistoryService } from 'src/match-history';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
@@ -26,9 +27,9 @@ export class LobbyService {
   constructor(
     // @InjectRedis() private readonly redis: Redis,
     @Inject(forwardRef(() => SocketService))
-    private socketService: SocketService,
+    public socketService: SocketService,
     @Inject(forwardRef(() => UserService))
-    private userService: UserService,
+    private userService: UserService, // @Inject(forwardRef(() => MatchHistoryService)) // private matchHistoryService: MatchHistoryService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });
     // this.mock();
@@ -111,11 +112,25 @@ export class LobbyService {
   }
 
   createLobby(host: User, name: string): Lobby {
-    const lobby = new Lobby(this.socketService.socketio, host, name);
+    const lobby = new Lobby(this, host, name);
     this.lobbies.set(host.id, lobby);
     this.socketService.serializeEmit('lobbies_update', [
       ...this.lobbies.values(),
     ]);
     return lobby;
+  }
+
+  async closeLobby(lobby: Lobby, winner = null) {
+    console.log('Stored match', lobby.match);
+    lobby.game.stop();
+    lobby.sock.emit('redirect', {
+      name: 'history',
+      params: { id: lobby.match.id },
+    });
+    lobby.match.finishedAt = new Date();
+    lobby.match = await lobby.match.save();
+    console.log('Updated match', lobby.match);
+    lobby.sock.socketsLeave(lobby.roomId);
+    this.lobbies.delete(lobby.id);
   }
 }

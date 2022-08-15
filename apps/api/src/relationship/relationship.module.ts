@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SocketModule } from 'src/socket';
 import { UserModule } from 'src/user';
@@ -21,7 +21,11 @@ import { RelationshipService } from './relationship.service';
 @Module({
   providers: [RelationshipService],
   exports: [],
-  imports: [UserModule, SocketModule, TypeOrmModule.forFeature([Relationship])],
+  imports: [
+    forwardRef(() => UserModule),
+    forwardRef(() => SocketModule),
+    TypeOrmModule.forFeature([Relationship]),
+  ],
   controllers: [RelationshipController],
 })
 export class RelationshipModule {}

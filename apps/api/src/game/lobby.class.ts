@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:48:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:50:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,12 @@ import Spectator from './spectator.class';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { User } from 'src/user';
 import { Bot } from './bot.class';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Logger, UnprocessableEntityException } from '@nestjs/common';
 import { LobbyBot } from './lobbyBot.class';
 import { SocketService } from 'src/socket';
 import { Server } from 'socket.io';
+import { LobbyService } from 'src/lobby';
+import { Match, UserMatch } from 'src/match-history';
 
 export type LobbyId = number;
 
@@ -39,6 +41,11 @@ export default class Lobby implements ILobby, ILobbyConfig {
   id: LobbyId;
   name: string;
   playersMax: number;
+  logger = new Logger('Lobby');
+
+  @Exclude()
+  @Type(() => Match)
+  match: Match;
 
   @Type(() => User)
   host: User;
@@ -69,12 +76,15 @@ export default class Lobby implements ILobby, ILobbyConfig {
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
   @Exclude()
   socketServer: Server;
+  @Exclude()
+  service: LobbyService;
   public get sock() {
     return this.socketServer.to(this.roomId);
   }
 
-  constructor(socket: Server, host: User, name = 'Unamed lobby') {
-    this.socketServer = socket;
+  constructor(service: LobbyService, host: User, name = 'Unamed lobby') {
+    this.socketServer = service.socketService.socketio;
+    this.service = service;
     this.id = host.id;
     this.name = name;
     this.host = host;
@@ -84,7 +94,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.spectatorsMax = 10;
     this.bots = [];
     this.fillBots();
-    console.log('Bots are', this.bots);
   }
 
   addPlayer(player: Player) {
@@ -108,7 +117,26 @@ export default class Lobby implements ILobby, ILobbyConfig {
     }
     this.game = new Game(this);
     this.sock.emit('start');
+    this.createMatchEntry();
+    this.logger.log(`Starting new game ${this.name}`);
     return this.game;
+  }
+
+  async createMatchEntry() {
+    const match = new Match();
+    match.totalPlayers = this.playersMax;
+    match.botCount = this.bots.length;
+    match.name = this.name;
+    this.match = await match.save();
+  }
+
+  async createPlayerRank(player: Player, rank: number) {
+    const um = new UserMatch();
+    um.user = player.user;
+    um.rank = rank;
+    um.match = this.match;
+    const added = await um.save();
+    console.log('Added rank', added, 'for', player.user.name);
   }
 
   configure(opts: Partial<Lobby>) {
@@ -145,14 +173,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   say(message) {
     this.sock.emit('message', message);
-  }
-
-  setWinner(winner) {
-    this.winner = winner;
-    this.sock.emit('end', {
-      name: this.winner.color,
-      color: this.winner.color,
-    });
   }
 
   public get roomId() {

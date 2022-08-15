@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 23:56:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:22:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Expose } from 'class-transformer';
 import { Thread } from 'src';
 import { Message } from 'src/chat/message';
-import { BaseEntity, TS } from 'src/entities/base.entity';
+import { RootEntity, TS } from 'src/entities/root.entity';
 import { User } from 'src/user';
 import {
   Entity,
@@ -27,7 +27,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class ThreadParticipant extends BaseEntity {
+export class ThreadParticipant extends RootEntity {
   @ManyToOne(() => User)
   public user: User;
 

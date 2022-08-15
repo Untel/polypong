@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:49:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:21:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ import { SocketService } from 'src/socket';
 import { User } from 'src/user';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('/lobbies/:id')
 export class LobbyController {
   constructor(
