@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 15:10:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:37:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ export class LobbyService {
 
   closeLobby(lobby: Lobby, winner = null) {
     console.log('Stored match', lobby.match);
+    lobby.game.stop();
     lobby.sock.emit('redirect', {
       name: 'history',
       params: { id: lobby.match.id },

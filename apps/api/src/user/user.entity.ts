@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 01:10:24 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:17:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:15:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { Relationship } from 'src/relationship/relationship.entity';
 import { NoIdBaseEntity } from 'src/entities';
 import { UserMatch } from 'src/match-history';
@@ -68,6 +68,7 @@ export class User extends NoIdBaseEntity {
   @OneToMany(() => Relationship, (relationship) => relationship.to)
   related: Relationship[];
 
+  @Type(() => UserMatch)
   @OneToMany(() => UserMatch, (match) => match.user)
   matchHistory: UserMatch[];
 }

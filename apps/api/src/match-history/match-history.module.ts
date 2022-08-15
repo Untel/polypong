@@ -7,7 +7,6 @@ import { Match, UserMatch } from './entities';
 @Module({
   // eslint-disable-next-line prettier/prettier
   imports: [
-    // forwardRef(() => UserModule),
     TypeOrmModule.forFeature([Match, UserMatch]),
   ],
   controllers: [MatchHistoryController],

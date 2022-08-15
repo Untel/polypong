@@ -6,23 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 15:18:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:02:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
-import { BroadcastOperator, Server } from 'socket.io';
-import Store from 'redis-json';
 import { Bot } from '.';
-import { pointOnLine, Line, angleToDegrees } from 'geometric';
-import { Collider2d, Vector } from 'collider2d';
+import { pointOnLine, Line } from 'geometric';
+import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
 import { shuffle } from 'lodash';
 import GameTools from './gametools.class';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { SocketData } from 'src/socket';
 import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
@@ -196,10 +192,7 @@ export default class Game {
     }
     // this.stop();
     if (this.nPlayers === 1 || this.players.size === 0) {
-      this.stop();
-      this.lobby.service.closeLobby(this.lobby);
-      // this.lobby.service.closeLobby(this.lobby, winner);
-      return;
+      return this.lobby.service.closeLobby(this.lobby);
     }
     // const timer = 1000;
     // this.socket.emit('timer', { timer });
