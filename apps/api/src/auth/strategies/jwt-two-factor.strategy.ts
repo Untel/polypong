@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jwt-two-factor.strategy.ts                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/14 00:55:16 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/14 00:55:17 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';

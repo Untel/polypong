@@ -232,27 +232,9 @@ export class UserService {
    * @returns : the updated user entity
    */
   async setAvatar(user: UserInterface, avatarUrl: string) {
-    this.logger.log(`in setAvatar, user.email = ${user.email}`);
-    this.logger.log(`in setAvatar, avatarUrl = ${avatarUrl}`);
     const email = user.email;
     const localUser = await this.find({ email });
-    this.logger.log(`in setAvatar, localUser = ${localUser}`);
     const res = await this.updateUser(localUser.id, { avatar: avatarUrl });
-    this.logger.log(`in setAvatar, res = ${JSON.stringify(res)}`);
     return res;
   }
-
-  /**
-   * get the avatar of an user
-   * @param user : the user interface
-   * @returns : the user avatar
-   */
-  async getAvatar(user: UserInterface) {
-    this.logger.log(`in getAvatar, user.email = ${user.email}`);
-    const email = user.email;
-    const localUser = await this.find({ email });
-    return localUser.avatar;
-  }
-
-  setIsConnected() {}
 }

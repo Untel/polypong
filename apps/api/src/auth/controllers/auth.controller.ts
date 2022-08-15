@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   auth.controller.ts                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/14 00:53:44 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/15 02:35:13 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { AuthService } from '../services/auth.service';
 import {
   Body,
@@ -14,7 +26,8 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
-  Query,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { LocalGuard } from 'src/guards/local.guard';
 import { UserService } from 'src/user/user.service';
@@ -28,9 +41,9 @@ import { PasswordService } from '../services/password-auth.service';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
 import JwtGuard from 'src/guards/jwt.guard';
-import { IntraOAuthGuard } from 'src/guards';
-import url from 'url';
+import { User } from 'src/user';
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -47,18 +60,11 @@ export class AuthController {
    * @returns
    */
   @Post('register')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async registerUser(
-    @Body() registerUserDto: RegisterUserDto,
-    @Req() req,
-    @Res() res,
-  ) {
-    this.logger.log("@Post('register')");
-    console.log('registerUserDto', registerUserDto);
+  async registerUser(@Body() registerUserDto: RegisterUserDto, @Req() req) {
     const result = await this.authService.registerUser(registerUserDto);
     if (result.user) {
       req.user = result.user;
-      return this.login(req, res);
+      return this.login(req);
     }
   }
 
@@ -68,25 +74,19 @@ export class AuthController {
    * @returns User
    */
   @UseGuards(LocalGuard)
-  @HttpCode(201)
   @Post('login')
-  async login(@Req() req, @Res() res) {
-    this.logger.log(
-      `@Post(login), req.session = ${JSON.stringify(req.session)}`,
-    );
+  login(@Req() req) {
     const user = req.user;
-    const token = this.authService.getToken({ ...user });
+    const token = this.authService.getToken({ id: user.id });
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {
-      return res.send({
+      return {
         isTwoFactorAuthenticationEnabled: true,
         token: token,
-      });
+      };
     }
-
-    this.logger.log('@Post(login), returning user');
-    return res.send({ ...user, token });
+    return { token };
   }
 
   /**
@@ -96,7 +96,7 @@ export class AuthController {
    */
   @UseGuards(JwtGuard)
   @Get('user')
-  async getUser(@Request() req): Promise<any> {
+  getUser(@Request() req: RequestWithUser): User {
     return req.user;
   }
 

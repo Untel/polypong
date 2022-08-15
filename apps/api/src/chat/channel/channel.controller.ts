@@ -6,18 +6,26 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+import { CurrentUser } from 'src/decorators';
+import JwtGuard from 'src/guards/jwt.guard';
+import { User } from 'src/user';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 
+@UseGuards(JwtGuard)
 @Controller('channel')
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Post()
-  create(@Body() createChannelDto: CreateChannelDto) {
-    return this.channelService.create(createChannelDto);
+  create(
+    @CurrentUser() user: User,
+    @Body() createChannelDto: CreateChannelDto,
+  ) {
+    return this.channelService.create(user, createChannelDto);
   }
 
   @Get()

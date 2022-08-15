@@ -40,7 +40,7 @@
         <PasswordInput v-if="isPrivate" label="Password?" dense filled v-model="password"/>
       </LobbyCard>
       <LobbyCard
-        v-for="lobby of lobbies.getLobbies"
+        v-for="lobby of $lobbies.getLobbies"
         :key="`lobby-${lobby.id}`"
         :name="lobby.name || 'Unamed lobby'"
         :subhead="`${lobby.host.name}'s party`"
@@ -51,15 +51,33 @@
       >
         <q-circular-progress
           show-value
+          class="text-accent q-ma-md"
+          track-color="grey-2"
+          :color="lobby.isStarted ? 'accent' : 'primary'"
+          :thickness=".2"
+          size="50px"
           :indeterminate="!!lobby.isStarted"
-          class="text-light-blue q-ma-md"
           :value="lobby.isStarted || lobby.players.length"
           :max="lobby.playersMax"
-          size="50px"
-          :color="lobby.isStarted ? 'accent' : 'primary'"
         >
-          <span v-if="lobby.isStarted">{{ lobby.isStarted }}/{{ lobby.playersMax }}</span>
-          <span v-else>{{ lobby.players.length }}/{{lobby.playersMax}}</span>
+          <span>{{ lobby.players.length }}</span>
+          <q-icon name="fa fa-user-astronaut" />
+          <q-tooltip>{{ lobby.players.length }} / {{ lobby.playersMax }} players</q-tooltip>
+        </q-circular-progress>
+        <q-circular-progress
+          show-value
+          class="text-primary q-ma-md"
+          track-color="grey-2"
+          :color="lobby.isStarted ? 'accent' : 'primary'"
+          size="50px"
+          :thickness=".2"
+          :indeterminate="!!lobby.isStarted"
+          :value="lobby.spectators.length"
+          :max="lobby.spectatorsMax"
+        >
+          <span>{{ lobby.spectators.length }}</span>
+          <q-icon name="fa fa-user-secret" />
+        <q-tooltip>{{ lobby.spectators.length }} spectators</q-tooltip>
         </q-circular-progress>
       </LobbyCard>
     </div>
@@ -67,12 +85,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useApi } from 'src/utils/api';
-import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import LobbyCard from 'src/components/LobbyCard.vue';
 import PasswordInput from 'src/components/PasswordInput.vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import {
   onMounted,
   onBeforeUnmount,
@@ -87,16 +104,16 @@ defineComponent({
   },
 });
 
-const lobbies = useLobbiesStore();
+const $lobbies = useLobbiesStore();
 const { socket } = useAuthStore();
-lobbies.fetchLobbies();
+$lobbies.fetchLobbies();
 const lobbyName = ref('');
 const password = ref('');
 const isPrivate = ref(false);
 const router = useRouter();
 
 async function createLobby() {
-  const newLobby = await lobbies.createLobby(lobbyName.value);
+  const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
     console.log('New lobby is', newLobby, newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
@@ -106,13 +123,16 @@ async function createLobby() {
 }
 
 onMounted(() => {
-  socket?.on('refreshedLobbies', lobbies.fetchLobbies);
-});
-
-onBeforeUnmount(() => {
-  socket?.off('refreshedLobbies', (args) => {
-    console.log('Removing listeners', args);
+  socket.on('update_lobbies', (evt) => {
+    console.log('Refreshed lobbies', evt);
+    $lobbies.lobbies = evt;
   });
 });
+
+// onBeforeUnmount(() => {
+//   socket.off('refreshedLobbies', (args) => {
+//     console.log('Removing listeners', args);
+//   });
+// });
 
 </script>

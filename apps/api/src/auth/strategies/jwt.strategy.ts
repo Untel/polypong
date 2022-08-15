@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   jwt.strategy.ts                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/14 00:55:21 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/14 23:50:40 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
@@ -25,6 +37,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const user = await this.userService.findById(userJwtPayload.id);
     // this.logger.log(`validate - user = ${JSON.stringify(user)}`);
     // if 2fa not required, just return the user
+    if (!user) {
+      return false;
+    }
+
     if (user.isTwoFactorAuthenticationEnabled == false) {
       return user;
     }

@@ -86,7 +86,7 @@
         <circle
           v-if="ball.target"
           :fill="ball.color || 'yellow'" r=".5"
-          v-bind="formatCirclePosition(ball.target.hit)"
+          v-bind="formatCirclePosition(ball.target)"
         />
       </g>
       <circle
@@ -99,13 +99,14 @@
     <slot />
     <pre>
       Ratio: {{ ratio }}
+      Gamma: {{ gammaRatio }} - {{ gamma }}
     </pre>
   </div>
 </template>
 
 <script setup lang="ts">
 import {
-  onMounted, computed, PropType, watch, ref,
+  computed, PropType, watch, ref, onMounted,
 } from 'vue';
 import {
   Position,
@@ -116,7 +117,7 @@ import {
   PolygonMap,
 } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
-import { MaybeElementRef, useMouseInElement } from '@vueuse/core';
+import { useMouseInElement, useDeviceOrientation, watchDebounced } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
 
 const props = defineProps({
@@ -151,9 +152,9 @@ const scaleRatio = computed(() => {
 function formatBallTrajectoryPoints(ball: Ball) {
   return {
     x1: ball.position.x,
-    x2: ball.target.hit.x,
+    x2: ball.target.x,
     y1: ball.position.y,
-    y2: ball.target.hit.y,
+    y2: ball.target.y,
   };
 }
 
@@ -184,14 +185,29 @@ const myWallIdx = computed(() => {
 });
 const myWall = computed(() => props.map.walls[myWallIdx.value]);
 const myWallRef = ref<HTMLElement | null>();
-const { elementX, elementWidth, isOutside } = useMouseInElement(myWallRef);
+
+const { elementX, elementWidth } = useMouseInElement(myWallRef);
+const { gamma } = useDeviceOrientation();
 const ratio = computed(() => {
   const r = elementX.value / elementWidth.value;
   return 1 - (r < 0 ? 0 : r > 1 ? 1 : r);
 });
-watch(ratio, (val) => {
-  emit('paddleMove', val);
+
+const gammaRatio = computed(() => {
+  if (gamma.value === null) return 0;
+  const r = (gamma.value - 10) / 50;
+  return 1 - (r < 0 ? 0 : r > 1 ? 1 : r);
 });
+watchDebounced(
+  ratio,
+  (val) => { emit('paddleMove', val); },
+  { debounce: 10, maxWait: 30 },
+);
+watchDebounced(
+  gammaRatio,
+  (val) => { emit('paddleMove', val); },
+  { debounce: 10, maxWait: 30 },
+);
 
 watch(() => props.map, (map, oldMap) => {
   const { verticles, angles, walls } = map;
@@ -208,5 +224,9 @@ watch(() => props.map, (map, oldMap) => {
       ],
     });
 }, { immediate: true });
+
+onMounted(() => {
+  console.log('to');
+});
 
 </script>

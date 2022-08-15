@@ -2,12 +2,12 @@ CMP		        = docker-compose -f compose.yml
 COMPOSE       = ${CMP} -f compose.tools.yml
 
 # c = Container name; change it when calling enter/rerun
-c			        =
+c			        = api
 
 all:
 	$(COMPOSE) up
 
-detach:
+detached:
 	$(COMPOSE) up -d
 
 build:
@@ -18,13 +18,7 @@ down:
 
 clear:
 	$(COMPOSE) down -v
-	docker system prune -f
-  # docker rmi $(shell docker image ls -qa)
-	# docker network rm $(shell docker network ls -qa)
-	# docker volume rm $(shell docker volume ls -qa)
-
-install:
-	$(COMPOSE) run --rm install
+	docker system -f prune
 
 enter:
 	$(COMPOSE) exec $(c) /bin/bash
@@ -32,8 +26,5 @@ enter:
 log:
 	$(COMPOSE) logs $(c) -f
 
-rerun:
-	$(COMPOSE) down $(c)
-	$(COMPOSE) run $(c) -d
 
-.PHONY: all build clear install $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)
+.PHONY: all build clear install nginx reload $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

@@ -1,21 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   reset-password.dto.ts                              :+:      :+:    :+:   */
+/*   config.ts                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/08/14 00:54:16 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 00:54:35 by adda-sil         ###   ########.fr       */
+/*   Created: 2022/08/15 01:10:30 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/15 01:10:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 
-export class ResetPasswordDto {
-  @IsNotEmpty()
-  token: string;
-
-  @IsNotEmpty()
-  password: string;
+export function asyncConfig(moduleName: string) {
+  return {
+    useFactory: (configService: ConfigService) => configService.get(moduleName),
+    inject: [ConfigService],
+  };
 }

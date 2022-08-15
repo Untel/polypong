@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   auth.service.ts                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/14 00:54:56 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/14 01:40:50 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 import {
   BadRequestException,
   ConflictException,
@@ -151,20 +163,10 @@ export class AuthService {
   }
 
   public async findUserByAccessToken(token: string): Promise<UserJwtPayload> {
-    this.logger.log(`findUserByAccessToken - token = ${token}`);
     const payload: UserJwtPayload = this.jwtService.verify<User>(token, {
       secret: process.env.JWT_SECRET,
     });
-    this.logger.log(
-      `findUserByAccessToken - payload = ${JSON.stringify(payload)}`,
-    );
-    if (payload.is2fa) {
-      return payload; // don't return all the user info if the token was signed with is2fa
-    } else {
-      this.logger.log(`findUserByAccessToken - payload.id = ${payload.id}`);
-      const user = this.userService.findById(payload.id);
-      this.logger.log(`findUserByAccessToken - user = ${JSON.stringify(user)}`);
-      return user;
-    }
+    const user = await this.userService.findById(payload.id);
+    return user;
   }
 }

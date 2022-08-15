@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:11:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 07:12:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/14 23:53:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,7 @@ import {
 // Can change the extends
 export class TS extends Date {}
 
-export abstract class BaseEntity extends TypeormBaseEntity {
-  @ApiProperty({ example: 'c057cc8c-ad1b-4081-ba05-41a648e29f19' })
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export abstract class NoIdBaseEntity extends TypeormBaseEntity {
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: TS;
@@ -39,4 +35,10 @@ export abstract class BaseEntity extends TypeormBaseEntity {
   @ApiProperty()
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: TS;
+}
+
+export abstract class BaseEntity extends NoIdBaseEntity {
+  @ApiProperty({ example: 'c057cc8c-ad1b-4081-ba05-41a648e29f19' })
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 }

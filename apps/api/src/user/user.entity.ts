@@ -1,14 +1,19 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-} from 'typeorm';
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   user.entity.ts                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/15 01:10:24 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/08/15 02:15:14 by adda-sil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Relationship } from 'src/relationship/relationship.entity';
-// import Message from 'src/chat/entities/message.entity';
+import { NoIdBaseEntity } from 'src/entities';
 
 export enum CoalitionChoice {
   ALLIANCE = 'alliance',
@@ -18,7 +23,7 @@ export enum CoalitionChoice {
 }
 
 @Entity()
-export class User {
+export class User extends NoIdBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -56,20 +61,9 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
-  @Exclude()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Exclude()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @OneToMany(() => Relationship, (relationship) => relationship.from)
   relationships: Relationship[];
 
   @OneToMany(() => Relationship, (relationship) => relationship.to)
   related: Relationship[];
-
-  // @OneToMany(() => Message, message => message.author)
-  // public message: Message;
 }

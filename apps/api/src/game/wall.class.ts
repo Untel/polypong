@@ -6,10 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 17:35:29 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 09:44:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+import { Exclude, Type } from 'class-transformer';
 import { Vector } from 'collider2d';
 import { Line, lineLength, lineAngle } from 'geometric';
 import { Ball } from './ball.class';
@@ -18,11 +19,14 @@ import { Paddle } from './paddle.class';
 import Player from './player.class';
 
 export class Wall {
+  @Type(() => Paddle)
   paddle: Paddle | null;
   bot: Bot | null;
   line: Line;
   width: number;
   angle: number;
+  @Exclude()
+  // @Type(() => Player)
   player: Player | null;
 
   constructor(line: Line, paddle?: Paddle, player?: Player | Bot) {
@@ -52,7 +56,7 @@ export class Wall {
     return {
       width: this.width,
       line: this.line,
-      player: this.player,
+      player: { user: { id: this.player?.id } },
     };
   }
 }

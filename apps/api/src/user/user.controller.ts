@@ -37,11 +37,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   logger = new Logger('UserController');
 
@@ -70,34 +66,18 @@ export class UserController {
     @Param('userId') userId,
     @Req() req,
   ) {
-    this.logger.log(`updateUser - userId = ${userId}`);
-    this.logger.log(
-      `updateUser - updateUserDto = ${JSON.stringify(updateUserDto)}`,
-    );
-    this.logger.log(`updateUser - req.user = ${JSON.stringify(req.user)}`);
     const isSelf = userId == req.user.id ? true : false;
-    this.logger.log(
-      `updateUser - req.user.id = ${req.user.id}, userId = ${userId}, isSelf = ${isSelf}`,
-    );
     let updatedUser = null;
-    try {
-      if (isSelf) {
-        updatedUser = await this.userService.updateSelf(
-          req.user,
-          updateUserDto,
-        );
-      } else {
-        updatedUser = await this.userService.updateOther(
-          req.user,
-          updateUserDto,
-          userId,
-        );
-      }
-    } catch (error) {
-      throw error;
+    if (isSelf) {
+      updatedUser = await this.userService.updateSelf(req.user, updateUserDto);
+    } else {
+      updatedUser = await this.userService.updateOther(
+        req.user,
+        updateUserDto,
+        userId,
+      );
     }
     return { user: updatedUser, statusCode: 201 };
-    // check properties and redirect to the right controllers ? Or do stuff in the service ?
   }
 
   /**
@@ -107,15 +87,12 @@ export class UserController {
    * @returns
    */
   @UseGuards(JwtGuard)
-  @UsePipes(new ValidationPipe({ transform: true }))
   @Post('setAvatar')
-  @UseInterceptors(FileInterceptor('avatar', { dest: './avatars' }))
+  @UseInterceptors(FileInterceptor('avatar'))
   async setAvatar(@Req() req, @UploadedFile() avatar: Express.Multer.File) {
-    this.logger.log(`in setAvatar, user.email : (${req.user.email})`);
-    this.logger.log(`in setAvatar, avatar.path = ${avatar.path})`);
     return await this.userService.setAvatar(
       req.user,
-      `http://localhost:8080/api/user/${avatar.path}`,
+      `/api/user/avatar/${avatar.filename}`,
     );
   }
 
@@ -124,11 +101,8 @@ export class UserController {
    * @param {Request} req : The request object.
    * @returns
    */
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @Get('avatars/:fileId')
+  @Get('avatar/:fileId')
   async serveAvatar(@Param('fileId') fileId, @Res() res) {
-    this.logger.log(`in serveAvatar, fileId = ${fileId}`);
-    this.logger.log('in serveAvatar, about to res.sendfile');
-    res.sendfile(fileId, { root: 'avatars' });
+    res.sendfile(fileId, { root: 'uploads/avatar' });
   }
 }

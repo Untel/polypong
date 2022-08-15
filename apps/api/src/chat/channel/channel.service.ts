@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { User } from 'src/user';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 
 @Injectable()
 export class ChannelService {
-  create(createChannelDto: CreateChannelDto) {
+  create(user: User, createChannelDto: CreateChannelDto) {
     return 'This action adds a new channel';
   }
 
