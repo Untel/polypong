@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:53:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:10:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:25:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ import { UserController } from './user.controller';
 import { AuthModule } from 'src/auth';
 import { MulterModule } from '@nestjs/platform-express';
 import { asyncConfig } from 'src/utils';
-// import { MatchHistoryModule } from 'match-history/match-history.module';
 
 @Module({
   providers: [UserService],
@@ -28,7 +27,6 @@ import { asyncConfig } from 'src/utils';
     TypeOrmModule.forFeature([User, ForgotPasswordToken]),
     MulterModule.registerAsync(asyncConfig('multer')),
     forwardRef(() => AuthModule),
-    // forwardRef(() => MatchHistoryModule),
   ],
   controllers: [UserController],
 })
