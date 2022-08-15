@@ -10,6 +10,12 @@ export class Match extends RootEntity {
   @Column()
   totalPlayers: number;
 
-  @Column({ type: 'timestamp' })
+  @Column()
+  botCount: number;
+
+  @Column({ type: 'timestamp', nullable: true })
   finishedAt: TS;
+
+  @Column()
+  name: string;
 }

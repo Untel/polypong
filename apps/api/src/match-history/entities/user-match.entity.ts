@@ -5,10 +5,10 @@ import { Match } from './match.entity';
 
 @Entity()
 export class UserMatch extends RootEntity {
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false })
   public user: User;
 
-  @ManyToOne(() => Match)
+  @ManyToOne(() => Match, { nullable: false })
   public match: Match;
 
   @Column()

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 13:58:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:10:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ import Player from 'src/game/player.class';
 // import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
+import { Match, MatchHistoryService } from 'src/match-history';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
@@ -29,6 +30,8 @@ export class LobbyService {
     public socketService: SocketService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    // @Inject(forwardRef(() => MatchHistoryService))
+    // private matchHistoryService: MatchHistoryService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });
     // this.mock();
@@ -120,12 +123,14 @@ export class LobbyService {
   }
 
   closeLobby(lobby: Lobby, winner = null) {
-    if (winner) {
-      this.socketService.serializeEmit('lobby_win', {
-        lobbyId: lobby.id,
-        winner: { color: winner.color, name: winner.name },
-      });
-    }
+    console.log('Stored match', lobby.match);
+    lobby.sock.emit('redirect', {
+      name: 'history',
+      params: { id: lobby.match.id },
+    });
+    lobby.sock.socketsLeave(lobby.roomId);
+    lobby.match.finishedAt = new Date();
+    lobby.match.save();
     this.lobbies.delete(lobby.id);
   }
 }

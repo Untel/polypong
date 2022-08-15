@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:15:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:25:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ import { asyncConfig } from './utils/config';
     RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
     PassportModule.registerAsync(asyncConfig('passport')),
-    forwardRef(() => MatchHistoryModule),
     forwardRef(() => UserModule),
     forwardRef(() => MailModule),
     forwardRef(() => AuthModule),
@@ -50,6 +49,7 @@ import { asyncConfig } from './utils/config';
     forwardRef(() => LobbyModule),
     forwardRef(() => RelationshipModule),
     forwardRef(() => ChatModule),
+    forwardRef(() => MatchHistoryModule),
   ],
 })
 export class AppModule {}

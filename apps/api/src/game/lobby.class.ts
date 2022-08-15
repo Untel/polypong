@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 13:57:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:14:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ import { LobbyBot } from './lobbyBot.class';
 import { SocketService } from 'src/socket';
 import { Server } from 'socket.io';
 import { LobbyService } from 'src/lobby';
+import { Match, UserMatch } from 'src/match-history';
 
 export type LobbyId = number;
 
@@ -40,6 +41,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
   id: LobbyId;
   name: string;
   playersMax: number;
+
+  @Type(() => Match)
+  match: Match;
 
   @Type(() => User)
   host: User;
@@ -112,7 +116,24 @@ export default class Lobby implements ILobby, ILobbyConfig {
     }
     this.game = new Game(this);
     this.sock.emit('start');
+    this.createMatchEntry();
     return this.game;
+  }
+
+  async createMatchEntry() {
+    const match = new Match();
+    match.totalPlayers = this.playersMax;
+    match.botCount = this.bots.length;
+    match.name = this.name;
+    this.match = await match.save();
+  }
+
+  async createPlayerRank(player: Player, rank: number) {
+    const um = new UserMatch();
+    um.user = player.user;
+    um.match = this.match;
+    um.rank = rank;
+    await um.save();
   }
 
   configure(opts: Partial<Lobby>) {

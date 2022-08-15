@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 12:53:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 15:18:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,20 +186,18 @@ export default class Game {
     });
   }
 
-  public reduce(wall: Wall) {
+  public async reduce(wall: Wall) {
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
     } else if (wall.player) {
       // this.lobby.service.rankUser(this.lobby, wall.player.id);
+      await this.lobby.createPlayerRank(wall.player, this.nPlayers);
       this.players.delete(wall.player.user.id);
     }
     // this.stop();
     if (this.nPlayers === 1 || this.players.size === 0) {
       this.stop();
-      let winner: Player | Bot | null = null;
-      if (this.bots.length) winner = this.bots.pop();
-      else winner = [...this.players.values()].pop();
-      console.log('THERE IS A WINNER', winner, this.bots, this.players);
+      this.lobby.service.closeLobby(this.lobby);
       // this.lobby.service.closeLobby(this.lobby, winner);
       return;
     }
