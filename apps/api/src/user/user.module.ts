@@ -19,8 +19,6 @@ import { UserController } from './user.controller';
 import { AuthModule } from 'src/auth';
 import { MulterModule } from '@nestjs/platform-express';
 import { asyncConfig } from 'src/utils';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 @Module({
   providers: [UserService],

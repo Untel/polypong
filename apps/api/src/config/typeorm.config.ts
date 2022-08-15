@@ -22,7 +22,7 @@ export const TypeormConfig = registerAs('typeorm', () => ({
   database: process.env['POSTGRES_DB'],
 
   entities: ['dist/**/*.entity{.ts,.js}'],
-  // synchronize: true,
+  synchronize: true,
 
   migrationsTableName: 'migration',
   migrations: ['src/migration/*.ts'],
