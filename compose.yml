@@ -9,7 +9,7 @@ services:
     domainname: ${DOMAIN_NAME}
     container_name: nginx
     volumes:
-      - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/${DOMAIN_NAME}.conf.template"
+      - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/default.conf.template"
       - "./compose/nginx/entrypoint/:/docker-entrypoint.d/${DOMAIN_NAME}"
     ports:
       - "${PORT_RANGE:-443}:${PORT_RANGE:-443}"

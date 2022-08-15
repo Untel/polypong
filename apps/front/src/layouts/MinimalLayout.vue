@@ -46,6 +46,27 @@
 <script lang="ts" setup>
 import { useSettingsStore } from 'src/stores/settings';
 import BgSocial from 'src/components/BgSocial.vue';
+import { Notify, useQuasar } from 'quasar';
+import { onMounted } from 'vue';
 
+const $q = useQuasar();
 const settings = useSettingsStore();
+const askPermission = (DeviceOrientationEvent as any).requestPermission;
+
+onMounted(async () => {
+  if ($q.platform.is.mobile) {
+    try {
+      if (await askPermission() !== 'granted') throw new Error();
+    } catch (error: Error) {
+      Notify.create({
+        message: 'You need browser permissions',
+        actions: [{
+          label: 'Ask',
+          color: 'danger',
+          handler: () => askPermission(),
+        }],
+      });
+    }
+  }
+});
 </script>
