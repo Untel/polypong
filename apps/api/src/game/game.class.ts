@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 16:02:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:36:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,6 +183,7 @@ export default class Game {
   }
 
   public async reduce(wall: Wall) {
+    console.log('I AM REDUCINNNNG');
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
     } else if (wall.player) {

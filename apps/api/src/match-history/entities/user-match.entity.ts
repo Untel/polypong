@@ -11,7 +11,7 @@ export class UserMatch extends RootEntity {
   public user: User;
 
   @Type(() => Match)
-  @ManyToOne(() => Match, { nullable: false })
+  @ManyToOne(() => Match, { nullable: false, cascade: true })
   public match: Match;
 
   @Column()

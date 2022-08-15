@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:53:44 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 02:35:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:21:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
 import JwtGuard from 'src/guards/jwt.guard';
 import { User } from 'src/user';
 
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(

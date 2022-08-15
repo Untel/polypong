@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 15:14:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:50:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ import Spectator from './spectator.class';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { User } from 'src/user';
 import { Bot } from './bot.class';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Logger, UnprocessableEntityException } from '@nestjs/common';
 import { LobbyBot } from './lobbyBot.class';
 import { SocketService } from 'src/socket';
 import { Server } from 'socket.io';
@@ -41,7 +41,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
   id: LobbyId;
   name: string;
   playersMax: number;
+  logger = new Logger('Lobby');
 
+  @Exclude()
   @Type(() => Match)
   match: Match;
 
@@ -92,7 +94,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.spectatorsMax = 10;
     this.bots = [];
     this.fillBots();
-    console.log('Bots are', this.bots);
   }
 
   addPlayer(player: Player) {
@@ -117,6 +118,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.game = new Game(this);
     this.sock.emit('start');
     this.createMatchEntry();
+    this.logger.log(`Starting new game ${this.name}`);
     return this.game;
   }
 
@@ -131,9 +133,10 @@ export default class Lobby implements ILobby, ILobbyConfig {
   async createPlayerRank(player: Player, rank: number) {
     const um = new UserMatch();
     um.user = player.user;
-    um.match = this.match;
     um.rank = rank;
-    await um.save();
+    um.match = this.match;
+    const added = await um.save();
+    console.log('Added rank', added, 'for', player.user.name);
   }
 
   configure(opts: Partial<Lobby>) {

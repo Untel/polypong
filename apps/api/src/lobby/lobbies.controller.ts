@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/11 01:48:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:22:38 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ import { LobbyService } from './lobby.service';
 
 @ApiBearerAuth()
 @UseGuards(JwtGuard)
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('lobbies')
 export class LobbiesController {
   constructor(private readonly lobbyService: LobbyService) {}
@@ -41,7 +40,7 @@ export class LobbiesController {
   }
 
   @Post()
-  createLobby(@CurrentUser() user, @Body('name') name) {
+  createLobby(@CurrentUser() user, @Body('name') name): Lobby {
     const lobby = this.lobbyService.createLobby(user, name);
     return lobby;
   }

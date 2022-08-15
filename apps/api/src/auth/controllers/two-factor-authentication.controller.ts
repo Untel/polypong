@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:53:51 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 00:53:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:21:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ import JwtSimpleGuard from 'src/guards/jwt-simple.guard';
 import url from 'url';
 
 @Controller('2fa')
-@UseInterceptors(ClassSerializerInterceptor)
 export class TwoFactorAuthenticationController {
   constructor(
     private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,

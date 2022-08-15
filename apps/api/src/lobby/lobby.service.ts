@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 15:37:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 16:26:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,7 @@ export class LobbyService {
     @Inject(forwardRef(() => SocketService))
     public socketService: SocketService,
     @Inject(forwardRef(() => UserService))
-    private userService: UserService,
-    // @Inject(forwardRef(() => MatchHistoryService))
-    // private matchHistoryService: MatchHistoryService,
+    private userService: UserService, // @Inject(forwardRef(() => MatchHistoryService)) // private matchHistoryService: MatchHistoryService,
   ) {
     // this.store = new Store<Lobby>(redis, { prefix: 'game:' });
     // this.mock();
@@ -122,16 +120,17 @@ export class LobbyService {
     return lobby;
   }
 
-  closeLobby(lobby: Lobby, winner = null) {
+  async closeLobby(lobby: Lobby, winner = null) {
     console.log('Stored match', lobby.match);
     lobby.game.stop();
     lobby.sock.emit('redirect', {
       name: 'history',
       params: { id: lobby.match.id },
     });
-    lobby.sock.socketsLeave(lobby.roomId);
     lobby.match.finishedAt = new Date();
-    lobby.match.save();
+    lobby.match = await lobby.match.save();
+    console.log('Updated match', lobby.match);
+    lobby.sock.socketsLeave(lobby.roomId);
     this.lobbies.delete(lobby.id);
   }
 }

@@ -16,9 +16,9 @@ import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
 import JwtGuard from 'src/guards/jwt.guard';
 import { CurrentUser } from 'src/decorators';
 import { User } from 'src/user/user.entity';
+import { UserMatch } from './entities';
 
 @UseGuards(JwtGuard)
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('match-history')
 export class MatchHistoryController {
   constructor(private readonly matchHistoryService: MatchHistoryService) {}
@@ -29,8 +29,10 @@ export class MatchHistoryController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: User) {
-    return this.matchHistoryService.findAll(user.id);
+  async findAll(@CurrentUser() user: User): Promise<UserMatch[]> {
+    const matchs = await this.matchHistoryService.findAll(user);
+    console.log('Retrieved matchs', matchs);
+    return matchs;
   }
 
   @Get(':id')
