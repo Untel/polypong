@@ -52,6 +52,7 @@
 import { Notify } from 'quasar';
 import { PreFetchOptions } from '@quasar/app-vite';
 import { useGameStore } from 'src/stores/game.store';
+import { useRoute } from 'vue-router';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -82,6 +83,8 @@ import {
   Ball,
   Power,
   PolygonMap as PolyMap,
+  Line,
+  Position,
 } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
@@ -102,8 +105,10 @@ const mapProps: Ref<PolyMap> = ref({
   wallWidth: 0,
 });
 
+const $route = useRoute();
+const id = +$route.params.id;
 const updatePaddlePercent = (percent: number) => {
-  socket.emit('paddlePercent', percent);
+  socket.emit('m', percent.toFixed(2));
 };
 
 onMounted(async () => {
@@ -114,6 +119,26 @@ onMounted(async () => {
   socket.on('gameUpdate', ({ balls: b, paddles: p }) => {
     paddles.value = p;
     balls.value = b;
+  });
+  socket.on('object', (index, name, item) => {
+    switch (name) {
+      case 'ball':
+        balls.value[index] = item;
+        break;
+      case 'power':
+        powers.value[index] = item;
+        break;
+      case 'paddle':
+        paddles.value[index] = item;
+        break;
+      default:
+        console.log('Unknown object', item);
+        break;
+    }
+  });
+  socket.on('p', (p: Line[], b: Position[]) => {
+    b.forEach((b, i) => { if (balls.value[i]) balls.value[i].position = b; });
+    p.forEach((p, i) => { if (paddles.value[i]) paddles.value[i].line = p; });
   });
   socket.on('mapChange', (map) => {
     mapProps.value = map;

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 23:13:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 11:49:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ import LobbyExistGuard from './guards/lobby-exist.guard';
 import SocketGuard from './guards/socket.guard';
 import { LobbyService } from './lobby.service';
 import { SocketService } from 'src/socket';
+import { User } from 'src/user';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -65,7 +66,13 @@ export class LobbyController {
 
   @Get('game')
   @UseGuards(InLobbyGuard)
-  gameInfos(@CurrentLobby() lobby: Lobby) {
+  gameInfos(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
+    const player = lobby.game.players.get(user.id);
+    if (player.afkInterval) {
+      player.unsetAfk(() => {
+        lobby.game.resume();
+      });
+    }
     return lobby.game.netScheme;
   }
 

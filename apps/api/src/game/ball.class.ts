@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 00:46:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 09:49:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,18 +185,17 @@ export class Ball extends Circle {
      * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
      * le paddle. Peut etre remettre ca en 1v1 only?
      */
-    // const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // // // x2 pour aller de -1 a x1;
-    // const percent = (hitLen / paddle.width - 0.5) * 2;
-    // // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
-    // console.log('Hit percent', percent);
-    // const maxAngle = 25;
-    // const addDeg = maxAngle * percent;
-    // newDegree += addDeg;
+    const hitLen = lineLength([paddle.line[1], this.target.hit]);
+    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    // // x2 pour aller de -1 a x1;
+    const percent = (hitLen / paddle.width - 0.5) * 2;
+    // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
+    console.log('Hit percent', percent);
+    const maxAngle = 25;
+    const addDeg = maxAngle * percent;
 
-    const newAngle = angleToRadians(newDegree);
+    const newAngle = angleToRadians(newDegree + addDeg);
     this.lastHitten = paddle;
     this.color = paddle.color;
     this.setAngle(newAngle);
@@ -235,10 +234,8 @@ export class Ball extends Circle {
       },
       radius: this.radius,
       target: {
-        hit: {
-          x: this.target.hit[0],
-          y: this.target.hit[1],
-        },
+        x: this.target.hit[0],
+        y: this.target.hit[1],
       },
     };
   }

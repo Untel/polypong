@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/12 01:37:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 11:53:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,7 @@ export default class Game {
     this.lobby = lobby;
     this.bots = lobby.bots.map((v) => new Bot(v));
     this.players = new Map(this.lobby.players);
-    console.log('New game', this.bots.length, this.players.size);
-    this.generateMap();
-    this.run();
-    this.newRound(15);
+    this.newRound(7);
   }
 
   addBall() {
@@ -83,7 +80,7 @@ export default class Game {
     this.map = new PolygonMap((this.nPlayers === 2 && 4) || this.nPlayers);
     this.paddles = [];
     const playersAndBotsToAssign = [...this.players.values(), ...this.bots];
-    const randomPlayers = shuffle(playersAndBotsToAssign);
+    const randomPlayers: (Bot | Player)[] = shuffle(playersAndBotsToAssign);
 
     this.walls = this.map.edges.map((line: Line, index) => {
       let paddle = null;
@@ -92,7 +89,7 @@ export default class Game {
         paddle = new Paddle(line, player.color);
         this.paddles.push(paddle);
         const wall = new Wall(line, paddle, player);
-        if (player instanceof Bot) player.attachWall(wall);
+        player.attachWall(wall);
         return wall;
       }
       return new Wall(line, paddle);
@@ -106,44 +103,48 @@ export default class Game {
     // this.generateMap(this.nPlayers);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
-    this.newRound();
   }
   stop() {
-    clearTimeout(this.waitTimeout);
     clearInterval(this.interval);
     clearInterval(this.intervalPowers);
     clearInterval(this.sayInterval);
     this.interval = null;
     this.intervalPowers = null;
-    this.waitTimeout = null;
     this.sayInterval = null;
   }
 
   newRound(timer = 5) {
-    this.paused = true;
+    this.generateMap();
     this.socket.emit('mapChange', this.mapNetScheme);
+    this.resume(timer);
+  }
+
+  resume(timer = 5) {
+    console.log('New round', this.players.size, this.bots.length);
+    this.paused = true;
+    if (this.isStopped) this.run();
     clearInterval(this.sayInterval);
     this.sayInterval = setInterval(() => {
       timer -= 1;
       if (timer === 0) {
-        this.socket.emit('message', 'Goo oo ooo ooo o o o o o o');
+        this.socket.emit('message', 'Goooo ooo ooo o o o o o o');
         // this.run();
         this.paused = false;
         clearInterval(this.sayInterval);
         this.sayInterval = null;
       } else {
-        this.socket.emit('message', `New round will start in ${timer}s`);
+        this.socket.emit('message', `Game resume in ${timer}s`);
       }
     }, 1000);
   }
 
   updatePaddlePercent(userId, percent: number) {
-    const wall = this.walls.find((w) => w?.player?.user.id === userId);
-    wall.paddle.updatePercentOnAxis(percent);
+    const player = this.players.get(userId);
+    if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
   runPhysics() {
-    this.balls.forEach((ball) => {
+    this.balls.forEach((ball, index) => {
       if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle: Paddle = ball.target.wall.paddle;
         if (paddle) {
@@ -155,6 +156,7 @@ export default class Game {
 
           if (paddleTouchTheBall) {
             ball.bouncePaddle(paddle, this.walls);
+            this.socket.emit('object', index, 'ball', ball.netScheme);
           } else {
             // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
             if (
@@ -163,12 +165,14 @@ export default class Game {
                 paddle.color === ball.lastHitten.color)
             ) {
               ball.bounceTargetWall(this.walls);
+              this.socket.emit('object', index, 'ball', ball.netScheme);
             } else {
               this.reduce(ball.target.wall);
             }
           }
         } else {
           ball.bounceTargetWall(this.walls);
+          this.socket.emit('object', index, 'ball', ball.netScheme);
         }
         ball.increaseSpeed();
       }
@@ -198,22 +202,13 @@ export default class Game {
       this.lobby.setWinner(winner);
       return;
     }
-    this.generateMap();
     // const timer = 1000;
     // this.socket.emit('timer', { timer });
     this.newRound();
   }
 
-  public reset() {
-    this.generateMap();
-    while (this.bots.length != 0) {
-      this.bots.pop();
-    }
-    // this.spawnBots(this.nBots);
-  }
-
   @Expose()
-  public get isPaused() {
+  public get isStopped() {
     return !this.interval;
   }
 
@@ -280,6 +275,8 @@ export default class Game {
           currBall.swapAngles(compared);
           currBall.findTarget(this.walls);
           compared.findTarget(this.walls);
+          this.socket.emit('object', bIdx, 'ball', currBall.netScheme);
+          this.socket.emit('object', cIdx, 'ball', compared.netScheme);
           break;
         }
       }
@@ -290,7 +287,6 @@ export default class Game {
         if (power.collideWithBall(currBall)) {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
-          console.log('removing power', this.powers.length);
           this.socket.emit('powers', this.powersNetScheme);
         }
       }
@@ -321,7 +317,17 @@ export default class Game {
       this.runPhysics();
       this.runBots();
     }
-    this.socket.emit('gameUpdate', this.networkState);
+    this.socket.emit(
+      'p',
+      this.paddles.map((p) => [
+        [p.line[0][0].toFixed(2), p.line[0][1].toFixed(2)],
+        [p.line[1][0].toFixed(2), p.line[1][1].toFixed(2)],
+      ]),
+      this.balls.map(({ position: { x, y } }) => ({
+        x: x.toFixed(2),
+        y: y.toFixed(2),
+      })),
+    );
   }
 
   public get socket() {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 23:09:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 11:41:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,17 @@ export class SocketGateway
   //   // this.pongService.joinLobby(client, id);
   // }
 
-  @SubscribeMessage('paddlePercent')
-  async paddlePercent(client: AuthSocket, percent: number) {
+  @SubscribeMessage('m')
+  paddlePercent(client: AuthSocket, percent) {
     const user: User = client.data.user;
-    const lobby = this.lobbyService.userIsInLobby(user.id);
+    const lobby: Lobby = client.data.lobby;
+    if (!lobby.game) {
+      console.log('No game while paddle moving', lobby);
+      return;
+    }
     const game = lobby.game;
     if (game) {
-      if (!game.isPaused) game.updatePaddlePercent(user.id, percent);
+      if (!game.isStopped) game.updatePaddlePercent(user.id, percent);
       else console.log('Game found but paused', user.id);
     } else {
       console.log('Game not found', lobby.game);
@@ -92,18 +96,28 @@ export class SocketGateway
 
   handleDisconnect(client: Socket) {
     const user: User = client.data.user;
-    const lobby: Lobby = this.lobbyService.userIsInLobby(user.id);
+    const lobby: Lobby = client.data.lobby;
+    // const lobby: Lobby = this.lobbyService.userIsInLobby(user.id);
     if (lobby) {
       if (lobby.game) {
-        console.log('Has lobby game');
-        lobby.game.stop();
-        // eslint-disable-next-line prettier/prettier
-        lobby.say(
-          `${user.name} has disconnected. Pausing game until he reconnect`,
-        );
+        const player = lobby.game.players.get(user.id); // user is still alive
+        if (player) {
+          lobby.game.stop();
+          player.setAfk(
+            (timer) => {
+              lobby.say(
+                `${user.name} is disconnected. ${timer} before being kicked.`,
+              );
+            },
+            () => {
+              lobby.game.players.delete(user.id);
+              lobby.game.newRound();
+            },
+          );
+          lobby.game.stop();
+        }
       } else {
         this.lobbyService.removePlayer(lobby.id, user);
-        // this.lobbyService.updateLobby(lobby.id, lobby);
       }
     }
   }

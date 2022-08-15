@@ -86,7 +86,7 @@
         <circle
           v-if="ball.target"
           :fill="ball.color || 'yellow'" r=".5"
-          v-bind="formatCirclePosition(ball.target.hit)"
+          v-bind="formatCirclePosition(ball.target)"
         />
       </g>
       <circle
@@ -152,9 +152,9 @@ const scaleRatio = computed(() => {
 function formatBallTrajectoryPoints(ball: Ball) {
   return {
     x1: ball.position.x,
-    x2: ball.target.hit.x,
+    x2: ball.target.x,
     y1: ball.position.y,
-    y2: ball.target.hit.y,
+    y2: ball.target.y,
   };
 }
 
@@ -186,7 +186,7 @@ const myWallIdx = computed(() => {
 const myWall = computed(() => props.map.walls[myWallIdx.value]);
 const myWallRef = ref<HTMLElement | null>();
 
-const { elementX, elementWidth, isOutside } = useMouseInElement(myWallRef);
+const { elementX, elementWidth } = useMouseInElement(myWallRef);
 const { gamma } = useDeviceOrientation();
 const ratio = computed(() => {
   const r = elementX.value / elementWidth.value;

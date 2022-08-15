@@ -26,9 +26,7 @@ export interface PolygonMap {
 export interface Ball {
   color: string;
   position: Position;
-  target: {
-    hit: Position;
-  };
+  target: Position;
 }
 
 export interface Power {
