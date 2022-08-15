@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:53:44 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 02:13:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 02:35:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
-  Query,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
@@ -44,8 +43,8 @@ import JwtTwoFactorGuard from 'src/guards/jwt-two-factor.guard';
 import JwtGuard from 'src/guards/jwt.guard';
 import { User } from 'src/user';
 
-@Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -61,16 +60,11 @@ export class AuthController {
    * @returns
    */
   @Post('register')
-  async registerUser(
-    @Body() registerUserDto: RegisterUserDto,
-    @Req() req,
-    @Res() res,
-  ) {
-    this.logger.log("@Post('register')");
+  async registerUser(@Body() registerUserDto: RegisterUserDto, @Req() req) {
     const result = await this.authService.registerUser(registerUserDto);
     if (result.user) {
       req.user = result.user;
-      return this.login(req, res);
+      return this.login(req);
     }
   }
 
@@ -80,21 +74,19 @@ export class AuthController {
    * @returns User
    */
   @UseGuards(LocalGuard)
-  @HttpCode(201)
   @Post('login')
-  async login(@Req() req, @Res() res) {
+  login(@Req() req) {
     const user = req.user;
-    const token = this.authService.getToken({ ...user });
+    const token = this.authService.getToken({ id: user.id });
 
     // if 2fa is enabled, don't return user info yet
     if (user.isTwoFactorAuthenticationEnabled) {
-      return res.send({
+      return {
         isTwoFactorAuthenticationEnabled: true,
         token: token,
-      });
+      };
     }
-
-    return res.send({ ...user, token });
+    return { token };
   }
 
   /**
