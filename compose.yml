@@ -6,17 +6,19 @@ services:
   nginx:
     image: nginx
     # build: ./compose/nginx
+    domainname: ${DOMAIN_NAME}
     container_name: nginx
     volumes:
-      - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/default.conf.template"
-      - "./compose/nginx/entrypoint/ssl.sh:/docker-entrypoint.d/ssl.sh"
+      - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/${DOMAIN_NAME}.conf.template"
+      - "./compose/nginx/entrypoint/:/docker-entrypoint.d/${DOMAIN_NAME}"
     ports:
       - "${PORT_RANGE:-443}:${PORT_RANGE:-443}"
       - "${NGINX_PORT:-80}:80"
     environment:
       - NGINX_PORT=80
       - NGINX_SSL_PORT=${PORT_RANGE:-443}
-      - SSL_PATH=/etc/ssl/certs/polypong
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - SSL_PATH=/etc/ssl/certs/${DOMAIN_NAME}
     networks:
       - proxy
     depends_on:
