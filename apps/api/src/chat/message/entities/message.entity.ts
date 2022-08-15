@@ -6,13 +6,13 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 02:13:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:22:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Thread } from 'src/chat/thread';
 import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.entity';
-import { BaseEntity } from 'src/entities/base.entity';
+import { RootEntity } from 'src/entities/root.entity';
 import { User } from 'src/user/user.entity';
 import {
   Column,
@@ -26,7 +26,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Message extends BaseEntity {
+export class Message extends RootEntity {
   @Column('text')
   content: string;
 

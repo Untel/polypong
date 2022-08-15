@@ -6,13 +6,13 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 16:48:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:22:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Channel } from './channel.entity';
 import { Message } from 'src/chat/message';
-import { BaseEntity, TS } from 'src/entities/base.entity';
+import { RootEntity, TS } from 'src/entities/root.entity';
 import { User } from 'src/user';
 import {
   Entity,
@@ -37,7 +37,7 @@ export enum ChannelMemberStatus {
 
 @Entity()
 @Index(['user', 'channel'], { unique: true })
-export class ChannelMember extends BaseEntity {
+export class ChannelMember extends RootEntity {
   @ManyToOne(() => User)
   public user: User;
 

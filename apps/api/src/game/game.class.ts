@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:53:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 12:53:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,6 +190,7 @@ export default class Game {
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
     } else if (wall.player) {
+      // this.lobby.service.rankUser(this.lobby, wall.player.id);
       this.players.delete(wall.player.user.id);
     }
     // this.stop();
@@ -199,7 +200,7 @@ export default class Game {
       if (this.bots.length) winner = this.bots.pop();
       else winner = [...this.players.values()].pop();
       console.log('THERE IS A WINNER', winner, this.bots, this.players);
-      this.lobby.setWinner(winner);
+      // this.lobby.service.closeLobby(this.lobby, winner);
       return;
     }
     // const timer = 1000;

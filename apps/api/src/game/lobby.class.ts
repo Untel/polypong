@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 02:48:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 13:57:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ import { UnprocessableEntityException } from '@nestjs/common';
 import { LobbyBot } from './lobbyBot.class';
 import { SocketService } from 'src/socket';
 import { Server } from 'socket.io';
+import { LobbyService } from 'src/lobby';
 
 export type LobbyId = number;
 
@@ -69,12 +70,15 @@ export default class Lobby implements ILobby, ILobbyConfig {
   // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
   @Exclude()
   socketServer: Server;
+  @Exclude()
+  service: LobbyService;
   public get sock() {
     return this.socketServer.to(this.roomId);
   }
 
-  constructor(socket: Server, host: User, name = 'Unamed lobby') {
-    this.socketServer = socket;
+  constructor(service: LobbyService, host: User, name = 'Unamed lobby') {
+    this.socketServer = service.socketService.socketio;
+    this.service = service;
     this.id = host.id;
     this.name = name;
     this.host = host;
@@ -145,14 +149,6 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   say(message) {
     this.sock.emit('message', message);
-  }
-
-  setWinner(winner) {
-    this.winner = winner;
-    this.sock.emit('end', {
-      name: this.winner.color,
-      color: this.winner.color,
-    });
   }
 
   public get roomId() {

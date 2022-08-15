@@ -14,7 +14,7 @@ build:
 	$(COMPOSE) up --build
 
 down:
-	$(COMPOSE) down
+	$(COMPOSE) down -v
 
 clear:
 	$(COMPOSE) down -v

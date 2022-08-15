@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:55:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 13:58:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ export class LobbyService {
   constructor(
     // @InjectRedis() private readonly redis: Redis,
     @Inject(forwardRef(() => SocketService))
-    private socketService: SocketService,
+    public socketService: SocketService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
   ) {
@@ -111,11 +111,21 @@ export class LobbyService {
   }
 
   createLobby(host: User, name: string): Lobby {
-    const lobby = new Lobby(this.socketService.socketio, host, name);
+    const lobby = new Lobby(this, host, name);
     this.lobbies.set(host.id, lobby);
     this.socketService.serializeEmit('lobbies_update', [
       ...this.lobbies.values(),
     ]);
     return lobby;
+  }
+
+  closeLobby(lobby: Lobby, winner = null) {
+    if (winner) {
+      this.socketService.serializeEmit('lobby_win', {
+        lobbyId: lobby.id,
+        winner: { color: winner.color, name: winner.name },
+      });
+    }
+    this.lobbies.delete(lobby.id);
   }
 }

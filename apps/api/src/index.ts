@@ -1,8 +1,6 @@
 // created from 'create-ts-index'
 
-export * from './app.controller';
 export * from './app.module';
-export * from './app.service';
 export * from './main';
 export * from './auth';
 export * from './chat';
@@ -13,6 +11,7 @@ export * from './game';
 export * from './guards';
 export * from './lobby';
 export * from './mail';
+export * from './match-history';
 export * from './pong';
 export * from './providers';
 export * from './relationship';

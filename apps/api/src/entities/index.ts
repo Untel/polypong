@@ -1,3 +1,3 @@
 // created from 'create-ts-index'
 
-export * from './base.entity';
+export * from './root.entity';

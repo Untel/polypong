@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 07:27:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/15 14:22:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Message } from 'src/chat/message';
-import { BaseEntity } from 'src/entities/base.entity';
+import { RootEntity } from 'src/entities/root.entity';
 import { User } from 'src/user';
 import {
   Entity,
@@ -25,7 +25,7 @@ import {
 import { ThreadParticipant } from './thread-participant.entity';
 
 @Entity()
-export class Thread extends BaseEntity {
+export class Thread extends RootEntity {
   @OneToMany(() => ThreadParticipant, (tp) => tp.thread)
   public participants: ThreadParticipant[];
 
