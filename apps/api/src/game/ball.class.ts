@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 21:23:02 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/16 22:50:40 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -293,10 +293,25 @@ export class Ball extends Circle {
 
     const newAngle = angleToRadians(newDegree % 360);
     // this.lastHitten = paddle;
+
     // this.color = paddle.color;
+    
+    const hitLen = lineLength([paddle.line[1], this.target.hit]);
+    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    // // x2 pour aller de -1 a x1;
+    const percent = (hitLen / paddle.width - 0.5) * 2;
+    // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
+    console.log('Hit percent', percent);
+    const maxAngle = 25;
+    const addDeg = maxAngle * percent;
+
+    
     this.lastHitten = paddle;
     this.color = paddle.color;
-    this.setAngle(newAngle);
+
+    
+    this.setAngle(GameTools.angleNormalize(newAngle +  angleToRadians(addDeg),0, 360));
     this.findTarget();
   }
 

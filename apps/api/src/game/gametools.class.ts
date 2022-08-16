@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gametools.class.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:32:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 22:44:31 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,14 @@ import { Vector } from 'collider2d';
 
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
+
+  static angleNormalize(val: number, r_start: number, r_end: number) {
+    let width: number = r_end - r_start;   // 
+    let offsetValue: number = val - r_start;   // value relative to 0
+
+    return (offsetValue - (Math.floor(offsetValue / width) * width)) + r_start;
+    // + start to reset back to start of original range
+  }
   static lineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
     const s1_x = p1_x - p0_x;
     const s1_y = p1_y - p0_y;
