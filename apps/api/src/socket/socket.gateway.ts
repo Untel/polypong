@@ -120,6 +120,10 @@ export class SocketGateway
         this.lobbyService.removePlayer(lobby.id, user);
       }
     }
+    this.server.emit('online', {
+      name: user.name,
+      type: 'disconnect',
+    });
   }
 
   handleConnection(client: AuthSocket, ...args: any[]) {
