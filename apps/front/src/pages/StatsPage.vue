@@ -2,7 +2,6 @@
 <div>
 --- id = {{ userId }} ---
 --- isSelf = {{ isSelf }} --- <br/>
---- his.matchs = {{ his.matchs }} --- <br/>
 <q-card>
   <q-card-section v-for="match in his.getMatches" :key="`${userId}-${match.id}`">
     <match-card :match="match"/>
@@ -16,6 +15,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import { useMatchHistoryStore } from 'src/stores/history.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useRoute } from 'vue-router';
+import MatchCard from 'src/components/MatchCard.vue';
 // import RelSearchBar from 'src/components/RelSearchBar.vue';
 // import SocialCard from 'src/components/SocialCard.vue';
 
