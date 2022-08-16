@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 15:01:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 18:53:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = false;
+const TEST_MODE = true;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -61,10 +61,13 @@ export default class Game {
   }
 
   addBall() {
-    const ball = new Ball(new Vector(this.map.center.x, this.map.center.y));
+    const ball = new Ball(
+      this,
+      new Vector(this.map.center.x, this.map.center.y),
+    );
     // ball.setAngle(angleToRadians(this.map.angles[1]));
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
-    ball.findTarget(this.walls);
+    ball.findTarget();
     this.balls.push(ball);
   }
 
@@ -151,8 +154,7 @@ export default class Game {
           );
 
           if (paddleTouchTheBall) {
-            ball.bouncePaddle(paddle, this.walls);
-            this.socket.emit('object', index, 'ball', ball.netScheme);
+            ball.bouncePaddle(paddle);
           } else {
             // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
             if (
@@ -160,15 +162,13 @@ export default class Game {
               (this.mode === MODE.Coalition &&
                 paddle.color === ball.lastHitten.color)
             ) {
-              ball.bounceTargetWall(this.walls);
-              this.socket.emit('object', index, 'ball', ball.netScheme);
+              ball.bounceTargetWall();
             } else {
               this.reduce(ball.target.wall);
             }
           }
         } else {
-          ball.bounceTargetWall(this.walls);
-          this.socket.emit('object', index, 'ball', ball.netScheme);
+          ball.bounceTargetWall();
         }
         ball.increaseSpeed();
       }
@@ -269,10 +269,8 @@ export default class Game {
         const compared: Ball = this.balls[cIdx];
         if (currBall.collideWithBall(compared)) {
           currBall.swapAngles(compared);
-          currBall.findTarget(this.walls);
-          compared.findTarget(this.walls);
-          this.socket.emit('object', bIdx, 'ball', currBall.netScheme);
-          this.socket.emit('object', cIdx, 'ball', compared.netScheme);
+          currBall.findTarget();
+          compared.findTarget();
           break;
         }
       }

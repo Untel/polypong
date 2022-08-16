@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { MatchHistoryService } from './match-history.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
@@ -31,7 +29,6 @@ export class MatchHistoryController {
   @Get()
   async findAll(@CurrentUser() user: User): Promise<UserMatch[] | Match[]> {
     const matchs = await this.matchHistoryService.findAll(user);
-    console.log('Retrieved matchs', matchs);
     return matchs;
   }
 

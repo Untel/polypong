@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 09:49:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 19:09:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ import GameTools from './gametools.class';
 import Triangle from 'triangle-solver';
 import { Wall } from './wall.class';
 import { Paddle } from './paddle.class';
+import Game from './game.class';
 export class Ball extends Circle {
   _speed = 1;
   maxSpeed = 1.5;
@@ -38,9 +39,11 @@ export class Ball extends Circle {
   targetInfo: any;
   adjacent: any;
   alpha: number;
+  game: Game;
 
-  constructor(startPos: Vector = new Vector(0, 0), radius = 2) {
+  constructor(game: Game, startPos: Vector = new Vector(0, 0), radius = 2) {
     super(startPos, radius);
+    this.game = game;
     this.color = `#${GameTools.genRanHex(6)}`;
   }
 
@@ -54,12 +57,7 @@ export class Ball extends Circle {
   }
 
   clone() {
-    const newBall = new Ball(
-      new Vector(this.position.x, this.position.y),
-      this.radius,
-    );
-    newBall.setAngle(this.angle);
-    return newBall;
+    return Object.assign({}, this);
   }
 
   setAngle(angle: number) {
@@ -75,7 +73,8 @@ export class Ball extends Circle {
    * Une fois qu'on a le prochain point d'impact, il suffit calculer la distance entre la balle et la Target
    * @see public get targetDistance()
    */
-  findTarget(walls: Wall[]) {
+  findTarget() {
+    const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
     const line: Line = [
@@ -139,6 +138,12 @@ export class Ball extends Circle {
         break;
       }
     }
+    this.game.socket.emit(
+      'object',
+      this.game.balls.findIndex((b) => b === this),
+      'ball',
+      this.netScheme,
+    );
   }
   move() {
     this.position.x = this.position.x + this.direction.x;
@@ -166,16 +171,16 @@ export class Ball extends Circle {
     compared.setAngle(tmpAngle);
   }
 
-  bounceTargetWall(walls: Wall[]) {
+  bounceTargetWall() {
     const incidenceAngleDeg = angleToDegrees(this.angle);
     const surfaceAngleDeg = lineAngle(this.target.wall.line); //paddle.angle;
     const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
     const newAngle = angleToRadians(newDegree);
     this.setAngle(newAngle);
-    this.findTarget(walls);
+    this.findTarget();
   }
 
-  bouncePaddle(paddle: Paddle, walls: Wall[]) {
+  bouncePaddle(paddle: Paddle) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
     const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
@@ -199,7 +204,7 @@ export class Ball extends Circle {
     this.lastHitten = paddle;
     this.color = paddle.color;
     this.setAngle(newAngle);
-    this.findTarget(walls);
+    this.findTarget();
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {

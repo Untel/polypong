@@ -122,7 +122,7 @@ export class SadiSlap extends Power {
 
   effect(ball: Ball) {
     ball.setAngle(Math.random() * (Math.PI * 2));
-    ball.findTarget(this.game.walls);
+    ball.findTarget();
   }
 }
 
