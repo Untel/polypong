@@ -1,9 +1,18 @@
+<style lang="scss" scoped>
+  .mini-footer {
+    left: initial;
+  }
+</style>
+
 <template>
-  <q-layout full-height view="lHh Lpr lFf">
+  <q-layout full-height view="lhH Lpr lfF">
     <q-page-container>
       <router-view />
     </q-page-container>
-    <q-page-sticky class="absolute bg-transparent">
+    <q-page-sticky reveal
+      :model-value="!disabled"
+      class="mini-footer bg-transparent"
+      >
       <span class="text-primary">
         Made with <q-icon name="favorite" color="red"/> by
         <BgSocial login="adda-sil"
@@ -47,11 +56,24 @@
 import { useSettingsStore } from 'src/stores/settings';
 import BgSocial from 'src/components/BgSocial.vue';
 import { Notify, useQuasar } from 'quasar';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
+const $route = useRoute();
 const $q = useQuasar();
 const settings = useSettingsStore();
 const askPermission = (DeviceOrientationEvent as any).requestPermission;
+
+const disabled = computed(() => {
+  // $q.screen.width > $q.screen.height
+  const dis = $route.name === 'inbox' && $q.screen.width < 850;
+  return dis;
+});
+const horizontal = computed(() => {
+  // $q.screen.width > $q.screen.height
+  const hor = ($route.name === 'inbox');
+  return hor;
+});
 
 onMounted(async () => {
   if ($q.platform.is.mobile) {

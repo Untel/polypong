@@ -16,7 +16,7 @@ import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
 import JwtGuard from 'src/guards/jwt.guard';
 import { CurrentUser } from 'src/decorators';
 import { User } from 'src/user/user.entity';
-import { UserMatch } from './entities';
+import { Match, UserMatch } from './entities';
 
 @UseGuards(JwtGuard)
 @Controller('match-history')
@@ -29,7 +29,7 @@ export class MatchHistoryController {
   }
 
   @Get()
-  async findAll(@CurrentUser() user: User): Promise<UserMatch[]> {
+  async findAll(@CurrentUser() user: User): Promise<Match[]> {
     const matchs = await this.matchHistoryService.findAll(user);
     console.log('Retrieved matchs', matchs);
     return matchs;

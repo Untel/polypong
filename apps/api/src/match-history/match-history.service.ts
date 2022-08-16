@@ -4,6 +4,7 @@ import { User } from 'src/user/user.entity';
 import { Equal, Repository } from 'typeorm';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
 import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
+import { Match } from './entities';
 import { UserMatch } from './entities/user-match.entity';
 
 @Injectable()
@@ -11,6 +12,8 @@ export class MatchHistoryService {
   constructor(
     @InjectRepository(UserMatch)
     private userMatchRep: Repository<UserMatch>,
+    @InjectRepository(Match)
+    private matchRep: Repository<Match>,
   ) {}
 
   create(createMatchHistoryDto: CreateMatchHistoryDto) {
@@ -19,10 +22,10 @@ export class MatchHistoryService {
 
   findAll(user: User) {
     console.log('Finding all for', user.id);
-    return this.userMatchRep.find({
-      where: { user: Equal(user) },
+    return this.matchRep.find({
+      where: { players: { user: { id: user.id } } },
       order: { createdAt: 'DESC' },
-      relations: ['match', 'match.players.user'],
+      relations: ['players.user'],
     });
   }
 

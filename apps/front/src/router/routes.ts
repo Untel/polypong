@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 16:52:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 14:41:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@ import {
   RouteRecordRaw,
 } from 'vue-router';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
+// import CopyrightFooter from 'src/components/CopyrightFooter.vue';
 import AuthGuard from './auth.guard';
 
 const authRoutes: RouteRecordRaw[] = [{
@@ -61,11 +62,11 @@ const authRoutes: RouteRecordRaw[] = [{
 const routes: RouteRecordRaw[] = [{
   path: '/',
   name: 'base',
-  component: MinimalLayout,
+  components: { default: MinimalLayout },
   children: [{
     path: 'auth',
     name: 'auth',
-    component: () => import('src/layouts/AuthLayout.vue'),
+    components: { default: () => import('src/layouts/AuthLayout.vue') },
     children: [{
       name: 'login',
       path: '',

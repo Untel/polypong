@@ -1,3 +1,9 @@
+<style>
+  .q-drawer--on-top {
+    z-index: 5000;
+  }
+</style>
+
 <template>
   <div class="WAL position-relative bg-grey-4" :style="style">
     <q-layout view="lHh Lpr lFf" class="WAL__layout shadow-3" container>
@@ -253,7 +259,7 @@ export default {
   width: 100%
   height: 100%
   padding-top: 20px
-  padding-bottom: 20px
+  padding-bottom: 50px
   &:before
     content: ''
     height: 127px
@@ -264,7 +270,7 @@ export default {
   &__layout
     margin: 0 auto
     z-index: 4000
-    height: calc(100% - 30px)
+    height: 100%
     width: 90%
     max-width: 950px
     border-radius: 5px
@@ -273,7 +279,7 @@ export default {
   .q-drawer--standard
     .WAL__drawer-close
       display: none
-@media (max-width: 850px)
+@media (max-width: 1025px)
   .WAL
     padding: 0
     &__layout

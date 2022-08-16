@@ -1,9 +1,12 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="text-primary">
+      <q-toolbar>
+        <q-avatar>
+          <img :src="$auth.user.avatar" alt="">
+        </q-avatar>
         <q-toolbar-title>
-          Polypong
+          {{ $auth.user.name }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -12,13 +15,11 @@
       show-if-above
       bordered
       mini-to-overlay
-
       :mini="miniState"
       @mouseover="miniState = false"
       @mouseout="miniState = true"
-
       :width="200"
-      :breakpoint="500"
+      :breakpoint="400"
     >
       <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
       <EssentialLink title="Home" caption="Home page" icon="fas fa-igloo" to="home"/>
@@ -57,12 +58,12 @@ defineComponent({
 
 const miniState = ref(true);
 
-const auth = useAuthStore(); const soc = useSocialStore();
+const $auth = useAuthStore();
+const soc = useSocialStore();
 
-auth.socket.on('friendship', () => { soc.fetchRelationships(); });
-auth.socket.on('block', () => { soc.fetchRelationships(); });
+$auth.socket.on('friendship', () => { soc.fetchRelationships(); });
+$auth.socket.on('block', () => { soc.fetchRelationships(); });
 
-// const auth = useAuthStore();
 // const router = useRouter();
 
 // onMounted(() => {
