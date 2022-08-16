@@ -20,13 +20,13 @@ export class MatchHistoryService {
     return 'This action adds a new matchHistory';
   }
 
-  findAll(user: User) {
-    console.log('Finding all for', user.id);
-    return this.matchRep.find({
-      where: { players: { user: { id: user.id } } },
+  async findAll(user: User) {
+    const userMatch = await this.userMatchRep.find({
+      where: { user: { id: user.id } },
       order: { createdAt: 'DESC' },
-      relations: ['players.user'],
+      relations: ['match.players.user'],
     });
+    return userMatch.map((um) => um.match);
   }
 
   findOne(id: number) {
