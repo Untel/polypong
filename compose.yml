@@ -65,7 +65,7 @@ services:
       - database
       - redis
       - proxy
-      - mailerz
+      - mailer
     depends_on:
       postgres:
         condition: service_healthy

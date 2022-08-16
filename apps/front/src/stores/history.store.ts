@@ -13,6 +13,7 @@
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { mande } from 'mande';
+import { identity } from '@vueuse/core';
 import { useAuthStore } from './auth.store';
 
 export const historyApi = mande('/api/match-history');
@@ -30,11 +31,16 @@ export const useMatchHistoryStore = defineStore('history', {
     matchs: [],
   } as MatchHistoryState),
   getters: {
+    getMatches(state): MatchHistory[] {
+      return state.matchs;
+    },
   },
   actions: {
+    getMatch(id: number): MatchHistory | undefined {
+      return this.getMatches.find((m) => m.id === id);
+    },
     async fetchHistory() {
       this.matchs = await historyApi.get<MatchHistory[]>('');
-      console.log('Fetched', this.matchs);
     },
   },
 });
