@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 14:53:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 15:01:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ export default class Game {
       this.players.delete(wall.player.user.id);
     }
     if (this.nPlayers === 1 || this.players.size === 0) {
-      this.stop();
+      // this.stop();
       return this.lobby.service.closeLobby(this.lobby);
     }
     // const timer = 1000;
