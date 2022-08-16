@@ -29,7 +29,7 @@ export class MatchHistoryController {
   }
 
   @Get()
-  async findAll(@CurrentUser() user: User): Promise<Match[]> {
+  async findAll(@CurrentUser() user: User): Promise<UserMatch[] | Match[]> {
     const matchs = await this.matchHistoryService.findAll(user);
     console.log('Retrieved matchs', matchs);
     return matchs;
