@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 18:53:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/16 20:16:38 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ export default class Game {
     if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
-  runPhysics() {
+  old_runPhysics() {
     this.balls.forEach((ball, index) => {
       if (ball.targetDistance <= ball.targetInfo.limit) {
         const paddle: Paddle = ball.target.wall.paddle;
@@ -173,6 +173,61 @@ export default class Game {
         ball.increaseSpeed();
       }
       ball.move();
+    });
+  }
+
+  runPhysics() {
+
+    this.balls.forEach((ball) => {
+
+      const targetDistance: number = ball.targetDistance //- ball.targetInfo.limit;
+      // const jump: boolean = ball.direction.len() > targetDistance
+      const test: number = targetDistance / ball.direction.len()
+
+      // jump = false;
+      if (test < 1 || (targetDistance <= ball.targetInfo.limit)) {
+        if (test < 1 && !(targetDistance <= ball.targetInfo.limit)) {
+          // console.log("Jump !");
+          // const ratio: number = (targetDistance) / ball.direction.len()
+          let test: Vector = new Vector(ball.direction.x, ball.direction.y);
+          test.normalize();
+          test.scale(targetDistance - ball.targetInfo.limit);
+          // console.log("Jump ratio is ", ratio)
+          // ball.position.x *= (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
+          // ball.position.y *= (ball.target.hit[1] - ball.position.y) * (ratio)//0.90;
+          ball.position.x += test.x //0.90;
+          ball.position.y += test.y //0.90;
+          // ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * (ratio)//0.90;
+          // ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * (ratio)//0.90;
+        }
+        const paddle: Paddle = ball.target.wall.paddle;
+
+        if (paddle) {
+          const paddleTouchTheBall = (pointOnLine as any)(
+            ball.targetInfo.actualhit,
+            paddle.line,
+            1,
+          );
+
+          if (paddleTouchTheBall) {
+            ball.bouncePaddle(paddle);
+          } else {
+            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
+            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+              ball.bounceTargetWall();
+            } else {
+              this.reduce(ball.target.wall);
+            }
+          }
+        } else {
+          ball.bounceTargetWall();
+        }
+        ball.increaseSpeed();
+
+      }
+      else
+        ball.move();
+
     });
   }
 
