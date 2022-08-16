@@ -1,27 +1,27 @@
 <template>
-{{ id }}
+<q-card>
+
+</q-card>
 </template>
 
 <script lang="ts" setup>
 import { useAuthStore } from 'src/stores/auth.store';
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 const auth = useAuthStore();
 
 defineComponent({ name: 'MatchCard' });
 
 const props = defineProps({
-  id: {
-    type: Number,
+  match: {
+    type: Object as PropType<any>,
   },
 });
 
-function onClick(): void {
-  console.log('click', props.id);
-}
-
-const emit = defineEmits(['matchCardClick']);
-
-function matchCardClick() { emit('matchCardClick', props.id); }
+// const emit = defineEmits(['matchCardClick']);
+//
+// function onClick(): void {
+//  emit('matchCardClick');
+// }
 
 </script>

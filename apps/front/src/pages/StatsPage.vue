@@ -4,10 +4,8 @@
 --- isSelf = {{ isSelf }} --- <br/>
 --- his.matchs = {{ his.matchs }} --- <br/>
 <q-card>
-  <q-card-section v-for="match in his.matchs" :key="`${userId}-${match.id}`">
-    <match-card
-      :id="match.id"
-    />
+  <q-card-section v-for="match in his.getMatches" :key="`${userId}-${match.id}`">
+    <match-card :match="match"/>
   </q-card-section>
 </q-card>
 </div>
