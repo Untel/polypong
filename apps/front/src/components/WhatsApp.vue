@@ -5,8 +5,10 @@
 </style>
 
 <template>
+  <!-- lHr lpr lfr -->
+  <!-- lHh Lpr lFf -->
   <div class="WAL position-relative bg-grey-4" :style="style">
-    <q-layout view="lHh Lpr lFf" class="WAL__layout shadow-3" container>
+    <q-layout view="lHh LpR lFr" class="WAL__layout shadow-3" container>
       <q-header elevated>
         <q-toolbar class="bg-grey-3 text-black">
           <q-btn
@@ -32,6 +34,9 @@
           <q-btn round flat icon="search" />
           <q-btn round flat>
             <q-icon name="attachment" class="rotate-135" />
+          </q-btn>
+          <q-btn round flat @click="rightDrawerOpen = !rightDrawerOpen">
+            {{ rightDrawerOpen ? 'X' : 'V' }}
           </q-btn>
           <q-btn round flat icon="more_vert">
             <q-menu auto-close :offset="[110, 0]">
@@ -161,6 +166,49 @@
         </q-scroll-area>
       </q-drawer>
 
+      <q-drawer
+        side="right"
+        show-if-above
+        bordered
+        v-model="rightDrawerOpen"
+      >
+        <q-scroll-area style="height: calc(100% - 100px)">
+          <q-list>
+            <q-item
+              v-for="(conversation, index) in conversations"
+              :key="conversation.id"
+              clickable
+              v-ripple
+              @click="setCurrentConversation(index)"
+            >
+              <q-item-section avatar>
+                <q-avatar>
+                  <img :src="conversation.avatar">
+                </q-avatar>
+              </q-item-section>
+
+              <q-item-section>
+                <q-item-label lines="1">
+                  {{ conversation.person }}
+                </q-item-label>
+                <q-item-label class="conversation__summary" caption>
+                  <q-icon name="check" v-if="conversation.sent" />
+                  <q-icon name="not_interested" v-if="conversation.deleted" />
+                  {{ conversation.caption }}
+                </q-item-label>
+              </q-item-section>
+
+              <q-item-section side>
+                <q-item-label caption>
+                  {{ conversation.time }}
+                </q-item-label>
+                <q-icon name="keyboard_arrow_down" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
+      </q-drawer>
+
       <q-page-container class="bg-grey-2">
         <router-view />
       </q-page-container>
@@ -226,6 +274,7 @@ export default {
   setup() {
     const $q = useQuasar();
     const leftDrawerOpen = ref(false);
+    const rightDrawerOpen = ref(true);
     const search = ref('');
     const message = ref('');
     const currentConversationIndex = ref(0);
@@ -241,6 +290,7 @@ export default {
     }
     return {
       leftDrawerOpen,
+      rightDrawerOpen,
       search,
       message,
       currentConversationIndex,
@@ -272,7 +322,7 @@ export default {
     z-index: 4000
     height: 100%
     width: 90%
-    max-width: 950px
+    max-width: 1400px
     border-radius: 5px
   &__field.q-field--outlined .q-field__control:before
     border: none

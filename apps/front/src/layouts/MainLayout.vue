@@ -19,7 +19,7 @@
       @mouseover="miniState = false"
       @mouseout="miniState = true"
       :width="200"
-      :breakpoint="400"
+      :breakpoint="0"
     >
       <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
       <EssentialLink title="Home" caption="Home page" icon="fas fa-igloo" to="home"/>
