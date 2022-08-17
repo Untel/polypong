@@ -19,7 +19,8 @@
 
   <!-- SEARCH -->
   <q-tab-panel name="search">
-    <q-card>
+    <q-card v-if="auth.getConnectedUsers.length > 1">
+      <pre>online users</pre>
       <q-card-section horizontal>
         <div class="q-pa-md row items-start q-gutter-md"
           v-for="user in auth.getConnectedUsers" :key="`user-${user.id}`"
@@ -27,8 +28,8 @@
           <social-avatar v-if="user.id !== auth.getUser.id"
             :id="user.id" :name="user.name" :avatar="user.avatar"
             @avatarClick="(name) => {
-              if (searchedRel?.to.name === name) {
-                searchedRel = null; soc.setSearchedRel(null);
+              if (soc.getSearchedRel?.to.name === name) {
+                soc.setSearchedRel(undefined);
               } else {
                 searchRel(name);
               }
@@ -38,27 +39,21 @@
       </q-card-section>
     </q-card>
     <pre>find people</pre>
-    <rel-search-bar
-      @searched="(rel) => { searchedRel = soc.getSearchedRel }"
-    />
+    <rel-search-bar/>
     <!-- SEARCH RESULTS -->
-    <pre>search results</pre>
-    {{ searchedRel }}
-    <q-card>
-        <div class="q-pa-md row items-start q-gutter-md">
-          <q-card-section v-if="searchedRel" :key="`${searchedRel.to.name}`">
-            <social-card :rel="searchedRel"
-              @toggle-gutter="(name) => toggleCard(name)"
-              @invite-to-lobby="(id) => inviteToLobby(id)"
-              @message="(id) => message(id)"
-              @stats="(id) => stats(id)"
-              @add-friend="(name) => addFriend(name)"
-              @unfriend="(name) => unfriend(name)"
-              @block="(name) => block(name)"
-              @unblock="(name) => unblock(name)"
-            />
-          </q-card-section>
-        </div>
+    <q-card v-if="soc.getSearchedRel">
+      {{ soc.getSearchedRel }}
+      <pre>search results</pre>
+        <social-card :relname="soc.getSearchedRel.to.name"
+          @toggle-gutter="(name) => toggleCard(name)"
+          @invite-to-lobby="(id) => inviteToLobby(id)"
+          @message="(id) => message(id)"
+          @stats="(id) => stats(id)"
+          @add-friend="(name) => addFriend(name)"
+          @unfriend="(name) => unfriend(name)"
+          @block="(name) => block(name)"
+          @unblock="(name) => unblock(name)"
+        />
     </q-card>
   </q-tab-panel>
   <!-- FRIENDLIST -->
@@ -91,7 +86,7 @@
           <q-card-section
             v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
           >
-            <social-card :rel="rel" :toggle="showCard === rel.to.name ? true : false"
+            <social-card :relname="rel.to.name"
               @toggle-gutter="(name) => toggleCard(name)"
               @invite-to-lobby="(id) => inviteToLobby(id)"
               @message="(id) => message(id)"
@@ -111,7 +106,7 @@
           <q-card-section
             v-for="rel in soc.getReceivedFriendships" :key="`rel-${rel.id}`" horizontal
           >
-            <social-card :rel="rel" :toggle="showCard === rel.to.name ? true : false"
+            <social-card :relname="rel.to.name"
               @toggle-gutter="(name) => toggleCard(name)"
               @invite-to-lobby="(id) => inviteToLobby(id)"
               @message="(id) => message(id)"
@@ -131,7 +126,7 @@
           <q-card-section
             v-for="rel in soc.getSentFriendships" :key="`rel-${rel.id}`" horizontal
           >
-            <social-card :rel="rel" :toggle="showCard === rel.to.name ? true : false"
+            <social-card :relname="rel.to.name"
               @toggle-gutter="(name) => toggleCard(name)"
               @invite-to-lobby="(id) => inviteToLobby(id)"
               @message="(id) => message(id)"
@@ -156,11 +151,9 @@
           <q-btn :label=rel.to.name @click="toggleCard(rel.to.name)"
             :color=friendOrNot(rel)
           />
-          <span v-if="showCard == rel.to.name">
-            <q-btn v-if="rel.block_sent" label="unblock"
-              @click="unblock(rel.to.name)" icon="fa-solid fa fa-unlock" color="red"
-            />
-          </span>
+          <q-btn v-if="rel.block_sent" label="unblock"
+            @click="unblock(rel.to.name)" icon="fa-solid fa fa-unlock" color="red"
+          />
         </div>
       </q-card-section>
     </q-card>
@@ -206,16 +199,20 @@ async function unfriend(name: string) { await soc.unsend_friendship(name); }
 async function block(name: string) { await soc.send_block(name); }
 async function unblock(name: string) { await soc.unsend_block(name); }
 
-const searchedRel = ref();
+// const searchedRel = ref(); searchedRel.value = null;
 async function searchRel(name: string) {
-  searchedRel.value = soc.getRelByName(name);
-  if (searchedRel.value === undefined) {
+  console.log('in searchRel, name = ', name);
+  const rel = soc.getRelByName(name);
+  if (rel === undefined) {
     await soc.addRel(name);
-    searchedRel.value = soc.getRelByName(name);
-    console.log('1searchedRel.value = ', searchedRel.value);
+    soc.setSearchedRel(soc.getRelByName(name));
+    //    searchedRel.value = soc.getRelByName(name);
+    console.log('1searchedRel = ', soc.getSearchedRel);
+  } else {
+    soc.setSearchedRel(rel);
+    //    searchedRelvalue = rel;
   }
-  console.log('2searchedRel.value = ', searchedRel.value);
-  soc.setSearchedRel(searchedRel.value);
+  console.log('2searchedRel = ', soc.getSearchedRel);
   console.log('2soc.getSearchedRel= ', soc.getSearchedRel);
 }
 

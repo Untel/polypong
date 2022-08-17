@@ -64,7 +64,10 @@ const $auth = useAuthStore();
 const soc = useSocialStore();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
-$auth.socket.on('block', () => { soc.fetchRelationships(); });
+$auth.socket.on('block', () => {
+  console.log('received block event');
+  soc.fetchRelationships();
+});
 
 // const router = useRouter();
 

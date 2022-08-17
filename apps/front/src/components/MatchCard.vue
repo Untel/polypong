@@ -1,22 +1,27 @@
 <template>
 <q-card>
   <q-card-section horizontal>
-    <q-card-section>{{ match.id }}</q-card-section>
+    <span>the {{ date[0] }} at {{ date[1] }}</span>
     <q-card-section v-for="
-      player in match.players" :key="`player-${player.id}`"
+      player in players" :key="`player-${player.id}`"
     >
-    <span>
-      {{ player.user.name }} rank : {{ player.rank }}
-    </span>
+      <social-avatar
+        @click="playerClick(player.user.name)"
+        :id="player.user.id" :name="player.user.name" :avatar="player.user.avatar"
+      />
     </q-card-section>
   </q-card-section>
 </q-card>
 </template>
 
 <script lang="ts" setup>
+import { match } from 'minimatch';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useSocialStore } from 'src/stores/social.store';
-import { defineComponent, PropType } from 'vue';
+import {
+  computed, defineComponent, PropType,
+} from 'vue';
+import SocialAvatar from './SocialAvatar.vue';
 
 defineComponent({ name: 'MatchCard' });
 
@@ -28,10 +33,20 @@ const props = defineProps({
 
 const auth = useAuthStore(); const soc = useSocialStore();
 
-// const emit = defineEmits(['matchCardClick']);
-//
-// function onClick(): void {
-//  emit('matchCardClick');
-// }
+const date = computed(
+  () => props.match?.finishedAt?.split('T').join(',').split('.').join(',')
+    .split(','),
+);
+console.log('date = ', date);
+
+const players = computed(
+  () => props.match?.players?.slice().sort((a, b) => a.rank - b.rank),
+);
+
+const emit = defineEmits(['playerClick']);
+
+function playerClick(name: string) {
+  emit('playerClick', name);
+}
 
 </script>

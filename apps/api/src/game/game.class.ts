@@ -23,7 +23,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',

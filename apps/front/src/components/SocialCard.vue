@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <q-card class="my-card" :label="rel.to.name">
+  <q-card v-if="rel" class="my-card" :label="rel.to.name">
     <div style="position: relative">
       <q-img :src="rel.to.avatar" height="280px" :ratio="4/3" fit="cover">
           <div class="absolute-top text-center text-weight-bolder">
@@ -85,21 +85,21 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, PropType, ref } from 'vue';
-import { Relationship } from '../stores/social.store';
+import {
+  computed,
+  defineComponent, PropType, ref, watch,
+} from 'vue';
+import { stringLiteral } from '@babel/types';
+import { Relationship, useSocialStore } from '../stores/social.store';
 import StatusBadge from './StatusBadge.vue';
 import SocialButton from './SocialButton.vue';
 
+const soc = useSocialStore();
+
 defineComponent({ name: 'SocialCard' });
-defineProps({
-  rel: {
-    type: Object as PropType<Relationship>,
-    default: null,
-  },
-  toggle: {
-    type: Boolean,
-    default: false,
-  },
+
+const props = defineProps({
+  relname: String,
 });
 
 const emit = defineEmits([
@@ -107,12 +107,10 @@ const emit = defineEmits([
   'addFriend', 'unfriend', 'block', 'unblock',
 ]);
 
-function friendOrNot(rel: Relationship): string {
-  if (rel.friendship_sent && rel.friendship_received) { return 'green'; }
-  if (rel.block_sent || rel.block_received) { return 'red'; }
-  return '';
-}
+const rel = computed(() => soc.getRelByName(props.relname || ''));
 
+console.log('in socialCard, props.relname = ', props.relname);
+console.log('in socialCard, rel = ', rel);
 const showGutter = ref('');
 const toggleWidth = ref('0');
 
