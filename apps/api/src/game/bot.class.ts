@@ -1,16 +1,7 @@
 import { Paddle } from './paddle.class';
-import Player from './player.class';
 import { Ball } from './ball.class';
 import { Wall } from './wall.class';
-import {
-  lineLength,
-  Line,
-  pointLeftofLine,
-  pointRightofLine,
-  lineMidpoint,
-  pointOnLine,
-} from 'geometric';
-import GameTools from './gametools.class';
+import { lineLength, Line } from 'geometric';
 export class Bot {
   botPaddle: Paddle;
   maxSpeed: number;
@@ -24,7 +15,6 @@ export class Bot {
 
   constructor(datas: Partial<Bot> = {}) {
     Object.assign(this, datas);
-    console.log("This bot level is", this.level);
     this.level++;
   }
   attachWall(wall: Wall) {
@@ -33,60 +23,65 @@ export class Bot {
   }
   think() {
     switch (this.level) {
-        case 1:
-            this.level1();
-            break;
-        case 2:
-            this.level2();
-            this.level1();
-            break;
-        case 3:
-          this.level2();
-          this.level1();
-          break;
+      case 0:
+        this.level1();
+        break;
+      case 1:
+        this.level2();
+        this.level1();
+        break;
+      case 2:
+        this.level2();
+        this.level1();
+        break;
     }
   }
   level2() {
     if (this.tasks.length !== 0 || this.wall.paddle.ratio === 0.5) {
-        return;
+      return;
     }
-    let offset: number;
-    const ratio: number = this.wall.paddle.ratio;
-    offset = (this.wall.paddle.ratio > 0.5) ? -0.01 : + 0.01;
-    if ((offset > 0 && (offset + ratio > 0.5)) || (offset < 0 && (offset + ratio < 0.5))) {
-        this.wall.paddle.updatePercentOnAxis(0.5);
+    const offset = this.wall.paddle.ratio > 0.5 ? -0.01 : +0.01;
+    const ratio = this.wall.paddle.ratio;
+    if (
+      (offset > 0 && offset + ratio > 0.5) ||
+      (offset < 0 && offset + ratio < 0.5)
+    ) {
+      this.wall.paddle.updatePercentOnAxis(0.5);
+    } else {
+      this.wall.paddle.updatePercentOnAxis(ratio + offset);
     }
-    else {
-        this.wall.paddle.updatePercentOnAxis(ratio + offset);
-    }
-
-}
-  level1(id: number = 0) {
+  }
+  level1(id = 0) {
     if (this.tasks.length === 0) {
-        return;
+      return;
     }
 
     const focus: Ball = this.tasks[id];
     // console.log(this.tasks.length);
 
-    let rSideDist = lineLength([this.wall.paddle.line[1], focus.targetInfo.actualhit]);
-    let lSideDist = lineLength([this.wall.paddle.line[0], focus.targetInfo.actualhit]);
+    const rSideDist = lineLength([
+      this.wall.paddle.line[1],
+      focus.targetInfo.actualhit,
+    ]);
+    const lSideDist = lineLength([
+      this.wall.paddle.line[0],
+      focus.targetInfo.actualhit,
+    ]);
 
     if (Math.abs(rSideDist - lSideDist) < 0.5) {
-        return;
+      return;
     }
     if (rSideDist > lSideDist) {
-        this.wall.paddle.updatePercentOnAxis(
-            (this.wall.paddle.ratio - 0.01) >= 0 ?
-                (this.wall.paddle.ratio - 0.01) : 0)
+      this.wall.paddle.updatePercentOnAxis(
+        this.wall.paddle.ratio - 0.01 >= 0 ? this.wall.paddle.ratio - 0.01 : 0,
+      );
+    } //if (lSideDist > rSideDist) {
+    else {
+      this.wall.paddle.updatePercentOnAxis(
+        this.wall.paddle.ratio + 0.01 <= 1 ? this.wall.paddle.ratio + 0.01 : 1,
+      );
     }
-    else //if (lSideDist > rSideDist) {
-    {
-        this.wall.paddle.updatePercentOnAxis(
-            (this.wall.paddle.ratio + 0.01) <= 1 ?
-                this.wall.paddle.ratio + 0.01 : 1)
-    }
-}
+  }
 
   // think() {
   //   // console.log("thinking")

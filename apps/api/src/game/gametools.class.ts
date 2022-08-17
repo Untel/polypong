@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gametools.class.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 22:44:31 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/17 16:07:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
 
   static angleNormalize(val: number, r_start: number, r_end: number) {
-    let width: number = r_end - r_start;   // 
-    let offsetValue: number = val - r_start;   // value relative to 0
+    const width: number = r_end - r_start; //
+    const offsetValue: number = val - r_start; // value relative to 0
 
-    return (offsetValue - (Math.floor(offsetValue / width) * width)) + r_start;
+    return offsetValue - Math.floor(offsetValue / width) * width + r_start;
     // + start to reset back to start of original range
   }
   static lineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
@@ -51,25 +51,6 @@ export default class GameTools {
     return Math.random() * (max - min) + min;
   }
 
-  static vectorRotate(vx: number, vy: number, degree: number) {
-    // const L = Math.norm([vx,vy]) this.distance(0, 0, vx, vy);
-    // L =
-    const vec: Vector = new Vector(vx, vy);
-    // console.log("vector L is ", L);
-    console.log('vec is ', vec);
-
-    // {
-    // ang = -ang * (Math.PI / 180);
-    const cos = Math.cos(degree);
-    const sin = Math.sin(degree);
-    const rotated = [
-      Math.round(10000 * (vx * cos - vy * sin)) / 10000,
-      Math.round(10000 * (vx * sin + vy * cos)) / 10000,
-    ];
-    // };
-    // console.log("rotated :", rotated)
-    return rotated;
-  }
 
   static pDistance(x: number, y: number, p1: number[], p2: number[]): number {
     const A = x - p1[0];

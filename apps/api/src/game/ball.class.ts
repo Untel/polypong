@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 22:50:40 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/17 16:20:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ export class Ball extends Circle {
    * Une fois qu'on a le prochain point d'impact, il suffit calculer la distance entre la balle et la Target
    * @see public get targetDistance()
    */
-   findTarget() {
+  findTarget() {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
@@ -81,8 +81,7 @@ export class Ball extends Circle {
       [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
     ];
-    if (this.target)
-      this.target.wall.clearBall(this);
+    if (this.target) this.target.wall.clearBall(this);
     const [[x1, y1], [x2, y2]] = line;
     // let collided = false;
     for (let i = 0; i < walls.length; i++) {
@@ -101,34 +100,31 @@ export class Ball extends Circle {
       );
 
       if (intersection) {
-
         this.target = {
           hit: [intersection.x, intersection.y],
           wall,
         };
         wall.addBall(this);
 
-        const incidenceAngle = angleToDegrees(this.angle)
+        const incidenceAngle = angleToDegrees(this.angle);
 
-        let normvector: Vector = new Vector(
-          (this.target.wall.line[0][0] - this.target.wall.line[1][0]),
-          (this.target.wall.line[0][1] - this.target.wall.line[1][1])
+        const normvector: Vector = new Vector(
+          this.target.wall.line[0][0] - this.target.wall.line[1][0],
+          this.target.wall.line[0][1] - this.target.wall.line[1][1],
         ).normalize();
 
-
         let alpha: number = wall.angle - incidenceAngle;
-        alpha = (alpha < 0) ? alpha + 360 : alpha;
+        alpha = alpha < 0 ? alpha + 360 : alpha;
 
-        let values = {
+        const values = {
           b: 3,
           B: alpha,
-          A: 90
-        }
+          A: 90,
+        };
 
-        const triangle: Triangle = new Triangle(values)
+        const triangle: Triangle = new Triangle(values);
         triangle.solve();
         normvector.scale(triangle.sides.c);
-
 
         // this.targetInfo = {
         //   actualhit: [
@@ -142,7 +138,10 @@ export class Ball extends Circle {
         // };
 
         this.targetInfo = {
-          actualhit: [((normvector.x) + this.target.hit[0]), ((normvector.y) + this.target.hit[1])],
+          actualhit: [
+            normvector.x + this.target.hit[0],
+            normvector.y + this.target.hit[1],
+          ],
           limit: triangle.sides.a,
           edgeIndex: i,
           edge,
@@ -276,8 +275,7 @@ export class Ball extends Circle {
   bouncePaddle(paddle: Paddle) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    let newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-    console.log("boucne paddle");
+    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
     /**
      * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
      * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
@@ -295,7 +293,7 @@ export class Ball extends Circle {
     // this.lastHitten = paddle;
 
     // this.color = paddle.color;
-    
+
     const hitLen = lineLength([paddle.line[1], this.target.hit]);
     // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
     // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
@@ -306,12 +304,12 @@ export class Ball extends Circle {
     const maxAngle = 25;
     const addDeg = maxAngle * percent;
 
-    
     this.lastHitten = paddle;
     this.color = paddle.color;
 
-    
-    this.setAngle(GameTools.angleNormalize(newAngle +  angleToRadians(addDeg),0, 360));
+    this.setAngle(
+      GameTools.angleNormalize(newAngle + angleToRadians(addDeg), 0, 360),
+    );
     this.findTarget();
   }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 20:16:38 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/17 16:18:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -177,26 +177,24 @@ export default class Game {
   }
 
   runPhysics() {
-
     this.balls.forEach((ball) => {
-
-      const targetDistance: number = ball.targetDistance //- ball.targetInfo.limit;
+      const targetDistance: number = ball.targetDistance; //- ball.targetInfo.limit;
       // const jump: boolean = ball.direction.len() > targetDistance
-      const test: number = targetDistance / ball.direction.len()
+      const test: number = targetDistance / ball.direction.len();
 
       // jump = false;
-      if (test < 1 || (targetDistance <= ball.targetInfo.limit)) {
+      if (test < 1 || targetDistance <= ball.targetInfo.limit) {
         if (test < 1 && !(targetDistance <= ball.targetInfo.limit)) {
           // console.log("Jump !");
           // const ratio: number = (targetDistance) / ball.direction.len()
-          let test: Vector = new Vector(ball.direction.x, ball.direction.y);
+          const test: Vector = new Vector(ball.direction.x, ball.direction.y);
           test.normalize();
           test.scale(targetDistance - ball.targetInfo.limit);
           // console.log("Jump ratio is ", ratio)
           // ball.position.x *= (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
           // ball.position.y *= (ball.target.hit[1] - ball.position.y) * (ratio)//0.90;
-          ball.position.x += test.x //0.90;
-          ball.position.y += test.y //0.90;
+          ball.position.x += test.x; //0.90;
+          ball.position.y += test.y; //0.90;
           // ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * (ratio)//0.90;
           // ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * (ratio)//0.90;
         }
@@ -213,7 +211,11 @@ export default class Game {
             ball.bouncePaddle(paddle);
           } else {
             // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (TEST_MODE || this.mode === MODE.Coalition && paddle.color === ball.lastHitten.color) {
+            if (
+              TEST_MODE ||
+              (this.mode === MODE.Coalition &&
+                paddle.color === ball.lastHitten.color)
+            ) {
               ball.bounceTargetWall();
             } else {
               this.reduce(ball.target.wall);
@@ -223,11 +225,7 @@ export default class Game {
           ball.bounceTargetWall();
         }
         ball.increaseSpeed();
-
-      }
-      else
-        ball.move();
-
+      } else ball.move();
     });
   }
 
@@ -237,25 +235,30 @@ export default class Game {
     });
   }
 
-  public async reduce(wall: Wall) {
-    console.log('I AM REDUCINNNNG');
+  public get ended() {
+    return this.nPlayers === 1 || this.players.size === 0;
+  }
+
+  async killPlayer(player: Player) {
+    this.players.delete(player.user.id);
+    await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
+    if (this.ended) {
+      this.stop();
+      return await this.lobby.service.closeLobby(this.lobby);
+    }
+    this.newRound();
+  }
+
+  public reduce(wall: Wall) {
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
+      this.newRound();
     } else if (wall.player) {
-      // this.lobby.service.rankUser(this.lobby, wall.player.id);
-      this.lobby.createPlayerRank(
-        Object.assign({}, wall.player),
-        this.nPlayers,
-      );
-      this.players.delete(wall.player.user.id);
+      this.stop();
+      this.killPlayer(wall.player).then(() => {
+        if (this.ended) this.run();
+      });
     }
-    if (this.nPlayers === 1 || this.players.size === 0) {
-      // this.stop();
-      return this.lobby.service.closeLobby(this.lobby);
-    }
-    // const timer = 1000;
-    // this.socket.emit('timer', { timer });
-    this.newRound();
   }
 
   @Expose()
