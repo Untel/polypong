@@ -26,18 +26,24 @@
         >
           <social-avatar v-if="user.id !== auth.getUser.id"
             :id="user.id" :name="user.name" :avatar="user.avatar"
-            @avatarClick="(name) => { submitSearchName = name; searchRel(name); }"
+            @avatarClick="(name) => {
+              if (searchedRel?.to.name === name) {
+                searchedRel = null; soc.setSearchedRel(null);
+              } else {
+                searchRel(name);
+              }
+            }"
           />
         </div>
       </q-card-section>
     </q-card>
     <pre>find people</pre>
     <rel-search-bar
-      :submittedName="submitSearchName"
-      @searched="(name) => searchedRel.value = soc.getRelByName(name)"
+      @searched="(rel) => { searchedRel = soc.getSearchedRel }"
     />
     <!-- SEARCH RESULTS -->
     <pre>search results</pre>
+    {{ searchedRel }}
     <q-card>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section v-if="searchedRel" :key="`${searchedRel.to.name}`">
@@ -200,13 +206,17 @@ async function unfriend(name: string) { await soc.unsend_friendship(name); }
 async function block(name: string) { await soc.send_block(name); }
 async function unblock(name: string) { await soc.unsend_block(name); }
 
-const submitSearchName = ref(''); const searchedRel = ref();
+const searchedRel = ref();
 async function searchRel(name: string) {
   searchedRel.value = soc.getRelByName(name);
   if (searchedRel.value === undefined) {
     await soc.addRel(name);
     searchedRel.value = soc.getRelByName(name);
+    console.log('1searchedRel.value = ', searchedRel.value);
   }
+  console.log('2searchedRel.value = ', searchedRel.value);
+  soc.setSearchedRel(searchedRel.value);
+  console.log('2soc.getSearchedRel= ', soc.getSearchedRel);
 }
 
 </script>

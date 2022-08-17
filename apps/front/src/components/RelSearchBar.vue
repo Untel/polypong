@@ -14,25 +14,25 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useSocialStore } from 'src/stores/social.store';
 
 defineComponent({ name: 'RelSearchBar' });
 
-const curRel = ref();
 const soc = useSocialStore();
-
 const relName = ref('');
 
 const emit = defineEmits(['searched']);
 
+const searchedRel = ref();
 async function searchRel(name: string) {
-  curRel.value = soc.getRelByName(name);
-  if (curRel.value === undefined) {
+  searchedRel.value = soc.getRelByName(name);
+  if (searchedRel.value === undefined) {
     await soc.addRel(name);
-    curRel.value = soc.getRelByName(name);
+    searchedRel.value = soc.getRelByName(name);
   }
-  emit('searched', name);
+  soc.setSearchedRel(searchedRel.value);
+  emit('searched');
 }
 
 </script>

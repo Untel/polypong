@@ -24,6 +24,7 @@ type SocialState = {
   relationships: Relationship[],
   error: unknown,
   notifCount: number,
+  searchedRel: Relationship | null,
 }
 
 export const useSocialStore = defineStore('social', {
@@ -31,6 +32,7 @@ export const useSocialStore = defineStore('social', {
     relationships: [],
     error: {},
     notifCount: 0,
+    searchedRel: null as Relationship | null,
   } as SocialState),
   getters: {
     getRelationships(state): Relationship[] { return state.relationships; },
@@ -51,6 +53,9 @@ export const useSocialStore = defineStore('social', {
     },
     getNotifCount(): number {
       return this.getReceivedFriendships.length;
+    },
+    getSearchedRel(state): Relationship {
+      return state.searchedRel;
     },
   },
   actions: {
@@ -137,6 +142,11 @@ export const useSocialStore = defineStore('social', {
 
     getRelByName(name: string): Relationship | undefined {
       return this.getRelationships.find((r) => r.to.name === name);
+    },
+
+    setSearchedRel(rel: Relationship | null): void {
+      console.log('in setSearchedRel, rel = ', rel);
+      this.searchedRel = rel;
     },
 
   },
