@@ -15,7 +15,6 @@ export class Bot {
 
   constructor(datas: Partial<Bot> = {}) {
     Object.assign(this, datas);
-    this.level++;
   }
   attachWall(wall: Wall) {
     this.wall = wall;
