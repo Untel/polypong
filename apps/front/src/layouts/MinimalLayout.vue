@@ -10,7 +10,7 @@
       <router-view />
     </q-page-container>
     <q-page-sticky reveal
-      :model-value="!disabled"
+      v-if="!disabled"
       class="mini-footer bg-transparent"
       >
       <span class="text-primary">
@@ -65,7 +65,6 @@ const settings = useSettingsStore();
 const askPermission = (DeviceOrientationEvent as any).requestPermission;
 
 const disabled = computed(() => {
-  // $q.screen.width > $q.screen.height
   const dis = $route.name === 'inbox' && $q.screen.width < 850;
   return dis;
 });
