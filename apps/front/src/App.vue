@@ -26,3 +26,23 @@ watch(theme, (val) => {
   }
 }, { immediate: true });
 </script>
+
+<style lang="scss">
+  body.body--dark {
+    .bg-grey-4 {
+      background-color: $grey-10 !important;
+    }
+    .bg-grey-3 {
+      background-color: $grey-9 !important;
+    }
+    .bg-grey-2 {
+      background-color: $grey-8 !important;
+    }
+    .bg-white {
+      background-color: $grey-7 !important;
+    }
+    .text-black {
+      color: $grey-1 !important;
+    }
+  }
+</style>

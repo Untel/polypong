@@ -59,32 +59,29 @@ import { Notify, useQuasar } from 'quasar';
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-const $route = useRoute();
 const $q = useQuasar();
+const $route = useRoute();
 const settings = useSettingsStore();
-const askPermission = (DeviceOrientationEvent as any).requestPermission;
 
 const disabled = computed(() => {
   const dis = $route.name === 'inbox' && $q.screen.width < 850;
   return dis;
 });
-const horizontal = computed(() => {
-  // $q.screen.width > $q.screen.height
-  const hor = ($route.name === 'inbox');
-  return hor;
-});
+
+const askPermission = (DeviceOrientationEvent as any).requestPermission;
 
 onMounted(async () => {
   if ($q.platform.is.mobile) {
     try {
       if (await askPermission() !== 'granted') throw new Error();
     } catch (error: Error) {
-      Notify.create({
+      const dismiss = Notify.create({
         message: 'You need browser permissions',
+        timeout: 0,
         actions: [{
           label: 'Ask',
           color: 'danger',
-          handler: () => askPermission(),
+          handler: () => { askPermission().finaly(dismiss); },
         }],
       });
     }
