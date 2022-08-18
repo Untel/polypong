@@ -30,10 +30,22 @@ export class Bot {
         this.level1();
         break;
       case 2:
+        this.level3();
         this.level2();
         this.level1();
         break;
+      default:
+        this.level1();
+
     }
+  }
+  level3()
+  {
+    this.tasks.sort((b) => b.targetDistance / b.direction.len());
+//     this.tasks.splice(
+// this.tasks.findIndex(b => b === ball),
+// 1
+// );
   }
   level2() {
     if (this.tasks.length !== 0 || this.wall.paddle.ratio === 0.5) {
