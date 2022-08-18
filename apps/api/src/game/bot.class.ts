@@ -87,7 +87,7 @@ export class Bot {
         this.wall.paddle.ratio - 0.01 >= 0 ? this.wall.paddle.ratio - 0.01 : 0,
       );
     } //if (lSideDist > rSideDist) {
-    else {
+    else if (rSideDist < lSideDist) {
       this.wall.paddle.updatePercentOnAxis(
         this.wall.paddle.ratio + 0.01 <= 1 ? this.wall.paddle.ratio + 0.01 : 1,
       );
