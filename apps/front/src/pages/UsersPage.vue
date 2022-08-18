@@ -80,8 +80,8 @@
     </q-card>
 -->
     <!-- actual friends -->
-    <pre v-if="soc.getFriendsRelationships.length">your friends</pre>
-    <q-card label="friends">
+    <q-card v-if="soc.getFriendsRelationships.length" label="friends">
+      <pre>your friends</pre>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
@@ -100,8 +100,8 @@
         </div>
     </q-card>
     <!-- received friends invites -->
-    <pre v-if="soc.getReceivedFriendships.length">friend requests received</pre>
-    <q-card label="received">
+    <q-card v-if="soc.getReceivedFriendships.length" label="received">
+      <pre>friend requests received</pre>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getReceivedFriendships" :key="`rel-${rel.id}`" horizontal
@@ -120,8 +120,8 @@
         </div>
     </q-card>
     <!-- sent friends invites -->
-    <pre v-if="soc.getSentFriendships.length">friend requests sent</pre>
-    <q-card label="sent">
+    <q-card v-if="soc.getSentFriendships.length" label="sent">
+      <pre>friend requests sent</pre>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getSentFriendships" :key="`rel-${rel.id}`" horizontal

@@ -95,7 +95,7 @@ import SocialButton from './SocialButton.vue';
 
 const soc = useSocialStore();
 
-defineComponent({ name: 'SocialCard' });
+defineComponent({ name: 'StatsCard' });
 
 const props = defineProps({
   relname: String,

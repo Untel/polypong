@@ -4,7 +4,9 @@
 --- isSelf = {{ isSelf }} --- <br/>
 <q-card>
       {{ playerClicked }}
-  <q-card-section v-for="match in his.getMatches" :key="`${userId}-${match.id}`">
+  <q-card-section v-for="
+    match in his.getUserMatches(auth.getUser.id).matches"
+    :key="`${userId}-${match.matchId}`">
     <q-card-section horizontal>
       <match-card
         :match="match"
@@ -31,7 +33,7 @@ import { computed, ref } from 'vue';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
 const soc = useSocialStore(); soc.fetchRelationships();
-const his = useMatchHistoryStore(); his.fetchHistory();
+const his = useMatchHistoryStore(); his.fetchUserMatchHistory();
 
 const $route = useRoute();
 const userId: number = $route.params.name ? +$route.params.name : auth.getUser.id;

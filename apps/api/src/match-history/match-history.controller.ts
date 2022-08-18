@@ -15,11 +15,15 @@ import JwtGuard from 'src/guards/jwt.guard';
 import { CurrentUser } from 'src/decorators';
 import { User } from 'src/user/user.entity';
 import { Match, UserMatch } from './entities';
+import { UserService } from 'src';
 
 @UseGuards(JwtGuard)
 @Controller('match-history')
 export class MatchHistoryController {
-  constructor(private readonly matchHistoryService: MatchHistoryService) {}
+  constructor(
+    private readonly matchHistoryService: MatchHistoryService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post()
   create(@Body() createMatchHistoryDto: CreateMatchHistoryDto) {
@@ -30,6 +34,18 @@ export class MatchHistoryController {
   async findAll(@CurrentUser() user: User): Promise<UserMatch[] | Match[]> {
     const matchs = await this.matchHistoryService.findAll(user);
     return matchs;
+  }
+
+  // fetch the match history of a given user
+  @Get('user/:userId')
+  async findAllUserMatches(
+    @Param('userId') userId: number,
+  ): Promise<UserMatch[] | Match[]> {
+    const user = await this.userService.findById(userId);
+    if (user) {
+      return await this.matchHistoryService.findAll(user);
+    }
+    return null;
   }
 
   @Get(':id')
