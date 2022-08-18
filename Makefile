@@ -21,10 +21,13 @@ clear:
 	docker system -f prune
 
 enter:
-	$(COMPOSE) exec $(c) /bin/bash
+	$(COMPOSE) exec $(c) /bin/sh
 
 log:
 	$(COMPOSE) logs $(c) -f
+
+run:
+	$(COMPOSE) up $(c) --build
 
 
 .PHONY: all build clear install nginx reload $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

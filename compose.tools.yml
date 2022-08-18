@@ -2,14 +2,20 @@ version: '3'
 services:
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
+    # image: dpage/pgadmin4
+    build:
+      context: './compose/pgadmin4'
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    env_file:
-      - .env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      CONF_DIR: "/pgadmin4"
     depends_on:
       postgres:
         condition: service_healthy
@@ -18,9 +24,12 @@ services:
     stop_signal: SIGINT
     networks:
       - database
-    logging:
-      driver: none
-    volumes: [ 'pgadmin:/var/lib/pgadmin' ]
+    # logging:
+    #   driver: none
+    volumes:
+      - 'pgadmin:/var/lib/pgadmin'
+      # - ./servers.json:/pgadmin4/to_subst.json
+      # - ./compose/pgadmin4/pgpass.sh:/pgpass.sh
 
   # Add mailhog webui available
   mailhog:

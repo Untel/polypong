@@ -39,11 +39,9 @@ export class ThreadController {
   @Get(':id')
   async findOneOrCreate(@CurrentUser() user: User, @Param('id') id: string) {
     const to = await this.userService.findById(+id);
-    console.log('Finding user', id, to);
-    if (!to) {
+    if (!to || to.id === +id) {
       throw new UnprocessableEntityException();
     }
-    console.log('Get thread', user, to);
     return this.threadService.findOneOrCreate([user, to]);
   }
 

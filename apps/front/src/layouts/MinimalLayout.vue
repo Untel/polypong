@@ -15,17 +15,28 @@
       >
       <span class="text-primary">
         Made with <q-icon name="favorite" color="red"/> by
-        <BgSocial login="adda-sil"
+        <BgSocial
           name="Adrien Fernandes"
+          login="adda-sil"
           linkedin="adrienfernandes"
           website="http://fernandes.bzh"
           github="untel" />
         <BgSocial
-          login="lspiess" name="Lambert Spiess" github="lambertspiess"
+          name="Lambert Spiess"
+          login="lspiess"
+          github="lambertspiess"
           linkedin="lambert-spiess-34493b173"
         />
-        <BgSocial login="edal--ce" name="Enzo Dal Cerro" github="endcerro" linkedin="enzodalcerro"/>
-        <BgSocial login="gozsertt" name="Guillaume Ozserttas" />
+        <BgSocial
+          name="Enzo Dal Cerro"
+          login="edal--ce"
+          github="endcerro"
+          linkedin="enzodalcerro"
+        />
+        <BgSocial
+          name="Guillaume Ozserttas"
+          login="gozsertt"
+        />
 
       </span>
       <q-toggle
