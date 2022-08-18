@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gametools.class.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/17 16:07:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/17 19:34:38 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,9 @@ export default class GameTools {
   }
 
   static distance(x1: number, y1: number, x2: number, y2: number): number {
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    const x2x1 : number = x2 - x1;
+    const y2y1 : number = y2 - y1;
+    return Math.sqrt(Math.pow(x2x1, 2)+ Math.pow(y2y1, 2));
   }
   static percentage(small: number, big: number): number {
     return (small / big) * 100;
@@ -94,4 +96,65 @@ export default class GameTools {
     [...Array(size)]
       .map(() => Math.floor(Math.random() * 16).toString(16))
       .join('');
-}
+
+  static linePoint(x1 : number, y1: number,x2 : number, y2: number, px: number, py: number)
+  {
+    const lineLen : number = GameTools.distance(x1, y1, x2, y2);
+
+    const d1 : number =  GameTools.distance(px,py,x1,y1);
+    const d2 : number =  GameTools.distance(px,py,x2,y2);
+
+    const buffer : number = 0.1;
+
+    if ((d1 + d2) >= (lineLen - buffer) && (d1+d2) <= (lineLen+buffer)) {
+      return true;
+    }
+    return false;
+  }
+
+  static pointCircle(px : number, py : number, cx : number, cy : number, r : number)
+  {
+    const distX : number = px - cx;
+    const distY : number = py - cy;
+
+    const distance = Math.sqrt( Math.pow(distX, 2) + Math.pow(distY, 2) );
+    if (distance <= r) {
+      return true;
+    }
+    return false;
+  }
+
+  static lineCircleCollision(x1 : number, y1: number,x2 : number, y2: number, cx: number, cy: number, r)
+  {
+    // let x1, y1, cx, cy, r : number;
+    // x1
+    // boolean inside1 = pointCircle(x1,y1, cx,cy,r); // Need pointcircle
+    // boolean inside2 = pointCircle(x2,y2, cx,cy,r);
+    // if (inside1 || inside2) return true; 
+
+    let distX : number = x1 - x2;
+    let distY : number = y1 - y2;
+    const len : number = Math.sqrt( (distX*distX) + (distY*distY) ); // Just the length of the line, may be ommited
+    const dot : number =  ( ((cx-x1)*(x2-x1)) + ((cy-y1)*(y2-y1)) ) / Math.pow(len,2);
+
+
+
+    const closestX : number = x1 + (dot * (x2-x1));
+    const closestY : number = y1 + (dot * (y2-y1));
+
+    let onSegment = this.linePoint(x1,y1,x2,y2, closestX,closestY); //Need linepoint
+    if (!onSegment) return false; 
+
+    distX = closestX - cx;
+    distY = closestY - cy;
+    let distance : number = Math.sqrt( (distX*distX) + (distY*distY) ); //Pythagore
+
+    if (distance <= r) {
+      return true;
+    }
+    return false;
+
+  }
+
+
+    }

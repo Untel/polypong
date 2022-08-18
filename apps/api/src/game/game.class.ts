@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/17 16:18:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/18 18:17:43 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
-import { pointOnLine, Line } from 'geometric';
+import { pointOnLine, Line,lineLength } from 'geometric';
 import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
@@ -144,8 +144,9 @@ export default class Game {
 
   old_runPhysics() {
     this.balls.forEach((ball, index) => {
-      if (ball.targetDistance <= ball.targetInfo.limit) {
+      if (ball.targetDistance <= ball.targetInfo.limit + 5) {
         const paddle: Paddle = ball.target.wall.paddle;
+
         if (paddle) {
           const paddleTouchTheBall = (pointOnLine as any)(
             ball.targetInfo.actualhit,
@@ -168,6 +169,16 @@ export default class Game {
             }
           }
         } else {
+
+          this.balls.forEach(e => {
+            if (e !== ball){
+            e.direction = new Vector(0,0);
+            e._speed = 0;
+          }
+          });
+
+          return;
+
           ball.bounceTargetWall();
         }
         ball.increaseSpeed();
@@ -176,7 +187,51 @@ export default class Game {
     });
   }
 
-  runPhysics() {
+  runPhysics()
+  {
+    // console.log("Edge width ", this.map.edgeWidth)
+    // console.log("in radius ", this.map.inradius)
+    this.balls.forEach((ball) => {
+      
+      // if (lineLength([[ball.position.x, ball.position.y],[this.map.center.x ,this.map.center.y]]))
+
+      const dtc = lineLength([[ball.position.x, ball.position.y],[this.map.center.x ,this.map.center.y]]);
+      // console.log(dtc)
+
+      if (dtc >= 60)
+      {
+        console.log("Ded ball")
+        this.reduce(ball.target.wall);
+        // ball.lastHitten.score++
+
+      }
+      const wall = ball.target.wall;
+
+      if (wall.paddle === null)
+      {
+        const test = GameTools.lineCircleCollision(wall[0][0],wall[0][1],wall[1][0],wall[1][1],ball.position.x, ball.position.y, ball.radius)  
+        if (test === true)
+        {
+          ball.bounceTargetWall();
+          console.log("wall collision");
+        }
+      }
+      else
+      {
+        const test = GameTools.lineCircleCollision(wall.paddle.line[0][0],wall.paddle.line[0][1],wall.paddle.line[1][0],wall.paddle.line[1][1],ball.position.x, ball.position.y, ball.radius)
+        if (test === true){
+          ball.bouncePaddle(wall.paddle);
+          console.log("paddle collision");
+        }
+        // console.log("no collision");
+      }
+      ball.move();
+    });
+    
+  }
+
+
+  currnet_runPhysics() {
     this.balls.forEach((ball) => {
       const targetDistance: number = ball.targetDistance; //- ball.targetInfo.limit;
       // const jump: boolean = ball.direction.len() > targetDistance
@@ -222,10 +277,20 @@ export default class Game {
             }
           }
         } else {
-          ball.bounceTargetWall();
+
+          this.balls.forEach(e => {
+            if (e !== ball){
+            e.direction = new Vector(0,0);
+            e._speed = 0;
+            console.log("ohno");
+          }
+          
+          });
+          // ball.bounceTargetWall();
         }
         ball.increaseSpeed();
-      } else ball.move();
+      }
+      ball.move();
     });
   }
 
