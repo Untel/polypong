@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 18:17:43 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/18 18:32:06 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,68 +142,70 @@ export default class Game {
     if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
-  old_runPhysics() {
-    this.balls.forEach((ball, index) => {
-      if (ball.targetDistance <= ball.targetInfo.limit + 5) {
-        const paddle: Paddle = ball.target.wall.paddle;
+  // old_runPhysics() {
+  //   this.balls.forEach((ball, index) => {
+  //     if (ball.targetDistance <= ball.targetInfo.limit + 5) {
+  //       const paddle: Paddle = ball.target.wall.paddle;
 
-        if (paddle) {
-          const paddleTouchTheBall = (pointOnLine as any)(
-            ball.targetInfo.actualhit,
-            paddle.line,
-            1,
-          );
+  //       if (paddle) {
+  //         const paddleTouchTheBall = (pointOnLine as any)(
+  //           ball.targetInfo.actualhit,
+  //           paddle.line,
+  //           1,
+  //         );
 
-          if (paddleTouchTheBall) {
-            ball.bouncePaddle(paddle);
-          } else {
-            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (
-              TEST_MODE ||
-              (this.mode === MODE.Coalition &&
-                paddle.color === ball.lastHitten.color)
-            ) {
-              ball.bounceTargetWall();
-            } else {
-              this.reduce(ball.target.wall);
-            }
-          }
-        } else {
+  //         if (paddleTouchTheBall) {
+  //           ball.bouncePaddle(paddle);
+  //         } else {
+  //           // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
+  //           if (
+  //             TEST_MODE ||
+  //             (this.mode === MODE.Coalition &&
+  //               paddle.color === ball.lastHitten.color)
+  //           ) {
+  //             ball.bounceTargetWall();
+  //           } else {
+  //             this.reduce(ball.target.wall);
+  //           }
+  //         }
+  //       } else {
 
-          this.balls.forEach(e => {
-            if (e !== ball){
-            e.direction = new Vector(0,0);
-            e._speed = 0;
-          }
-          });
+  //         this.balls.forEach(e => {
+  //           if (e !== ball){
+  //           e.direction = new Vector(0,0);
+  //           e._speed = 0;
+  //         }
+  //         });
 
-          return;
+  //         return;
 
-          ball.bounceTargetWall();
-        }
-        ball.increaseSpeed();
-      }
-      ball.move();
-    });
-  }
+  //         ball.bounceTargetWall();
+  //       }
+  //       ball.increaseSpeed();
+  //     }
+  //     ball.move();
+  //   });
+  // }
 
   runPhysics()
   {
-    // console.log("Edge width ", this.map.edgeWidth)
-    // console.log("in radius ", this.map.inradius)
     this.balls.forEach((ball) => {
       
-      // if (lineLength([[ball.position.x, ball.position.y],[this.map.center.x ,this.map.center.y]]))
-
       const dtc = lineLength([[ball.position.x, ball.position.y],[this.map.center.x ,this.map.center.y]]);
       // console.log(dtc)
 
-      if (dtc >= 60)
+      if (dtc >= 50 && dtc < 70)
       {
         console.log("Ded ball")
-        this.reduce(ball.target.wall);
         // ball.lastHitten.score++
-
+        this.balls.forEach(e => {
+          if (e !== ball)
+            e.stop();
+        });
+      }
+      else if (dtc >= 70)
+      {
+        this.reduce(ball.target.wall);
       }
       const wall = ball.target.wall;
 
@@ -231,68 +233,68 @@ export default class Game {
   }
 
 
-  currnet_runPhysics() {
-    this.balls.forEach((ball) => {
-      const targetDistance: number = ball.targetDistance; //- ball.targetInfo.limit;
-      // const jump: boolean = ball.direction.len() > targetDistance
-      const test: number = targetDistance / ball.direction.len();
+  // currnet_runPhysics() {
+  //   this.balls.forEach((ball) => {
+  //     const targetDistance: number = ball.targetDistance; //- ball.targetInfo.limit;
+  //     // const jump: boolean = ball.direction.len() > targetDistance
+  //     const test: number = targetDistance / ball.direction.len();
 
-      // jump = false;
-      if (test < 1 || targetDistance <= ball.targetInfo.limit) {
-        if (test < 1 && !(targetDistance <= ball.targetInfo.limit)) {
-          // console.log("Jump !");
-          // const ratio: number = (targetDistance) / ball.direction.len()
-          const test: Vector = new Vector(ball.direction.x, ball.direction.y);
-          test.normalize();
-          test.scale(targetDistance - ball.targetInfo.limit);
-          // console.log("Jump ratio is ", ratio)
-          // ball.position.x *= (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
-          // ball.position.y *= (ball.target.hit[1] - ball.position.y) * (ratio)//0.90;
-          ball.position.x += test.x; //0.90;
-          ball.position.y += test.y; //0.90;
-          // ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * (ratio)//0.90;
-          // ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * (ratio)//0.90;
-        }
-        const paddle: Paddle = ball.target.wall.paddle;
+  //     // jump = false;
+  //     if (test < 1 || targetDistance <= ball.targetInfo.limit) {
+  //       if (test < 1 && !(targetDistance <= ball.targetInfo.limit)) {
+  //         // console.log("Jump !");
+  //         // const ratio: number = (targetDistance) / ball.direction.len()
+  //         const test: Vector = new Vector(ball.direction.x, ball.direction.y);
+  //         test.normalize();
+  //         test.scale(targetDistance - ball.targetInfo.limit);
+  //         // console.log("Jump ratio is ", ratio)
+  //         // ball.position.x *= (ball.target.hit[0] - ball.position.x) * (ratio)//0.90;
+  //         // ball.position.y *= (ball.target.hit[1] - ball.position.y) * (ratio)//0.90;
+  //         ball.position.x += test.x; //0.90;
+  //         ball.position.y += test.y; //0.90;
+  //         // ball.position.x += (ball.targetInfo.actualhit[0] - ball.position.x) * (ratio)//0.90;
+  //         // ball.position.y += (ball.targetInfo.actualhit[1] - ball.position.y) * (ratio)//0.90;
+  //       }
+  //       const paddle: Paddle = ball.target.wall.paddle;
 
-        if (paddle) {
-          const paddleTouchTheBall = (pointOnLine as any)(
-            ball.targetInfo.actualhit,
-            paddle.line,
-            1,
-          );
+  //       if (paddle) {
+  //         const paddleTouchTheBall = (pointOnLine as any)(
+  //           ball.targetInfo.actualhit,
+  //           paddle.line,
+  //           1,
+  //         );
 
-          if (paddleTouchTheBall) {
-            ball.bouncePaddle(paddle);
-          } else {
-            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (
-              TEST_MODE ||
-              (this.mode === MODE.Coalition &&
-                paddle.color === ball.lastHitten.color)
-            ) {
-              ball.bounceTargetWall();
-            } else {
-              this.reduce(ball.target.wall);
-            }
-          }
-        } else {
+  //         if (paddleTouchTheBall) {
+  //           ball.bouncePaddle(paddle);
+  //         } else {
+  //           // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
+  //           if (
+  //             TEST_MODE ||
+  //             (this.mode === MODE.Coalition &&
+  //               paddle.color === ball.lastHitten.color)
+  //           ) {
+  //             ball.bounceTargetWall();
+  //           } else {
+  //             this.reduce(ball.target.wall);
+  //           }
+  //         }
+  //       } else {
 
-          this.balls.forEach(e => {
-            if (e !== ball){
-            e.direction = new Vector(0,0);
-            e._speed = 0;
-            console.log("ohno");
-          }
+  //         this.balls.forEach(e => {
+  //           if (e !== ball){
+  //           e.direction = new Vector(0,0);
+  //           e._speed = 0;
+  //           console.log("ohno");
+  //         }
           
-          });
-          // ball.bounceTargetWall();
-        }
-        ball.increaseSpeed();
-      }
-      ball.move();
-    });
-  }
+  //         });
+  //         // ball.bounceTargetWall();
+  //       }
+  //       ball.increaseSpeed();
+  //     }
+  //     ball.move();
+  //   });
+  // }
 
   runBots() {
     this.bots.forEach((e) => {
@@ -309,7 +311,7 @@ export default class Game {
     await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
     if (this.ended) {
       this.stop();
-      return await this.lobby.service.closeLobby(this.lobby);
+      // return await this.lobby.service.closeLobby(this.lobby);
     }
     this.newRound();
   }

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 17:32:53 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/18 18:23:30 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,48 +272,48 @@ export class Ball extends Circle {
     this.findTarget();
   }
 
+  // bouncePaddle(paddle: Paddle) {
+  //   const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
+  //   const surfaceAngleDeg = paddle.angle; //paddle.angle;
+  //   const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+  //   /**
+  //    * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
+  //    * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
+  //    * le paddle. Peut etre remettre ca en 1v1 only?
+  //    */
+  //   // const hitLen = lineLength([paddle.line[1], this.target.hit]);
+  //   // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+  //   // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+  //   // const percent = hitLen / paddle.width - .5;
+  //   // const maxAngle = Math.abs(newDegree) - Math.abs(incidenceAngleDeg);
+  //   // const addDeg = (maxAngle * percent);
+  //   // newDegree += addDeg;
+
+  //   const newAngle = angleToRadians(newDegree % 360);
+  //   // this.lastHitten = paddle;
+
+  //   // this.color = paddle.color;
+
+  //   const hitLen = lineLength([paddle.line[1], this.target.hit]);
+  //   // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+  //   // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+  //   // // x2 pour aller de -1 a x1;
+  //   const percent = (hitLen / paddle.width - 0.5) * 2;
+  //   // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
+  //   console.log('Hit percent', percent);
+  //   const maxAngle = 25;
+  //   const addDeg = maxAngle * percent;
+
+  //   this.lastHitten = paddle;
+  //   this.color = paddle.color;
+
+  //   this.setAngle(
+  //     GameTools.angleNormalize(newAngle + angleToRadians(addDeg), 0, 360),
+  //   );
+  //   this.findTarget();
+  // }
+
   bouncePaddle(paddle: Paddle) {
-    const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
-    const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
-    /**
-     * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
-     * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
-     * le paddle. Peut etre remettre ca en 1v1 only?
-     */
-    // const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // const percent = hitLen / paddle.width - .5;
-    // const maxAngle = Math.abs(newDegree) - Math.abs(incidenceAngleDeg);
-    // const addDeg = (maxAngle * percent);
-    // newDegree += addDeg;
-
-    const newAngle = angleToRadians(newDegree % 360);
-    // this.lastHitten = paddle;
-
-    // this.color = paddle.color;
-
-    const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // // x2 pour aller de -1 a x1;
-    const percent = (hitLen / paddle.width - 0.5) * 2;
-    // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
-    console.log('Hit percent', percent);
-    const maxAngle = 25;
-    const addDeg = maxAngle * percent;
-
-    this.lastHitten = paddle;
-    this.color = paddle.color;
-
-    this.setAngle(
-      GameTools.angleNormalize(newAngle + angleToRadians(addDeg), 0, 360),
-    );
-    this.findTarget();
-  }
-
-  old_bouncePaddle(paddle: Paddle) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
     const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
@@ -346,6 +346,12 @@ export class Ball extends Circle {
       this.speed = this.maxSpeed;
       // console.log("Max ball speed reached");
     }
+  }
+
+  stop()
+  {
+    this.speed = 0;
+    this.direction = new Vector(0,0);
   }
 
   /**
