@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:11:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:22:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/18 18:25:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ import {
 export class TS extends Date {}
 
 export abstract class NoIdBaseEntity extends BaseEntity {
+  // constructor(datas: Partial<NoIdBaseEntity> = {}) {
+  //   super();
+  //   Object.assign(this, datas);
+  // }
+
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: TS;
@@ -37,6 +42,11 @@ export abstract class NoIdBaseEntity extends BaseEntity {
 }
 
 export abstract class RootEntity extends NoIdBaseEntity {
+  // constructor(datas: Partial<RootEntity> = {}) {
+  //   super();
+  //   Object.assign(this, datas);
+  // }
+
   @ApiProperty({ example: 'c057cc8c-ad1b-4081-ba05-41a648e29f19' })
   @PrimaryGeneratedColumn()
   id: number;

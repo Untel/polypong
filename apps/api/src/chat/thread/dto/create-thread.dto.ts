@@ -1,1 +1,3 @@
-export class CreateThreadDto {}
+export class CreateThreadDto {
+  targetId?: number;
+}

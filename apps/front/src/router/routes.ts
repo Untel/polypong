@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 14:41:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/18 18:58:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ const authRoutes: RouteRecordRaw[] = [{
 },
 {
   name: 'inbox',
-  path: 'inbox',
+  path: 'inbox/:id',
+  props: true,
   component: () => import('pages/InboxPage.vue'),
 },
 ];

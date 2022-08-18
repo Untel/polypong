@@ -221,7 +221,8 @@
             dense
             class="WAL__field col-grow q-mr-sm"
             v-model="message"
-            placeholder="Type a message" />
+            placeholder="Type a message"
+          />
           <q-btn round flat icon="mic" />
         </q-toolbar>
       </q-footer>
@@ -272,7 +273,7 @@ export default {
   setup() {
     const $q = useQuasar();
     const leftDrawerOpen = ref(false);
-    const rightDrawerOpen = ref(true);
+    const rightDrawerOpen = ref(false);
     const search = ref('');
     const message = ref('');
     const currentConversationIndex = ref(0);
@@ -317,7 +318,6 @@ export default {
     background-color: #009688
   &__layout
     margin: 0 auto
-    z-index: 4000
     height: 100%
     width: 90%
     max-width: 1400px

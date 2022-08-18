@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:22:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/18 19:06:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@ import { ThreadParticipant } from './thread-participant.entity';
 
 @Entity()
 export class Thread extends RootEntity {
+  constructor(datas: Partial<Thread> = {}) {
+    super();
+    Object.assign(this, datas);
+  }
+
   @OneToMany(() => ThreadParticipant, (tp) => tp.thread)
   public participants: ThreadParticipant[];
 
@@ -36,6 +41,7 @@ export class Thread extends RootEntity {
    * Could be usefull to load the thread without loading all messages
    * Ex: have the last text and lastMessage to sort thread with last activity
    */
-  @OneToOne(() => Message)
+  @OneToOne(() => Message, { nullable: true })
+  @JoinTable()
   public lastMessage: Message;
 }
