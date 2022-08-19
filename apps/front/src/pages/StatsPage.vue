@@ -12,10 +12,10 @@
         :match="match"
         @player-click="(name) => togglePlayer(name, match.matchId)"
       />
-      <social-card
-        v-if="toggledMatchId === match.matchId && rel !== undefined"
-        :relname="rel.to.name"
-      />
+      <q-div v-if="toggledMatchId === match.matchId && rel !== undefined">
+        <social-card :relname="rel.to.name"/>
+        <stats-card :history="his.getUserMatchesHistory(rel.toId)"/>
+      </q-div>
     </q-card-section>
   </q-card-section>
 </q-card>
@@ -29,6 +29,7 @@ import { useSocialStore } from 'src/stores/social.store';
 import { useRoute } from 'vue-router';
 import MatchCard from 'src/components/MatchCard.vue';
 import SocialCard from 'src/components/SocialCard.vue';
+import StatsCard from 'src/components/StatsCard.vue';
 import { computed, ref } from 'vue';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
@@ -44,7 +45,12 @@ console.log('userMatchesHistory = ', userMatchesHistory);
 
 const playerClicked = ref('');
 const toggledMatchId = ref(0);
-const rel = computed(() => soc.getRelByName(playerClicked.value));
+const rel = computed(() => {
+  const ret = soc.getRelByName(playerClicked.value);
+  if (ret) { return ret; }
+  soc.addRel(playerClicked.value);
+  return soc.getRelByName(playerClicked.value);
+});
 
 async function togglePlayer(name: string, matchId: number) {
   if (name === auth.getUser.name) { return; }
