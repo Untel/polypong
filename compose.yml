@@ -11,9 +11,8 @@ services:
       - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/default.conf.template"
       - "./compose/nginx/entrypoint/:/docker-entrypoint.d/${DOMAIN_NAME:-localhost}"
     ports:
-      - "${EXPOSED_PORT_RANGE:-${PORT_RANGE:-443}}:${PORT_RANGE:-443}"
+      - "${EXPOSED_PORT_RANGE:-443}:${PORT_RANGE:-443}"
     environment:
-      - NGINX_PORT=80
       - NGINX_SSL_PORT=${PORT_RANGE:-443}
       - DOMAIN_NAME=${DOMAIN_NAME:-localhost}
       - SSL_PATH=/etc/ssl/certs/${DOMAIN_NAME:-localhost}
