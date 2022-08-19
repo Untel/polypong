@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { MatchHistoryService } from './match-history.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
@@ -22,6 +24,7 @@ import { UserService } from 'src';
 export class MatchHistoryController {
   constructor(
     private readonly matchHistoryService: MatchHistoryService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
