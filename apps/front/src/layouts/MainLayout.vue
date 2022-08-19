@@ -49,6 +49,7 @@ import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useSocialStore } from 'src/stores/social.store';
+import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
 
 defineComponent({
@@ -62,10 +63,12 @@ const miniState = ref(true);
 
 const $auth = useAuthStore();
 const soc = useSocialStore();
+const $thread = useThreadStore();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => { soc.fetchRelationships(); });
 
+$thread.fetchThreads();
 // const router = useRouter();
 
 // onMounted(() => {

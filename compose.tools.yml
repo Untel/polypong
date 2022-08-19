@@ -15,6 +15,7 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
       DOMAIN_NAME: ${DOMAIN_NAME}
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 30
       CONF_DIR: "/pgadmin4"
     depends_on:
       postgres:
@@ -26,8 +27,7 @@ services:
       - database
     # logging:
     #   driver: none
-    volumes:
-      - 'pgadmin:/var/lib/pgadmin'
+    volumes: [ "pgadmin:/var/lib/pgadmin" ]
       # - ./servers.json:/pgadmin4/to_subst.json
       # - ./compose/pgadmin4/pgpass.sh:/pgpass.sh
 

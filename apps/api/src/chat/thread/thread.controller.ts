@@ -39,9 +39,8 @@ export class ThreadController {
   @Get(':id')
   async findOneOrCreate(@CurrentUser() user: User, @Param('id') id: string) {
     const to = await this.userService.findById(+id);
-    if (!to || to.id === +id) {
-      throw new UnprocessableEntityException();
-    }
+    if (!to) throw new UnprocessableEntityException('This user does not exist');
+    if (to.id === user.id) throw new UnprocessableEntityException('You can\'t thread with yourself');
     return this.threadService.findOneOrCreate([user, to]);
   }
 

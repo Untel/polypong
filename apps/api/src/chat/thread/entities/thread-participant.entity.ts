@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 19:07:38 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/19 04:10:42 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,11 @@ import {
   OneToOne,
   Column,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
+@Index(['user', 'thread'], { unique: true })
 export class ThreadParticipant extends RootEntity {
   constructor(datas: Partial<ThreadParticipant> = {}) {
     super();
@@ -41,7 +43,7 @@ export class ThreadParticipant extends RootEntity {
   public thread: Thread;
 
   @OneToMany(() => Message, (m) => m.sender)
-  sentMessages: Message[];
+  public sentMessages: Message[];
 
   @CreateDateColumn({ type: 'timestamp' })
   public sawUntil: TS;
