@@ -3,9 +3,9 @@ import * as gravatar from 'gravatar';
 
 export class LobbyBot {
   name: string;
-  color: string;
   avatar: string;
   level: number;
+  color: string;
 
   constructor(datas: Partial<LobbyBot> = {}) {
     Object.assign(this, datas);

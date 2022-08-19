@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 18:53:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/19 17:34:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 
 const FRAME_RATE = 30;
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export enum MODE {
   Coalition = 'coalition',
@@ -99,6 +99,7 @@ export default class Game {
   }
 
   run() {
+    this.stop();
     // this.generateMap(this.nPlayers);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
