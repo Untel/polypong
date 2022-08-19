@@ -19,7 +19,7 @@
       @mouseover="miniState = false"
       @mouseout="miniState = true"
       :width="200"
-      :breakpoint="400"
+      :breakpoint="0"
     >
       <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
       <EssentialLink title="Home" caption="Home page" icon="fas fa-igloo" to="home"/>
@@ -49,6 +49,7 @@ import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useSocialStore } from 'src/stores/social.store';
+import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
 
 defineComponent({
@@ -62,6 +63,7 @@ const miniState = ref(true);
 
 const $auth = useAuthStore();
 const soc = useSocialStore();
+const $thread = useThreadStore();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
@@ -69,6 +71,7 @@ $auth.socket.on('block', () => {
   soc.fetchRelationships();
 });
 
+$thread.fetchThreads();
 // const router = useRouter();
 
 // onMounted(() => {

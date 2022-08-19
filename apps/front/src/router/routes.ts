@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 14:41:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/18 22:52:09 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ const authRoutes: RouteRecordRaw[] = [{
 },
 {
   name: 'inbox',
-  path: 'inbox',
+  path: 'inbox/:id?',
+  props: true,
   component: () => import('pages/InboxPage.vue'),
 },
 ];
@@ -103,13 +104,14 @@ const routes: RouteRecordRaw[] = [{
   path: '/external',
   name: 'external',
   component: () => import('pages/LoginPage.vue'),
-  beforeEnter(to) {
+  beforeEnter(to, from, next) {
     const url: string = to.query.url as string;
     // eslint-disable-next-line no-restricted-globals, no-alert
     const wantTo = confirm(`You are about to leave polypong to go to ${url}, are you sur?`);
     if (wantTo) {
-      window.location.href = url;
+      window.open(url, '_blank');
     }
+    next(false);
   },
 }];
 

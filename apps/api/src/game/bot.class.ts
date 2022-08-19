@@ -11,6 +11,7 @@ import {
   pointOnLine,
 } from 'geometric';
 import GameTools from './gametools.class';
+import { LobbyBot } from './lobbyBot.class';
 export class Bot {
   botPaddle: Paddle;
   maxSpeed: number;
@@ -21,7 +22,7 @@ export class Bot {
   name: string;
   color: string;
 
-  constructor(datas: Partial<Bot> = {}) {
+  constructor(datas: Partial<Bot | LobbyBot> = {}) {
     Object.assign(this, datas);
   }
   attachWall(wall: Wall) {
@@ -55,8 +56,6 @@ export class Bot {
         this.wall.paddle.ratio + 0.01 <= 1 ? this.wall.paddle.ratio + 0.01 : 1,
       );
     }
-
-    // }
   }
   popBall(target: Ball) {
     this.tasks.splice(this.tasks.indexOf(target), 1);

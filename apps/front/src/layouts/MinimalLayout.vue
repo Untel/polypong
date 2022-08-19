@@ -10,22 +10,33 @@
       <router-view />
     </q-page-container>
     <q-page-sticky reveal
-      :model-value="!disabled"
+      v-if="!disabled"
       class="mini-footer bg-transparent"
       >
       <span class="text-primary">
         Made with <q-icon name="favorite" color="red"/> by
-        <BgSocial login="adda-sil"
+        <BgSocial
           name="Adrien Fernandes"
+          login="adda-sil"
           linkedin="adrienfernandes"
           website="http://fernandes.bzh"
           github="untel" />
         <BgSocial
-          login="lspiess" name="Lambert Spiess" github="lambertspiess"
+          name="Lambert Spiess"
+          login="lspiess"
+          github="lambertspiess"
           linkedin="lambert-spiess-34493b173"
         />
-        <BgSocial login="edal--ce" name="Enzo Dal Cerro" github="endcerro" linkedin="enzodalcerro"/>
-        <BgSocial login="gozsertt" name="Guillaume Ozserttas" />
+        <BgSocial
+          name="Enzo Dal Cerro"
+          login="edal--ce"
+          github="endcerro"
+          linkedin="enzodalcerro"
+        />
+        <BgSocial
+          name="Guillaume Ozserttas"
+          login="gozsertt"
+        />
 
       </span>
       <q-toggle
@@ -59,33 +70,29 @@ import { Notify, useQuasar } from 'quasar';
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-const $route = useRoute();
 const $q = useQuasar();
+const $route = useRoute();
 const settings = useSettingsStore();
-const askPermission = (DeviceOrientationEvent as any).requestPermission;
 
 const disabled = computed(() => {
-  // $q.screen.width > $q.screen.height
   const dis = $route.name === 'inbox' && $q.screen.width < 850;
   return dis;
 });
-const horizontal = computed(() => {
-  // $q.screen.width > $q.screen.height
-  const hor = ($route.name === 'inbox');
-  return hor;
-});
+
+const askPermission = (DeviceOrientationEvent as any).requestPermission;
 
 onMounted(async () => {
   if ($q.platform.is.mobile) {
     try {
       if (await askPermission() !== 'granted') throw new Error();
     } catch (error: Error) {
-      Notify.create({
+      const dismiss = Notify.create({
         message: 'You need browser permissions',
+        timeout: 0,
         actions: [{
           label: 'Ask',
           color: 'danger',
-          handler: () => askPermission(),
+          handler: () => { askPermission().finaly(dismiss); },
         }],
       });
     }

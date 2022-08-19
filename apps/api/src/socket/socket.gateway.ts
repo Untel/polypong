@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:41:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/17 15:55:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,12 @@ export class SocketGateway
               );
             },
             () => {
+              lobby.say(`${user.name} has been removed. Resuming.`);
               lobby.game.players.delete(user.id);
               lobby.game.newRound();
             },
           );
-          lobby.game.stop();
+          return lobby.game.stop();
         }
       } else {
         this.lobbyService.removePlayer(lobby.id, user);
