@@ -1,19 +1,19 @@
 <template>
 <div>
---- id = {{ userId }} ---
+--- id = {{ userId }} --- <br/>
 --- isSelf = {{ isSelf }} --- <br/>
 <q-card>
       {{ playerClicked }}
   <q-card-section v-for="
-    match in his.getUserMatches(auth.getUser.id).matches"
+    match in his.getUserMatchesHistory(userId)?.matches"
     :key="`${userId}-${match.matchId}`">
     <q-card-section horizontal>
       <match-card
         :match="match"
-        @player-click="(name) => togglePlayer(name, match.id)"
+        @player-click="(name) => togglePlayer(name, match.matchId)"
       />
       <social-card
-        v-if="toggledMatchId === match.id && rel !== undefined"
+        v-if="toggledMatchId === match.matchId && rel !== undefined"
         :relname="rel.to.name"
       />
     </q-card-section>
@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { useAuthStore } from 'src/stores/auth.store';
-import { useMatchHistoryStore } from 'src/stores/history.store';
+import { useMatchHistoryStore, UserMatchesHistory } from 'src/stores/history.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useRoute } from 'vue-router';
 import MatchCard from 'src/components/MatchCard.vue';
@@ -33,11 +33,14 @@ import { computed, ref } from 'vue';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
 const soc = useSocialStore(); soc.fetchRelationships();
-const his = useMatchHistoryStore(); his.fetchUserMatchHistory();
-
 const $route = useRoute();
-const userId: number = $route.params.name ? +$route.params.name : auth.getUser.id;
+const userId: number = $route.params.userId ? +$route.params.userId : auth.getUser.id;
+const his = useMatchHistoryStore(); his.fetchUserMatchesHistory(userId);
+
+console.log('from url, userId = ', userId);
 const isSelf: boolean = userId === auth.user.id;
+const userMatchesHistory = computed(() => his.getUserMatchesHistory(userId));
+console.log('userMatchesHistory = ', userMatchesHistory);
 
 const playerClicked = ref('');
 const toggledMatchId = ref(0);

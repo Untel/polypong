@@ -69,30 +69,30 @@ export interface MatchHistory {
   players: Player[];
 }
 
-interface UserMatchsHistory {
+export interface UserMatchesHistory {
   userId: number;
   matches: MatchHistory[];
 }
 
-interface UsersMatchsHistoriesState {
-  usersHis: UserMatchsHistory[];
+interface UsersMatchesHistoriesState {
+  usersHis: UserMatchesHistory[];
 }
 
 export const useMatchHistoryStore = defineStore('history', {
   state: () => ({
     usersHis: [],
-  } as UsersMatchsHistoriesState),
+  } as UsersMatchesHistoriesState),
   getters: {
     getUsersHis(state) {
       return state.usersHis;
     },
   },
   actions: {
-    getUserMatches(userId: number): UserMatchsHistory | undefined {
+    getUserMatchesHistory(userId: number): UserMatchesHistory | undefined {
       return this.getUsersHis.find((his) => his.userId === userId);
     },
     getUserMatch(userId: number, matchId: number): MatchHistory | undefined {
-      return this.getUserMatches(userId)?.matches
+      return this.getUserMatchesHistory(userId)?.matches
         ?.find((match) => match.matchId === matchId);
     },
     getUserMatchPlayerByPlayerId(userId: number, matchId: number, playerId: number)
@@ -105,14 +105,16 @@ export const useMatchHistoryStore = defineStore('history', {
       return this.getUserMatch(userId, matchId)?.players
         ?.find((player) => player.user.userId === targetUserId);
     },
-    async fetchUserMatchHistory(userId?: number): Promise<UserMatchsHistory | undefined> {
+    async fetchUserMatchesHistory(userId?: number): Promise<UserMatchesHistory | undefined> {
       if (!userId) {
         userId = useAuthStore().getUser.id;
       }
-      const matches = await historyApi.get<MatchHistory[]>(`${userId}`);
-      const curHis = this.getUserMatches(userId);
+      console.log('history store - fetchUserMatchesHistory - userId = ', userId);
+      const matches = await historyApi.get<MatchHistory[]>(`user/${userId}`);
+      console.log('history store - fetchUserMatchesHistory - matches = ', matches);
+      const curHis = this.getUserMatchesHistory(userId);
       if (curHis) {
-        curHis.matches = await historyApi.get<MatchHistory[]>(`${userId}`);
+        curHis.matches = matches;
         return curHis;
       }
       const newHis = { userId, matches };

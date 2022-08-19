@@ -9,6 +9,7 @@ import {
   UseGuards,
   Inject,
   forwardRef,
+  Logger,
 } from '@nestjs/common';
 import { MatchHistoryService } from './match-history.service';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
@@ -28,6 +29,8 @@ export class MatchHistoryController {
     private readonly userService: UserService,
   ) {}
 
+  logger = new Logger('match-history');
+
   @Post()
   create(@Body() createMatchHistoryDto: CreateMatchHistoryDto) {
     return this.matchHistoryService.create(createMatchHistoryDto);
@@ -45,6 +48,7 @@ export class MatchHistoryController {
     @Param('userId') userId: number,
   ): Promise<UserMatch[] | Match[]> {
     const user = await this.userService.findById(userId);
+    this.logger.log(`in user/${userId}, got user =`, user);
     if (user) {
       return await this.matchHistoryService.findAll(user);
     }
