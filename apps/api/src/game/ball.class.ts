@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 19:11:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/19 18:02:45 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,7 +181,6 @@ export class Ball extends Circle {
     this.findTarget();
   }
 
-
   bouncePaddle(paddle: Paddle) {
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
@@ -217,10 +216,9 @@ export class Ball extends Circle {
     }
   }
 
-  stop()
-  {
+  stop() {
     this.speed = 0;
-    this.direction = new Vector(0,0);
+    this.direction = new Vector(0, 0);
   }
 
   /**

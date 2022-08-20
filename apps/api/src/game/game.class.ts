@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 19:11:27 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/19 18:16:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
-import { pointOnLine, Line,lineLength } from 'geometric';
+import { pointOnLine, Line, lineLength } from 'geometric';
 import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
@@ -99,6 +99,7 @@ export default class Game {
   }
 
   run() {
+    this.stop();
     // this.generateMap(this.nPlayers);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
     this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
@@ -127,10 +128,8 @@ export default class Game {
       timer -= 1;
       if (timer === 0) {
         this.socket.emit('message', 'Goooo ooo ooo o o o o o o');
-        // this.run();
         this.paused = false;
-        clearInterval(this.sayInterval);
-        this.sayInterval = null;
+        this.run();
       } else {
         this.socket.emit('message', `Game resume in ${timer}s`);
       }
@@ -169,12 +168,11 @@ export default class Game {
             }
           }
         } else {
-
-          this.balls.forEach(e => {
-            if (e !== ball){
-            e.direction = new Vector(0,0);
-            e._speed = 0;
-          }
+          this.balls.forEach((e) => {
+            if (e !== ball) {
+              e.direction = new Vector(0, 0);
+              e._speed = 0;
+            }
           });
 
           return;
@@ -187,52 +185,58 @@ export default class Game {
     });
   }
 
-  runPhysics()
-  {
+  runPhysics() {
     this.balls.forEach((ball) => {
-      
-      const dtc = lineLength([[ball.position.x, ball.position.y],[this.map.center.x ,this.map.center.y]]);
+      const dtc = lineLength([
+        [ball.position.x, ball.position.y],
+        [this.map.center.x, this.map.center.y],
+      ]);
       // console.log(dtc)
 
-      if (dtc > 50 && dtc < 70)
-      {
-        console.log("Ded ball")
+      if (dtc > 50 && dtc < 70) {
+        console.log('Ded ball');
         // ball.lastHitten.score++
-        this.balls.forEach(e => {
-          if (e !== ball)
-            e.stop();
+        this.balls.forEach((e) => {
+          if (e !== ball) e.stop();
         });
-      }
-      else if (dtc >= 70)
-      {
+      } else if (dtc >= 70) {
         this.reduce(ball.target.wall);
       }
       const wall = ball.target.wall;
 
-      if (wall.paddle === null)
-      {
-        const test = GameTools.lineCircleCollision(wall[0][0],wall[0][1],wall[1][0],wall[1][1],ball.position.x, ball.position.y, ball.radius)  
-        if (test === true)
-        {
+      if (wall.paddle === null) {
+        const test = GameTools.lineCircleCollision(
+          wall.line[0][0],
+          wall.line[0][1],
+          wall.line[1][0],
+          wall.line[1][1],
+          ball.position.x,
+          ball.position.y,
+          ball.radius,
+        );
+        if (test === true) {
           ball.bounceTargetWall();
-          console.log("wall collision");
+          console.log('wall collision');
         }
-      }
-      else
-      {
-        const test = GameTools.lineCircleCollision(wall.paddle.line[0][0],wall.paddle.line[0][1],wall.paddle.line[1][0],wall.paddle.line[1][1],ball.position.x, ball.position.y, ball.radius)
-        if (test === true){
+      } else {
+        const test = GameTools.lineCircleCollision(
+          wall.paddle.line[0][0],
+          wall.paddle.line[0][1],
+          wall.paddle.line[1][0],
+          wall.paddle.line[1][1],
+          ball.position.x,
+          ball.position.y,
+          ball.radius,
+        );
+        if (test === true) {
           ball.bouncePaddle(wall.paddle);
-          console.log("paddle collision");
+          console.log('paddle collision');
         }
         // console.log("no collision");
       }
       ball.move();
     });
-    
   }
-
-
 
   runBots() {
     this.bots.forEach((e) => {
@@ -245,24 +249,27 @@ export default class Game {
   }
 
   async killPlayer(player: Player) {
+    this.stop();
     this.players.delete(player.user.id);
     await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
     if (this.ended) {
-      this.stop();
-      // return await this.lobby.service.closeLobby(this.lobby);
+      return await this.lobby.service.closeLobby(this.lobby);
     }
     this.newRound();
+    this.run();
   }
 
   public reduce(wall: Wall) {
+    this.stop();
     if (wall.bot) {
       this.bots = this.bots.filter((b) => b !== wall.bot);
-      this.newRound();
+      if (this.ended) {
+        this.killPlayer([...this.players.values()][0]);
+      } else {
+        this.newRound();
+      }
     } else if (wall.player) {
-      this.stop();
-      this.killPlayer(wall.player).then(() => {
-        if (this.ended) this.run();
-      });
+      this.killPlayer(wall.player);
     }
   }
 
