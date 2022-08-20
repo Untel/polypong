@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { User } from 'src/user';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { Channel } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {
-  create(user: User, createChannelDto: CreateChannelDto) {
+  create(user: User, datas: Partial<Channel>) {
     return 'This action adds a new channel';
   }
 

@@ -1,3 +1,4 @@
+import { LoadingBar } from 'quasar';
 import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
@@ -31,6 +32,12 @@ export default route((/* { store, ssrContext } */) => {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
+
+  Router.beforeEach((to, from) => {
+    console.log('Navigating to', to, 'from', from);
+    if (from.name) LoadingBar.start();
+  });
+  Router.afterEach(() => LoadingBar.stop());
 
   return Router;
 });

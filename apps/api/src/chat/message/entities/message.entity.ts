@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:22:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/19 03:44:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ export class Message extends RootEntity {
   content: string;
 
   // If null, then system message
-  @ManyToOne(() => ThreadParticipant) // Bind to User or ThreadParticipant ?
+  @ManyToOne(() => ThreadParticipant, (tp) => tp.sentMessages) // Bind to User or ThreadParticipant ?
   public sender: ThreadParticipant;
 
   @ManyToMany(() => ThreadParticipant) // Bind to User or ThreadParticipant ?

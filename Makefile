@@ -7,6 +7,9 @@ c			        = api
 all:
 	$(COMPOSE) up
 
+config:
+	$(COMPOSE) config
+
 detached:
 	$(COMPOSE) up -d
 
@@ -21,10 +24,12 @@ clear:
 	docker system -f prune
 
 enter:
-	$(COMPOSE) exec $(c) /bin/bash
+	$(COMPOSE) exec $(c) /bin/sh
 
 log:
-	$(COMPOSE) logs $(c) -f
+	$(COMPOSE) logs $(c)
 
+run:
+	$(COMPOSE) up --build $(c)
 
-.PHONY: all build clear install nginx reload $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)
+.PHONY: all build clear install config $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)

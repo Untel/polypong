@@ -1,9 +1,13 @@
 import { Paddle } from './paddle.class';
 import { Ball } from './ball.class';
 import { Wall } from './wall.class';
-import { lineLength, Line } from 'geometric';
+import {
+  lineLength,
+  Line,
+} from 'geometric';
+import { LobbyBot } from './lobbyBot.class';
 export class Bot {
-  botPaddle: Paddle;
+  botPaddle: Paddle;s
   maxSpeed: number;
   edge: Line;
   wall: Wall;
@@ -13,7 +17,7 @@ export class Bot {
   color: string;
   level: number;
 
-  constructor(datas: Partial<Bot> = {}) {
+  constructor(datas: Partial<Bot | LobbyBot> = {}) {
     Object.assign(this, datas);
   }
   attachWall(wall: Wall) {

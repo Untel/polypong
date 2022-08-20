@@ -69,7 +69,7 @@
 
 <script lang="ts" setup>
 import {
-  ref, watch, onBeforeUnmount, defineEmits,
+  ref, watch, onBeforeUnmount,
 } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Notify } from 'quasar';
@@ -84,12 +84,12 @@ const email = ref<string>('');
 const name = ref<string>('');
 const password = ref<string>('');
 const repeatPassword = ref<string>('');
-const coalition = ref<CoalitionChoice>('');
+const coalition = ref<CoalitionChoice>();
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
 
-const onSignUp = async (form: Event) => {
+const onSignUp = async (form: Event): Promise<void> => {
   try {
     await auth.register(
       name.value,

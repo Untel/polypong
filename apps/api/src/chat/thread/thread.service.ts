@@ -6,36 +6,71 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/13 00:24:24 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/19 04:31:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { User } from 'src/user';
+import { In, Repository } from 'typeorm';
+import { Message } from '../message/entities/message.entity';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
-import { Thread } from './entities';
+import { Thread, ThreadParticipant } from './entities';
 
 @Injectable()
 export class ThreadService {
+  logger = new Logger('ThreadService');
+
   constructor(
     @InjectRepository(Thread)
     private threadRep: Repository<Thread>,
+    @InjectRepository(ThreadParticipant)
+    private threadParticipantRep: Repository<ThreadParticipant>,
   ) {}
 
-  async create(createThreadDto: CreateThreadDto) {
-    const thread = this.threadRep.create(createThreadDto);
-    await this.threadRep.insert(thread);
+  async create(th: Partial<Thread>) {
+    const thread = Thread.create(th);
     return thread;
   }
 
-  findAll() {
-    return `This action returns all thread`;
+  async newDirectMessage(message: Partial<Message>, from: User, to: User) {
+    return;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} thread`;
+  findAll(user: User) {
+    return Thread.find({
+      where: { participants: { user: { id: user.id } } },
+      relations: ['participants', 'lastMessage.sender', 'channel'],
+      order: { lastMessage: { createdAt: 'ASC' } }
+    });
+  }
+
+  async findOneOrCreate(users: User[] = []) {
+    console.log("Search thread");
+    const th = await this.threadRep.findOne({
+      // join: { alias: 'p', leftJoin: {  }},
+      where: {
+        // participants: users.map((u) => ({ user: { id: u.id } })),
+        participants: { user: { id: In(users.map((u) => u.id)) } },
+      },
+      relations: ['participants.user', 'messages'],
+    });
+    console.log("Found thread", th);
+    if (th) return th;
+
+    this.logger.log(
+      `Trying to get unexisting thread between ${users
+        .map((u) => u.name)
+        .join(', ')}. Creating...`,
+    );
+
+    const thread = new Thread();
+    // console.log('thread', thread);
+    const participants = users.map((user) => (new ThreadParticipant({ user, thread })));
+    thread.participants = participants;
+    return await thread.save();
   }
 
   update(id: number, updateThreadDto: UpdateThreadDto) {

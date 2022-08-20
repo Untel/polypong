@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:22:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/19 07:50:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ import {
   Unique,
   Index,
 } from 'typeorm';
+import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.entity';
 
 export enum ChannelMemberStatus {
   OWNER = 'owner',
@@ -36,10 +37,10 @@ export enum ChannelMemberStatus {
 }
 
 @Entity()
-@Index(['user', 'channel'], { unique: true })
+@Index(['participant', 'channel'], { unique: true })
 export class ChannelMember extends RootEntity {
-  @ManyToOne(() => User)
-  public user: User;
+  @ManyToOne(() => ThreadParticipant)
+  public participant: ThreadParticipant;
 
   @ManyToOne(() => Channel)
   public channel: Channel;
