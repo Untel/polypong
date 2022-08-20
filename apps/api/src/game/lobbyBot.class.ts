@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import * as gravatar from 'gravatar';
 
 export class LobbyBot {
   name: string;
