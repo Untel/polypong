@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/20 22:35:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/21 16:00:55 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ export default class Game {
   addBall() {
     const ball = new Ball(
       this,
-      new Vector(this.map.center.x, this.map.center.y),
+      this.map.center.clone(),
     );
     // ball.setAngle(angleToRadians(this.map.angles[1]));
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));

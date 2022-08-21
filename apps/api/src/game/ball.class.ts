@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/20 23:58:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/21 16:00:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ export class Ball extends Circle {
    * @see public get targetDistance()
    */
 
-  findTarget() {
+  findTarget(ignorePreviousWall = true) {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
@@ -86,7 +86,7 @@ export class Ball extends Circle {
     const [[x1, y1], [x2, y2]] = line;
     for (let i = 0; i < walls.length; i++) {
       const wall: Wall = walls[i];
-      if (wall === this.target?.wall) {
+      if (ignorePreviousWall && wall === this.target?.wall) {
         continue ;
       }
       const edge: Line = wall.line;
