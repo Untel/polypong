@@ -6,11 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 03:25:33 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 22:47:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { ThreadController } from './thread.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -23,11 +23,12 @@ import { ChannelModule } from '../channel';
   // eslint-disable-next-line prettier/prettier
   imports: [
     TypeOrmModule.forFeature([Thread, ThreadParticipant]),
-    UserModule,
-    MessageModule,
-    ChannelModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => MessageModule),
+    forwardRef(() => ChannelModule),
   ],
   controllers: [ThreadController],
   providers: [ThreadService],
+  exports: [ThreadService],
 })
 export class ThreadModule {}

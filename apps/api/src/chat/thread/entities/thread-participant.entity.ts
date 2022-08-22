@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 04:10:42 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 20:23:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ export class ThreadParticipant extends RootEntity {
     Object.assign(this, datas);
   }
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   public user: User;
 
   @ManyToOne(() => Thread)

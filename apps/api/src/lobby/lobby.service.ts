@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 16:26:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 18:03:29 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ import Player from 'src/game/player.class';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
 import { Match, MatchHistoryService } from 'src/match-history';
+import { TS } from 'src/entities/root.entity';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
@@ -127,7 +128,7 @@ export class LobbyService {
       name: 'history',
       params: { id: lobby.match.id },
     });
-    lobby.match.finishedAt = new Date();
+    lobby.match.finishedAt = TS.ts();
     lobby.match = await lobby.match.save();
     console.log('Updated match', lobby.match);
     lobby.sock.socketsLeave(lobby.roomId);

@@ -6,24 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 03:44:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 20:24:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Thread } from 'src/chat/thread';
 import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.entity';
 import { RootEntity } from 'src/entities/root.entity';
-import { User } from 'src/user/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  Tree,
-  TreeChildren,
-  TreeParent,
-} from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Message extends RootEntity {

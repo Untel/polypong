@@ -6,18 +6,30 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import JwtGuard from 'src/guards/jwt.guard';
+import ThreadGuard, { CurrentThread } from '../thread/thread.guard';
+import { CurrentUser } from 'src/decorators';
+import { Thread } from '../thread';
+import { User } from 'src/user';
 
-@Controller('message')
+@UseGuards(JwtGuard, ThreadGuard)
+@Controller('thread/:threadId/message')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
+  create(
+    @CurrentThread() thread: Thread,
+    @CurrentUser() user: User,
+    @Body() createMessageDto: CreateMessageDto,
+  ) {
+    console.log('Add to thread', thread.id, createMessageDto);
+    return this.messageService.create(thread, user, createMessageDto);
   }
 
   @Get()
