@@ -48,13 +48,13 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'users',
   component: () => import('pages/UsersPage.vue'),
 }, {
-  name: 'stats',
-  path: 'stats/:userId?',
+  name: 'history',
+  path: 'history/:userId?',
   props: true,
-  component: () => import('pages/StatsPage.vue'),
+  component: () => import('pages/HistoryPage.vue'),
 }, {
   name: 'settings',
-  path: 'settings',
+  path: 'sehistor',
   component: () => import('pages/SettingsPage.vue'),
 },
 {

@@ -1,27 +1,19 @@
-<style lang="sass" scoped>
-.my-card
-  width: 100%
-  max-width: 320px
-  min-width: 320px
-</style>
-
 <template>
-<q-card class="my-card">
-  <q-img :src=coaBackground height="280px">
-    <div class="absolute-full text-subtitle2 flex flex-center">
-      name: {{ name }}
-      <br/>
-      played: {{ nPlayed }}
-      <br/>
-      wins: {{ nWins }}
-      <br/>
-      losses: {{ nLosses }}
-      <br/>
-      ratio: {{ ratio }}
-      <slot></slot>
-    </div>
-  </q-img>
-</q-card>
+  <q-banner rounded class="bg-grey-3">
+    <q-img :src=coaBackground height="160px">
+      <div class="absolute-full text-subtitle2 flex flex-center">
+        name: {{ name }}
+        <br/>
+        played: {{ nPlayed }}
+        <br/>
+        wins: {{ nWins }}
+        <br/>
+        losses: {{ nLosses }}
+        <br/>
+        ratio: {{ ratio }}
+      </div>
+    </q-img>
+  </q-banner>
 </template>
 
 <script lang="ts" setup>
@@ -41,7 +33,7 @@ const his = useMatchHistoryStore();
 const soc = useSocialStore();
 const auth = useAuthStore();
 
-defineComponent({ name: 'StatsCard' });
+defineComponent({ name: 'StatsBanner' });
 
 const props = defineProps({
   userId: {

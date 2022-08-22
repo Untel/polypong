@@ -1,5 +1,4 @@
 <template>
-<q-card>
   <q-card-section horizontal>
     <span>the {{ date[0] }} at {{ date[1] }}</span>
     <q-card-section v-for="
@@ -11,12 +10,12 @@
       />
     </q-card-section>
   </q-card-section>
-</q-card>
 </template>
 
 <script lang="ts" setup>
 import { match } from 'minimatch';
 import { useAuthStore } from 'src/stores/auth.store';
+import { Match } from 'src/stores/history.store';
 import { useSocialStore } from 'src/stores/social.store';
 import {
   computed, defineComponent, PropType,

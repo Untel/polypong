@@ -169,6 +169,7 @@ import { ref } from 'vue';
 import RelSearchBar from 'src/components/RelSearchBar.vue';
 import SocialCard from 'src/components/SocialCard.vue';
 import SocialAvatar from 'src/components/SocialAvatar.vue';
+import { useRouter } from 'vue-router';
 
 const tab = ref('friendlist');
 const showCard = ref('');
@@ -184,6 +185,7 @@ function friendOrNot(rel: Relationship): string {
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
 const soc = useSocialStore(); soc.fetchRelationships();
+const router = useRouter();
 
 async function inviteToLobby(id: number) {
   console.log(`invite to lobby ${id}`);
@@ -192,7 +194,7 @@ async function message(id: number) {
   console.log(`message ${id}`);
 }
 async function stats(id: number) {
-  console.log(`stats ${id}`);
+  router.push(`/history/${id}`);
 }
 async function addFriend(name: string) { await soc.send_friendship(name); }
 async function unfriend(name: string) { await soc.unsend_friendship(name); }

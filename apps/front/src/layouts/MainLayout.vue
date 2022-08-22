@@ -32,8 +32,8 @@
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
       <EssentialLink title="Inbox" caption="Your message threads"
         icon="fa-solid fa-comments" to="inbox" />
-      <EssentialLink title="Stats" caption="Player statistics"
-        icon="fa-solid fa-chart-line" to="stats" />
+      <EssentialLink title="History" caption="Match history"
+        icon="fa-solid fa-chart-line" to="history" />
       <EssentialLink title="Settings" caption="Your account settings"
         icon="fa-solid fa-gear" to="settings" />
     </q-drawer>

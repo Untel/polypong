@@ -8,11 +8,11 @@
 <template>
   <q-page class="row">
     <div class="wrapper">
-      <UserBanner :user="$auth.user"/>
+      <UserBanner :userId="$auth.user.id"/>
     </div>
     <q-card>
       <pre>
-        {{ userMatchHistory }}
+        {{ userMatchesHistory }}
       </pre>
     </q-card>
   </q-page>
@@ -27,9 +27,9 @@ import { computed, onMounted } from 'vue';
 const $auth = useAuthStore();
 const $his = useMatchHistoryStore();
 
-const { userMatchHistory } = computed(() => $his.getUserMatches($auth.getUser.id));
+const userMatchesHistory = computed(() => $his.getUserMatchesHistory($auth.getUser.id));
 
 onMounted(() => {
-  $his.fetchUserMatchHistory($auth.getUser.id);
+  $his.fetchUserMatchesHistory($auth.getUser.id);
 });
 </script>
