@@ -8,7 +8,7 @@
     <WhatsApp
       :threads="$thread.threads"
       :currentThread="$thread.current"
-      @selectThread="(t: Thread) => $router.push(`${t.id}`)"
+      @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
     >
       <template v-if="$thread.current">

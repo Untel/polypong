@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 22:57:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 16:15:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,12 @@ export default class ThreadGuard implements CanActivate {
     const threadId = +params.threadId;
     const user = req.user;
     // const thread = await this.threadService.findThread(threadId, user.id);
-    const thread = await Thread.findOneBy({
-      id: threadId,
-      participants: { user: { id: user.id } },
+    const thread = await Thread.findOne({
+      where: {
+        id: threadId,
+        participants: { user: { id: user.id } },
+      },
+      relations: ['participants.user', 'lastMessage'],
     });
     console.log('ALlowED THREAD', thread);
     if (!thread) {

@@ -134,22 +134,22 @@
               v-for="(thread, index) in threads"
               :key="`thread-${index}`"
               clickable
-              v-ripple
               @click="$emit('selectThread', thread)"
             >
               <q-item-section avatar>
-                <q-avatar>
-                  <img :src="thread.recipient.avatar">
+                <q-avatar class="bg-grey-2">
+                  <img v-if="thread.avatar && thread.avatar !== 'group'" :src="thread.avatar">
+                  <q-icon v-else name="group" />
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
                 <q-item-label lines="1">
-                  {{ thread.recipient.name }}
+                  {{ thread.recipient?.name }}
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
-                  <q-icon name="check" v-if="thread.seen" />
-                  <q-icon name="not_interested" v-if="thread.deleted" />
+                  <!-- <q-icon name="check" v-if="thread.seen" />
+                  <q-icon name="not_interested" v-if="thread.deleted" /> -->
                   {{ thread.lastMessage?.content }}
                 </q-item-label>
               </q-item-section>
@@ -236,15 +236,15 @@
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
 import { ref, computed, PropType } from 'vue';
-import { Thread } from 'src/stores/thread.store';
+import { ActiveThread, Thread } from 'src/stores/thread.store';
 
 defineProps({
   threads: {
-    type: Array,
+    type: Array<Thread>,
     default: () => [],
   },
   currentThread: {
-    type: Object as PropType<Thread>,
+    type: Object as PropType<ActiveThread>,
     default: null,
   },
 });
@@ -264,6 +264,13 @@ function toggleLeftDrawer() {
 }
 function sendMessage() {
   emit('sendMessage', message.value);
+  message.value = '';
+}
+function threadAvatar(thread: Thread) {
+  if (thread.channel) {
+    return 'group';
+  }
+  return thread.recipient?.avatar || 'https://cdn.quasar.dev/img/avatar.png';
 }
 </script>
 

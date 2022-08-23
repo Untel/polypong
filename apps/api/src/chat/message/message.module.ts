@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:17 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 23:02:24 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 15:14:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@ import { MessageController } from './message.controller';
 import { Message } from './entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThreadModule } from '../thread/thread.module';
-import { SocketModule } from 'src/socket';
+import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
   // eslint-disable-next-line prettier/prettier
   imports: [
-    // forwardRef(() => SocketModule),
+    forwardRef(() => SocketModule),
     TypeOrmModule.forFeature([Message]),
   ],
   controllers: [MessageController],

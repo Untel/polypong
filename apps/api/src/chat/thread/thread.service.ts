@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 22:46:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 18:06:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ID, TS } from 'src/entities';
 import { User } from 'src/user';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { Message } from '../message/entities/message.entity';
 import { UpdateThreadDto } from './dto/update-thread.dto';
 import { Thread, ThreadParticipant } from './entities';
@@ -56,9 +56,11 @@ export class ThreadService {
       const recipient = t.channel
         ? t.channel.initiator.user
         : t.participants.find((p) => p.user.id !== user.id).user;
+      const me = t.participants.find((p) => p.user.id === user.id);
       return {
         ...t,
         recipient,
+        me,
       };
     });
     console.log('Mapped', mapped);
@@ -90,6 +92,7 @@ export class ThreadService {
       where: {
         // participants: users.map((u) => ({ user: { id: u.id } })),
         participants: { user: { id: In(users.map((u) => u.id)) } },
+        channel: IsNull(),
       },
       relations: ['participants.user', 'messages'],
     });

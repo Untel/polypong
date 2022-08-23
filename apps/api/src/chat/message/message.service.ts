@@ -6,15 +6,16 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 23:02:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 16:29:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SocketService } from 'src/socket';
+import { SocketService } from 'src/socket/socket.service';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
+import { Thread } from '../thread';
 // import { Thread } from '../thread/entities/thread.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -25,17 +26,24 @@ export class MessageService {
   constructor(
     @InjectRepository(Message)
     private messageRep: Repository<Message>,
-    // @Inject(forwardRef(() => SocketService))
-    // private socketService: SocketService,
+    @Inject(forwardRef(() => SocketService))
+    private socketService: SocketService,
   ) {}
 
-  async create(thread: any, user: User, createMessageDto: CreateMessageDto) {
+  async create(thread: Thread, user: User, createMessageDto: CreateMessageDto) {
     const message = new Message();
     message.content = createMessageDto.content;
     message.thread = thread;
     message.sender = thread.participants.find((p) => p.user.id === user.id);
     const savedMessage = await message.save();
 
+    // thread.lastMessage = savedMessage;
+    // await thread.save();
+    thread.participants.forEach((p) => {
+      this.socketService
+        .getUserSocket(p.user.id)
+        .emit('thread-message', thread, savedMessage);
+    });
     return savedMessage;
   }
 
