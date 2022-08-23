@@ -28,6 +28,7 @@ import { asyncComputed } from '@vueuse/core';
 import { useAuthStore } from 'src/stores/auth.store';
 import { CoalitionChoice } from 'src/types';
 import { useSocialStore } from '../stores/social.store';
+import SocialAvatar from './SocialAvatar.vue';
 
 const his = useMatchHistoryStore();
 const soc = useSocialStore();
@@ -88,11 +89,11 @@ const name = computed(() => {
   return '';
 });
 
-// const avatar = computed(() => {
-//  if (isSelf.value) { return auth.user.avatar; }
-//  if (rel.value) { return rel.value.to.avatar; }
-//  return '';
-// });
+const avatar = computed(() => {
+  if (isSelf.value) { return auth.user.avatar; }
+  if (rel.value) { return rel.value.to.avatar; }
+  return '';
+});
 
 const coalition: ComputedRef<CoalitionChoice> = computed(() => {
   if (isSelf.value) { return auth.user.coalition; }

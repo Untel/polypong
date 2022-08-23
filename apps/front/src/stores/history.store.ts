@@ -11,9 +11,8 @@
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
-import { Notify } from 'quasar';
 import { mande } from 'mande';
-import { identity } from '@vueuse/core';
+import { Stats } from 'fs';
 import { useAuthStore } from './auth.store';
 
 export const historyApi = mande('/api/match-history');
@@ -69,19 +68,25 @@ export interface Match{
   players: Player[];
 }
 
+export interface UserStats {
+  wins: number;
+  losses: number;
+  ratio: number;
+}
 export interface UserMatchesHistory {
   userId: number;
   matches: Match[];
+  stats: UserStats;
 }
 
-interface UsersMatchesHistoriesState {
+interface UsersMatchesHistories{
   usersHis: UserMatchesHistory[];
 }
 
 export const useMatchHistoryStore = defineStore('history', {
   state: () => ({
     usersHis: [],
-  } as UsersMatchesHistoriesState),
+  } as UsersMatchesHistories),
   getters: {
     getUsersHis(state) {
       return state.usersHis;
@@ -115,11 +120,45 @@ export const useMatchHistoryStore = defineStore('history', {
       const curHis = this.getUserMatchesHistory(userId);
       if (curHis) {
         curHis.matches = matches;
+        curHis.stats = this.computeStats(userId, matches);
         return curHis;
       }
-      const newHis = { userId, matches };
+      const stats = this.computeStats(userId, matches);
+      const newHis = { userId, matches, stats };
       this.usersHis.push(newHis);
       return newHis;
+    },
+
+    computeStats(userId: number, matches: Match[]): UserStats {
+      const res: UserStats = { wins: 0, losses: 0, ratio: 1 };
+      const nPlayed = matches.length;
+      matches.forEach((m) => {
+        const nplayers = m.players.length;
+        const winThreshold = nplayers / 2;
+        m.players.forEach((p) => {
+          if (p.user.id === userId) {
+            if (p.rank <= winThreshold) {
+              res.wins += 1;
+            }
+          }
+        });
+      });
+      res.losses = nPlayed - res.wins;
+      if (nPlayed > 0) {
+        res.ratio = res.wins / nPlayed;
+      }
+      return res;
+    },
+
+    async getAllMatches(): Promise<Match[] | undefined> {
+      console.log('history store - getAllMatches');
+      const allMatches = await historyApi.get<Match[]>('all');
+      console.log('history store - getAllMatches - matches = ', allMatches);
+      return allMatches;
+    },
+    async getPlayersUsersIds(): Promise<[any]> {
+      console.log('history store - getPlayersUsersIds');
+      return historyApi.get<[any]>('playersUsersIds');
     },
   },
 });

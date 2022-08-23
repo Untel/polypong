@@ -55,6 +55,16 @@ export class MatchHistoryController {
     return null;
   }
 
+  @Get('all')
+  async getAllMatches(): Promise<UserMatch[] | Match[]> {
+    return await this.matchHistoryService.getAllMatches();
+  }
+
+  @Get('playersUsersIds')
+  async getAllPlayersUsersIds(): Promise<number[]> {
+    return await this.matchHistoryService.getAllPlayersUsersIds();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.matchHistoryService.findOne(+id);
