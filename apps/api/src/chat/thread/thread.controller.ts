@@ -36,7 +36,9 @@ export class ThreadController {
   @Get(':id')
   @UseGuards(ThreadGuard)
   async findOne(@CurrentUser() user: User, @Param('id') id: string) {
-    return this.threadService.findThreadWithMessages(+id);
+    const thread = await this.threadService.findThreadWithMessages(+id);
+    await this.threadService.setThreadAsRead(thread, user);
+    return thread;
   }
 
   @Get('user/:id')

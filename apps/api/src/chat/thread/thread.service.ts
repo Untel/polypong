@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 06:14:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 06:53:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ID, TS } from 'src/entities';
-import { User } from 'src/user';
+import { ID, TS } from 'src/entities/root.entity';
+import { User } from 'src/user/user.entity';
 import { In, IsNull, Repository } from 'typeorm';
 import { Message } from '../message/entities/message.entity';
 import { UpdateThreadDto } from './dto/update-thread.dto';
@@ -101,6 +101,16 @@ export class ThreadService {
       ],
       order: { messages: { createdAt: 'DESC' } },
     });
+  }
+
+  async setThreadAsRead(thread: Thread, user: User) {
+    return ThreadParticipant.update(
+      {
+        thread: { id: thread.id },
+        user: { id: user.id },
+      },
+      { sawUntil: new Date() },
+    );
   }
 
   async findThread(id: ID, userId: ID) {
