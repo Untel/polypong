@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 06:01:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 07:44:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,9 @@ export const useThreadStore = defineStore('thread', {
       });
 
       return threads;
+    },
+    totalUnread(state): number {
+      return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
     },
     current(state): ActiveThread | null {
       if (!state._current) return null;

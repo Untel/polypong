@@ -10,7 +10,7 @@
       avatar
     >
       <q-icon :name="icon" />
-      <q-badge v-if="notif!= 0" color="orange" rounded transparent floating>
+      <q-badge v-if="notif != 0" color="red" floating>
         {{ notif }}
       </q-badge>
     </q-item-section>
