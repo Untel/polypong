@@ -18,7 +18,7 @@ import { Thread } from '../thread';
 import { User } from 'src/user';
 
 @UseGuards(JwtGuard, ThreadGuard)
-@Controller('thread/:threadId/message')
+@Controller('thread/:id/message')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 

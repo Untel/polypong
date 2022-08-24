@@ -18,6 +18,7 @@ import { User } from 'src/user/user.entity';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserService } from 'src/user';
 import JwtGuard from 'src/guards/jwt.guard';
+import ThreadGuard from './thread.guard';
 
 @UseGuards(JwtGuard)
 @Controller('thread')
@@ -33,6 +34,7 @@ export class ThreadController {
   }
 
   @Get(':id')
+  @UseGuards(ThreadGuard)
   async findOne(@CurrentUser() user: User, @Param('id') id: string) {
     return this.threadService.findThreadWithMessages(+id);
   }

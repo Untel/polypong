@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 00:38:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 06:43:49 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ export default class ThreadGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
     const params = req.params;
-    const threadId = +params.threadId;
+    const threadId = +params.id;
     const user = req.user;
+    console.log('Checking thread auth');
     // const thread = await this.threadService.findThread(threadId, user.id);
     const thread = await Thread.findOne({
       where: {
