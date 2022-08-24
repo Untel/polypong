@@ -6,12 +6,11 @@
 </style>
 
 <template>
-<q-card class="my-card">
+<q-card class="my-card" @click="emit('click', userId)">
   <q-img :src=coaBackground :height=height>
     <div class="absolute-full flex flex-center">
       {{ name }} | W: {{ nWins }} | L: {{ nLosses }} | {{ ratio * 100 }}%
     </div>
-    <slot></slot>
   </q-img>
 </q-card>
 </template>
@@ -35,6 +34,7 @@ const soc = useSocialStore();
 const auth = useAuthStore();
 
 defineComponent({ name: 'StatsCard' });
+const emit = defineEmits(['click']);
 
 const props = defineProps({
   userId: {

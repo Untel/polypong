@@ -96,6 +96,11 @@ export const useMatchHistoryStore = defineStore('history', {
     getUserMatchesHistory(userId: number): UserMatchesHistory | undefined {
       return this.getUsersHis.find((his) => his.userId === userId);
     },
+    getUserNameByIdFromMatchHistory(userId: number): string | undefined {
+      const userHis = this.getUserMatchesHistory(userId);
+      const player = userHis?.matches[0]?.players?.find((p) => p.user.id === userId);
+      return player?.user.name || undefined;
+    },
     getUserMatch(userId: number, matchId: number): Match| undefined {
       return this.getUserMatchesHistory(userId)?.matches
         ?.find((match) => match.id === matchId);

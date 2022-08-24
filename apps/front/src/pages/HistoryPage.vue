@@ -38,11 +38,13 @@
           <q-card-section v-if="playerClicked">
             <q-card-section v-if="playerClicked === auth.user.name">
               <stats-card
+                @click="(userIdParam) => stats(userIdParam)"
                 :userId="auth.user.id"
                 :name="auth.user.name"
                 :nWins="playerClickedStats?.wins"
                 :nLosses="playerClickedStats?.losses"
                 :ratio="playerClickedStats?.ratio"
+                height="280px"
               >
                 <social-button
                   @click="stats(auth.user.id)"
@@ -52,15 +54,23 @@
             </q-card-section>
             <q-card-section v-else-if="rel" horizontal>
               <stats-card
+                @click="(userIdParam) => stats(userIdParam)"
                 :userId="rel.toId"
                 :name="rel.to.name"
                 :nWins="playerClickedStats?.wins"
                 :nLosses="playerClickedStats?.losses"
                 :ratio="playerClickedStats?.ratio"
+                height="280px"
               />
               <q-separator vertical/>
               <social-card :relname="rel.to.name"
                 @stats="(id) => stats(id)"
+                @invite-to-lobby="(id) => inviteToLobby(id)"
+                @message="(id) => message(id)"
+                @add-friend="(name) => addFriend(name)"
+                @unfriend="(name) => unfriend(name)"
+                @block="(name) => block(name)"
+                @unblock="(name) => unblock(name)"
               />
             </q-card-section>
           </q-card-section>
@@ -73,8 +83,9 @@
 </div>
 </q-tab-panel>
 <q-tab-panel name="ladder">
-  <pre>{{usersIds}}</pre>
-  <ladder-board/>
+  <ladder-board
+    @click="(userIdParam) => stats(userIdParam)"
+  />
 </q-tab-panel>
 </q-tab-panels>
 
@@ -109,13 +120,13 @@ const his = useMatchHistoryStore();
 his.fetchUserMatchesHistory(userId.value);
 
 const isSelf: boolean = userId.value === auth.user.id;
-const OwningRel = asyncComputed(async () => {
-  if (isSelf) { return undefined; }
-  const ret = soc.getRelByUserId(userId.value);
-  if (ret) { return ret; }
-  await soc.addRelByUserId(userId.value);
-  return soc.getRelByUserId(userId.value);
-});
+// const OwningRel = asyncComputed(async () => {
+//  if (isSelf) { return undefined; }
+//  const ret = soc.getRelByUserId(userId.value);
+//  if (ret) { return ret; }
+//  await soc.addRelByUserId(userId.value);
+//  return soc.getRelByUserId(userId.value);
+// });
 
 const playerClicked = ref('');
 const playerClickedId = ref(-1);
@@ -145,11 +156,11 @@ function togglePlayer(name: string, usrId: number, matchId: number) {
   }
 }
 
+const tab = ref('history');
 async function stats(id: number) {
+  tab.value = 'history';
   router.push(`/history/${id}`);
 }
-
-const tab = ref('ladder');
 
 const usersIds = asyncComputed(async () => {
   const raw = await his.getPlayersUsersIds();
@@ -159,5 +170,16 @@ const usersIds = asyncComputed(async () => {
   });
   return arr;
 });
+
+async function inviteToLobby(id: number) {
+  console.log(`invite to lobby ${id}`);
+}
+async function message(id: number) {
+  console.log(`message ${id}`);
+}
+async function addFriend(name: string) { await soc.send_friendship(name); }
+async function unfriend(name: string) { await soc.unsend_friendship(name); }
+async function block(name: string) { await soc.send_block(name); }
+async function unblock(name: string) { await soc.unsend_block(name); }
 
 </script>
