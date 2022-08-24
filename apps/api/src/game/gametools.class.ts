@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gametools.class.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/11 02:32:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/17 19:34:38 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,14 @@ import { Vector } from 'collider2d';
 
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
+
+  static angleNormalize(val: number, r_start: number, r_end: number) {
+    const width: number = r_end - r_start; //
+    const offsetValue: number = val - r_start; // value relative to 0
+
+    return offsetValue - Math.floor(offsetValue / width) * width + r_start;
+    // + start to reset back to start of original range
+  }
   static lineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
     const s1_x = p1_x - p0_x;
     const s1_y = p1_y - p0_y;
@@ -41,26 +49,6 @@ export default class GameTools {
   }
   static getRandomFloatArbitrary(min, max): number {
     return Math.random() * (max - min) + min;
-  }
-
-  static vectorRotate(vx: number, vy: number, degree: number) {
-    // const L = Math.norm([vx,vy]) this.distance(0, 0, vx, vy);
-    // L =
-    const vec: Vector = new Vector(vx, vy);
-    // console.log("vector L is ", L);
-    console.log('vec is ', vec);
-
-    // {
-    // ang = -ang * (Math.PI / 180);
-    const cos = Math.cos(degree);
-    const sin = Math.sin(degree);
-    const rotated = [
-      Math.round(10000 * (vx * cos - vy * sin)) / 10000,
-      Math.round(10000 * (vx * sin + vy * cos)) / 10000,
-    ];
-    // };
-    // console.log("rotated :", rotated)
-    return rotated;
   }
 
   static pDistance(x: number, y: number, p1: number[], p2: number[]): number {
@@ -95,7 +83,9 @@ export default class GameTools {
   }
 
   static distance(x1: number, y1: number, x2: number, y2: number): number {
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    const x2x1: number = x2 - x1;
+    const y2y1: number = y2 - y1;
+    return Math.sqrt(Math.pow(x2x1, 2) + Math.pow(y2y1, 2));
   }
   static percentage(small: number, big: number): number {
     return (small / big) * 100;
@@ -105,4 +95,79 @@ export default class GameTools {
     [...Array(size)]
       .map(() => Math.floor(Math.random() * 16).toString(16))
       .join('');
+
+  static linePoint(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    px: number,
+    py: number,
+  ) {
+    const lineLen: number = GameTools.distance(x1, y1, x2, y2);
+
+    const d1: number = GameTools.distance(px, py, x1, y1);
+    const d2: number = GameTools.distance(px, py, x2, y2);
+
+    const buffer = 0.1;
+
+    if (d1 + d2 >= lineLen - buffer && d1 + d2 <= lineLen + buffer) {
+      return true;
+    }
+    return false;
+  }
+
+  static pointCircle(
+    px: number,
+    py: number,
+    cx: number,
+    cy: number,
+    r: number,
+  ) {
+    const distX: number = px - cx;
+    const distY: number = py - cy;
+
+    const distance = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+    if (distance <= r) {
+      return true;
+    }
+    return false;
+  }
+
+  static lineCircleCollision(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    cx: number,
+    cy: number,
+    r,
+  ) {
+    // let x1, y1, cx, cy, r : number;
+    // x1
+    // boolean inside1 = pointCircle(x1,y1, cx,cy,r); // Need pointcircle
+    // boolean inside2 = pointCircle(x2,y2, cx,cy,r);
+    // if (inside1 || inside2) return true;
+
+    let distX: number = x1 - x2;
+    let distY: number = y1 - y2;
+    const len: number = Math.sqrt(distX * distX + distY * distY); // Just the length of the line, may be ommited
+    const dot: number =
+      ((cx - x1) * (x2 - x1) + (cy - y1) * (y2 - y1)) / Math.pow(len, 2);
+
+    const closestX: number = x1 + dot * (x2 - x1);
+    const closestY: number = y1 + dot * (y2 - y1);
+
+    const onSegment = this.linePoint(x1, y1, x2, y2, closestX, closestY); //Need linepoint
+    if (!onSegment) return false;
+
+    distX = closestX - cx;
+    distY = closestY - cy;
+    const distance: number = Math.sqrt(distX * distX + distY * distY); //Pythagore
+
+    if (distance <= r) {
+      return true;
+    }
+    return false;
+  }
 }

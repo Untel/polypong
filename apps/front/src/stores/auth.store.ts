@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -16,6 +17,7 @@ import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
 import { mande, defaults } from 'mande';
 import { User } from 'src/types/user';
+import { useThreadStore } from './thread.store';
 
 export const authApi = mande('/api/auth');
 export const twoFactorApi = mande('/api/2fa');
@@ -90,6 +92,12 @@ export const useAuthStore = defineStore('auth', {
               },
             }],
           });
+        });
+
+        this.socket.on('thread-message', (thread, message) => {
+          console.log('New socket message', thread, message);
+          const $thread = useThreadStore();
+          $thread.socketAddMessage(thread, message);
         });
       });
     },

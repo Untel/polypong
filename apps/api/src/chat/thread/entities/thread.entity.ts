@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 04:09:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 03:20:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,10 @@ export class Thread extends RootEntity {
     Object.assign(this, datas);
   }
 
-  @OneToMany(() => ThreadParticipant, (tp) => tp.thread, { cascade: true })
+  @OneToMany(() => ThreadParticipant, (tp) => tp.thread, {
+    cascade: true,
+    eager: true,
+  })
   public participants: ThreadParticipant[];
 
   @OneToMany(() => Message, (m) => m.thread, { cascade: true })
@@ -42,9 +45,10 @@ export class Thread extends RootEntity {
    * Could be usefull to load the thread without loading all messages
    * Ex: have the last text and lastMessage to sort thread with last activity
    */
-  @OneToOne(() => Message, { nullable: true })
-  @JoinColumn()
   public lastMessage: Message;
+  public unreadMessages: Message[];
+  public unreadCount: number;
+  public me: ThreadParticipant;
 
   @OneToOne(() => Channel, (c) => c.thread, { nullable: true })
   public channel: Channel;

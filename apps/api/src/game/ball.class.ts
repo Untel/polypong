@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 19:09:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/21 16:00:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,8 @@ export class Ball extends Circle {
    * Une fois qu'on a le prochain point d'impact, il suffit calculer la distance entre la balle et la Target
    * @see public get targetDistance()
    */
-  findTarget() {
+
+  findTarget(ignorePreviousWall = true) {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
@@ -85,6 +86,9 @@ export class Ball extends Circle {
     const [[x1, y1], [x2, y2]] = line;
     for (let i = 0; i < walls.length; i++) {
       const wall: Wall = walls[i];
+      if (ignorePreviousWall && wall === this.target?.wall) {
+        continue ;
+      }
       const edge: Line = wall.line;
       const [[x3, y3], [x4, y4]] = edge;
       const intersection = GameTools.lineIntersection(
@@ -191,9 +195,9 @@ export class Ball extends Circle {
      * le paddle. Peut etre remettre ca en 1v1 only?
      */
     const hitLen = lineLength([paddle.line[1], this.target.hit]);
-    // // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // // x2 pour aller de -1 a x1;
+    // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
+    // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
+    // x2 pour aller de -1 a x1;
     const percent = (hitLen / paddle.width - 0.5) * 2;
     // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
     console.log('Hit percent', percent);
@@ -213,6 +217,11 @@ export class Ball extends Circle {
       this.speed = this.maxSpeed;
       // console.log("Max ball speed reached");
     }
+  }
+
+  stop() {
+    this.speed = 0;
+    this.direction = new Vector(0, 0);
   }
 
   /**

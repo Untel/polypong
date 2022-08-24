@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 06:26:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 20:55:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ export class Channel extends RootEntity {
   @OneToMany(() => ChannelMember, (cm) => cm.participant)
   members: ChannelMember[];
 
-  @OneToOne(() => ThreadParticipant)
+  @OneToOne(() => ThreadParticipant, { eager: true })
   @JoinColumn()
   initiator: ThreadParticipant;
 

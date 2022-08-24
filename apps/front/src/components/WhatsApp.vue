@@ -2,6 +2,14 @@
   .q-drawer--on-top {
     z-index: 5000;
   }
+  .column-reverse {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .bold > * {
+    font-weight: bold !important;
+  }
 </style>
 
 <template>
@@ -21,12 +29,12 @@
 
           <q-btn round flat>
             <q-avatar>
-              <img :src="currentConversation.avatar">
+              <!-- <img :src="currentThread.avatar"> -->
             </q-avatar>
           </q-btn>
 
           <span class="q-subtitle-1 q-pl-md">
-            {{ currentConversation.person }}
+            <!-- {{ currentConversation.person }} -->
           </span>
 
           <q-space/>
@@ -131,34 +139,34 @@
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
             <q-item
-              v-for="(conversation, index) in conversations"
-              :key="conversation.id"
+              v-for="(thread, index) in threads"
+              :key="`thread-${index}`"
               clickable
-              v-ripple
-              @click="setCurrentConversation(index)"
+              @click="$emit('selectThread', thread)"
+              :active="thread.id === currentThread?.id"
+              :class="{ bold: thread.unreadMessages.length > 0 }"
             >
               <q-item-section avatar>
-                <q-avatar>
-                  <img :src="conversation.avatar">
+                <q-avatar class="bg-grey-2">
+                  <img v-if="thread.avatar && thread.avatar !== 'group'" :src="thread.avatar">
+                  <q-icon v-else name="group" />
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
-                <q-item-label lines="1">
-                  {{ conversation.person }}
-                </q-item-label>
-                <q-item-label class="conversation__summary" caption>
-                  <q-icon name="check" v-if="conversation.sent" />
-                  <q-icon name="not_interested" v-if="conversation.deleted" />
-                  {{ conversation.caption }}
-                </q-item-label>
+                <q-item-label>{{ thread.recipient?.name }}</q-item-label>
+                <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
               </q-item-section>
 
-              <q-item-section side>
+              <q-item-section side top>
                 <q-item-label caption>
-                  {{ conversation.time }}
+                  {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
                 </q-item-label>
-                <q-icon name="keyboard_arrow_down" />
+                <q-badge
+                  v-if="thread.unreadMessages.length"
+                  color="red"
+                  :label="`${thread.unreadMessages.length}`"
+                />
               </q-item-section>
             </q-item>
           </q-list>
@@ -173,43 +181,48 @@
       >
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
-            <q-item
-              v-for="(conversation, index) in conversations"
-              :key="conversation.id"
+            <!-- <q-item
+              v-for="(thread, index) in threads"
+              :key="`thread-${index}`"
               clickable
               v-ripple
-              @click="setCurrentConversation(index)"
+              @click="$emit('selectThread', thread)"
             >
               <q-item-section avatar>
                 <q-avatar>
-                  <img :src="conversation.avatar">
+                  <img :src="thread.participants[0]?.user.avatar">
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
                 <q-item-label lines="1">
-                  {{ conversation.person }}
+                  {{ thread.recipient.username }}
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
                   <q-icon name="check" v-if="conversation.sent" />
                   <q-icon name="not_interested" v-if="conversation.deleted" />
-                  {{ conversation.caption }}
+                  {{ thread.recipient.username }}
                 </q-item-label>
               </q-item-section>
 
               <q-item-section side>
                 <q-item-label caption>
-                  {{ conversation.time }}
+                  {{ thread.createdAt }}
                 </q-item-label>
                 <q-icon name="keyboard_arrow_down" />
               </q-item-section>
-            </q-item>
+            </q-item> -->
           </q-list>
         </q-scroll-area>
       </q-drawer>
 
-      <q-page-container class="bg-grey-2">
-        <router-view />
+      <q-page-container full-height container class="bg-grey-2">
+        <q-page class="column-reverse" padding>
+          <slot />
+          <q-page-scroller reverse position="top" :scroll-offset="20" :offset="[0, 18]">
+            <q-btn fab icon="keyboard_arrow_down" color="primary" />
+          </q-page-scroller>
+        </q-page>
       </q-page-container>
 
       <q-footer>
@@ -220,87 +233,68 @@
             outlined
             dense
             class="WAL__field col-grow q-mr-sm"
-            v-model="message"
             placeholder="Type a message"
+            @keydown.enter.prevent="sendMessage"
+            v-model.trim="message"
           />
-          <q-btn round flat icon="mic" />
+          <q-btn round flat icon="send" @click="sendMessage"/>
         </q-toolbar>
       </q-footer>
     </q-layout>
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import { useQuasar } from 'quasar';
-import { ref, computed } from 'vue';
+import { ref, computed, PropType } from 'vue';
+import { ActiveThread, Thread } from 'src/stores/thread.store';
+import moment from 'moment';
 
-const conversations = [
-  {
-    id: 1,
-    person: 'Razvan Stoenescu',
-    avatar: 'https://cdn.quasar.dev/team/razvan_stoenescu.jpeg',
-    caption: 'I\'m working on Quasar!',
-    time: '15:00',
-    sent: true,
+defineProps({
+  threads: {
+    type: Array<Thread>,
+    default: () => [],
   },
-  {
-    id: 2,
-    person: 'Dan Popescu',
-    avatar: 'https://cdn.quasar.dev/team/dan_popescu.jpg',
-    caption: 'I\'m working on Quasar!',
-    time: '16:00',
-    sent: true,
+  currentThread: {
+    type: Object as PropType<ActiveThread | null>,
+    default: null,
   },
-  {
-    id: 3,
-    person: 'Jeff Galbraith',
-    avatar: 'https://cdn.quasar.dev/team/jeff_galbraith.jpg',
-    caption: 'I\'m working on Quasar!',
-    time: '18:00',
-    sent: true,
-  },
-  {
-    id: 4,
-    person: 'Allan Gaunt',
-    avatar: 'https://cdn.quasar.dev/team/allan_gaunt.png',
-    caption: 'I\'m working on Quasar!',
-    time: '17:00',
-    sent: true,
-  },
-];
-export default {
-  name: 'WhatsappLayout',
-  setup() {
-    const $q = useQuasar();
-    const leftDrawerOpen = ref(false);
-    const rightDrawerOpen = ref(false);
-    const search = ref('');
-    const message = ref('');
-    const currentConversationIndex = ref(0);
-    const currentConversation = computed(() => conversations[currentConversationIndex.value]);
-    const style = computed(() => ({
-      height: `${$q.screen.height - 50}px`,
-    }));
-    function toggleLeftDrawer() {
-      leftDrawerOpen.value = !leftDrawerOpen.value;
-    }
-    function setCurrentConversation(index) {
-      currentConversationIndex.value = index;
-    }
-    return {
-      leftDrawerOpen,
-      rightDrawerOpen,
-      search,
-      message,
-      currentConversationIndex,
-      conversations,
-      currentConversation,
-      setCurrentConversation,
-      style,
-      toggleLeftDrawer,
-    };
-  },
-};
+});
+
+const emit = defineEmits(['selectThread', 'sendMessage']);
+
+const $q = useQuasar();
+const leftDrawerOpen = ref(false);
+const rightDrawerOpen = ref(false);
+const search = ref('');
+const message = ref('');
+const style = computed(() => ({
+  height: `${$q.screen.height - 50}px`,
+}));
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+}
+function sendMessage() {
+  emit('sendMessage', message.value);
+  message.value = '';
+}
+function threadAvatar(thread: Thread) {
+  if (thread.channel) {
+    return 'group';
+  }
+  return thread.recipient?.avatar || 'https://cdn.quasar.dev/img/avatar.png';
+}
+function containerStyleFn(offset) {
+  // "offset" is a Number (pixels) that refers to the total
+  // height of header + footer that occupies on screen,
+  // based on the QLayout "view" prop configuration
+
+  // this is actually what the default style-fn does in Quasar
+  return {
+    minHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
+    maxHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
+  };
+}
 </script>
 
 <style lang="sass">
@@ -320,7 +314,6 @@ export default {
     margin: 0 auto
     height: 100%
     width: 90%
-    max-width: 1400px
     border-radius: 5px
   &__field.q-field--outlined .q-field__control:before
     border: none

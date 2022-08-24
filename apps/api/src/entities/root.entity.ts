@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:11:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 18:25:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/22 21:02:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,19 @@ import {
 } from 'typeorm';
 
 // Can change the extends
-export class TS extends Date {}
+export class TS extends Date {
+  static ASC: 'ASC' = 'ASC';
+  static DESC: 'DESC' = 'DESC';
+  static ts() {
+    // return Date.now();
+    return new Date();
+  }
+}
+
+// export class ID extends Number {}
+export type ID = number;
 
 export abstract class NoIdBaseEntity extends BaseEntity {
-  // constructor(datas: Partial<NoIdBaseEntity> = {}) {
-  //   super();
-  //   Object.assign(this, datas);
-  // }
-
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: TS;
@@ -49,5 +54,5 @@ export abstract class RootEntity extends NoIdBaseEntity {
 
   @ApiProperty({ example: 'c057cc8c-ad1b-4081-ba05-41a648e29f19' })
   @PrimaryGeneratedColumn()
-  id: number;
+  id: ID;
 }

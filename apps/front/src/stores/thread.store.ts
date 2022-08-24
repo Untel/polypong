@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 18:55:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 07:44:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 import { defineStore } from 'pinia';
 import { mande } from 'mande';
+import { User } from './lobbies.store';
+import { useAuthStore } from './auth.store';
 
 export const threadApi = mande('/api/thread');
 export const channelApi = mande('/api/channel');
@@ -27,20 +29,39 @@ export interface BaseObject {
 
 export interface Channel extends BaseObject {
   name: string;
+  avatar: string;
+}
+
+export interface Participant extends BaseObject {
+  user: User;
+  sawUntil: Date;
 }
 
 export interface Message extends BaseObject {
   content: string;
+  contents: string[];
+  sender: Participant;
 }
 
-export interface Thread extends BaseObject {
+export interface BaseThread extends BaseObject {
+  participants: Participant[];
+  channel?: Channel;
+}
+
+export interface Thread extends BaseThread {
   lastMessage: Message;
+  recipient: User;
+  avatar: string;
+  unreadMessages: Message[];
+}
+
+export interface ActiveThread extends BaseThread {
   messages: Message[];
 }
 
 interface ThreadState {
   _threads: Thread[];
-  _current: Thread | null;
+  _current: ActiveThread | null;
 }
 
 export const useThreadStore = defineStore('thread', {
@@ -50,9 +71,23 @@ export const useThreadStore = defineStore('thread', {
   } as ThreadState),
   getters: {
     threads(state): Thread[] {
-      return state._threads;
+      const $auth = useAuthStore();
+      const threads = state._threads.map((thread) => {
+        const mapped = {
+          ...thread,
+          avatar: !thread.channel ? thread.recipient.avatar : (thread.channel.avatar || 'group'),
+        };
+        console.log('Mapped', mapped);
+        return mapped;
+      });
+
+      return threads;
     },
-    current(state): Thread | null {
+    totalUnread(state): number {
+      return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
+    },
+    current(state): ActiveThread | null {
+      if (!state._current) return null;
       return state._current;
     },
   },
@@ -61,12 +96,20 @@ export const useThreadStore = defineStore('thread', {
       this._threads = await threadApi.get<Thread[]>('');
     },
 
-    async getOrCreateThread(userId: number | null | undefined) {
+    async getThread(userId: number | null | undefined) {
       if (userId) {
-        this._current = await threadApi.get<Thread>(userId);
+        this._current = await threadApi.get<ActiveThread>(userId);
       } else {
         this._current = null;
       }
+    },
+
+    async sendMessage(content: string) {
+      const id = this._current?.id;
+      if (!id) return;
+      console.log('Sendiiiing msg', content);
+      const response = await threadApi.post(`${id}/message`, { content });
+      console.log('Message sent', response);
     },
 
     async newDirectMessage(userId: number) {
@@ -75,6 +118,16 @@ export const useThreadStore = defineStore('thread', {
 
     async newChannel() {
       await threadApi.post<Thread[]>('/channel');
+    },
+
+    async socketAddMessage(thread, message) {
+      console.log('Socket add message', thread, message);
+      if (this._current && this._current.id === thread.id) {
+        this.getThread(thread.id);
+      }
+      if (this._threads.find((t) => t.id === thread.id)) {
+        this.fetchThreads();
+      }
     },
   },
 });

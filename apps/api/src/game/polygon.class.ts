@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/07/14 01:47:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/21 16:02:55 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,11 @@ export default class MyPolygon {
   edges = [];
   angles = [];
   edgeWidth = 0;
-  center;
+  center: Vector;
 
   constructor(npoints, x = 0, y = 0, radius = 50) {
     this.center = new Vector(x, y);
     if (npoints === 2) {
-      // this.verticles = [
-      //   [-50, 50],
-      //   [50, 50],
-      //   [50, -50],
-      //   [-50, -50],
-      // ];
       const a = x - y;
       const b = x + y;
       this.verticles = [
@@ -55,7 +49,6 @@ export default class MyPolygon {
         const sy = /*Math.fround*/ y + Math.sin(angle * i) * radius;
         this.verticles.push([sx, sy]);
         this.sides.push(new Vector(sx, sy));
-        // console.log('sx, sy ', [sx, sy]);
       }
       this.shape = new Polygon(this.center, this.sides);
     }
@@ -66,8 +59,6 @@ export default class MyPolygon {
       this.angles.push(lineAngle(line));
       this.edges[i] = line;
     }
-
-    // console.log('-- Edges', this.shape);
     this.edgeWidth = lineLength(this.edges[0]);
     this.inradius = this.edgeWidth / (Math.tan(Math.PI / npoints) * 2);
   }
