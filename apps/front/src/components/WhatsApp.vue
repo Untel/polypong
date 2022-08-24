@@ -2,6 +2,14 @@
   .q-drawer--on-top {
     z-index: 5000;
   }
+  .column-reverse {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .bold > * {
+    font-weight: bold !important;
+  }
 </style>
 
 <template>
@@ -135,6 +143,8 @@
               :key="`thread-${index}`"
               clickable
               @click="$emit('selectThread', thread)"
+              :active="thread.id === currentThread.id"
+              :class="{ bold: thread.unreadMessages.length > 0 }"
             >
               <q-item-section avatar>
                 <q-avatar class="bg-grey-2">
@@ -144,21 +154,19 @@
               </q-item-section>
 
               <q-item-section>
-                <q-item-label lines="1">
-                  {{ thread.recipient?.name }}
-                </q-item-label>
-                <q-item-label class="conversation__summary" caption>
-                  <!-- <q-icon name="check" v-if="thread.seen" />
-                  <q-icon name="not_interested" v-if="thread.deleted" /> -->
-                  {{ thread.lastMessage?.content }}
-                </q-item-label>
+                <q-item-label>{{ thread.recipient?.name }}</q-item-label>
+                <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
               </q-item-section>
 
-              <q-item-section side>
+              <q-item-section side top>
                 <q-item-label caption>
-                  {{ thread.createdAt }}
+                  {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
                 </q-item-label>
-                <q-icon name="keyboard_arrow_down" />
+                <q-badge
+                  v-if="thread.unreadMessages.length"
+                  color="red"
+                  :label="`${thread.unreadMessages.length}`"
+                />
               </q-item-section>
             </q-item>
           </q-list>
@@ -208,10 +216,13 @@
         </q-scroll-area>
       </q-drawer>
 
-      <q-page-container class="bg-grey-2">
-        <!-- <router-view /> -->
-        Hello
-        <slot />
+      <q-page-container full-height container class="bg-grey-2">
+        <q-page class="column-reverse" padding>
+          <slot />
+          <q-page-scroller reverse position="top" :scroll-offset="20" :offset="[0, 18]">
+            <q-btn fab icon="keyboard_arrow_down" color="primary" />
+          </q-page-scroller>
+        </q-page>
       </q-page-container>
 
       <q-footer>
@@ -237,6 +248,7 @@
 import { useQuasar } from 'quasar';
 import { ref, computed, PropType } from 'vue';
 import { ActiveThread, Thread } from 'src/stores/thread.store';
+import moment from 'moment';
 
 defineProps({
   threads: {
@@ -271,6 +283,17 @@ function threadAvatar(thread: Thread) {
     return 'group';
   }
   return thread.recipient?.avatar || 'https://cdn.quasar.dev/img/avatar.png';
+}
+function containerStyleFn(offset) {
+  // "offset" is a Number (pixels) that refers to the total
+  // height of header + footer that occupies on screen,
+  // based on the QLayout "view" prop configuration
+
+  // this is actually what the default style-fn does in Quasar
+  return {
+    minHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
+    maxHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
+  };
 }
 </script>
 

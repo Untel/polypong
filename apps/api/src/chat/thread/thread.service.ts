@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/23 18:06:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 06:14:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,42 @@ export class ThreadService {
   }
 
   async findAll(user: User) {
-    const threads = await Thread.find({
-      where: { participants: { user: { id: user.id } } },
-      relations: [
-        'participants.user',
-        'lastMessage.sender.user',
-        'channel.initiator.user',
-      ],
-      order: { lastMessage: { createdAt: TS.ASC } },
-    });
+    const threads = await Thread.createQueryBuilder('thread')
+      .innerJoinAndSelect('thread.participants', 'me', 'me.user_id = :id', {
+        id: user.id,
+      })
+      .leftJoinAndMapMany(
+        'thread.unreadMessages',
+        'thread.messages',
+        'message',
+        'message.created_at > me.saw_until', // "me" alias is known
+      )
+      // .loadRelationCountAndMap(
+      //   'thread.unreadCount',
+      //   'thread.messages',
+      //   'message',
+      //   (qb) => qb.andWhere('message.created_at > me.saw_until'), // "me" alias is unknown
+      // )
+      .leftJoinAndSelect('thread.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'user')
+      .leftJoinAndSelect('thread.channel', 'channel')
+      .leftJoinAndSelect('channel.initiator', 'initiator')
+      .leftJoinAndSelect('initiator.user', 'initiator_user')
+      // LAST MESSAGE
+      .leftJoinAndMapOne(
+        'thread.lastMessage',
+        'message',
+        'lastMessage',
+        'lastMessage.id = (SELECT MAX(id) FROM message WHERE thread_id = thread.id)',
+      )
+      .orderBy('lastMessage.createdAt', 'DESC')
+      .leftJoinAndSelect('lastMessage.sender', 'sender')
+      .leftJoinAndSelect('sender.user', 'sender_user')
+      .getMany();
 
-    console.log('Threads', threads);
+    // console.log('Threads', threads);
     const mapped = threads.map((t) => {
-      console.log('T is', t);
+      // console.log('T is', t);
       const recipient = t.channel
         ? t.channel.initiator.user
         : t.participants.find((p) => p.user.id !== user.id).user;
@@ -63,7 +86,7 @@ export class ThreadService {
         me,
       };
     });
-    console.log('Mapped', mapped);
+    // console.log('Mapped', mapped);
     return mapped;
   }
 
@@ -76,6 +99,7 @@ export class ThreadService {
         'messages.sender.user',
         'channel',
       ],
+      order: { messages: { createdAt: 'DESC' } },
     });
   }
 

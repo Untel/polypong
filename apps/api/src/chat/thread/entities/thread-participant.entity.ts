@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 20:23:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 23:44:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ export class ThreadParticipant extends RootEntity {
 
   @CreateDateColumn({ type: 'timestamp' })
   public sawUntil: TS;
+
+  public unreadCount: number;
 
   // @Expose()
   // public get isUnread() {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/23 18:01:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 06:01:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ export interface Participant extends BaseObject {
 
 export interface Message extends BaseObject {
   content: string;
+  contents: string[];
   sender: Participant;
 }
 
@@ -51,6 +52,7 @@ export interface Thread extends BaseThread {
   lastMessage: Message;
   recipient: User;
   avatar: string;
+  unreadMessages: Message[];
 }
 
 export interface ActiveThread extends BaseThread {
@@ -82,6 +84,7 @@ export const useThreadStore = defineStore('thread', {
       return threads;
     },
     current(state): ActiveThread | null {
+      if (!state._current) return null;
       return state._current;
     },
   },
@@ -90,7 +93,7 @@ export const useThreadStore = defineStore('thread', {
       this._threads = await threadApi.get<Thread[]>('');
     },
 
-    async getOrCreateThread(userId: number | null | undefined) {
+    async getThread(userId: number | null | undefined) {
       if (userId) {
         this._current = await threadApi.get<ActiveThread>(userId);
       } else {
@@ -117,14 +120,7 @@ export const useThreadStore = defineStore('thread', {
     async socketAddMessage(thread, message) {
       console.log('Socket add message', thread, message);
       if (this._current && this._current.id === thread.id) {
-        this._current = {
-          ...this._current,
-          ...thread,
-          messages: [
-            ...this._current.messages,
-            message,
-          ],
-        };
+        this.getThread(thread.id);
       }
       if (this._threads.find((t) => t.id === thread.id)) {
         this.fetchThreads();

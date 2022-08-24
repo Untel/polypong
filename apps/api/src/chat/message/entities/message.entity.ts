@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/23 16:35:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/23 22:19:42 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@ import { ThreadParticipant } from 'src/chat/thread/entities/thread-participant.e
 import { RootEntity } from 'src/entities/root.entity';
 import { Column, Entity, ManyToMany, ManyToOne } from 'typeorm';
 
-@Entity({ orderBy: { createdAt: 'DESC' } })
+@Entity()
 export class Message extends RootEntity {
   @Column('text')
   content: string;
