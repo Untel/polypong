@@ -1,9 +1,11 @@
 <template>
+<div>
 <q-tabs
   v-model="tab" dense class="text-grey" active-color="primary"
   indicator-color="primary" narrow-indicator
 >
   <q-tab name="history" label="history"/>
+  <q-tab name="achievements" label="achievements"/>
   <q-tab name="ladder" label="ladder"/>
 </q-tabs>
 
@@ -88,13 +90,20 @@
   </div>
 </div>
 </q-tab-panel>
+<q-tab-panel name="achievements">
+  <achievements-card
+    :userId="userId"
+    :name="userId === auth.user.id ? auth.user.name : owningRel?.to.name"
+    :userMatches="his.getUserMatchesHistory(userId)"
+  />
+</q-tab-panel>
 <q-tab-panel name="ladder">
   <ladder-board
     @click="(userIdParam) => stats(userIdParam)"
   />
 </q-tab-panel>
 </q-tab-panels>
-
+</div>
 </template>
 
 <script lang="ts" setup>
@@ -110,6 +119,7 @@ import { asyncComputed } from '@vueuse/core';
 import StatsBanner from 'src/components/StatsBanner.vue';
 import SocialButton from 'src/components/SocialButton.vue';
 import LadderBoard from 'src/components/LadderBoard.vue';
+import AchievementsCard from 'src/components/AchievementsCard.vue';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
 const soc = useSocialStore(); soc.fetchRelationships();
@@ -163,7 +173,7 @@ function togglePlayer(name: string, usrId: number, matchId: number) {
   }
 }
 
-const tab = ref('ladder');
+const tab = ref('history');
 async function stats(id: number) {
   tab.value = 'history';
   router.push(`/history/${id}`);
