@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   message.service.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 07:34:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 18:29:16 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,11 @@ export class MessageService {
       console.log('p.user.id', p.user.id, this.socketService
       .getUserSocket(p.user.id));
       this.socketService
-        .getUserSocket(p.user.id)?
-        .emit('thread-message', null);
+        .getUserSocket(p.user.id)?.emit('thread-message', null);
         // .emit('thread-message', thread, savedMessage);
-    });
+        // 
+
+      });
     return savedMessage;
   }
 

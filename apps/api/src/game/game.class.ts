@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/21 16:00:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 22:07:01 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ export default class Game {
       // console.log(dtc)
 
       if (dtc > 50 && dtc < 70) {
-        console.log('Ded ball');
+        console.log('Ded ball :', dtc);
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
           if (e !== ball) e.stop();
@@ -212,27 +212,21 @@ export default class Game {
           wall.line[1][1],
           ball.position.x,
           ball.position.y,
-          ball.radius,
+          ball.radius,[0,0]
         );
         if (test === true) {
           ball.bounceTargetWall();
           console.log('wall collision');
         }
       } else {
-        const test = GameTools.lineCircleCollision(
-          wall.paddle.line[0][0],
-          wall.paddle.line[0][1],
-          wall.paddle.line[1][0],
-          wall.paddle.line[1][1],
-          ball.position.x,
-          ball.position.y,
-          ball.radius,
-        );
+        let ret = [0,0]; 
+        const test = GameTools.wallBallCollision(wall.paddle.line, ball,ret);
         if (test === true) {
           ball.bouncePaddle(wall.paddle);
-          console.log('paddle collision');
+          console.log('paddle collision');    
         }
-        // console.log("no collision");
+        ball.closestP[0] = ret[0];
+        ball.closestP[1] = ret[1];
       }
       ball.move();
     });

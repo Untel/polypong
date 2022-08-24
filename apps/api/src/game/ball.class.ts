@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/21 16:00:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/24 22:08:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ export class Ball extends Circle {
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
+  closestP: number[] = [0,0];
   target: {
     hit: Point;
     wall: Wall;
