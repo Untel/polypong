@@ -143,7 +143,7 @@
               :key="`thread-${index}`"
               clickable
               @click="$emit('selectThread', thread)"
-              :active="thread.id === currentThread.id"
+              :active="thread.id === currentThread?.id"
               :class="{ bold: thread.unreadMessages.length > 0 }"
             >
               <q-item-section avatar>
@@ -256,7 +256,7 @@ defineProps({
     default: () => [],
   },
   currentThread: {
-    type: Object as PropType<ActiveThread>,
+    type: Object as PropType<ActiveThread | null>,
     default: null,
   },
 });
