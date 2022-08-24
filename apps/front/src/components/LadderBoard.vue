@@ -40,18 +40,37 @@ const $route = useRoute(); const router = useRouter();
 defineComponent({ name: 'LadderBoard' });
 
 const usersIds = asyncComputed(async () => {
+  console.log('0---------------------------------------------');
   const raw = await his.getPlayersUsersIds();
+  console.log('raw = ', raw);
   const arr: number[] = [];
   raw?.forEach((e) => {
     arr.push(parseInt(e.user_id, 10));
   });
-  return arr;
-});
-
-asyncComputed(async () => {
-  usersIds.value.forEach(async (userId) => {
+  console.log('1---------------------------------------------');
+  arr.forEach(async (userId) => {
+    console.log('fetching history for userId = ', userId);
     await his.fetchUserMatchesHistory(userId);
+    console.log('fetched history.stats = ', his.getUserMatchesHistory(userId)?.stats);
   });
+  console.log('2---------------------------------------------');
+  arr.sort((ida: number, idb: number) => {
+    console.log('ida = ', ida, ', idb = ', idb);
+    const statsa = his.getUserMatchesHistory(ida)?.stats;
+    const statsb = his.getUserMatchesHistory(idb)?.stats;
+    console.log('in sort, statsa = ', statsa, ', statsb= ', statsb);
+    const ra = statsa ? statsa.ratio : 0;
+    const rb = statsb ? statsb.ratio : 0;
+    console.log('in sort, ra = ', ra, ', rb = ', rb);
+    if (ra < rb) {
+      return 1;
+    } if (ra > rb) {
+      return -1;
+    }
+    return 0;
+  });
+  console.log('3---------------------------------------------');
+  return arr;
 });
 
 const emit = defineEmits(['click']);

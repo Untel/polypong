@@ -119,9 +119,13 @@ export const useMatchHistoryStore = defineStore('history', {
       if (!userId) {
         userId = useAuthStore().getUser.id;
       }
-      console.log('history store - fetchUserMatchesHistory - userId = ', userId);
       const matches = await historyApi.get<Match[]>(`user/${userId}`);
-      console.log('history store - fetchUserMatchesHistory - matches = ', matches);
+      console.log(
+        'history store - fetchUserMatchesHistory - userId = ',
+        userId,
+        ', matches = ',
+        matches,
+      );
       const curHis = this.getUserMatchesHistory(userId);
       if (curHis) {
         curHis.matches = matches;

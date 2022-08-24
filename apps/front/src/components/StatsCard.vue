@@ -9,7 +9,7 @@
 <q-card class="my-card" @click="emit('click', userId)">
   <q-img :src=coaBackground :height=height>
     <div class="absolute-full flex flex-center">
-      {{ name }} | W: {{ nWins }} | L: {{ nLosses }} | {{ ratio * 100 }}%
+      {{ name }} | W: {{ nWins }} | L: {{ nLosses }} | {{ ratio }} | {{ ratio * 100 }}%
     </div>
   </q-img>
 </q-card>

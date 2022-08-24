@@ -17,7 +17,13 @@
 --- playerClicked = {{ playerClicked }} --- <br/>
 --- HistoryOwner = {{ OwningRel }} --- <br/>
   -->
-  <stats-banner :userId="userId"/>
+  <stats-banner
+    :userId="userId"
+    :name="userId === auth.user.id ? auth.user.name : owningRel?.to.name"
+    :nWins="his.getUserMatchesHistory(userId)?.stats.wins"
+    :nLosses="his.getUserMatchesHistory(userId)?.stats.losses"
+    :nRatio="his.getUserMatchesHistory(userId)?.stats.ratio"
+  />
   <div>
     <q-card v-for="
       match in his.getUserMatchesHistory(userId)?.matches"
@@ -120,13 +126,14 @@ const his = useMatchHistoryStore();
 his.fetchUserMatchesHistory(userId.value);
 
 const isSelf: boolean = userId.value === auth.user.id;
-// const OwningRel = asyncComputed(async () => {
-//  if (isSelf) { return undefined; }
-//  const ret = soc.getRelByUserId(userId.value);
-//  if (ret) { return ret; }
-//  await soc.addRelByUserId(userId.value);
-//  return soc.getRelByUserId(userId.value);
-// });
+
+const owningRel = asyncComputed(async () => {
+  if (isSelf) { return undefined; }
+  const ret = soc.getRelByUserId(userId.value);
+  if (ret) { return ret; }
+  await soc.addRelByUserId(userId.value);
+  return soc.getRelByUserId(userId.value);
+});
 
 const playerClicked = ref('');
 const playerClickedId = ref(-1);
@@ -156,7 +163,7 @@ function togglePlayer(name: string, usrId: number, matchId: number) {
   }
 }
 
-const tab = ref('history');
+const tab = ref('ladder');
 async function stats(id: number) {
   tab.value = 'history';
   router.push(`/history/${id}`);

@@ -40,12 +40,12 @@ export class MessageService {
     // thread.lastMessage = savedMessage;
     // await thread.save();
     thread.participants.forEach((p) => {
-      console.log('p.user.id', p.user.id, this.socketService
-      .getUserSocket(p.user.id));
-      this.socketService
-        .getUserSocket(p.user.id)?
-        .emit('thread-message', null);
-        // .emit('thread-message', thread, savedMessage);
+      //console.log('p.user.id', p.user.id, this.socketService.getUserSocket(p.user.id));
+      const sock = this.socketService.getUserSocket(p.user.id);
+      if (sock) {
+        sock.emit('thread-message', thread, savedMessage);
+        //sock.emit('thread-message', null);
+      }
     });
     return savedMessage;
   }
