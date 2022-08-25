@@ -56,7 +56,6 @@ import { watch } from 'vue';
 import { Notify } from 'quasar';
 import { MandeError } from 'mande';
 import moment from 'moment';
-import { computedAsync } from '@vueuse/core';
 
 const $auth = useAuthStore();
 const $thread = useThreadStore();

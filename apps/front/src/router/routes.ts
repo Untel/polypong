@@ -68,16 +68,18 @@ const authRoutes: RouteRecordRaw[] = [{
   name: 'dm',
   path: 'inbox/user/:userId',
   props: true,
-  component: () => import(''),
+  component: () => import('pages/InboxPage.vue'),
   async beforeEnter(to, from, next) {
     const { userId } = to.params;
     const $thread = useThreadStore();
     try {
       const res = await $thread.getDmThreadByUserId(+userId);
-      next(`/inbox/${res?.id}`);
+      if (res) {
+        next(`/inbox/${res?.id}`);
+      }
     } catch (e) {
       console.log(e);
-      next(false);
+      next('/inbox');
     }
   },
 },

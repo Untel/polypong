@@ -18,12 +18,14 @@ import { Thread, ThreadParticipant } from './entities';
 import { UserModule } from 'src/user';
 import { MessageModule } from '../message';
 import { ChannelModule } from '../channel';
+import { RelationshipModule } from 'src/relationship';
 
 @Module({
   // eslint-disable-next-line prettier/prettier
   imports: [
     TypeOrmModule.forFeature([Thread, ThreadParticipant]),
     forwardRef(() => UserModule),
+    forwardRef(() => RelationshipModule),
     forwardRef(() => MessageModule),
     forwardRef(() => ChannelModule),
   ],

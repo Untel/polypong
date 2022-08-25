@@ -45,7 +45,7 @@ interface Achievement {
   body: string;
 }
 
-const achievements: ComputedRef<Array<Achievement>> = computed(() => {
+const achievements: ComputedRef<Achievement[]> = computed(() => {
   const arr: Achievement[] = [];
   if (props.userMatches?.stats && props.userMatches.stats.wins > 0) {
     arr.push({
@@ -61,6 +61,7 @@ const achievements: ComputedRef<Array<Achievement>> = computed(() => {
     arr.push({
       title: 'I did it...', body: 'lose a game',
     });
+  }
   if (props.userMatches?.stats && props.userMatches.stats.losses > 3) {
     arr.push({
       title: 'Oops I did it again', body: 'lose multiple games',

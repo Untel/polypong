@@ -21,8 +21,6 @@ import {
   ValidationPipe,
   Req,
   Put,
-  forwardRef,
-  Inject,
   UploadedFile,
   UseInterceptors,
   Get,
@@ -32,7 +30,6 @@ import {
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
-import { AuthService } from 'src/auth';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
