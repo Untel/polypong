@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 03:30:51 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 05:38:27 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,17 @@ export default class Game {
     this.newRound(7);
   }
 
-  addBall() {
+  addBall(hotBall : boolean = false) {
     const ball = new Ball(
       this,
       this.map.center.clone(),
     );
     // ball.setAngle(angleToRadians(this.map.angles[1]));
-    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
-    ball.findTarget();
     this.balls.push(ball);
+    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.findTarget();    
+    if (hotBall)
+      ball.unFreeze();
     console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
   }
 
@@ -94,7 +96,7 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nBall; i++) this.addBall();
+    for (let i = 0; i < this.nBall; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
   }
@@ -144,6 +146,8 @@ export default class Game {
 
   runPhysics() {
     this.balls.forEach((ball) => {
+      // if (ball.direction.x === 0 && ball.direction.y === 0)
+      //   return;
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
@@ -325,12 +329,12 @@ export default class Game {
       powerObj.name,
       Object.keys(powerObj),
       typeof powerObj,
+    ); 
+    // this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
+    this.socket.emit(
+      'powers',
+      this.powers.map((p) => p.netScheme),
     );
-    this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
-    // this.socket.emit(
-    //   'powers',
-    //   this.powers.map((p) => p.netScheme),
-    // );
   }
 
   public tick() {

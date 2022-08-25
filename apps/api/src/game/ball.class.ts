@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 03:59:44 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 07:02:27 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,15 @@ export class Ball extends Circle {
   targetInfo: any;
   adjacent: any;
   alpha: number;
+  freezeTime: number;
   game: Game;
 
   constructor(game: Game, startPos: Vector = new Vector(0, 0), radius = 2) {
     super(startPos, radius);
     this.game = game;
     this.color = `#${GameTools.genRanHex(6)}`;
+    this.direction = new Vector(0,0);
+    this.freezeTime = 150;
   }
 
   public get speed() {
@@ -108,27 +111,29 @@ export class Ball extends Circle {
           hit: [intersection.x, intersection.y],
           wall,
         };
-        wall.addBall(this);
+        if (!this.unFreeze(0))
+          wall.addBall(this);
 
         const incidenceAngle = angleToDegrees(this.angle);
 
+        //This is code used to find the position the ball is going to hit the line but not cross it
         const normvector: Vector = new Vector(
           this.target.wall.line[0][0] - this.target.wall.line[1][0],
           this.target.wall.line[0][1] - this.target.wall.line[1][1],
         ).normalize();
 
         let alpha: number = wall.angle - incidenceAngle;
-        alpha = alpha < 0 ? alpha + 360 : alpha;
+        GameTools.angleNormalize(alpha, 0, 360);
 
+        //Come constants used to solve the pythagorean equation
         const values = {
           b: 3,
           B: alpha,
           A: 90,
         };
-
-        const test: Triangle = new Triangle(values);
-        test.solve();
-        normvector.scale(test.sides.c);
+        const t: Triangle = new Triangle(values);
+        t.solve();
+        normvector.scale(t.sides.c);
 
         console.log("TARGETING WALL ", i);
         this.targetInfo = {
@@ -136,7 +141,7 @@ export class Ball extends Circle {
             normvector.x + this.target.hit[0],
             normvector.y + this.target.hit[1],
           ],
-          limit: test.sides.a,
+          // limit: test.sides.a,
           edgeIndex: i,
           edge,
           ...intersection,
@@ -152,6 +157,8 @@ export class Ball extends Circle {
     );
   }
   move() {
+    if (this.unFreeze(1))
+      return;
     this.position.x = this.position.x + this.direction.x;
     this.position.y = this.position.y + this.direction.y;
   }
@@ -162,7 +169,20 @@ export class Ball extends Circle {
     this.position.y = position.y;
   }
 
+  unFreeze(value : number = 150)
+  {
+    if (this.freezeTime === 0)
+      return false;
+    this.freezeTime = ((this.freezeTime - value) < 0) ? 0 : this.freezeTime - value
+    if (this.freezeTime > 0)
+      return true;
+    this.target.wall.addBall(this);
+    return false;
+  }
+
   collideWithBall(compared: Ball) {
+    if (this.unFreeze(0))
+      return;
     const dist = lineLength([this.point, compared.point]);
     if (dist < this.radius + compared.radius) {
       const delta = compared.position.clone().sub(this.position);
@@ -215,6 +235,8 @@ export class Ball extends Circle {
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {
+    if (this.unFreeze(0))
+      return ;
     this.speed += ratio;
     if (this.speed > this.maxSpeed) {
       this.speed = this.maxSpeed;
@@ -243,17 +265,18 @@ export class Ball extends Circle {
     return [this.position.x, this.position.y];
   }
   public get netScheme() {
-    return {
-      color: this.color,
-      position: {
-        x: this.position.x,
-        y: this.position.y,
-      },
-      radius: this.radius,
-      target: {
-        x: this.target.hit[0],
-        y: this.target.hit[1],
-      },
-    };
+      return {
+        color: this.color,
+        position: {
+          x: this.position.x,
+          y: this.position.y,
+        },
+        radius: this.radius,
+        target: {
+          x: this.target.hit[0],
+          y: this.target.hit[1],
+        },
+      };
+
   }
 }

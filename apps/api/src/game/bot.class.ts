@@ -10,6 +10,7 @@ import {
 import { LobbyBot } from './lobbyBot.class';
 import { copyFileSync } from 'fs';
 import { Vector } from 'collider2d';
+import GameTools from './gametools.class';
 
 export class Bot {
   botPaddle: Paddle;
@@ -37,7 +38,6 @@ export class Bot {
         break;
       case 1:
         this.level2();
-        this.level1();
         break;
       case 2:
         this.level3();
@@ -53,10 +53,13 @@ export class Bot {
       return;
     }
     this.tasks.sort((b) => b.targetDistance / b.direction.len());
-    this.level1(this.tasks[0].closestP)
+    // this.level1(this.tasks[0].closestP)
+    this.level1();
   }
   level2() {
-    if (this.tasks.length !== 0 || this.wall.paddle.ratio === 0.5) {
+    if (this.tasks.length !== 0)
+    {
+      this.level1();
       return;
     }
     const offset = this.wall.paddle.ratio > 0.5 ? -0.01 : +0.01;
@@ -70,43 +73,33 @@ export class Bot {
       this.wall.paddle.updatePercentOnAxis(ratio + offset);
     }
   }
-  level1(id = [0,0]) {
+  level1(coords = [0,0]) {
     if (this.tasks.length === 0) {
       return;
     }
-    let focus : number[] = id;
-
-    if (id[0] === id[1] && id[0] === 0)
+    let focus : Point = [coords[0], coords[1]];
+    if (!coords[0] && !coords[1])
       focus = this.tasks[0].targetInfo.actualhit;
 
-    const paddlePoint = lineMidpoint(this.wall.paddle.line);    
+    let dir : number = 0;
+    const leftSideDist = lineLength([focus,this.wall.line[0]]);
+    const totalDist = lineLength(this.wall.line);
+    const paddleMidpoint = lineMidpoint(this.wall.paddle.line);
+    const paddleMidpointDist = lineLength([paddleMidpoint, this.wall.line[0]]);
 
-    let usedPoint : Point;
-    let dir : number;
-    if (lineLength([[focus[0],focus[1]], this.wall.line[0]]) >lineLength([[focus[0],focus[1]], this.wall.line[1]]))
-    {
-      usedPoint = this.wall.line[0];
+    const paddleMidRatio = GameTools.calculateRatio(paddleMidpointDist, totalDist);
+    const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
+    console.log("paddleMid",paddleMidRatio);
+    console.log(`Ball Ratio:${ratio}`);
+    if (ratio > paddleMidRatio)
       dir = 1;
-      console.log("moving left")
-    }
-    else
-    {
-      usedPoint = this.wall.line[1];
+    else if (ratio  < paddleMidRatio )
       dir = -1;
-      console.log("moving right")
-    }
-    const dBall: Vector = new Vector(focus[0] - usedPoint[0],focus[1] - usedPoint[1] )
-    const dPaddle : Vector = new Vector(paddlePoint[0]- usedPoint[0], paddlePoint[1] - usedPoint[1])
- 
-    const bLen = dBall.len()
-    const pLen = dPaddle.len()
-
-    if (Math.abs(pLen - bLen) < 0.5)
-      return;
-    let newPercent = this.wall.paddle.ratio + dir * (0.01 * this.maxSpeed);
+    // God mode
+    // let newPercent = ratio;
+    let newPercent = this.wall.paddle.ratio + (dir * 0.02);
     newPercent = (newPercent < 0) ? 0 : newPercent; 
     newPercent = (newPercent > 1) ? 1 : newPercent; 
-
     this.wall.paddle.updatePercentOnAxis(newPercent);
   }
 

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 03:28:12 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 07:03:09 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,17 @@ import { Ball } from './ball.class';
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
 
+  static calculateRatio(num_1 : number, num_2: number){
+    for(let num : number = num_2; num >1; num--) {
+        if((num_1 % num) == 0 && (num_2 % num) == 0) {
+            num_1=num_1/num;
+            num_2=num_2/num;
+        }
+    }
+    // var ratio = num_1+":"+num_2;
+    var ratio = num_1/num_2;
+    return ratio;
+  }
   static angleNormalize(val: number, r_start: number, r_end: number) {
     const width: number = r_end - r_start; //
     const offsetValue: number = val - r_start; // value relative to 0

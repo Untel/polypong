@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/16 22:45:48 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 06:43:47 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ export class Paddle {
     const newPosEnd = this.interpolationEnd(ratio);
     this.line = [newPosStart, newPosEnd];
     this.width = lineLength(this.line);
+    //Potential bug here
   }
 
   affectPower(power: Power) {
