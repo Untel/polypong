@@ -22,10 +22,12 @@ export class Bot {
   name: string;
   color: string;
   level: number;
+  precision: number;
 
   constructor(datas: Partial<Bot | LobbyBot> = {}) {
     Object.assign(this, datas);
     this.maxSpeed = this.level + 1;
+    this.precision = 0.05;
   }
   attachWall(wall: Wall) {
     this.wall = wall;
@@ -91,13 +93,13 @@ export class Bot {
     const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
     console.log("paddleMid",paddleMidRatio);
     console.log(`Ball Ratio:${ratio}`);
-    if (ratio > paddleMidRatio + 0.02)
+    if (ratio > paddleMidRatio + (this.precision / 2))
       dir = 1;
-    else if (ratio  < paddleMidRatio - 0.02)
+    else if (ratio < paddleMidRatio - (this.precision / 2))
       dir = -1;
     // God mode
     // let newPercent = ratio;
-    let newPercent = this.wall.paddle.ratio + (dir * 0.02);
+    let newPercent = this.wall.paddle.ratio + (dir * this.precision);
     newPercent = (newPercent < 0) ? 0 : newPercent; 
     newPercent = (newPercent > 1) ? 1 : newPercent; 
     this.wall.paddle.updatePercentOnAxis(newPercent);

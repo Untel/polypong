@@ -31,4 +31,5 @@ export interface Ball {
 
 export interface Power {
   position: Position;
+  name: string
 }

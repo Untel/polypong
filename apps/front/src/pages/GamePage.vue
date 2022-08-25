@@ -152,7 +152,6 @@ onMounted(async () => {
   socket.on('powers', (pow) => {
     powers.value = pow;
   });
-
   socket.once('end', (winner = { name: 'Error' }) => {
     Notify.create({
       message: `Chicken chiken dinner we have a winner ${winner.name}`,
