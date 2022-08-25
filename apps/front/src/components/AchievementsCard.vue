@@ -1,14 +1,13 @@
 <template>
 <q-card>
-  <q-card-section class="column items-center" horizontal>
-    <pre> {{ name }}</pre><br/>
-    <pre> {{ userMatches }}</pre><br/>
-    <pre> {{ achievements }}</pre><br/>
-    <!--
-    <q-card-section v-for="a in achievements" :key="`${a.title}`">
-      {{ a }}
+  <q-card-section v-if="achievements.length === 0" class="column items-center">
+    <pre>achievements will be displayed here</pre>
+  </q-card-section>
+  <q-card-section v-else class="column items-center" horizontal>
+    <q-card-section v-for="(achievement, index) in achievements" :key="achievement.title">
+      <q-separator v-if="index > 0"/>
+      <pre>"{{achievement.title}}"<br/>{{achievement.body}}</pre>
     </q-card-section>
-    -->
   </q-card-section>
 </q-card>
 </template>
@@ -17,14 +16,10 @@
 import { useAuthStore } from 'src/stores/auth.store';
 import { useMatchHistoryStore, UserMatchesHistory } from 'src/stores/history.store';
 import { useSocialStore } from 'src/stores/social.store';
-import StatsCard from 'src/components/StatsCard.vue';
 import {
   computed, ComputedRef, defineComponent, PropType,
 } from 'vue';
-import { asyncComputed } from '@vueuse/core';
 import { useRoute, useRouter } from 'vue-router';
-import { PROPERTY_TYPES } from '@babel/types';
-import { type } from 'os';
 
 const his = useMatchHistoryStore(); his.fetchUserMatchesHistory();
 const auth = useAuthStore(); auth.fetchConnectedUsers();
@@ -53,9 +48,22 @@ interface Achievement {
 const achievements: ComputedRef<Array<Achievement>> = computed(() => {
   const arr: Achievement[] = [];
   if (props.userMatches?.stats && props.userMatches.stats.wins > 0) {
-    console.log('LALA');
     arr.push({
       title: 'I did it !', body: 'win a game',
+    });
+  }
+  if (props.userMatches?.stats && props.userMatches.stats.wins > 10) {
+    arr.push({
+      title: 'PongChamp', body: 'win 10 games',
+    });
+  }
+  if (props.userMatches?.stats && props.userMatches.stats.losses > 0) {
+    arr.push({
+      title: 'I did it...', body: 'lose a game',
+    });
+  if (props.userMatches?.stats && props.userMatches.stats.losses > 3) {
+    arr.push({
+      title: 'Oops I did it again', body: 'lose multiple games',
     });
   }
   return arr;

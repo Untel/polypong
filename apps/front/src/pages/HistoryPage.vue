@@ -1,5 +1,24 @@
 <template>
 <div>
+<q-card>
+  <q-card-section>
+    <q-input
+      filled v-model="searchedRel" label="Enter a name"
+      @keydown.enter.prevent="searchRel(searchedRel)"
+      stack-label dense>
+      <template v-slot:append>
+        <q-btn @click="searchRel(searchedRel)">search</q-btn>
+      </template>
+    </q-input>
+  </q-card-section>
+  <stats-banner
+    :userId="userId"
+    :name="userId === auth.user.id ? auth.user.name : owningRel?.to.name"
+    :nWins="his.getUserMatchesHistory(userId)?.stats.wins"
+    :nLosses="his.getUserMatchesHistory(userId)?.stats.losses"
+    :nRatio="his.getUserMatchesHistory(userId)?.stats.ratio"
+  />
+</q-card>
 <q-tabs
   v-model="tab" dense class="text-grey" active-color="primary"
   indicator-color="primary" narrow-indicator
@@ -19,13 +38,6 @@
 --- playerClicked = {{ playerClicked }} --- <br/>
 --- HistoryOwner = {{ OwningRel }} --- <br/>
   -->
-  <stats-banner
-    :userId="userId"
-    :name="userId === auth.user.id ? auth.user.name : owningRel?.to.name"
-    :nWins="his.getUserMatchesHistory(userId)?.stats.wins"
-    :nLosses="his.getUserMatchesHistory(userId)?.stats.losses"
-    :nRatio="his.getUserMatchesHistory(userId)?.stats.ratio"
-  />
   <div>
     <q-card v-for="
       match in his.getUserMatchesHistory(userId)?.matches"
@@ -114,7 +126,7 @@ import { useRoute, useRouter } from 'vue-router';
 import MatchCard from 'src/components/MatchCard.vue';
 import SocialCard from 'src/components/SocialCard.vue';
 import StatsCard from 'src/components/StatsCard.vue';
-import { computed, ref } from 'vue';
+import { computed, ComputedRef, ref } from 'vue';
 import { asyncComputed } from '@vueuse/core';
 import StatsBanner from 'src/components/StatsBanner.vue';
 import SocialButton from 'src/components/SocialButton.vue';
@@ -135,19 +147,35 @@ const userId = computed(() => {
 const his = useMatchHistoryStore();
 his.fetchUserMatchesHistory(userId.value);
 
-const isSelf: boolean = userId.value === auth.user.id;
+const isSelf: ComputedRef<boolean> = computed(() => userId.value === auth.user.id);
 
 const owningRel = asyncComputed(async () => {
-  if (isSelf) { return undefined; }
+  if (isSelf.value) { return undefined; }
   const ret = soc.getRelByUserId(userId.value);
   if (ret) { return ret; }
   await soc.addRelByUserId(userId.value);
   return soc.getRelByUserId(userId.value);
 });
 
-const playerClicked = ref('');
-const playerClickedId = ref(-1);
+const searchedRel = ref('');
+async function searchRel(name: string) {
+  if (name === auth.user.name) {
+    router.push(`/profile/${auth.user.id}`);
+    return;
+  }
+  let rel = soc.getRelByName(name);
+  if (!rel) {
+    await soc.addRel(name);
+    rel = soc.getRelByName(name);
+  }
+  if (rel) {
+    router.push(`/profile/${rel.toId}`);
+  }
+}
 
+const playerClicked = ref('');
+
+const playerClickedId = ref(-1);
 const playerClickedStats = asyncComputed(async () => {
   if (playerClickedId.value === -1) { return undefined; }
   const userMatchesHistory = await his.fetchUserMatchesHistory(playerClickedId.value);
@@ -176,7 +204,7 @@ function togglePlayer(name: string, usrId: number, matchId: number) {
 const tab = ref('history');
 async function stats(id: number) {
   tab.value = 'history';
-  router.push(`/history/${id}`);
+  router.push(`/profile/${id}`);
 }
 
 const usersIds = asyncComputed(async () => {

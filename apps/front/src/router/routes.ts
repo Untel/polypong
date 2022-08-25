@@ -48,13 +48,13 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'users',
   component: () => import('pages/UsersPage.vue'),
 }, {
-  name: 'history',
-  path: 'history/:userId?',
+  name: 'profile',
+  path: 'profile/:userId?',
   props: true,
   component: () => import('pages/HistoryPage.vue'),
 }, {
   name: 'settings',
-  path: 'sehistor',
+  path: 'settings',
   component: () => import('pages/SettingsPage.vue'),
 },
 {
@@ -112,6 +112,15 @@ const routes: RouteRecordRaw[] = [{
       window.open(url, '_blank');
     }
     next(false);
+  },
+}, {
+  path: '/chatwith/:id',
+  name: 'chatwith',
+  component: () => import('pages/LoginPage.vue'),
+  beforeEnter(to, from, next) {
+    // await api call /api/threads/user/:id
+    // -> threadId
+    // next(/inbox/threadId)
   },
 }];
 

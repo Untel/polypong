@@ -194,7 +194,7 @@ async function message(id: number) {
   console.log(`message ${id}`);
 }
 async function stats(id: number) {
-  router.push(`/history/${id}`);
+  router.push(`/profile/${id}`);
 }
 async function addFriend(name: string) { await soc.send_friendship(name); }
 async function unfriend(name: string) { await soc.unsend_friendship(name); }
