@@ -80,31 +80,34 @@ export class Bot {
       focus = this.tasks[0].targetInfo.actualhit;
 
     const paddlePoint = lineMidpoint(this.wall.paddle.line);    
-    const dBall: Vector = new Vector(focus[0] - this.wall.line[0][0],focus[1] - this.wall.line[0][1] )
-    const dPaddle : Vector = new Vector(paddlePoint[0]- this.wall.line[0][0], paddlePoint[1]- this.wall.line[0][1])
 
+    let usedPoint : Point;
+    let dir : number;
+    if (lineLength([[focus[0],focus[1]], this.wall.line[0]]) >lineLength([[focus[0],focus[1]], this.wall.line[1]]))
+    {
+      usedPoint = this.wall.line[0];
+      dir = 1;
+      console.log("moving left")
+    }
+    else
+    {
+      usedPoint = this.wall.line[1];
+      dir = -1;
+      console.log("moving right")
+    }
+    const dBall: Vector = new Vector(focus[0] - usedPoint[0],focus[1] - usedPoint[1] )
+    const dPaddle : Vector = new Vector(paddlePoint[0]- usedPoint[0], paddlePoint[1] - usedPoint[1])
  
     const bLen = dBall.len()
     const pLen = dPaddle.len()
-  
 
-    if (Math.abs(pLen - bLen) < 1) {
-      console.log("stop");
-    return;
-    }
-    if (pLen >  bLen) {
-      this.wall.paddle.updatePercentOnAxis(
-        this.wall.paddle.ratio - (0.01 * this.maxSpeed) >= 0 ? this.wall.paddle.ratio - (0.01 * this.maxSpeed) : 0,
-      );
-      console.log("move right");
-    }
-    else 
-    {
-      this.wall.paddle.updatePercentOnAxis(
-        this.wall.paddle.ratio + (0.01 * this.maxSpeed) <= 1 ? this.wall.paddle.ratio + (0.01 * this.maxSpeed) : 1,
-      );
-      console.log("move left");
-    }
+    if (Math.abs(pLen - bLen) < 0.5)
+      return;
+    let newPercent = this.wall.paddle.ratio + dir * (0.01 * this.maxSpeed);
+    newPercent = (newPercent < 0) ? 0 : newPercent; 
+    newPercent = (newPercent > 1) ? 1 : newPercent; 
+
+    this.wall.paddle.updatePercentOnAxis(newPercent);
   }
 
   popBall(target: Ball) {

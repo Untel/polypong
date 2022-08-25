@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 02:29:38 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 03:30:51 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,65 +142,27 @@ export default class Game {
     if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
-  old_runPhysics() {
-    this.balls.forEach((ball, index) => {
-      if (ball.targetDistance <= ball.targetInfo.limit + 5) {
-        const paddle: Paddle = ball.target.wall.paddle;
-
-        if (paddle) {
-          const paddleTouchTheBall = (pointOnLine as any)(
-            ball.targetInfo.actualhit,
-            paddle.line,
-            1,
-          );
-
-          if (paddleTouchTheBall) {
-            ball.bouncePaddle(paddle);
-          } else {
-            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (
-              TEST_MODE ||
-              (this.mode === MODE.Coalition &&
-                paddle.color === ball.lastHitten.color)
-            ) {
-              ball.bounceTargetWall();
-            } else {
-              this.reduce(ball.target.wall);
-            }
-          }
-        } else {
-          this.balls.forEach((e) => {
-            if (e !== ball) {
-              e.direction = new Vector(0, 0);
-              e._speed = 0;
-            }
-          });
-
-          return;
-
-          ball.bounceTargetWall();
-        }
-        ball.increaseSpeed();
-      }
-      ball.move();
-    });
-  }
-
   runPhysics() {
     this.balls.forEach((ball) => {
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
       ]);
-      // console.log(dtc)
 
-      if (dtc > 50 && dtc < 70) {
+      const testDist : number = lineLength(
+        [[this.map.center.x, this.map.center.y],
+        this.map.edges[0][0]]
+        );
+      // console.log("dtc vs dist ", dtc, " ", testDist)
+      // console.log("edges ", this.map.edges[0])
+
+        if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
         console.log('Ded ball :', dtc);
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
           if (e !== ball) e.stop();
         });
-      } else if (dtc >= 70) {
+      } else if (testDist != 0 && dtc >= testDist * 1.3) {
         this.reduce(ball.target.wall);
       }
       const wall = ball.target.wall;
@@ -223,11 +185,11 @@ export default class Game {
         let ret = [0,0]; 
         const test = GameTools.wallBallCollision(wall.paddle.line, ball,ret);
         if (test === true) {
-          ball.bouncePaddle(wall.paddle);
-          console.log('paddle collision');    
+          ball.bouncePaddle(wall.paddle, ret);
+          console.log('paddle collision at,', ret);    
+          ball.closestP[0] = ret[0];
+          ball.closestP[1] = ret[1];
         }
-        ball.closestP[0] = ret[0];
-        ball.closestP[1] = ret[1];
       }
       ball.move();
     });
