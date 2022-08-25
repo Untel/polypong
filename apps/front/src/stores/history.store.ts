@@ -11,9 +11,8 @@
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
-import { Notify } from 'quasar';
 import { mande } from 'mande';
-import { identity } from '@vueuse/core';
+import { Stats } from 'fs';
 import { useAuthStore } from './auth.store';
 
 export const historyApi = mande('/api/match-history');
@@ -52,29 +51,123 @@ export const historyApi = mande('/api/match-history');
 //  }
 // ]
 
-export interface MatchHistory {
-  id: number;
+export interface Player {
+  id: number, // for a given match, a given player unique ID
+  rank: number,
+  user: {
+    id: number, // for a given player, the user's unique ID
+    name: string,
+    email: string,
+    coalition: string,
+    avatar: string,
+  }
 }
 
-interface MatchHistoryState {
-  matchs: MatchHistory[];
+export interface Match{
+  id: number; // the match's unique Id
+  players: Player[];
+}
+
+export interface UserStats {
+  wins: number;
+  losses: number;
+  ratio: number;
+}
+export interface UserMatchesHistory {
+  userId: number;
+  matches: Match[];
+  stats: UserStats;
+}
+
+interface UsersMatchesHistories{
+  usersHis: UserMatchesHistory[];
 }
 
 export const useMatchHistoryStore = defineStore('history', {
   state: () => ({
-    matchs: [],
-  } as MatchHistoryState),
+    usersHis: [],
+  } as UsersMatchesHistories),
   getters: {
-    getMatches(state): MatchHistory[] {
-      return state.matchs;
+    getUsersHis(state) {
+      return state.usersHis;
     },
   },
   actions: {
-    getMatch(id: number): MatchHistory | undefined {
-      return this.getMatches.find((m) => m.id === id);
+    getUserMatchesHistory(userId: number): UserMatchesHistory | undefined {
+      return this.getUsersHis.find((his) => his.userId === userId);
     },
-    async fetchHistory() {
-      this.matchs = await historyApi.get<MatchHistory[]>('');
+    getUserNameByIdFromMatchHistory(userId: number): string | undefined {
+      const userHis = this.getUserMatchesHistory(userId);
+      const player = userHis?.matches[0]?.players?.find((p) => p.user.id === userId);
+      return player?.user.name || undefined;
+    },
+    getUserMatch(userId: number, matchId: number): Match| undefined {
+      return this.getUserMatchesHistory(userId)?.matches
+        ?.find((match) => match.id === matchId);
+    },
+    getUserMatchPlayerByPlayerId(userId: number, matchId: number, playerId: number)
+    : Player | undefined {
+      return this.getUserMatch(userId, matchId)?.players
+        ?.find((player) => player.id === playerId);
+    },
+    getUserMatchPlayerByUserId(userId: number, matchId: number, targetUserId: number)
+    : Player | undefined {
+      return this.getUserMatch(userId, matchId)?.players
+        ?.find((player) => player.user.id === targetUserId);
+    },
+    async fetchUserMatchesHistory(userId?: number): Promise<UserMatchesHistory | undefined> {
+      if (!userId) {
+        userId = useAuthStore().getUser.id;
+      }
+      const matches = await historyApi.get<Match[]>(`user/${userId}`);
+      console.log(
+        'history store - fetchUserMatchesHistory - userId = ',
+        userId,
+        ', matches = ',
+        matches,
+      );
+      const curHis = this.getUserMatchesHistory(userId);
+      if (curHis) {
+        curHis.matches = matches;
+        curHis.stats = this.computeStats(userId, matches);
+        return curHis;
+      }
+      const stats = this.computeStats(userId, matches);
+      const newHis = { userId, matches, stats };
+      this.usersHis.push(newHis);
+      return newHis;
+    },
+
+    computeStats(userId: number, matches: Match[]): UserStats {
+      const res: UserStats = { wins: 0, losses: 0, ratio: 1 };
+      const nPlayed = matches.length;
+      matches.forEach((m) => {
+        const nplayers = m.players.length;
+        const winThreshold = nplayers / 2;
+        m.players.forEach((p) => {
+          if (p.user.id === userId) {
+            if (p.rank <= winThreshold) {
+              res.wins += 1;
+            }
+          }
+        });
+      });
+      res.losses = nPlayed - res.wins;
+      if (nPlayed > 0) {
+        res.ratio = res.wins / nPlayed;
+      }
+      return res;
+    },
+
+    async getAllMatches(): Promise<Match[] | undefined> {
+      console.log('history store - getAllMatches');
+      const allMatches = await historyApi.get<Match[]>('all');
+      console.log('history store - getAllMatches - matches = ', allMatches);
+      return allMatches;
+    },
+    async getPlayersUsersIds(): Promise<[any]> {
+      console.log('history store - getPlayersUsersIds');
+      return historyApi.get<[any]>('playersUsersIds');
     },
   },
 });

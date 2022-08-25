@@ -22,19 +22,19 @@
       :breakpoint="0"
     >
       <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
-      <EssentialLink title="Home" caption="Home page" icon="fas fa-igloo" to="home"/>
-      <EssentialLink title="Login" caption="Login page" icon="fab fa-connectdevelop" to="login"/>
-      <EssentialLink title="Coalitions" caption="Coalitions page"
+      <EssentialLink title="Home" caption="Sweet home" icon="fas fa-igloo" to="home"/>
+      <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
+      <EssentialLink title="Coalitions" caption="Mine's better"
         icon="fas fa-group-arrows-rotate" to="coalitions"/>
-      <EssentialLink title="Lobbies" caption="Find a lobby of ppl to play with"
+      <EssentialLink title="Lobbies" caption="Game on !"
         icon="fab fa-forumbee" to="lobbies"/>
       <EssentialLink title="Community" caption="Out and about"
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
-      <EssentialLink title="Inbox" caption="Your message threads"
+      <EssentialLink title="Inbox" caption="bla bla"
         icon="fa-solid fa-comments" to="inbox" :notif="$thread.totalUnread"/>
-      <EssentialLink title="Stats" caption="Player statistics"
-        icon="fa-solid fa-chart-line" to="stats" />
-      <EssentialLink title="Settings" caption="Your account settings"
+      <EssentialLink title="Profile" caption="Stats, check em"
+        icon="fa-solid fa-chart-line" to="profile" />
+      <EssentialLink title="Settings" caption="Account settings"
         icon="fa-solid fa-gear" to="settings" />
     </q-drawer>
 
@@ -66,7 +66,10 @@ const soc = useSocialStore();
 const $thread = useThreadStore();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
-$auth.socket.on('block', () => { soc.fetchRelationships(); });
+$auth.socket.on('block', () => {
+  console.log('received block event');
+  soc.fetchRelationships();
+});
 
 $thread.fetchThreads();
 // const router = useRouter();

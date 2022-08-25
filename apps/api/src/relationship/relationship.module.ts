@@ -20,12 +20,12 @@ import { RelationshipService } from './relationship.service';
 
 @Module({
   providers: [RelationshipService],
-  exports: [],
   imports: [
     forwardRef(() => UserModule),
     forwardRef(() => SocketModule),
     TypeOrmModule.forFeature([Relationship]),
   ],
   controllers: [RelationshipController],
+  exports: [RelationshipService],
 })
 export class RelationshipModule {}

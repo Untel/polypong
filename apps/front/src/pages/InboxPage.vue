@@ -108,4 +108,15 @@ watch(
   },
   { immediate: true },
 );
+
+// const dmThread = computedAsync(async () => {
+//  if ($route.params.userId) {
+//    console.log('wanna chat with : ', $route.params.userId);
+//    const userId: number = +$route.params.userId;
+//    await $thread.getThreadWithUser(userId);
+//    if ($thread._current.channel === undefined) {
+//      $route.
+//    }
+//  }
+// });
 </script>

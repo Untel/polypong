@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from 'src/user';
+import { AddRelationByIdDto } from './dtos/add-relation-by-id.dto';
 import { AddRelationDto } from './dtos/add-relation.dto';
 import { SendFriendRequestDto } from './dtos/send-friend-request.dto';
 import { RelationshipService } from './relationship.service';
@@ -44,6 +45,22 @@ export class RelationshipController {
     )}
     `);
     await this.relService.addRelationship(req.user, body.name);
+    return await this.relService.fetchRels(req.user);
+  }
+
+  /**
+   * create a relationship
+   * @param {Request} req : The request object.
+   * @param {AddRelationDto} body : other user's name
+   */
+  @UseGuards(JwtGuard)
+  @Post('addRelByUserId')
+  async addRelationshipByUserId(@Req() req, @Body() body: AddRelationByIdDto) {
+    this.logger.log(`
+      In addRelByUserId, req.user = ${req.user},
+      AddRelationByIdDto = ${JSON.stringify(body)}
+    `);
+    await this.relService.addRelationshipByUserId(req.user, body.userId);
     return await this.relService.fetchRels(req.user);
   }
 

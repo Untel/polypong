@@ -11,20 +11,17 @@
 <template>
   <div class="wrapper">
     <FssFallback
-      :fss-settings="coalitions[user.coalition || 'federation'].shaderConfig"
+      :fss-settings="coalitions[coalition || 'federation'].shaderConfig"
     >
       <div>
         <!-- <LogoBannerCoalition
           :coalition="user.coalition || 'alliance'"
           show-banner/> -->
         <q-avatar>
-          <img :src="user.avatar">
+          <img :src="avatar">
         </q-avatar>
-        {{ user.name }}
-        {{ user.email }}
-        <pre>
-          {{ user }}
-        </pre>
+        {{ name }}
+        {{ email }}
       </div>
     </FssFallback>
   </div>
@@ -32,15 +29,55 @@
 
 <script setup lang="ts">
 import { CoalitionChoice, coalitions } from 'src/types/coalition';
-import { PropType } from 'vue';
+import { computed, ComputedRef, PropType } from 'vue';
 import { User } from 'src/types/user';
+import { useAuthStore } from 'src/stores/auth.store';
+import { useSocialStore } from 'src/stores/social.store';
+import { asyncComputed } from '@vueuse/core';
 import FssFallback from './FssFallback.vue';
 import LogoBannerCoalition from './LogoBannerCoalition.vue';
 
+const auth = useAuthStore(); const soc = useSocialStore();
+
 const props = defineProps({
-  user: {
-    type: Object as PropType<User>,
-    default: null,
+  userId: {
+    type: Number,
+    default: -1,
   },
 });
+
+const isSelf = computed(() => (props.userId === auth.user.id));
+
+const rel = asyncComputed(async () => {
+  if (isSelf.value) { return undefined; }
+  const res = soc.getRelByUserId(props.userId);
+  if (res) { return res; }
+  await soc.addRelByUserId(props.userId);
+  return soc.getRelByUserId(props.userId);
+});
+
+const name = computed(() => {
+  if (isSelf.value) { return auth.user.name; }
+  if (rel.value) { return rel.value.to.name; }
+  return '';
+});
+
+const avatar = computed(() => {
+  if (isSelf.value) { return auth.user.avatar; }
+  if (rel.value) { return rel.value.to.avatar; }
+  return '';
+});
+
+const coalition: ComputedRef<CoalitionChoice> = computed(() => {
+  if (isSelf.value) { return auth.user.coalition; }
+  if (rel.value) { return rel.value.to.coalition; }
+  return CoalitionChoice.FEDERATION;
+});
+
+const email = computed(() => {
+  if (isSelf.value) { return auth.user.email; }
+  if (rel.value) { return rel.value.to.email; }
+  return '';
+});
+
 </script>

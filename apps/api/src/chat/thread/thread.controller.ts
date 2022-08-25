@@ -1,24 +1,24 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
-  UnauthorizedException,
   UnprocessableEntityException,
   UseGuards,
+  Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
-import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
-import { ChannelService } from '../channel/channel.service';
 import { User } from 'src/user/user.entity';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserService } from 'src/user';
 import JwtGuard from 'src/guards/jwt.guard';
 import ThreadGuard from './thread.guard';
+import { RelationshipService } from 'src/relationship';
 
 @UseGuards(JwtGuard)
 @Controller('thread')
@@ -26,7 +26,10 @@ export class ThreadController {
   constructor(
     private readonly threadService: ThreadService,
     private readonly userService: UserService, // private readonly channelService: ChannelService,
+    private readonly relService: RelationshipService,
   ) {}
+
+  logger = new Logger('ThreadController');
 
   @Get()
   findAll(@CurrentUser() user: User) {
@@ -43,12 +46,25 @@ export class ThreadController {
 
   @Get('user/:id')
   async findOneOrCreate(@CurrentUser() user: User, @Param('id') id: string) {
+//    this.logger.log("------------------------------------------------------------");
+//    this.logger.log(`in Get('user/:id'), user.id = ${user.id}, param id = ${id}`);
     const to = await this.userService.findById(+id);
+//    this.logger.log("------------------------------------------------------------");
+//    this.logger.log(`in Get('user/:id'), to = ${JSON.stringify(to)}`);
     if (!to) throw new UnprocessableEntityException('This user does not exist');
+//    this.logger.log("------------------------------------------------------------");
+    const rel = await this.relService.findRel(user, to);
+//    this.logger.log(`in Get('user/:id'), rel = ${JSON.stringify(rel)}`);
+    if (rel) {
+      if (rel.block_received) throw new UnauthorizedException('This user has blocked you');
+      if (rel.block_sent) throw new UnauthorizedException('You have blocked this user');
+    }
+//    this.logger.log("------------------------------------------------------------");
     if (to.id === user.id)
       throw new UnprocessableEntityException("You can't thread with yourself");
     return this.threadService.findOneOrCreate([user, to]);
   }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateThreadDto: UpdateThreadDto) {

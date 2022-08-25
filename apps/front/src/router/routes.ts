@@ -15,6 +15,7 @@ import {
 } from 'vue-router';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
 // import CopyrightFooter from 'src/components/CopyrightFooter.vue';
+import { useThreadStore } from 'src/stores/thread.store';
 import AuthGuard from './auth.guard';
 
 const authRoutes: RouteRecordRaw[] = [{
@@ -48,10 +49,10 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'users',
   component: () => import('pages/UsersPage.vue'),
 }, {
-  name: 'stats',
-  path: 'stats/:id?',
+  name: 'profile',
+  path: 'profile/:userId?',
   props: true,
-  component: () => import('pages/StatsPage.vue'),
+  component: () => import('pages/HistoryPage.vue'),
 }, {
   name: 'settings',
   path: 'settings',
@@ -62,6 +63,25 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'inbox/:id?',
   props: true,
   component: () => import('pages/InboxPage.vue'),
+},
+{
+  name: 'dm',
+  path: 'inbox/user/:userId',
+  props: true,
+  component: () => import('pages/InboxPage.vue'),
+  async beforeEnter(to, from, next) {
+    const { userId } = to.params;
+    const $thread = useThreadStore();
+    try {
+      const res = await $thread.getDmThreadByUserId(+userId);
+      if (res) {
+        next(`/inbox/${res?.id}`);
+      }
+    } catch (e) {
+      console.log(e);
+      next('/inbox');
+    }
+  },
 },
 ];
 

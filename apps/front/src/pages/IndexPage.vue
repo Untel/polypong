@@ -8,11 +8,11 @@
 <template>
   <q-page class="row">
     <div class="wrapper">
-      <UserBanner :user="$auth.user"/>
+      <UserBanner :userId="$auth.user.id"/>
     </div>
     <q-card>
       <pre>
-        {{ matchs }}
+        {{ userMatchesHistory }}
       </pre>
     </q-card>
   </q-page>
@@ -22,13 +22,14 @@
 import { useAuthStore } from 'src/stores/auth.store';
 import { useMatchHistoryStore } from 'src/stores/history.store';
 import UserBanner from 'src/components/UserBanner.vue';
-import { onMounted } from 'vue';
-import { storeToRefs } from 'pinia';
+import { computed, onMounted } from 'vue';
 
 const $auth = useAuthStore();
-const $history = useMatchHistoryStore();
-const { matchs } = storeToRefs($history);
+const $his = useMatchHistoryStore();
+
+const userMatchesHistory = computed(() => $his.getUserMatchesHistory($auth.getUser.id));
+
 onMounted(() => {
-  $history.fetchHistory();
+  $his.fetchUserMatchesHistory($auth.getUser.id);
 });
 </script>
