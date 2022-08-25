@@ -91,9 +91,9 @@ export class Bot {
     const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
     console.log("paddleMid",paddleMidRatio);
     console.log(`Ball Ratio:${ratio}`);
-    if (ratio > paddleMidRatio)
+    if (ratio > paddleMidRatio + 0.02)
       dir = 1;
-    else if (ratio  < paddleMidRatio )
+    else if (ratio  < paddleMidRatio - 0.02)
       dir = -1;
     // God mode
     // let newPercent = ratio;
