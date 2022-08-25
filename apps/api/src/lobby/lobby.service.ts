@@ -108,6 +108,11 @@ export class LobbyService {
     this.logger.log(`User ${user.id} joined lobby ${lobby.roomId}`);
   }
 
+  inviteUserToLobby(lobby: Lobby, from: User, invitee: User) {
+    const socketOfInvitee = this.socketService.getUserSocket(invitee.id);
+    socketOfInvitee?.emit('lobbyInvite', from.id, lobby.id);
+  }
+
   clearLobbies() {
     this.lobbies.clear();
   }

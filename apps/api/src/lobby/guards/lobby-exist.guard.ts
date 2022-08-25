@@ -15,11 +15,7 @@ import {
   ExecutionContext,
   Injectable,
   UnprocessableEntityException,
-  createParamDecorator,
-  Inject,
-  forwardRef,
 } from '@nestjs/common';
-import Lobby from 'src/game/lobby.class';
 import { LobbyService } from 'src/lobby/lobby.service';
 
 @Injectable()

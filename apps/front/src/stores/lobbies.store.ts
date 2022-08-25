@@ -83,6 +83,18 @@ export const useLobbiesStore = defineStore('lobbies', {
     async fetchCurrentLobby(lobbyId: number | string) {
       this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
     },
+    async inviteUserToLobby(userId: number) {
+      const { socket, getIsConnected } = useAuthStore();
+      if (!getIsConnected) return;
+      if (!this.activeLobby) return;
+      lobbiesApi.post(`${this.activeLobby.id}/invite/${userId}`);
+    },
+    async invitedBy(fromId: number, lobbyId: number) {
+      Notify.create({
+        type: 'positive',
+        message: `You have been invited by ${fromId} to join lobby ${lobbyId}`,
+      });
+    },
     async createLobby(lobbyName: string) {
       try {
         const newLobby: Lobby = await lobbiesApi.post('', {

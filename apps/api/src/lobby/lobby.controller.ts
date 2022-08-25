@@ -18,6 +18,9 @@ import {
   UseGuards,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Param,
+  Logger,
+  Post,
 } from '@nestjs/common';
 import { CurrentLobby, CurrentUser } from 'src/decorators';
 import Lobby from 'src/game/lobby.class';
@@ -28,7 +31,7 @@ import LobbyExistGuard from './guards/lobby-exist.guard';
 import SocketGuard from './guards/socket.guard';
 import { LobbyService } from './lobby.service';
 import { SocketService } from 'src/socket';
-import { User } from 'src/user';
+import { User, UserService } from 'src/user';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
 @Controller('/lobbies/:id')
@@ -36,7 +39,11 @@ export class LobbyController {
   constructor(
     private readonly lobbyService: LobbyService,
     private readonly socketService: SocketService,
+    private readonly userService: UserService,
   ) {}
+
+  logger = new Logger('LobbyController');
+
   @Get()
   @UseGuards(InLobbyGuard)
   getLobby(@CurrentLobby() lobby): Lobby {
@@ -51,6 +58,19 @@ export class LobbyController {
   ): Promise<Lobby> {
     this.lobbyService.userJoinLobby(lobby, user);
     return lobby;
+  }
+
+  @Post('invite/:userId')
+  // @UseGuards(SocketGuard)
+  async inviteUserToLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+    @Param('userId') userId: string,
+  ): Promise<void> {
+    this.logger.log(`@Get('invite/:userId), userId = ${userId}`);
+    const invitee = await this.userService.findById(+userId);
+    this.logger.log(`@Get('invite/:userId), invitee.name = ${invitee.name}`);
+    this.lobbyService.inviteUserToLobby(lobby, user, invitee);
   }
 
   @Get('start')
