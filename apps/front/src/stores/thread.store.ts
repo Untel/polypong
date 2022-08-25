@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 07:44:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 22:44:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ export interface Message extends BaseObject {
 }
 
 export interface BaseThread extends BaseObject {
+  id: number;
   participants: Participant[];
   channel?: Channel;
 }
@@ -73,14 +74,17 @@ export const useThreadStore = defineStore('thread', {
     threads(state): Thread[] {
       const $auth = useAuthStore();
       const threads = state._threads.map((thread) => {
+        const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
         const mapped = {
           ...thread,
-          avatar: !thread.channel ? thread.recipient.avatar : (thread.channel.avatar || 'group'),
+          recipient,
+          avatar: !thread.channel
+            ? recipient.avatar
+            : (thread.channel.avatar || 'group'),
+          lastMessage: thread.lastMessage || { createdAt: Date.now(), content: 'Empty thread' },
         };
-        console.log('Mapped', mapped);
         return mapped;
       });
-
       return threads;
     },
     totalUnread(state): number {
@@ -117,10 +121,12 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async newChannel() {
-      await threadApi.post<Thread[]>('/channel');
+      const thread = await channelApi.post<Thread>();
+      await this.fetchThreads();
+      this.router.push({ name: 'inbox', params: { id: thread.id } });
     },
 
-    async socketAddMessage(thread, message) {
+    async socketAddMessage(thread: Thread, message: Message) {
       console.log('Socket add message', thread, message);
       if (this._current && this._current.id === thread.id) {
         this.getThread(thread.id);
