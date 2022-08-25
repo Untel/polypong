@@ -96,12 +96,20 @@ export const useThreadStore = defineStore('thread', {
       this._threads = await threadApi.get<Thread[]>('');
     },
 
-    async getThread(userId: number | null | undefined) {
-      if (userId) {
-        this._current = await threadApi.get<ActiveThread>(userId);
+    async getThread(threadId: number | null | undefined) {
+      if (threadId) {
+        this._current = await threadApi.get<ActiveThread>(threadId);
       } else {
         this._current = null;
       }
+    },
+
+    async getDmThreadByUserId(userId: number | null | undefined) {
+      if (userId) {
+        const res = await threadApi.get<ActiveThread>(`/user/${userId}`);
+        return res;
+      }
+      return null;
     },
 
     async sendMessage(content: string) {

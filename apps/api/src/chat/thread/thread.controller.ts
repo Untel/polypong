@@ -9,6 +9,7 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
@@ -28,6 +29,8 @@ export class ThreadController {
     private readonly userService: UserService, // private readonly channelService: ChannelService,
   ) {}
 
+  logger = new Logger('ThreadController');
+
   @Get()
   findAll(@CurrentUser() user: User) {
     return this.threadService.findAll(user);
@@ -43,7 +46,10 @@ export class ThreadController {
 
   @Get('user/:id')
   async findOneOrCreate(@CurrentUser() user: User, @Param('id') id: string) {
+    this.logger.log(`in Get('user/:id'), id = ${id}`);
     const to = await this.userService.findById(+id);
+    this.logger.log(`in Get('user/:id'), found to = `, to);
+
     if (!to) throw new UnprocessableEntityException('This user does not exist');
     if (to.id === user.id)
       throw new UnprocessableEntityException("You can't thread with yourself");

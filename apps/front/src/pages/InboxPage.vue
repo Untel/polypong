@@ -56,6 +56,7 @@ import { watch } from 'vue';
 import { Notify } from 'quasar';
 import { MandeError } from 'mande';
 import moment from 'moment';
+import { computedAsync } from '@vueuse/core';
 
 const $auth = useAuthStore();
 const $thread = useThreadStore();
@@ -108,4 +109,15 @@ watch(
   },
   { immediate: true },
 );
+
+// const dmThread = computedAsync(async () => {
+//  if ($route.params.userId) {
+//    console.log('wanna chat with : ', $route.params.userId);
+//    const userId: number = +$route.params.userId;
+//    await $thread.getThreadWithUser(userId);
+//    if ($thread._current.channel === undefined) {
+//      $route.
+//    }
+//  }
+// });
 </script>

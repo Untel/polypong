@@ -15,6 +15,7 @@ import {
 } from 'vue-router';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
 // import CopyrightFooter from 'src/components/CopyrightFooter.vue';
+import { useThreadStore } from 'src/stores/thread.store';
 import AuthGuard from './auth.guard';
 
 const authRoutes: RouteRecordRaw[] = [{
@@ -62,6 +63,23 @@ const authRoutes: RouteRecordRaw[] = [{
   path: 'inbox/:id?',
   props: true,
   component: () => import('pages/InboxPage.vue'),
+},
+{
+  name: 'dm',
+  path: 'inbox/user/:userId',
+  props: true,
+  component: () => import(''),
+  async beforeEnter(to, from, next) {
+    const { userId } = to.params;
+    const $thread = useThreadStore();
+    try {
+      const res = await $thread.getDmThreadByUserId(+userId);
+      next(`/inbox/${res?.id}`);
+    } catch (e) {
+      console.log(e);
+      next(false);
+    }
+  },
 },
 ];
 
@@ -112,15 +130,6 @@ const routes: RouteRecordRaw[] = [{
       window.open(url, '_blank');
     }
     next(false);
-  },
-}, {
-  path: '/chatwith/:id',
-  name: 'chatwith',
-  component: () => import('pages/LoginPage.vue'),
-  beforeEnter(to, from, next) {
-    // await api call /api/threads/user/:id
-    // -> threadId
-    // next(/inbox/threadId)
   },
 }];
 
