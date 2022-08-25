@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 16:05:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/26 00:18:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,25 +100,22 @@ export class ThreadService {
     });
   }
 
-  async findOneOrCreate(users: User[]) {
-    const th = await this.threadRep.findOne({
-      // join: { alias: 'p', leftJoin: {  }},
-      where: {
-        // participants: users.map((u) => ({ user: { id: u.id } })),
-        participants: { user: { id: In(users.map((u) => u.id)) } },
-        channel: IsNull(),
-      },
-      relations: ['participants.user', 'messages'],
-    });
+  async findOneOrCreate(user: User, to: User) {
+    const th = await Thread.createQueryBuilder('thread')
+      .innerJoinAndSelect('thread.participants', 'me', 'me.user_id = :id', {
+        id: user.id,
+      })
+      .innerJoinAndSelect('thread.participants', 'other', 'other.user_id = :id', {
+        id: to.id,
+      })
+      .getOne();
     if (th) return th;
 
     this.logger.log(
-      `Trying to get unexisting thread between ${users
-        .map((u) => u.name)
-        .join(', ')}. Creating...`,
+      `Trying to get unexisting thread between. Creating...`,
     );
 
-    return await this.create(users);
+    return await this.create([user, to]);
   }
 
   async create(users: User[]) {

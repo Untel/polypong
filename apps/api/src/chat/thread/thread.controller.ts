@@ -62,7 +62,7 @@ export class ThreadController {
 //    this.logger.log("------------------------------------------------------------");
     if (to.id === user.id)
       throw new UnprocessableEntityException("You can't thread with yourself");
-    return this.threadService.findOneOrCreate([user, to]);
+    return this.threadService.findOneOrCreate(user, to);
   }
 
 
