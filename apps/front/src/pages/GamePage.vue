@@ -126,7 +126,12 @@ onMounted(async () => {
         balls.value[index] = item;
         break;
       case 'power':
+        // console.log("power time")
         powers.value[index] = item;
+        break;
+      case 'removePower':
+      //   powers.value[index] = item;
+      //   powers.value.splice(index,1);
         break;
       case 'paddle':
         paddles.value[index] = item;

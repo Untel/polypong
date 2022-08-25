@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 22:07:01 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 02:29:38 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ export default class Game {
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     ball.findTarget();
     this.balls.push(ball);
+    console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
   }
 
   generateMap(n = 0) {
@@ -346,6 +347,7 @@ export default class Game {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
           this.socket.emit('powers', this.powersNetScheme);
+          // this.socket.emit('removePower', power.netScheme, pIdx);
         }
       }
     }
@@ -362,10 +364,11 @@ export default class Game {
       Object.keys(powerObj),
       typeof powerObj,
     );
-    this.socket.emit(
-      'powers',
-      this.powers.map((p) => p.netScheme),
-    );
+    this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
+    // this.socket.emit(
+    //   'powers',
+    //   this.powers.map((p) => p.netScheme),
+    // );
   }
 
   public tick() {
