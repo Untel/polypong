@@ -108,4 +108,8 @@ watch(
   },
   { immediate: true },
 );
+onUnmounted(() => {
+  // eslint-disable-next-line no-underscore-dangle
+  $thread._current = null;
+});
 </script>
