@@ -219,7 +219,6 @@
               v-for="(participant, index) in currentThread.participants"
               :key="`participant-${index}`"
               clickable
-              v-ripple
             >
               <q-item-section avatar>
                 <q-avatar>
@@ -262,6 +261,7 @@
         <q-toolbar class="bg-grey-3 row text-black">
           <DiscordPicker
             @emoji="message += $event"
+            :api-key="$env.TENOR_API_KEY || ''"
           />
           <q-input
             rounded
