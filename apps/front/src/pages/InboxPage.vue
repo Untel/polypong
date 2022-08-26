@@ -52,7 +52,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import { Thread, Message, useThreadStore } from 'src/stores/thread.store';
 import WhatsApp from 'src/components/WhatsApp.vue';
 import { useRoute } from 'vue-router';
-import { watch } from 'vue';
+import { watch, onUnmounted } from 'vue';
 import { Notify } from 'quasar';
 import { MandeError } from 'mande';
 import moment from 'moment';
@@ -108,4 +108,8 @@ watch(
   },
   { immediate: true },
 );
+onUnmounted(() => {
+  // eslint-disable-next-line no-underscore-dangle
+  $thread._current = null;
+});
 </script>

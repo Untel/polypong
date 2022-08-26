@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 07:44:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 11:40:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,13 +121,10 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async socketAddMessage(thread, message) {
-      console.log('Socket add message', thread, message);
       if (this._current && this._current.id === thread.id) {
         this.getThread(thread.id);
       }
-      if (this._threads.find((t) => t.id === thread.id)) {
-        this.fetchThreads();
-      }
+      this.fetchThreads();
     },
   },
 });
