@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 07:34:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 23:32:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,11 @@ export class MessageService {
     message.sender = thread.participants.find((p) => p.user.id === user.id);
     const savedMessage = await message.save();
 
-    // thread.lastMessage = savedMessage;
-    // await thread.save();
     thread.participants.forEach((p) => {
-      console.log('p.user.id', p.user.id, this.socketService
-      .getUserSocket(p.user.id));
-      this.socketService
-        .getUserSocket(p.user.id)?
-        .emit('thread-message', null);
-        // .emit('thread-message', thread, savedMessage);
+      const sock = this.socketService.getUserSocket(p.user.id);
+      if (sock) {
+        sock.emit('thread-message', thread, savedMessage);
+      }
     });
     return savedMessage;
   }

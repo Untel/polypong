@@ -10,6 +10,7 @@
       :currentThread="$thread.current"
       @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
+      @newChannel="() => $thread.newChannel()"
     >
       <q-infinite-scroll @load="() => {}" reverse>
         <!-- <template v-slot:loading>
@@ -66,10 +67,9 @@ function reduceClosestMessages(messages: Message[]) {
     const lastMessage = acc[acc.length - 1];
     if (lastMessage
       && lastMessage.sender.id === message.sender.id
-      && moment(lastMessage.createdAt).diff(message.createdAt, 'minutes') < 10
+      && moment(message.createdAt).diff(moment(lastMessage.createdAt), 'minutes') < 3
     ) {
-      lastMessage.contents.push(message.content);
-      lastMessage.createdAt = message.createdAt;
+      acc[acc.length - 1] = { ...message, contents: [...lastMessage.contents, message.content] };
     } else {
       acc.push({ ...message, contents: [message.content] });
     }
@@ -108,8 +108,4 @@ watch(
   },
   { immediate: true },
 );
-onUnmounted(() => {
-  // eslint-disable-next-line no-underscore-dangle
-  $thread._current = null;
-});
 </script>

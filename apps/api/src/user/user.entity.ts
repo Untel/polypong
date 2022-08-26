@@ -32,7 +32,6 @@ export class User extends NoIdBaseEntity {
   @Column({ nullable: true })
   twoFactorAuthenticationSecret?: string;
 
-  @Exclude()
   @Column({ default: false })
   public isTwoFactorAuthenticationEnabled: boolean;
 

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 11:40:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/26 18:43:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ export interface Message extends BaseObject {
 }
 
 export interface BaseThread extends BaseObject {
+  id: number;
   participants: Participant[];
   channel?: Channel;
 }
@@ -73,14 +74,17 @@ export const useThreadStore = defineStore('thread', {
     threads(state): Thread[] {
       const $auth = useAuthStore();
       const threads = state._threads.map((thread) => {
+        const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
         const mapped = {
           ...thread,
-          avatar: !thread.channel ? thread.recipient.avatar : (thread.channel.avatar || 'group'),
+          recipient,
+          avatar: !thread.channel
+            ? recipient?.avatar
+            : (thread.channel.avatar || 'group'),
+          lastMessage: thread.lastMessage || { createdAt: Date.now(), content: 'Empty thread' },
         };
-        console.log('Mapped', mapped);
         return mapped;
       });
-
       return threads;
     },
     totalUnread(state): number {
@@ -96,12 +100,20 @@ export const useThreadStore = defineStore('thread', {
       this._threads = await threadApi.get<Thread[]>('');
     },
 
-    async getThread(userId: number | null | undefined) {
-      if (userId) {
-        this._current = await threadApi.get<ActiveThread>(userId);
+    async getThread(threadId: number | null | undefined) {
+      if (threadId) {
+        this._current = await threadApi.get<ActiveThread>(threadId);
       } else {
         this._current = null;
       }
+    },
+
+    async getDmThreadByUserId(userId: number | null | undefined) {
+      if (userId) {
+        const res = await threadApi.get<ActiveThread>(`/user/${userId}`);
+        return res;
+      }
+      return null;
     },
 
     async sendMessage(content: string) {
@@ -117,10 +129,12 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async newChannel() {
-      await threadApi.post<Thread[]>('/channel');
+      const thread = await channelApi.post<Thread>();
+      await this.fetchThreads();
+      this.router.push({ name: 'inbox', params: { id: thread.id } });
     },
 
-    async socketAddMessage(thread, message) {
+    async socketAddMessage(thread: Thread, message: Message) {
       if (this._current && this._current.id === thread.id) {
         this.getThread(thread.id);
       }

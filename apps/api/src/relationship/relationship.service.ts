@@ -39,7 +39,7 @@ export class RelationshipService {
       const res = await this.relRepo
         .createQueryBuilder('rel')
         .where({ from: from })
-        .select(['rel', 'to.name', 'to.avatar'])
+        .select(['rel', 'to.name', 'to.avatar', 'to.coalition', 'to.email'])
         .leftJoin('rel.to', 'to')
         .getMany();
       this.logger.log(`in fetchRels, res = ${JSON.stringify(res)}`);
@@ -88,6 +88,24 @@ export class RelationshipService {
     if (existingRel) {
       throw new BadRequestException(
         `Cannot add ${name} because relation already exists`,
+      );
+    }
+    const newRel = this.createRelationship(from, to);
+    return newRel;
+  }
+
+  async addRelationshipByUserId(from: User, userId: number) {
+    this.logger.log(
+      `in addRelationshipByUserId, from.email = ${from.email}, userId = ${userId}`,
+    );
+    const to = await this.userService.find({ id: userId });
+    if (!to) {
+      throw new BadRequestException(`no results for userId = ${userId}`);
+    }
+    const existingRel = await this.findRel(from, to);
+    if (existingRel) {
+      throw new BadRequestException(
+        `Cannot add ${userId} because relation already exists`,
       );
     }
     const newRel = this.createRelationship(from, to);

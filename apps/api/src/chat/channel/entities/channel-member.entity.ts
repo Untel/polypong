@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/19 07:50:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 17:43:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ export enum ChannelMemberStatus {
 }
 
 @Entity()
-@Index(['participant', 'channel'], { unique: true })
+@Index(['user', 'channel'], { unique: true })
 export class ChannelMember extends RootEntity {
-  @ManyToOne(() => ThreadParticipant)
-  public participant: ThreadParticipant;
+  @ManyToOne(() => User)
+  public user: User;
 
   @ManyToOne(() => Channel)
   public channel: Channel;
@@ -59,7 +59,7 @@ export class ChannelMember extends RootEntity {
     enum: ChannelMemberStatus,
     default: ChannelMemberStatus.MEMBER,
   })
-  status: string;
+  status: ChannelMemberStatus;
 
   @Column({ type: 'timestamp' })
   public isBanUntil: TS;

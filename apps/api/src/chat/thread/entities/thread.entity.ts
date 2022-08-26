@@ -13,16 +13,7 @@
 import { Channel } from 'src/chat/channel/entities/channel.entity';
 import { Message } from 'src/chat/message';
 import { RootEntity } from 'src/entities/root.entity';
-import { User } from 'src/user';
-import {
-  Entity,
-  ManyToMany,
-  OneToMany,
-  JoinColumn,
-  ManyToOne,
-  JoinTable,
-  OneToOne,
-} from 'typeorm';
+import { Entity, OneToMany, OneToOne } from 'typeorm';
 import { ThreadParticipant } from './thread-participant.entity';
 
 @Entity()

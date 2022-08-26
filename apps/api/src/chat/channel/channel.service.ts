@@ -1,13 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user';
+import { ThreadService } from '../thread';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { ChannelMember, ChannelMemberStatus } from './entities';
 import { Channel } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {
-  create(user: User, datas: Partial<Channel>) {
-    return 'This action adds a new channel';
+  constructor(private readonly threadService: ThreadService) {}
+  async create(user: User) {
+    const thread = await this.threadService.create([user]);
+    const channel = Channel.create({
+      thread,
+      initiator: user,
+      members:[
+        ChannelMember.create({
+          user,
+          status: ChannelMemberStatus.OWNER,
+        })
+      ],
+    });
+    return await channel.save();
+  }
+
+  update(id: number,  updateChannelDto: UpdateChannelDto) {
   }
 
   findAll() {
@@ -18,9 +35,6 @@ export class ChannelService {
     return `This action returns a #${id} channel`;
   }
 
-  update(id: number, updateChannelDto: UpdateChannelDto) {
-    return `This action updates a #${id} channel`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} channel`;

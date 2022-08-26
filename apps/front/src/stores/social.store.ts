@@ -1,12 +1,17 @@
 import { defineStore } from 'pinia';
 import { mande } from 'mande';
 import { Notify } from 'quasar';
+import { CoalitionChoice } from 'src/types';
 
 export const relsApi = mande('/api/relationship');
 
 export interface otherInfo {
+id(id: any): any;
+[x: string]: number;
   name: string,
+  coalition: CoalitionChoice,
   avatar: string,
+  email: string,
 }
 
 export interface Relationship {
@@ -24,7 +29,7 @@ type SocialState = {
   relationships: Relationship[],
   error: unknown,
   notifCount: number,
-  searchedRel: Relationship | null,
+  searchedRel: Relationship | undefined,
 }
 
 export const useSocialStore = defineStore('social', {
@@ -32,7 +37,7 @@ export const useSocialStore = defineStore('social', {
     relationships: [],
     error: {},
     notifCount: 0,
-    searchedRel: null as Relationship | null,
+    searchedRel: undefined as Relationship | undefined,
   } as SocialState),
   getters: {
     getRelationships(state): Relationship[] { return state.relationships; },
@@ -54,7 +59,7 @@ export const useSocialStore = defineStore('social', {
     getNotifCount(): number {
       return this.getReceivedFriendships.length;
     },
-    getSearchedRel(state): Relationship {
+    getSearchedRel(state): Relationship | undefined {
       return state.searchedRel;
     },
   },
@@ -77,6 +82,16 @@ export const useSocialStore = defineStore('social', {
     async addRel(name: string) {
       try {
         this.relationships = await relsApi.post('addRel', { name });
+      } catch (error: any) {
+        Notify.create({
+          type: 'warning', message: error.body.message,
+        });
+      }
+    },
+
+    async addRelByUserId(userId: number) {
+      try {
+        this.relationships = await relsApi.post('addRelByUserId', { userId });
       } catch (error: any) {
         Notify.create({
           type: 'warning', message: error.body.message,
@@ -144,7 +159,12 @@ export const useSocialStore = defineStore('social', {
       return this.getRelationships.find((r) => r.to.name === name);
     },
 
-    setSearchedRel(rel: Relationship | null): void {
+    getRelByUserId(userId: number): Relationship | undefined {
+      console.log('in getRelByUserId, userId = ', userId);
+      return this.getRelationships.find((r) => r.toId === userId);
+    },
+
+    setSearchedRel(rel: Relationship | undefined): void {
       console.log('in setSearchedRel, rel = ', rel);
       this.searchedRel = rel;
     },
