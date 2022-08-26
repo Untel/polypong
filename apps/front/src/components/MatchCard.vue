@@ -1,6 +1,6 @@
 <template>
   <q-card-section horizontal>
-    <span>the {{ date[0] }} at {{ date[1] }}</span>
+    <span>{{ date }}</span>
     <q-card-section v-for="
       player in players" :key="`player-${player.id}`"
     >
@@ -17,6 +17,8 @@ import { Match } from 'src/stores/history.store';
 import {
   computed, defineComponent, PropType,
 } from 'vue';
+import moment from 'moment';
+
 import SocialAvatar from './SocialAvatar.vue';
 
 defineComponent({ name: 'MatchCard' });
@@ -29,11 +31,10 @@ const props = defineProps({
 
 // const auth = useAuthStore(); const soc = useSocialStore();
 
-const date = computed(
-  () => props.match?.finishedAt?.split('T').join(',').split('.').join(',')
-    .split(','),
-);
-console.log('date = ', date);
+const date = computed(() => {
+  const d = moment(props.match?.createdAt);
+  return d.fromNow();
+});
 
 const players = computed(
   () => props.match?.players?.slice().sort((a, b) => a.rank - b.rank),
