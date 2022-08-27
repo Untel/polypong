@@ -10,6 +10,10 @@
 </style>
 
 <template>
+<pre>
+  host : {{ $lobbies.getActiveLobby?.host.name }}
+  lobbyId : {{ $lobbies.getActiveLobby?.id }}
+</pre>
   <q-page padding>
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
@@ -27,6 +31,11 @@
         @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
       >
         <q-btn v-if="!(player.user.id === $auth.user.id)">Add friend</q-btn>
+        <q-btn v-if="player.user.id === $auth.user.id"
+          @click="async () => $lobbies.leave()"
+        >
+          Leave
+        </q-btn>
       </UserCard>
       <UserCard
         v-for="(bot, index) in $lobbies.getActiveLobby.bots"

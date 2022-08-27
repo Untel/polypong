@@ -60,6 +60,22 @@ export class LobbyController {
     return lobby;
   }
 
+  @Post('leave')
+  // @UseGuards(SocketGuard)
+  async leaveLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+  ): Promise<void> {
+    return this.lobbyService.userLeaveLobby(lobby, user);
+  }
+
+  @Post('kill')
+  @UseGuards(IsLobbyHost)
+  // @UseGuards(SocketGuard)
+  async killLobby(@CurrentLobby() lobby: Lobby): Promise<void> {
+    return this.lobbyService.killLobby(lobby);
+  }
+
   @Post('invite/:userId')
   // @UseGuards(SocketGuard)
   async inviteUserToLobby(
@@ -84,10 +100,10 @@ export class LobbyController {
   }
 
   @Get('game')
-  @UseGuards(InLobbyGuard)
+//  @UseGuards(InLobbyGuard)
   gameInfos(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
     const player = lobby.game.players.get(user.id);
-    if (player.afkInterval) {
+    if (player?.afkInterval) {
       player.unsetAfk(() => {
         lobby.game.resume();
       });

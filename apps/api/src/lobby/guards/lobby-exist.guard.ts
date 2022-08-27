@@ -44,7 +44,9 @@ export default class LobbyExistGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const params = req.params;
     const lobbyId = +params.id;
+    console.log('++++++++lobbyId = ', lobbyId);
     const lobby = this.lobbyService.getLobby(lobbyId);
+    console.log('++++++++lobby = ', lobby);
     if (!lobby) {
       throw new UnprocessableEntityException();
     }

@@ -25,6 +25,8 @@ import { Match, UserMatch } from 'src/match-history';
 
 export type LobbyId = number;
 
+let nextid = 42000;
+
 export interface ILobby {
   id: LobbyId;
   players: Map<number, Player>;
@@ -85,7 +87,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   constructor(service: LobbyService, host: User, name = 'Unamed lobby') {
     this.socketServer = service.socketService.socketio;
     this.service = service;
-    this.id = host.id;
+    this.id = nextid++;
     this.name = name;
     this.host = host;
     this.players = new Map<number, Player>();

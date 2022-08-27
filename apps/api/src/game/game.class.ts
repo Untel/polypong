@@ -197,7 +197,7 @@ export default class Game {
         console.log('Ded ball');
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
-          if (e !== ball) e.stop();
+//          if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
         this.reduce(ball.target.wall);

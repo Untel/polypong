@@ -52,6 +52,7 @@ import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -66,6 +67,7 @@ const $auth = useAuthStore();
 const soc = useSocialStore();
 const $thread = useThreadStore();
 const $lobbies = useLobbiesStore();
+const router = useRouter();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
@@ -75,10 +77,29 @@ $auth.socket.on('block', () => {
 
 $thread.fetchThreads();
 
-$auth.socket.on('lobbyInvite', (fromId: number, lobbyId: number) => {
-  $lobbies.invitedBy(fromId, lobbyId);
+$auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: number) => {
+  $lobbies.invitedBy(fromId, fromName, lobbyId);
 });
-// const router = useRouter();
+$auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId: number) => {
+  console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
+$auth.socket.on('lobbyDeleted', async (lobbyId: number) => {
+  console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
+  await $lobbies.fetchLobbies();
+});
+$auth.socket.on('lobbyCreated', async (lobbyId: number) => {
+  console.log(`LOBBYCREATED : ${lobbyId} has been created`);
+  await $lobbies.fetchLobbies();
+});
+$auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
+  console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
 
 // onMounted(() => {
 //   auth.socket.on('online', ({ name, type }) => {

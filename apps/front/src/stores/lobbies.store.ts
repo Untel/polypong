@@ -83,19 +83,38 @@ export const useLobbiesStore = defineStore('lobbies', {
     async fetchCurrentLobby(lobbyId: number | string) {
       this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
     },
+    async leave() {
+      this.router.push('/lobbies');
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        this.activeLobby = null;
+      }
+    },
     async inviteUserToLobby(userId: number) {
       const { socket, getIsConnected } = useAuthStore();
       if (!getIsConnected) return;
       if (!this.activeLobby) return;
       lobbiesApi.post(`${this.activeLobby.id}/invite/${userId}`);
     },
-    async invitedBy(fromId: number, lobbyId: number) {
+    async invitedBy(fromId: number, fromName: string, lobbyId: number) {
       Notify.create({
-        type: 'positive',
-        message: `You have been invited by ${fromId} to join lobby ${lobbyId}`,
+        type: 'neutral',
+        color: 'primary',
+        message: `You have been invited by ${fromName} to join lobby ${lobbyId}`,
+        actions: [
+          {
+            label: 'Accept',
+            color: 'white',
+            handler: () => {
+              console.log('about to reroute to /lobby/', lobbyId);
+              this.router.push(`/lobby/${lobbyId}`);
+            },
+          },
+        ],
       });
     },
     async createLobby(lobbyName: string) {
+      await this.leave();
       try {
         const newLobby: Lobby = await lobbiesApi.post('', {
           name: lobbyName,

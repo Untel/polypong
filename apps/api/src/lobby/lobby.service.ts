@@ -55,7 +55,12 @@ export class LobbyService {
   }
 
   getLobby(id: LobbyId): Lobby {
+    this.logger.log('getLobby - id = ', id);
+    console.log('getLobby - id = ', id);
+    this.logger.log('this.lobbies = ', this.lobbies);
+    console.log('this.lobbies = ', this.lobbies);
     const lobby = this.lobbies.get(id);
+    console.log('lobby = ', lobby, typeof id);
     return lobby;
   }
 
@@ -108,9 +113,41 @@ export class LobbyService {
     this.logger.log(`User ${user.id} joined lobby ${lobby.roomId}`);
   }
 
+  async userLeaveLobby(lobby: Lobby, user: User) {
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('userLeaveLobby - user = ', user, ', lobby.id = ', lobby.id);
+    const socketOfLeaver = this.socketService.getUserSocket(user.id);
+    if (lobby.players.has(user.id)) {
+      this.removePlayer(lobby.id, user);
+      socketOfLeaver.leave(lobby.roomId);
+      this.logger.warn(
+        `User ${user.id} already is in this lobby ${lobby.roomId}, rejoining the socket`,
+      );
+      // check if the lobby still exists
+      lobby.sock.emit('lobbyLeaver', user.id, user.name, lobby.id);
+      if (lobby.players.size === 0) {
+        this.logger.log('userLeaveLobby - no more players, closing lobby');
+        await this.closeLobby(lobby);
+        this.socketService.socketio.emit('lobbyDeleted', user.id);
+      } else if (lobby.host.id === user.id) {
+        // change host if the player who left was host
+        const nextHost = [...lobby.players.values()][0];
+        this.logger.log('userLeaveLobby - host left, next host = ', nextHost);
+        lobby.host = nextHost.user;
+        lobby.sock.emit('lobbyNewHost', user.id, lobby.id);
+      }
+    }
+    return null;
+  }
+
+  async killLobby(lobby: Lobby) {
+    await this.closeLobby(lobby);
+    this.socketService.socketio.emit('lobbyDeleted');
+  }
+
   inviteUserToLobby(lobby: Lobby, from: User, invitee: User) {
     const socketOfInvitee = this.socketService.getUserSocket(invitee.id);
-    socketOfInvitee?.emit('lobbyInvite', from.id, lobby.id);
+    socketOfInvitee?.emit('lobbyInvite', from.id, from.name, lobby.id);
   }
 
   clearLobbies() {
@@ -119,23 +156,25 @@ export class LobbyService {
 
   createLobby(host: User, name: string): Lobby {
     const lobby = new Lobby(this, host, name);
-    this.lobbies.set(host.id, lobby);
+    this.lobbies.set(lobby.id, lobby);
     this.socketService.serializeEmit('lobbies_update', [
       ...this.lobbies.values(),
     ]);
+    this.socketService.socketio.emit('lobbyCreated');
     return lobby;
   }
 
   async closeLobby(lobby: Lobby, winner = null) {
     console.log('Stored match', lobby.match);
-    lobby.game.stop();
-    lobby.sock.emit('redirect', {
-      name: 'history',
-      params: { id: lobby.match.id },
-    });
-    lobby.match.finishedAt = TS.ts();
-    lobby.match = await lobby.match.save();
-    console.log('Updated match', lobby.match);
+    if (lobby.game) {
+      lobby.game.stop();
+      lobby.sock.emit('redirect', {
+        name: 'profile',
+      });
+      lobby.match.finishedAt = TS.ts();
+      lobby.match = await lobby.match.save();
+      console.log('Updated match', lobby.match);
+    }
     lobby.sock.socketsLeave(lobby.roomId);
     this.lobbies.delete(lobby.id);
   }
