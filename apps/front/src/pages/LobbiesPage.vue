@@ -42,6 +42,7 @@
       <LobbyCard
         v-for="lobby of $lobbies.getLobbies"
         :key="`lobby-${lobby.id}`"
+        :id="lobby.id"
         :name="lobby.name || 'Unamed lobby'"
         :subhead="`${lobby.host.name}'s party`"
         :avatar="lobby.host.avatar"

@@ -1,6 +1,6 @@
 <template>
   <q-card-section horizontal>
-    <span>the {{ date[0] }} at {{ date[1] }}</span>
+    <span v-if="date">the {{ date[0] }} at {{ date[1] }}</span>
     <q-card-section v-for="
       player in players" :key="`player-${player.id}`"
     >

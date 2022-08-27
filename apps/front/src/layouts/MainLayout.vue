@@ -80,6 +80,16 @@ $thread.fetchThreads();
 $auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: number) => {
   $lobbies.invitedBy(fromId, fromName, lobbyId);
 });
+$auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: number) => {
+  console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
+  if (fromId === $auth.user.id) {
+    $lobbies.activeLobby = null;
+    router.push('/lobbies');
+  }
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
 $auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId: number) => {
   console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
   if ($lobbies.getActiveLobby) {

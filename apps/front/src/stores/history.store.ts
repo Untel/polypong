@@ -12,7 +12,6 @@
 
 import { defineStore } from 'pinia';
 import { mande } from 'mande';
-import { Stats } from 'fs';
 import { useAuthStore } from './auth.store';
 
 export const historyApi = mande('/api/match-history');
@@ -66,6 +65,7 @@ export interface Player {
 export interface Match{
   id: number; // the match's unique Id
   players: Player[];
+  finishedAt?: string;
 }
 
 export interface UserStats {

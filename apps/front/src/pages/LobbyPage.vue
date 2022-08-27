@@ -17,28 +17,45 @@
   <q-page padding>
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
-    <q-btn @click="$lobbies.startGame(+$route.params.id);">Start game</q-btn>
+    <q-card-section>
+      <q-btn
+        @click="$lobbies.startGame(+$route.params.id);"
+        class="full-width" outline bordered color="primary"
+      >
+        Start game
+      </q-btn>
+    </q-card-section>
 
-    <section class="user-list">
-      <UserCard
-        v-for="player in $lobbies.getActiveLobby.players"
+    <!--<section class="user-list">-->
+    <section class="row justify-center">
+      <UserCard class="col-md-6"
+        v-for="player in $lobbies.getActiveLobby?.players"
         :key="`player-${player.user.id}`"
         :avatar="player.user.avatar"
         :name="player.user.name"
         :caption="player.user.email"
         :color="player.color"
         :canUpdate="canUpdate"
+        :isHost="player.user.id === $lobbies.getActiveLobby.host.id"
         @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
       >
-        <q-btn v-if="!(player.user.id === $auth.user.id)">Add friend</q-btn>
-        <q-btn v-if="player.user.id === $auth.user.id"
-          @click="async () => $lobbies.leave()"
-        >
-          Leave
-        </q-btn>
+        <template #exit>
+            <!-- leave lobby -->
+            <q-btn
+              v-if="player.user.id === $auth.user.id"
+              round icon="fa-solid fa-xmark" size="s"
+              @click="async () => $lobbies.leave()"
+            />
+            <!-- kick player (host only)-->
+            <q-btn
+              v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
+              round icon="fa-solid fa-xmark" size="s"
+              @click="async () => $lobbies.kick(lobby.id, player.user.id)"
+            />
+        </template>
       </UserCard>
-      <UserCard
-        v-for="(bot, index) in $lobbies.getActiveLobby.bots"
+      <UserCard class="col-md-6"
+        v-for="(bot, index) in $lobbies.getActiveLobby?.bots"
         :key="`bot-${index}`"
         :avatar="bot.avatar"
         :color="bot.color"
@@ -85,7 +102,7 @@
           />
         </q-field>
         <q-input
-          :model-value="$lobbies.getActiveLobby.name"
+          :model-value="$lobbies.getActiveLobby?.name"
           label="Lobby name"
           @change="(evt) => $lobbies.updateLobby(lobby.id, { name: evt })"
           :disable="!canUpdate"
@@ -143,7 +160,7 @@ const $route = useRoute();
 const $router = useRouter();
 
 const minPlayers = computed(() => {
-  const present = $lobbies.getActiveLobby.players.length;
+  const present = $lobbies.getActiveLobby?.players.length;
   if (present < 2) return 2;
   return present;
 });
@@ -173,4 +190,9 @@ const botLevels = [
   { color: 'orange', label: 'medium' },
   { color: 'red', label: 'hard' },
 ];
+
+// function isHost(id: number): boolean {
+//  if (!id) return false;
+//  return $lobbies.getActiveLobby?.host.id === id;
+// }
 </script>

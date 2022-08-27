@@ -90,6 +90,11 @@ export const useLobbiesStore = defineStore('lobbies', {
         this.activeLobby = null;
       }
     },
+    async kick(lobbyId: number, userId: number) {
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/kick/${userId}`);
+      }
+    },
     async inviteUserToLobby(userId: number) {
       const { socket, getIsConnected } = useAuthStore();
       if (!getIsConnected) return;

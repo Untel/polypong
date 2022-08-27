@@ -69,6 +69,19 @@ export class LobbyController {
     return this.lobbyService.userLeaveLobby(lobby, user);
   }
 
+  @Post('kick/:userId')
+  @UseGuards(IsLobbyHost)
+  async kickUserFromLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+    @Param('userId') userId: string,
+  ): Promise<void> {
+    const userToBeKicked = await this.userService.findById(+userId);
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log(`@Get('kick/:userId), userToBeKicked.name = ${userToBeKicked.name}`);
+    return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
+  }
+
   @Post('kill')
   @UseGuards(IsLobbyHost)
   // @UseGuards(SocketGuard)
