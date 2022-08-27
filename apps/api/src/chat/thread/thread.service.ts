@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/26 00:18:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 02:33:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ export class ThreadService {
       .leftJoinAndSelect('lastMessage.sender', 'sender')
       .leftJoinAndSelect('sender.user', 'sender_user')
       .getMany();
-    // console.log('Mapped', mapped);
     return threads;
   }
 
@@ -101,26 +100,17 @@ export class ThreadService {
   }
 
   async findOneOrCreate(user: User, to: User) {
-    const th = await Thread.createQueryBuilder('thread')
-      .innerJoinAndSelect('thread.participants', 'me', 'me.user_id = :id', {
-        id: user.id,
-      })
-      .innerJoinAndSelect('thread.participants', 'other', 'other.user_id = :id', {
-        id: to.id,
-      })
-      .getOne();
+    const key = `th-${[user.id, to.id].sort().join('-')}`;
+    const th = await Thread.findOneBy({ key });
     if (th) return th;
 
-    this.logger.log(
-      `Trying to get unexisting thread between. Creating...`,
-    );
-
-    return await this.create([user, to]);
+    return this.create([user, to], key);
   }
 
-  async create(users: User[]) {
+  async create(users: User[], key = null) {
     const thread = Thread.create({
-      participants: users.map((user) => ThreadParticipant.create({ user }))
+      key,
+      participants: users.map((user) => ThreadParticipant.create({ user })),
     });
     return await thread.save();
   }

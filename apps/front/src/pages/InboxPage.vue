@@ -96,16 +96,7 @@ function splitByDay(messages: Message[]) {
 
 watch(
   () => $route.params.id,
-  (id) => {
-    try {
-      $thread.getThread(+id);
-    } catch (e: MandeError) {
-      Notify.create({
-        message: e.message,
-        color: 'negative',
-      });
-    }
-  },
+  (id) => $thread.getThread(+id),
   { immediate: true },
 );
 onUnmounted(() => {

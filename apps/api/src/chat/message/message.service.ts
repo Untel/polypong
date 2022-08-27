@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 23:32:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 02:34:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ export class MessageService {
     message.sender = thread.participants.find((p) => p.user.id === user.id);
     const savedMessage = await message.save();
 
+    message.sender.sawUntil = new Date();
+    await message.sender.save();
     thread.participants.forEach((p) => {
       const sock = this.socketService.getUserSocket(p.user.id);
       if (sock) {

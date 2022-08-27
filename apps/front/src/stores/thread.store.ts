@@ -6,14 +6,15 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/26 18:51:21 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 02:36:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande } from 'mande';
+import { mande, MandeError } from 'mande';
+import { Notify } from 'quasar';
 import { User } from './lobbies.store';
 import { useAuthStore } from './auth.store';
 
@@ -102,7 +103,16 @@ export const useThreadStore = defineStore('thread', {
 
     async getThread(threadId: number | null | undefined) {
       if (threadId) {
-        this._current = await threadApi.get<ActiveThread>(threadId);
+        try {
+          this._current = await threadApi.get<ActiveThread>(threadId);
+          this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
+        } catch (e: MandeError<unknown>) {
+          this.router.push('/inbox');
+          Notify.create({
+            message: e.message,
+            color: 'negative',
+          });
+        }
       } else {
         this._current = null;
       }

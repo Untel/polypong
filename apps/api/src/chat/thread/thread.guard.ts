@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 23:05:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 03:10:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnprocessableEntityException,
   createParamDecorator,
-  Inject,
-  forwardRef,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Thread } from 'src/chat/thread/entities/thread.entity';
@@ -32,10 +29,15 @@ export default class ThreadGuard implements CanActivate {
     console.log('Checking thread auth');
     // const thread = await this.threadService.findThread(threadId, user.id);
     const thread = await Thread.createQueryBuilder('thread')
-      .innerJoinAndSelect('thread.participants', 'me', 'me.user_id = :userId AND me.thread_id = :threadId', {
-        userId,
-        threadId
-      })
+      .innerJoinAndSelect(
+        'thread.participants',
+        'me',
+        'me.user_id = :userId AND me.thread_id = :threadId',
+        {
+          userId,
+          threadId,
+        },
+      )
       .leftJoinAndSelect('thread.participants', 'participants')
       .leftJoinAndSelect('participants.user', 'user')
       .getOne();
