@@ -25,26 +25,28 @@
       </q-item>
 
       <q-separator />
+
       <q-card-section>
         <slot />
       </q-card-section>
       <q-separator />
       <q-card-actions class="q-pa-md row q-gutter-md">
         <q-btn
-          :color="!isPrivate ? 'primary' : 'negative'"
           class="col" @click="emit('joinLobby')"
-          :icon="!isPrivate ? 'sports_tennis' : 'lock'"
-          :label="joinText" />
+          :icon="!props.isPrivate ? 'sports_tennis' : 'lock'"
+          :label="isInsideLobby ? 'Current Lobby' : props.joinText"
+          :color="btnColor"
+          />
       </q-card-actions>
     </q-form>
   </q-card>
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref } from 'vue';
-import { CoalitionChoice } from 'src/types/coalition';
-import allianceLogo from 'src/assets/alliance_logo.svg';
-import PasswordInput from 'src/components/PasswordInput.vue';
+import { computed, PropType, ref } from 'vue';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
+
+const $lobbies = useLobbiesStore();
 
 const props = defineProps({
   id: {
@@ -78,6 +80,19 @@ const props = defineProps({
   isPrivate: {
     type: Boolean,
   },
+});
+
+const isInsideLobby = computed(() => {
+  if ($lobbies.getActiveLobby && props.id) {
+    return $lobbies.getActiveLobby.id === props.id;
+  }
+  return false;
+});
+
+const btnColor = computed(() => {
+  if (props.isPrivate) return 'negative';
+  if (isInsideLobby.value) return 'accent';
+  return 'primary';
 });
 
 const emit = defineEmits(['joinLobby']);

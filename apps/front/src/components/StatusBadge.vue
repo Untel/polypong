@@ -40,8 +40,9 @@ function onClick(): void {
   console.log('click');
 }
 
-const users = auth.getConnectedUsers;
-const user = computed(() => users.find((u: any) => u.id === props.id));
+const users = computed(() => auth.getConnectedUsers);
+
+const user = computed(() => users.value.find((u: any) => u.id === props.id));
 
 const status = computed(() => {
   if (user.value) {

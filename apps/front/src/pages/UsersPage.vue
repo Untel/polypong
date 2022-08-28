@@ -1,4 +1,5 @@
 <template>
+<pre>{{ soc.getRelationships }}</pre>
 <q-tabs
   v-model="tab" dense class="text-grey" active-color="primary"
   indicator-color="primary" narrow-indicator
@@ -173,7 +174,7 @@ import { useRouter } from 'vue-router';
 const tab = ref('friendlist');
 const showCard = ref('');
 function toggleCard(name: string) {
-  console.log(`caught toggleCard event, name = ${name}`);
+  // console.log(`caught toggleCard event, name = ${name}`);
   if (showCard.value === name) { showCard.value = ''; } else { showCard.value = name; }
 }
 function friendOrNot(rel: Relationship): string {
@@ -187,7 +188,7 @@ const soc = useSocialStore(); soc.fetchRelationships();
 const router = useRouter();
 
 async function inviteToLobby(id: number) {
-  console.log(`invite to lobby ${id}`);
+  // console.log(`invite to lobby ${id}`);
 }
 async function message(id: number) {
   router.push(`/chat/${id}`);
@@ -202,19 +203,19 @@ async function unblock(name: string) { await soc.unsend_block(name); }
 
 // const searchedRel = ref(); searchedRel.value = null;
 async function searchRel(name: string) {
-  console.log('in searchRel, name = ', name);
+  // console.log('in searchRel, name = ', name);
   const rel = soc.getRelByName(name);
   if (rel === undefined) {
     await soc.addRel(name);
     soc.setSearchedRel(soc.getRelByName(name));
     //    searchedRel.value = soc.getRelByName(name);
-    console.log('1searchedRel = ', soc.getSearchedRel);
+    // console.log('1searchedRel = ', soc.getSearchedRel);
   } else {
     soc.setSearchedRel(rel);
     //    searchedRelvalue = rel;
   }
-  console.log('2searchedRel = ', soc.getSearchedRel);
-  console.log('2soc.getSearchedRel= ', soc.getSearchedRel);
+  // console.log('2searchedRel = ', soc.getSearchedRel);
+  // console.log('2soc.getSearchedRel= ', soc.getSearchedRel);
 }
 
 </script>

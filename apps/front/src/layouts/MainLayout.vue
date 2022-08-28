@@ -48,9 +48,11 @@
 import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -64,15 +66,50 @@ const miniState = ref(true);
 const $auth = useAuthStore();
 const soc = useSocialStore();
 const $thread = useThreadStore();
+const $lobbies = useLobbiesStore();
+const router = useRouter();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
-  console.log('received block event');
+  // console.log('received block event');
   soc.fetchRelationships();
 });
 
 $thread.fetchThreads();
-// const router = useRouter();
+
+$auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: number) => {
+  $lobbies.invitedBy(fromId, fromName, lobbyId);
+});
+$auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: number) => {
+  // console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
+  if (fromId === $auth.user.id) {
+    $lobbies.activeLobby = null;
+    router.push('/lobbies');
+  }
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
+$auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId: number) => {
+  // console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
+$auth.socket.on('lobbyDeleted', async (lobbyId: number) => {
+  // console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
+  await $lobbies.fetchLobbies();
+});
+$auth.socket.on('lobbyCreated', async (lobbyId: number) => {
+  // console.log(`LOBBYCREATED : ${lobbyId} has been created`);
+  await $lobbies.fetchLobbies();
+});
+$auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
+  // console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
+  if ($lobbies.getActiveLobby) {
+    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
 
 // onMounted(() => {
 //   auth.socket.on('online', ({ name, type }) => {

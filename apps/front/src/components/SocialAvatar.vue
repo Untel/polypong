@@ -18,7 +18,7 @@ const auth = useAuthStore();
 defineComponent({ name: 'SocialAvatar' });
 const props = defineProps({
   id: {
-    type: Number,
+    type: Number, default: -1,
   },
   name: {
     type: String,
