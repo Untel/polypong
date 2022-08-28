@@ -188,10 +188,10 @@ const canUpdate = computed(() => {
   return can;
 });
 
-onMounted(() => {
+onMounted(async () => {
   const id = +($route.params.id as string);
-  $auth.socket.on('lobby_change', (evt) => {
-    $lobbies.fetchCurrentLobby(id);
+  $auth.socket.on('lobby_change', async (evt) => {
+    await $lobbies.fetchCurrentLobby(id);
   });
   $auth.socket.on('start', (evt) => {
     $router.push(`/lobby/${id}/game`);

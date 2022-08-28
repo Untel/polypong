@@ -180,9 +180,10 @@ export class LobbyService {
     console.log('Stored match', lobby.match);
     if (lobby.game) {
       lobby.game.stop();
-      lobby.sock.emit('redirect', {
-        name: 'profile',
-      });
+//      lobby.sock.emit('redirect', {
+//        name: 'profile',
+//      });
+      lobby.sock.emit('gameOver', lobby.id);
       lobby.match.finishedAt = TS.ts();
       lobby.match = await lobby.match.save();
       console.log('Updated match', lobby.match);

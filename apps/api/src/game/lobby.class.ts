@@ -104,14 +104,14 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.sock.emit('lobby_change');
   }
 
-  start(): Game {
+  async start(): Promise<Game> {
     if (this.game) {
       this.game.stop();
       delete this.game;
     }
     this.game = new Game(this);
-    this.sock.emit('start');
-    this.createMatchEntry();
+    await this.createMatchEntry();
+    this.sock.emit('start', this.id);
     this.logger.log(`Starting new game ${this.name}`);
     return this.game;
   }
@@ -127,7 +127,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   async createPlayerRank(player: Player, rank: number) {
     const um = new UserMatch();
     um.user = player.user;
-    um.rank = rank;
+    um.rank = rank + 1;
     um.match = this.match;
     const added = await um.save();
     console.log('Added rank', added, 'for', player.user.name);

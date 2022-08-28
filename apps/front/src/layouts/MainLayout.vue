@@ -45,14 +45,15 @@
 </template>
 
 <script lang="ts" setup>
+import { usePageLeave } from '@vueuse/core';
 import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
-import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { lobbiesApi, useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -67,7 +68,7 @@ const $auth = useAuthStore();
 const soc = useSocialStore();
 const $thread = useThreadStore();
 const $lobbies = useLobbiesStore();
-const router = useRouter();
+const router = useRouter(); const route = useRoute();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
@@ -108,6 +109,29 @@ $auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
   // console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
   if ($lobbies.getActiveLobby) {
     await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  }
+});
+$auth.socket.on('gameOver', async (lobbyId: number) => {
+  console.log(`GAMEOVER : ${lobbyId} has been closed`);
+  $lobbies.activeLobby = null;
+  try {
+    await lobbiesApi.post(`${lobbyId}/leave`);
+  } catch (e) {
+    console.log(e);
+  }
+  const currentUrl = window.location.pathname;
+  console.log('Current url: ', currentUrl);
+  if (currentUrl === `/lobby/${lobbyId}/game`) {
+    router.push('/lobbies');
+  }
+});
+$auth.socket.on('start', async (lobbyId: number) => {
+  console.log(`GAMESTART : ${lobbyId} has started`);
+  if ($lobbies.activeLobby?.id === lobbyId) {
+    router.push(`/lobby/${lobbyId}/game`);
+  } else {
+    await $lobbies.fetchAndJoinLobby(lobbyId);
+    router.push(`/lobby/${lobbyId}/game`);
   }
 });
 
