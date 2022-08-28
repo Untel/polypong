@@ -129,13 +129,11 @@ const status: ComputedRef<'in game' | 'in lobby' | 'online' | 'offline' | ''> = 
 function inviteToLobby(id: number) {
   // emit('inviteToLobby', id);
   if (status.value === 'offline' || status.value === 'in game') {
-    console.log('cannot invite, status = ', status);
+    // console.log('cannot invite, status = ', status);
     return;
   }
-  console.log('lobbies.activeLobby : ', lobbies.activeLobby);
-  if (!lobbies.activeLobby) {
-    console.log('you must first create a lobby to invite people');
-  } else {
+  // console.log('lobbies.activeLobby : ', lobbies.activeLobby);
+  if (lobbies.activeLobby) {
     lobbies.inviteUserToLobby(id);
   }
 }

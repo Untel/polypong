@@ -71,7 +71,7 @@ const router = useRouter();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
-  console.log('received block event');
+  // console.log('received block event');
   soc.fetchRelationships();
 });
 
@@ -81,7 +81,7 @@ $auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: numbe
   $lobbies.invitedBy(fromId, fromName, lobbyId);
 });
 $auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: number) => {
-  console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
+  // console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
   if (fromId === $auth.user.id) {
     $lobbies.activeLobby = null;
     router.push('/lobbies');
@@ -91,21 +91,21 @@ $auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: n
   }
 });
 $auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId: number) => {
-  console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
+  // console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
   if ($lobbies.getActiveLobby) {
     await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
   }
 });
 $auth.socket.on('lobbyDeleted', async (lobbyId: number) => {
-  console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
+  // console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
   await $lobbies.fetchLobbies();
 });
 $auth.socket.on('lobbyCreated', async (lobbyId: number) => {
-  console.log(`LOBBYCREATED : ${lobbyId} has been created`);
+  // console.log(`LOBBYCREATED : ${lobbyId} has been created`);
   await $lobbies.fetchLobbies();
 });
 $auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
-  console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
+  // console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
   if ($lobbies.getActiveLobby) {
     await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
   }

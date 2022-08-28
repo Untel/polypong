@@ -111,7 +111,7 @@ export const useLobbiesStore = defineStore('lobbies', {
             label: 'Accept',
             color: 'white',
             handler: () => {
-              console.log('about to reroute to /lobby/', lobbyId);
+              // console.log('about to reroute to /lobby/', lobbyId);
               this.router.push(`/lobby/${lobbyId}`);
             },
           },

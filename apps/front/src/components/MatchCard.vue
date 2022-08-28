@@ -33,7 +33,7 @@ const date = computed(
   () => props.match?.finishedAt?.split('T').join(',').split('.').join(',')
     .split(','),
 );
-console.log('date = ', date);
+// console.log('date = ', date);
 
 const players = computed(
   () => props.match?.players?.slice().sort((a, b) => a.rank - b.rank),

@@ -212,10 +212,8 @@ const botLevels = [
 const clickedUserName = ref('');
 const rel = asyncComputed(async () => {
   if (!clickedUserName.value) return null;
-  console.log('in computed, clickedUserName.value = ', clickedUserName.value);
   if (clickedUserName.value === $auth.user.name) return null;
   const ret = $soc.getRelByName(clickedUserName.value);
-  console.log('after first getRelByName, ret = ', ret);
   if (ret) return ret;
   await $soc.addRel(clickedUserName.value);
   return $soc.getRelByName(clickedUserName.value);
