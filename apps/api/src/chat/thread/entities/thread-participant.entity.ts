@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/23 23:44:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/28 03:35:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,16 @@ import {
   Index,
 } from 'typeorm';
 
-@Entity()
+export enum ThreadMemberStatus {
+  INVITED,
+  MEMBER,
+  ADMIN,
+  OWNER,
+}
+
+@Entity({ orderBy: { status: 'DESC' } })
 @Index(['user', 'thread'], { unique: true })
 export class ThreadParticipant extends RootEntity {
-  constructor(datas: Partial<ThreadParticipant> = {}) {
-    super();
-    Object.assign(this, datas);
-  }
-
   @ManyToOne(() => User, { eager: true })
   public user: User;
 
@@ -48,22 +50,23 @@ export class ThreadParticipant extends RootEntity {
   @CreateDateColumn({ type: 'timestamp' })
   public sawUntil: TS;
 
-  public unreadCount: number;
+  @Column({
+    type: 'enum',
+    enum: ThreadMemberStatus,
+    default: ThreadMemberStatus.MEMBER,
+  })
+  status: ThreadMemberStatus;
 
-  // @Expose()
-  // public get isUnread() {
-  //   return (
-  //     this.thread.lastMessage &&
-  //     this.sawUntil < this.thread.lastMessage.createdAt &&
-  //     this.hasMuteUntil < new TS()
-  //   );
-  // }
-  // @Column({ type: 'timestamp' })
-  // public joinedAt: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  public isBanUntil: TS;
 
-  // @Column({ type: 'timestamp' })
-  // public leftAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  public isMuteUntil: TS;
 
   @Column({ type: 'timestamp', nullable: true })
   public hasMuteUntil: TS;
+
+  @CreateDateColumn({ type: 'timestamp', nullable: true })
+  public joinedAt: TS;
 }

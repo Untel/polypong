@@ -147,6 +147,7 @@ module.exports = configure((/* ctx */) => ({
     plugins: [
       'LoadingBar',
       'Notify',
+      'Dialog',
     ],
   },
 

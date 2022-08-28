@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 02:33:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 23:47:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,13 @@ export class ThreadService {
     const th = await Thread.findOneBy({ key });
     if (th) return th;
 
-    return this.create([user, to], key);
+    return this.create([user, to], { key });
   }
 
-  async create(users: User[], key = null) {
+  async create(users: User[], datas: Partial<Thread> = {}) {
     const thread = Thread.create({
-      key,
       participants: users.map((user) => ThreadParticipant.create({ user })),
+      ...datas,
     });
     return await thread.save();
   }

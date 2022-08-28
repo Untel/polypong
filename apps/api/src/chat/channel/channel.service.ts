@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user';
-import { ThreadService } from '../thread';
+import { Thread, ThreadMemberStatus, ThreadParticipant, ThreadService } from '../thread';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ChannelMember, ChannelMemberStatus } from './entities';
@@ -10,16 +10,12 @@ import { Channel } from './entities/channel.entity';
 export class ChannelService {
   constructor(private readonly threadService: ThreadService) {}
   async create(user: User) {
-    const thread = await this.threadService.create([user]);
+    const thread = await Thread.create({
+      participants: [ThreadParticipant.create({ user, status: ThreadMemberStatus.OWNER })],
+    }).save();
     const channel = Channel.create({
       thread,
       initiator: user,
-      members:[
-        ChannelMember.create({
-          user,
-          status: ChannelMemberStatus.OWNER,
-        })
-      ],
     });
     return await channel.save();
   }

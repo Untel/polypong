@@ -8,6 +8,7 @@
     <WhatsApp
       :threads="$thread.threads"
       :currentThread="$thread.current"
+      :me="$thread.current?.participants.find((e) => e.user.id === $auth.user.id)"
       @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
       @newChannel="() => $thread.newChannel()"

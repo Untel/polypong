@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 15:58:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/28 03:41:44 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,11 @@ export enum ChannelPrivacy {
 
 @Entity()
 export class Channel extends RootEntity {
-  @OneToMany(() => ChannelMember, (cm) => cm.user)
-  members: ChannelMember[];
-
-  @OneToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn()
   initiator: User;
 
-  @OneToOne(() => Thread)
+  @OneToOne(() => Thread, { cascade: true })
   @JoinColumn()
   thread: Thread;
 

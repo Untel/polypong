@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 02:36:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/28 03:47:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 import { defineStore } from 'pinia';
 import { mande, MandeError } from 'mande';
-import { Notify } from 'quasar';
+import { Dialog, Notify } from 'quasar';
 import { User } from './lobbies.store';
 import { useAuthStore } from './auth.store';
 
@@ -28,20 +28,27 @@ export interface BaseObject {
   deletedAt: Date;
 }
 
-export interface Channel extends BaseObject {
-  name: string;
-  avatar: string;
+export enum ThreadMemberStatus {
+  INVITED,
+  MEMBER,
+  ADMIN,
+  OWNER,
 }
-
 export interface Participant extends BaseObject {
   user: User;
   sawUntil: Date;
+  status: ThreadMemberStatus,
 }
 
 export interface Message extends BaseObject {
   content: string;
   contents: string[];
   sender: Participant;
+}
+
+export interface Channel extends BaseObject {
+  name: string;
+  avatar: string;
 }
 
 export interface BaseThread extends BaseObject {
@@ -95,6 +102,7 @@ export const useThreadStore = defineStore('thread', {
       if (!state._current) return null;
       return state._current;
     },
+
   },
   actions: {
     async fetchThreads() {
@@ -139,9 +147,9 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async newChannel() {
-      const thread = await channelApi.post<Thread>();
+      const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
-      this.router.push({ name: 'inbox', params: { id: thread.id } });
+      this.router.push({ name: 'inbox', params: { id: channel.thread.id } });
     },
 
     async socketAddMessage(thread: Thread, message: Message) {
@@ -149,6 +157,63 @@ export const useThreadStore = defineStore('thread', {
         this.getThread(thread.id);
       }
       this.fetchThreads();
+    },
+
+    async join() {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Leave thread',
+        message: `Are you sure you want to leave this thread ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.delete(`${id}`);
+        this._threads = this.threads.filter((t) => t.id !== id);
+        this.router.push('/inbox');
+      });
+    },
+
+    async leave() {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Leave thread',
+        message: `Are you sure you want to leave this thread ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.delete(`${id}`);
+        this.router.push('/inbox');
+        this._threads = this.threads.filter((t) => t.id !== id);
+      });
+    },
+
+    async kick(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Leave thread',
+        message: `Are you sure you want to kick ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/kick`);
+      });
+    },
+
+    async ban(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: `Ban ${participant.user.name} thread`,
+        prompt: {
+          label: 'Duration',
+          type: 'number',
+          model: '42',
+        },
+        message: `Are you sure you want to ban ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async (duration: number) => {
+        const response = await threadApi.put(`${id}/ban`, { duration });
+      });
     },
   },
 });
