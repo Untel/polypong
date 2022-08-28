@@ -6,13 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 16:13:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/26 18:51:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
 import { mande } from 'mande';
 import { useAuthStore } from './auth.store';
+import { BaseObject } from './thread.store';
 
 export const historyApi = mande('/api/match-history');
 
@@ -62,7 +63,7 @@ export interface Player {
   }
 }
 
-export interface Match{
+export interface Match extends BaseObject {
   id: number; // the match's unique Id
   players: Player[];
   finishedAt?: string;

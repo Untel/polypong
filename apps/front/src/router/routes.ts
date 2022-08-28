@@ -6,13 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/18 22:52:09 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 23:50:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import {
   RouteRecordRaw,
 } from 'vue-router';
+import { Notify } from 'quasar';
 import MinimalLayout from 'src/layouts/MinimalLayout.vue';
 // import CopyrightFooter from 'src/components/CopyrightFooter.vue';
 import { useThreadStore } from 'src/stores/thread.store';
@@ -65,8 +66,8 @@ const authRoutes: RouteRecordRaw[] = [{
   component: () => import('pages/InboxPage.vue'),
 },
 {
-  name: 'dm',
-  path: 'inbox/user/:userId',
+  name: 'chat',
+  path: 'chat/:userId',
   props: true,
   component: () => import('pages/InboxPage.vue'),
   async beforeEnter(to, from, next) {
@@ -77,10 +78,15 @@ const authRoutes: RouteRecordRaw[] = [{
       const res = await $thread.getDmThreadByUserId(+userId);
       if (res) {
         next(`/inbox/${res?.id}`);
+      } else {
+        throw new Error('wut');
       }
     } catch (e) {
-      console.log(e);
-      next('/inbox');
+      Notify.create({
+        message: `Failed to get thread ${e.message}`,
+        type: 'negative',
+      });
+      next(false);
     }
   },
 },

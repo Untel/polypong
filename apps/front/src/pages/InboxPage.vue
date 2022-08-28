@@ -10,6 +10,7 @@
       :currentThread="$thread.current"
       @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
+      @newChannel="() => $thread.newChannel()"
     >
       <q-infinite-scroll @load="() => {}" reverse>
         <!-- <template v-slot:loading>
@@ -52,7 +53,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import { Thread, Message, useThreadStore } from 'src/stores/thread.store';
 import WhatsApp from 'src/components/WhatsApp.vue';
 import { useRoute } from 'vue-router';
-import { watch } from 'vue';
+import { watch, onUnmounted } from 'vue';
 import { Notify } from 'quasar';
 import { MandeError } from 'mande';
 import moment from 'moment';
@@ -66,10 +67,9 @@ function reduceClosestMessages(messages: Message[]) {
     const lastMessage = acc[acc.length - 1];
     if (lastMessage
       && lastMessage.sender.id === message.sender.id
-      && moment(lastMessage.createdAt).diff(message.createdAt, 'minutes') < 10
+      && moment(message.createdAt).diff(moment(lastMessage.createdAt), 'minutes') < 3
     ) {
-      lastMessage.contents.push(message.content);
-      lastMessage.createdAt = message.createdAt;
+      acc[acc.length - 1] = { ...message, contents: [...lastMessage.contents, message.content] };
     } else {
       acc.push({ ...message, contents: [message.content] });
     }
@@ -96,27 +96,11 @@ function splitByDay(messages: Message[]) {
 
 watch(
   () => $route.params.id,
-  (id) => {
-    try {
-      $thread.getThread(+id);
-    } catch (e: MandeError) {
-      Notify.create({
-        message: e.message,
-        color: 'negative',
-      });
-    }
-  },
+  (id) => $thread.getThread(+id),
   { immediate: true },
 );
-
-// const dmThread = computedAsync(async () => {
-//  if ($route.params.userId) {
-//    console.log('wanna chat with : ', $route.params.userId);
-//    const userId: number = +$route.params.userId;
-//    await $thread.getThreadWithUser(userId);
-//    if ($thread._current.channel === undefined) {
-//      $route.
-//    }
-//  }
-// });
+onUnmounted(() => {
+  // eslint-disable-next-line no-underscore-dangle
+  $thread._current = null;
+});
 </script>

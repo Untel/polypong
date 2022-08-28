@@ -191,7 +191,7 @@ async function inviteToLobby(id: number) {
   // console.log(`invite to lobby ${id}`);
 }
 async function message(id: number) {
-  router.push(`/inbox/user/${id}`);
+  router.push(`/chat/${id}`);
 }
 async function stats(id: number) {
   router.push(`/profile/${id}`);

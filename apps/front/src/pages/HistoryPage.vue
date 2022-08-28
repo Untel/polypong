@@ -220,7 +220,7 @@ async function inviteToLobby(id: number) {
   console.log(`invite to lobby ${id}`);
 }
 async function message(id: number) {
-  console.log(`message ${id}`);
+  router.push(`/chat/${id}`);
 }
 async function addFriend(name: string) { await soc.send_friendship(name); }
 async function unfriend(name: string) { await soc.unsend_friendship(name); }

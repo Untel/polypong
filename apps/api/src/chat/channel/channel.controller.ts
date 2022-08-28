@@ -21,11 +21,8 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Post()
-  create(
-    @CurrentUser() user: User,
-    @Body() createChannelDto: CreateChannelDto,
-  ) {
-    return this.channelService.create(user, createChannelDto);
+  create(@CurrentUser() user: User) {
+    return this.channelService.create(user);
   }
 
   @Get()

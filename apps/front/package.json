@@ -30,7 +30,8 @@
     "vue-filepond": "^7.0.3",
     "vue-flat-surface-shader": "^1.0.5",
     "vue-i18n": "^9.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.0.0",
+    "vue3-discordpicker": "^1.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",

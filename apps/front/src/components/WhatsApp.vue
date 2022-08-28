@@ -1,4 +1,4 @@
-<style lang="scss" scoped>
+<style lang="scss">
   .q-drawer--on-top {
     z-index: 5000;
   }
@@ -10,11 +10,44 @@
   .bold > * {
     font-weight: bold !important;
   }
+
+  .vue3-emojipicker {
+    .mt-4 {
+      margin-top: 0 !important;
+    }
+    .vue3-discord-emojipicker__emojibutton.ml-3 {
+      margin-right: 10px !important;
+    }
+
+    .vue3-discord-emojipicker {
+      &.-top-4 {
+        top: -10px !important;
+      }
+      &.right-0 {
+        right: initial !important;
+      }
+      input {
+        width: auto;
+      }
+    }
+  }
+    body.body--light {
+    .vue3-emojipicker {
+
+      .bg-grey-400 {
+        background-color: $grey-1;
+      }
+      .bg-grey-600 {
+        background-color: $grey-2;
+      }
+      .text-white {
+        color: $grey-10 !important;
+      }
+    }
+  }
 </style>
 
 <template>
-  <!-- lHr lpr lfr -->
-  <!-- lHh Lpr lFf -->
   <div class="WAL position-relative bg-grey-4" :style="style">
     <q-layout view="lHh LpR lFr" class="WAL__layout shadow-3" container>
       <q-header elevated>
@@ -90,8 +123,8 @@
           <q-btn round flat icon="more_vert">
             <q-menu auto-close :offset="[110, 8]">
               <q-list style="min-width: 150px">
-                <q-item clickable>
-                  <q-item-section>New group</q-item-section>
+                <q-item clickable @click="emit('newChannel')">
+                  <q-item-section>New channel</q-item-section>
                 </q-item>
                 <q-item clickable>
                   <q-item-section>Profile</q-item-section>
@@ -177,41 +210,40 @@
         side="right"
         show-if-above
         bordered
-        v-model="rightDrawerOpen"
+        v-if="currentThread"
+        :model-value="rightDrawerOpen"
       >
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
-            <!-- <q-item
-              v-for="(thread, index) in threads"
-              :key="`thread-${index}`"
+            <q-item
+              v-for="(participant, index) in currentThread.participants"
+              :key="`participant-${index}`"
               clickable
-              v-ripple
-              @click="$emit('selectThread', thread)"
             >
               <q-item-section avatar>
                 <q-avatar>
-                  <img :src="thread.participants[0]?.user.avatar">
+                  <img :src="participant.user.avatar">
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
                 <q-item-label lines="1">
-                  {{ thread.recipient.username }}
+                  {{ participant.user.name }}
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
-                  <q-icon name="check" v-if="conversation.sent" />
-                  <q-icon name="not_interested" v-if="conversation.deleted" />
-                  {{ thread.recipient.username }}
+                  <q-icon name="check" v-if="participantSeenLastMessage(participant)" />
+                  <!-- <q-icon name="not_interested" v-if="conversation.deleted" />
+                  {{ thread.recipient.username }} -->
                 </q-item-label>
               </q-item-section>
 
-              <q-item-section side>
+              <!-- <q-item-section side>
                 <q-item-label caption>
                   {{ thread.createdAt }}
                 </q-item-label>
                 <q-icon name="keyboard_arrow_down" />
-              </q-item-section>
-            </q-item> -->
+              </q-item-section> -->
+            </q-item>
           </q-list>
         </q-scroll-area>
       </q-drawer>
@@ -227,7 +259,10 @@
 
       <q-footer>
         <q-toolbar class="bg-grey-3 row text-black">
-          <q-btn round flat icon="insert_emoticon" class="q-mr-sm" />
+          <DiscordPicker
+            @emoji="message += $event"
+            :api-key="$env.TENOR_API_KEY || ''"
+          />
           <q-input
             rounded
             outlined
@@ -246,11 +281,17 @@
 
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
-import { ref, computed, PropType } from 'vue';
-import { ActiveThread, Thread } from 'src/stores/thread.store';
+import {
+  ref,
+  computed,
+  PropType,
+  defineComponent,
+} from 'vue';
+import { ActiveThread, Thread, Participant } from 'src/stores/thread.store';
+import DiscordPicker from 'vue3-discordpicker';
 import moment from 'moment';
 
-defineProps({
+const props = defineProps({
   threads: {
     type: Array<Thread>,
     default: () => [],
@@ -261,7 +302,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['selectThread', 'sendMessage']);
+const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel']);
 
 const $q = useQuasar();
 const leftDrawerOpen = ref(false);
@@ -284,16 +325,11 @@ function threadAvatar(thread: Thread) {
   }
   return thread.recipient?.avatar || 'https://cdn.quasar.dev/img/avatar.png';
 }
-function containerStyleFn(offset) {
-  // "offset" is a Number (pixels) that refers to the total
-  // height of header + footer that occupies on screen,
-  // based on the QLayout "view" prop configuration
-
-  // this is actually what the default style-fn does in Quasar
-  return {
-    minHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
-    maxHeight: offset ? `calc(100vh - ${offset}px)` : '100vh',
-  };
+function participantSeenLastMessage(participant: Participant) {
+  const messages = props.currentThread?.messages;
+  if (!messages || !messages.length) return false;
+  const lastMessage = messages[messages.length - 1];
+  return moment(participant.sawUntil).isBefore(lastMessage.createdAt);
 }
 </script>
 
