@@ -48,6 +48,9 @@
 
               </q-item-label>
             </q-item-section>
+            <q-item-section>
+              <slot />
+            </q-item-section>
           </q-item>
         </div>
 
