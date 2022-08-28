@@ -66,6 +66,7 @@ export interface Player {
 export interface Match extends BaseObject {
   id: number; // the match's unique Id
   players: Player[];
+  finishedAt?: string;
 }
 
 export interface UserStats {

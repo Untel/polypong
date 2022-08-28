@@ -160,12 +160,12 @@ export const useSocialStore = defineStore('social', {
     },
 
     getRelByUserId(userId: number): Relationship | undefined {
-      console.log('in getRelByUserId, userId = ', userId);
+      // console.log('in getRelByUserId, userId = ', userId);
       return this.getRelationships.find((r) => r.toId === userId);
     },
 
     setSearchedRel(rel: Relationship | undefined): void {
-      console.log('in setSearchedRel, rel = ', rel);
+      // console.log('in setSearchedRel, rel = ', rel);
       this.searchedRel = rel;
     },
 

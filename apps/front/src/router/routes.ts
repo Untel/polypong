@@ -72,6 +72,7 @@ const authRoutes: RouteRecordRaw[] = [{
   component: () => import('pages/InboxPage.vue'),
   async beforeEnter(to, from, next) {
     const { userId } = to.params;
+    console.log('in guard, userId = ', userId);
     const $thread = useThreadStore();
     try {
       const res = await $thread.getDmThreadByUserId(+userId);
