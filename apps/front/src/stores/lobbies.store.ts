@@ -96,7 +96,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       }
     },
     async inviteUserToLobby(userId: number) {
-      const { socket, getIsConnected } = useAuthStore();
+      const { getIsConnected } = useAuthStore();
       if (!getIsConnected) return;
       if (!this.activeLobby) return;
       lobbiesApi.post(`${this.activeLobby.id}/invite/${userId}`);
@@ -119,7 +119,10 @@ export const useLobbiesStore = defineStore('lobbies', {
       });
     },
     async createLobby(lobbyName: string) {
-      await this.leave();
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        this.activeLobby = null;
+      }
       try {
         const newLobby: Lobby = await lobbiesApi.post('', {
           name: lobbyName,

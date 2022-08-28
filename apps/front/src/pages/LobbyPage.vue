@@ -38,6 +38,9 @@
         :canUpdate="canUpdate"
         :isHost="player.user.id === $lobbies.getActiveLobby.host.id"
         @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
+        @avatarClick="(name) => {
+          clickedUserName = clickedUserName === name ? '' : name
+        }"
       >
         <template #exit>
             <!-- leave lobby -->
@@ -112,12 +115,26 @@
         />
       </q-form>
     </section>
+
+    <section v-if="rel" class="row justify-center">
+      <!-- SEARCH RESULTS -->
+      <social-card :relname="rel.to.name"
+        @message="(id) => message(id)"
+        @stats="(id) => stats(id)"
+        @add-friend="(name) => addFriend(name)"
+        @unfriend="(name) => unfriend(name)"
+        @block="(name) => block(name)"
+        @unblock="(name) => unblock(name)"
+      />
+    </section>
   </q-page>
 </template>
 <script lang="ts">
 import { Notify } from 'quasar';
 import { PreFetchOptions } from '@quasar/app-vite';
-import { useLobbiesStore, Lobby } from 'src/stores/lobbies.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { useSocialStore } from 'src/stores/social.store';
+import { asyncComputed } from '@vueuse/core';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -138,13 +155,15 @@ export default {
   },
 };
 </script>
+
 <script lang="ts" setup>
 import {
-  defineProps, computed, ref, watch, defineComponent, onMounted, onUnmounted,
+  defineProps, computed, ref, onMounted, onUnmounted,
 } from 'vue';
 import { useAuthStore } from 'src/stores/auth.store';
 import UserCard from 'src/components/UserCard.vue';
 import { useRoute, useRouter } from 'vue-router';
+import SocialCard from 'src/components/SocialCard.vue';
 
 const props = defineProps({
   id: {
@@ -153,11 +172,10 @@ const props = defineProps({
   },
 });
 
-const $lobbies = useLobbiesStore();
-const $auth = useAuthStore();
+const $lobbies = useLobbiesStore(); const $auth = useAuthStore();
 const { getActiveLobby: lobby } = $lobbies;
-const $route = useRoute();
-const $router = useRouter();
+const $route = useRoute(); const $router = useRouter();
+const $soc = useSocialStore(); $soc.fetchRelationships();
 
 const minPlayers = computed(() => {
   const present = $lobbies.getActiveLobby?.players.length;
@@ -190,6 +208,29 @@ const botLevels = [
   { color: 'orange', label: 'medium' },
   { color: 'red', label: 'hard' },
 ];
+
+const clickedUserName = ref('');
+const rel = asyncComputed(async () => {
+  if (!clickedUserName.value) return null;
+  console.log('in computed, clickedUserName.value = ', clickedUserName.value);
+  if (clickedUserName.value === $auth.user.name) return null;
+  const ret = $soc.getRelByName(clickedUserName.value);
+  console.log('after first getRelByName, ret = ', ret);
+  if (ret) return ret;
+  await $soc.addRel(clickedUserName.value);
+  return $soc.getRelByName(clickedUserName.value);
+});
+
+async function message(id: number) {
+  $router.push(`/inbox/user/${id}`);
+}
+async function stats(id: number) {
+  $router.push(`/profile/${id}`);
+}
+async function addFriend(name: string) { await $soc.send_friendship(name); }
+async function unfriend(name: string) { await $soc.unsend_friendship(name); }
+async function block(name: string) { await $soc.send_block(name); }
+async function unblock(name: string) { await $soc.unsend_block(name); }
 
 // function isHost(id: number): boolean {
 //  if (!id) return false;

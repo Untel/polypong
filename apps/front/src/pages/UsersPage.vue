@@ -1,4 +1,5 @@
 <template>
+<pre>{{ soc.getRelationships }}</pre>
 <q-tabs
   v-model="tab" dense class="text-grey" active-color="primary"
   indicator-color="primary" narrow-indicator
