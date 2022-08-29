@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 05:14:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 18:51:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,6 @@ export class ThreadParticipant extends RootEntity {
 
   @ManyToOne(() => Thread)
   public thread: Thread;
-
-  @OneToMany(() => Message, (m) => m.sender)
-  public sentMessages: Message[];
 
   @CreateDateColumn({ type: 'timestamp' })
   public sawUntil: TS;

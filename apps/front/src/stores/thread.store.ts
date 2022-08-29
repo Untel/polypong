@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 04:43:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 22:21:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande } from 'mande';
+import { mande, MandeError } from 'mande';
 import { Dialog, Notify } from 'quasar';
 import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
@@ -42,7 +42,7 @@ export interface Participant extends BaseObject {
 export interface Message extends BaseObject {
   content: string;
   contents: string[];
-  sender: Participant;
+  sender?: User;
 }
 
 export interface Channel extends BaseObject {
@@ -136,7 +136,16 @@ export const useThreadStore = defineStore('thread', {
     async sendMessage(content: string) {
       const id = this._current?.id;
       if (!id) return;
-      const response = await threadApi.post(`${id}/message`, { content });
+      try {
+        const response = await threadApi.post(`${id}/message`, { content });
+      } catch (e: MandeError) {
+        Notify.create({
+          message: `${e.message}`,
+          caption: `${e.body.message}`,
+          icon: 'fas fa-bug',
+          color: 'negative',
+        });
+      }
     },
 
     async newDirectMessage(userId: number) {
@@ -188,7 +197,7 @@ export const useThreadStore = defineStore('thread', {
       const id = this._current?.id;
       if (!id) return;
       Dialog.create({
-        title: 'Invite',
+        title: 'Invite user',
         message: `Are you sure you want to invite ${user.name} in this thread ?`,
         cancel: true,
       }).onOk(async () => {
@@ -196,15 +205,69 @@ export const useThreadStore = defineStore('thread', {
       });
     },
 
+    async promote(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Promote user',
+        message: `Are you sure you want to promote ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/promote`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
+    async demote(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Demote user',
+        message: `Are you sure you want to demote ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/demote`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
     async kick(participant: Participant) {
       const id = this._current?.id;
       if (!id) return;
       Dialog.create({
-        title: 'Leave thread',
+        title: 'Kick user',
         message: `Are you sure you want to kick ${participant.user.name} ?`,
         cancel: true,
       }).onOk(async () => {
-        const response = await threadApi.put(`${id}/kick`);
+        const response = await threadApi.put(`${id}/kick`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
+    async mute(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Mute user',
+        message: `How much time do you want to mute ${participant.user.name} on this thread ?`,
+        options: {
+          model: 'duration',
+          type: 'radio',
+          items: [
+            { label: '10 mins', value: 10 },
+            { label: '1 hour', value: 60, color: 'accent' },
+            { label: 'Forever', value: null, color: 'negative' },
+          ],
+        },
+        cancel: true,
+      }).onOk(async (duration) => {
+        const response = await threadApi.put(`${id}/mute`, {
+          targetId: participant.user.id,
+          duration,
+        });
       });
     },
 

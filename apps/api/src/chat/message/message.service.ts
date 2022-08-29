@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/28 02:22:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 19:48:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,22 @@ export class MessageService {
     const message = new Message();
     message.content = createMessageDto.content;
     message.thread = thread;
-    message.sender = thread.participants.find((p) => p.user.id === user.id);
+    const participant = thread.participants.find((p) => p.user.id === user.id);
+    message.sender = participant.user;
     const savedMessage = await message.save();
 
-    message.sender.sawUntil = new Date();
+    participant.sawUntil = new Date();
     await message.sender.save();
+    this.notifyThread(thread, savedMessage);
+    return savedMessage;
+  }
+
+  async sendSystemMessage(thread: Thread, content: string) {
+    const message = Message.create({
+      thread,
+      content,
+    });
+    const savedMessage = await message.save();
     this.notifyThread(thread, savedMessage);
     return savedMessage;
   }

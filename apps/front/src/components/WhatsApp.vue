@@ -392,20 +392,25 @@ function actionable(target: Participant) : Action[] {
   ];
 
   if (props.me.id !== target.id) {
-    if (props.me.status === ThreadMemberStatus.ADMIN
-      && target.status < ThreadMemberStatus.ADMIN) {
+    if (props.me.status >= ThreadMemberStatus.ADMIN
+      && target.status < props.me.status) {
       actions.push(
-        { label: 'Kick', icon: { name: 'fas fa-user-large-slash' }, fn },
+        { label: 'Kick', icon: { name: 'fas fa-user-large-slash' }, fn: $thread.kick },
         { label: 'Ban', icon: { name: 'fas fa-user-large-slash' }, fn },
-        { label: 'Mute', icon: { name: 'fas fa-user-large-slash' }, fn },
+        { label: 'Mute', icon: { name: 'fas fa-user-large-slash' }, fn: $thread.mute },
       );
     }
 
-    if (props.me.status === ThreadMemberStatus.OWNER
-      && target.status < ThreadMemberStatus.ADMIN) {
-      actions.push(
-        { label: 'Promote admin', icon: { name: 'fas fa-user-shield' }, fn },
-      );
+    if (props.me.status === ThreadMemberStatus.OWNER) {
+      if (target.status < ThreadMemberStatus.ADMIN) {
+        actions.push(
+          { label: 'Promote admin', icon: { name: 'fas fa-shield-heart' }, fn: $thread.promote },
+        );
+      } else if (target.status === ThreadMemberStatus.ADMIN) {
+        actions.push(
+          { label: 'Demote admin', icon: { name: 'fas fa-shield-virus' }, fn: $thread.demote },
+        );
+      }
     }
     actions.push(
       { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn },

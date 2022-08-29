@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 23:47:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 20:16:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ export class ThreadService {
       )
       .orderBy('lastMessage.createdAt', 'DESC')
       .leftJoinAndSelect('lastMessage.sender', 'sender')
-      .leftJoinAndSelect('sender.user', 'sender_user')
       .getMany();
     return threads;
   }
@@ -73,7 +72,7 @@ export class ThreadService {
     return Thread.findOne({
       where: { id },
       // eslint-disable-next-line prettier/prettier
-      relations: ['participants.user', 'messages.sender.user', 'channel'],
+      relations: ['participants.user', 'messages.sender', 'channel'],
       order: { messages: { createdAt: 'DESC' } },
     });
   }

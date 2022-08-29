@@ -20,13 +20,14 @@ import { User } from 'src/user/user.entity';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserService } from 'src/user';
 import JwtGuard from 'src/guards/jwt.guard';
-import ThreadGuard, { CurrentThread } from './thread.guard';
+import ThreadGuard, { CurrentThread, ThreadRole } from './thread.guard';
 import ThreadAdminGuard from './thread-admin.guard';
 import { RelationshipService } from 'src/relationship';
 import { ID } from 'src/entities';
 import { Thread, ThreadMemberStatus, ThreadParticipant } from './entities';
 import { Message, MessageService } from '../message';
 import { SocketService } from 'src/socket/socket.service';
+import moment from 'moment';
 
 @UseGuards(JwtGuard)
 @Controller('thread')
@@ -71,8 +72,13 @@ export class ThreadController {
   }
 
   @Get(':id/invite/:userId')
-  @UseGuards(ThreadGuard, ThreadAdminGuard)
-  async invite(@CurrentThread() thread: Thread, @Param('userId') userId: ID) {
+  @ThreadRole(ThreadMemberStatus.ADMIN)
+  @UseGuards(ThreadGuard)
+  async invite(
+    @CurrentUser() inviter: User,
+    @CurrentThread() thread: Thread,
+    @Param('userId') userId: ID
+  ) {
     const user = await this.userService.findById(+userId);
     if (!user)
       throw new UnprocessableEntityException('This user does not exist');
@@ -81,28 +87,62 @@ export class ThreadController {
       thread,
       status: ThreadMemberStatus.MEMBER,
     }).save();
-    this.socketService.getUserSocket(user.id)?.emit('thread-invite', thread);
+    this.messageService.sendSystemMessage(thread, `${user.name} was invited by ${inviter.name}`);
   }
 
-  @Get(':id/kick/:targetId')
-  @UseGuards(ThreadGuard, ThreadAdminGuard)
-  async kick(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
+  @Put(':id/kick')
+  @ThreadRole(ThreadMemberStatus.ADMIN)
+  @UseGuards(ThreadGuard)
+  async kick(
+    @CurrentUser() user: User,
+    @CurrentThread() thread,
+    @Req() req
+  ) {
     const target: ThreadParticipant = req.target;
-    await target.softRemove();
+    await target.remove();
+    this.messageService.sendSystemMessage(thread, `${target.user.name} was kicked by ${user.name}`);
   }
 
-  @Get(':id/promote/:targetId')
-  @UseGuards(ThreadGuard, ThreadAdminGuard)
-  async promote(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
+  @Put(':id/promote')
+  @ThreadRole(ThreadMemberStatus.OWNER)
+  @UseGuards(ThreadGuard)
+  async promote(
+    @CurrentUser() user: User,
+    @CurrentThread() thread,
+    @Req() req
+  ) {
     const target: ThreadParticipant = req.target;
-    await target.softRemove();
+    target.status = ThreadMemberStatus.ADMIN;
+    await target.save();
+    this.messageService.sendSystemMessage(thread, `${target.user.name} was promoted to admin by ${user.name}`);
   }
 
-  @Get(':id/demote/:targetId')
-  @UseGuards(ThreadGuard, ThreadAdminGuard)
+  @Put(':id/mute')
+  @ThreadRole(ThreadMemberStatus.ADMIN)
+  @UseGuards(ThreadGuard)
+  async mute(
+    @CurrentUser() user: User,
+    @CurrentThread() thread,
+    @Req() req
+  ) {
+    const target: ThreadParticipant = req.target;
+    const duration = +req.body.duration;
+    const endDate = !duration ? moment(8.64e15) : moment().add(duration, 'minutes');
+    target.isMuteUntil = endDate.toDate();
+    await target.save();
+    this.messageService.sendSystemMessage(thread, `${target.user.name} was mute for ${
+      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
+    } by ${user.name}`);
+  }
+
+  @Put(':id/demote')
+  @ThreadRole(ThreadMemberStatus.OWNER)
+  @UseGuards(ThreadGuard)
   async demote(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
     const target: ThreadParticipant = req.target;
-    await target.softRemove();
+    target.status = ThreadMemberStatus.MEMBER;
+    await target.save();
+    this.messageService.sendSystemMessage(thread, `${target.user.name} was demoted to member by ${user.name}`);
   }
 
   @Delete(':id')
@@ -110,7 +150,6 @@ export class ThreadController {
   async leave(
     @CurrentUser() user: User,
     @CurrentThread() thread: Thread,
-    @Req() req,
   ) {
     const me = thread.participants.find((p) => p.user.id === user.id);
     // Si l'owner leave, on transfert le status d'owner
@@ -129,7 +168,7 @@ export class ThreadController {
       } else {
         // Si personne n'est eligible, on ferme le thread
         this.logger.log(`Thread ${thread.id} => Closing thread`);
-        return await thread.softRemove();
+        return await thread.remove();
       }
     }
     this.logger.log(`Thread ${thread.id} => ${me.user.name} left`);
@@ -137,7 +176,7 @@ export class ThreadController {
       thread,
       content: `${me.user.name} left`,
     }).save();
-    await me.softRemove();
+    await me.remove();
     await this.messageService.notifyThread(thread, leaveMessage);
   }
 }

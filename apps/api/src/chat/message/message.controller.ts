@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -14,8 +16,9 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import JwtGuard from 'src/guards/jwt.guard';
 import ThreadGuard, { CurrentThread } from '../thread/thread.guard';
 import { CurrentUser } from 'src/decorators';
-import { Thread } from '../thread';
+import { Thread, ThreadParticipant } from '../thread';
 import { User } from 'src/user';
+import { TS } from 'src/entities';
 
 @UseGuards(JwtGuard, ThreadGuard)
 @Controller('thread/:id/message')
@@ -27,8 +30,12 @@ export class MessageController {
     @CurrentThread() thread: Thread,
     @CurrentUser() user: User,
     @Body() createMessageDto: CreateMessageDto,
+    @Req() req,
   ) {
-    console.log('Add to thread', thread.id, createMessageDto);
+    const me: ThreadParticipant = req.me;
+    if (me.isMuteUntil > new TS()) {
+      throw new UnauthorizedException('You are muted');
+    }
     return this.messageService.create(thread, user, createMessageDto);
   }
 
