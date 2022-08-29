@@ -396,7 +396,7 @@ function actionable(target: Participant) : Action[] {
       && target.status < props.me.status) {
       actions.push(
         { label: 'Kick', icon: { name: 'fas fa-person-through-window' }, fn: $thread.kick },
-        { label: 'Ban', icon: { name: 'fas fa-hand-middle-finger' }, fn },
+        { label: 'Ban', icon: { name: 'fas fa-hand-middle-finger' }, fn: $thread.ban },
         { label: 'Mute', icon: { name: 'fas fa-head-side-cough-slash' }, fn: $thread.mute },
       );
     }

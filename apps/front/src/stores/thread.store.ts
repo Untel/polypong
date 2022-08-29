@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 22:21:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 22:48:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,10 +276,14 @@ export const useThreadStore = defineStore('thread', {
       if (!id) return;
       Dialog.create({
         title: `Ban ${participant.user.name} thread`,
-        prompt: {
-          label: 'Duration',
-          type: 'number',
-          model: '42',
+        options: {
+          model: 'duration',
+          type: 'radio',
+          items: [
+            { label: '10 mins', value: 10 },
+            { label: '1 hour', value: 60, color: 'accent' },
+            { label: 'Forever', value: null, color: 'negative' },
+          ],
         },
         message: `Are you sure you want to ban ${participant.user.name} ?`,
         cancel: true,
