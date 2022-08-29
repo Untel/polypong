@@ -122,6 +122,7 @@ export class LobbyController {
         lobby.game.resume();
       });
     }
+    this.socketService.getUserSocket(user.id)?.join(lobby.roomId);
     return lobby.game.netScheme;
   }
 

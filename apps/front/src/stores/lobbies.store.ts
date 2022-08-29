@@ -45,7 +45,7 @@ export interface Lobby {
   spectatorsMax: number;
   description: string;
   isPrivate?: boolean;
-  isStarted: number;
+  isStarted: boolean;
   host: User
 }
 
@@ -120,7 +120,11 @@ export const useLobbiesStore = defineStore('lobbies', {
     },
     async createLobby(lobbyName: string) {
       if (this.activeLobby) {
-        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        try {
+          await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        } catch (e) {
+          console.log(e);
+        }
         this.activeLobby = null;
       }
       try {

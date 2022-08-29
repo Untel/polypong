@@ -64,7 +64,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   @Expose()
   public get isStarted() {
-    return this.game && this.game.players.size;
+    return !!this.game;
   }
 
   @Exclude()
@@ -155,7 +155,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
       this.playersMax = opts.playersMax;
       this.fillBots();
     }
-    this.sock.emit('lobby_change', this.id);
+    //this.sock.emit('lobby_change', this.id);
+    this.socketServer.sockets.emit('lobby_change', this.id);
   }
 
   fillBots() {

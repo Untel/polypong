@@ -203,6 +203,7 @@ export class LobbyService {
 //        name: 'profile',
 //      });
       lobby.sock.emit('gameOver', lobby.id);
+      this.socketService.socketio.emit('other_game_over', lobby.id);
       lobby.match.finishedAt = TS.ts();
       lobby.match = await lobby.match.save();
       console.log('Updated match', lobby.match);

@@ -147,18 +147,30 @@ $auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
 
 $auth.socket.on('gameOver', async (lobbyId: number) => {
   console.log(`GAMEOVER : ${lobbyId} has been closed`);
-  if (isActiveIn(lobbyId)) {
-    $lobbies.activeLobby = null;
-    router.push('/lobbies');
+  try {
+    await $lobbies.leave();
+  } catch (e) {
+    console.log(e);
   }
+  router.push('/lobbies');
+  $lobbies.activeLobby = null;
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+});
+
+$auth.socket.on('other_game_over', async (lobbyId: number) => {
   await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
 
 $auth.socket.on('start', async (lobbyId: number) => {
-  console.log(`GAMESTART : ${lobbyId} has started`);
+  console.log(`GAMESTART : your game in ${lobbyId} has started`);
   if (isActiveIn(lobbyId)) {
     router.push(`/lobby/${lobbyId}/game`);
   }
+});
+
+$auth.socket.on('game_start', async (lobbyId: number) => {
+  console.log(`OTHER GAMESTART : ${lobbyId} has started`);
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
 
 $auth.socket.on('lobby_change', async (lobbyId: number) => {
