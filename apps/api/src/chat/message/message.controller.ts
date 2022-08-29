@@ -19,6 +19,7 @@ import { CurrentUser } from 'src/decorators';
 import { Thread, ThreadParticipant } from '../thread';
 import { User } from 'src/user';
 import { TS } from 'src/entities';
+import moment from 'moment';
 
 @UseGuards(JwtGuard, ThreadGuard)
 @Controller('thread/:id/message')
@@ -33,8 +34,12 @@ export class MessageController {
     @Req() req,
   ) {
     const me: ThreadParticipant = req.me;
-    if (me.isMuteUntil > new TS()) {
-      throw new UnauthorizedException('You are muted');
+    if (me.isMuteUntil) {
+      const m = moment(me.isMuteUntil).diff(moment(), 'seconds');
+      const dur = moment.duration(m, 'seconds');
+      throw new UnauthorizedException(
+        `You are muted for ${dur.humanize()} remaining`,
+      );
     }
     return this.messageService.create(thread, user, createMessageDto);
   }
