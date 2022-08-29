@@ -1,18 +1,29 @@
+<style lang="scss">
+  .q-field--outlined .q-field__control:before {
+    border: none;
+  }
+</style>
+
 <template>
   <q-select
-    filled
+    :label="($attrs.label as string) || 'Search User'"
+    dense
+    rounded
+    outlined
+    class="full-width"
     :model-value="null"
     use-input
     hide-selected
     input-debounce="300"
-    label="Search user"
     :options="options"
     option-label="name"
-    hint="Search users to invite"
     @filter="filterFn"
     ref="select"
     @update:model-value="$emit('select', $event)"
   >
+    <template v-slot:prepend>
+      <q-icon name="search" />
+    </template>
     <template v-slot:option="{ opt, itemProps }">
       <SearchUserRow
         v-bind="itemProps"

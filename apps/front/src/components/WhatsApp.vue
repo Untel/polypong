@@ -150,8 +150,8 @@
           />
         </q-toolbar>
 
-        <q-toolbar class="bg-grey-2">
-          <q-input
+        <q-toolbar class="search-toolbar bg-grey-2">
+          <!-- <q-input
             rounded
             outlined
             dense
@@ -162,7 +162,8 @@
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
-          </q-input>
+          </q-input> -->
+          <SearchUser />
         </q-toolbar>
 
         <q-scroll-area style="height: calc(100% - 100px)">
@@ -214,10 +215,12 @@
           <q-list>
             <template v-if="currentThread.channel && me.status === ThreadMemberStatus.OWNER">
               <q-item-label header>Channel Settings</q-item-label>
-              <SearchUser
-                :excludes="currentThread.participants.map(p => p.user)"
-                @select="$thread.invite"
-                />
+              <q-item>
+                <SearchUser
+                  :excludes="currentThread.participants.map(p => p.user)"
+                  @select="$thread.invite"
+                  />
+              </q-item>
               <q-separator />
             </template>
             <q-item-label header>Participants</q-item-label>

@@ -158,6 +158,7 @@ onUnmounted(() => {
   socket.off('gameUpdate');
   socket.off('mapChange');
   socket.off('powers');
+  $game.$reset();
 });
 
 </script>
