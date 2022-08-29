@@ -18,6 +18,7 @@
         name="MatchMaking"
         subhead="Find the regular opponent"
         avatar="/matchmaking.png"
+        :isCreated=true
       >
         <q-circular-progress
           show-value
@@ -32,7 +33,7 @@
         :id="-1"
         name="Create"
         subhead="Create a new lobby"
-        joinText="Create"
+        :isCreated=false
         @joinLobby="createLobby"
       >
         <q-input label="Lobby name" dense filled v-model="lobbyName"/>
@@ -46,10 +47,15 @@
         :name="lobby.name || 'Unamed lobby'"
         :subhead="`${lobby.host.name}'s party`"
         :avatar="lobby.host.avatar"
+        :isCreated=true
         :is-private="lobby.isPrivate"
-        :join-text="lobby.isStarted ? 'Spectate' : 'Join'"
+        :is-started="lobby.isStarted"
+        :is-full="lobby.players.length === lobby.playersMax"
         @joinLobby="router.push({ name: 'lobby', params: { id: lobby.id } })"
+        @joinGame="router.push({ name: 'game', params: { id: lobby.id } })"
+        @spectate="router.push({ name: 'game', params: { id: lobby.id } })"
       >
+      lobby.players.length = {{ lobby.players.length }}
         <q-circular-progress
           show-value
           class="text-accent q-ma-md"
@@ -58,7 +64,7 @@
           :thickness=".2"
           size="50px"
           :indeterminate="!!lobby.isStarted"
-          :value="lobby.isStarted || lobby.players.length"
+          :value="lobby.players.length"
           :max="lobby.playersMax"
         >
           <span>{{ lobby.players.length }}</span>
@@ -117,6 +123,7 @@ async function createLobby() {
   const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
     console.log('New lobby is', newLobby, newLobby.id);
+    await $lobbies.fetchAndJoinLobby(newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
   } else {
     console.log('Error lulz');

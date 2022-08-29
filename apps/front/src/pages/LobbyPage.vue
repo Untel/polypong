@@ -107,7 +107,9 @@
         <q-input
           :model-value="$lobbies.getActiveLobby?.name"
           label="Lobby name"
-          @change="(evt) => $lobbies.updateLobby(lobby.id, { name: evt })"
+          @change="(evt) => $lobbies.updateLobby(
+            $lobbies.getActiveLobby.id, { name: evt }
+          )"
           :disable="!canUpdate"
           name="name"
           lazy-rules
@@ -135,6 +137,7 @@ import { PreFetchOptions } from '@quasar/app-vite';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { asyncComputed } from '@vueuse/core';
+import { MandeError } from 'mande';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -145,10 +148,10 @@ export default {
     const id = currentRoute.params.id as string;
     try {
       await $lobbies.fetchAndJoinLobby(id);
-    } catch (err) {
+    } catch (err: MandeError) {
       Notify.create({
         type: 'negative',
-        message: 'Error while joining lobby',
+        message: err.body.message || 'Error while joining lobby',
       });
       redirect({ name: 'lobbies' });
     }
@@ -184,24 +187,37 @@ const minPlayers = computed(() => {
 });
 
 const canUpdate = computed(() => {
-  const can = lobby.host.id === $auth.user.id;
-  return can;
+  if ($lobbies.activeLobby) {
+    if ($lobbies.activeLobby.host.id === $auth.user.id) return true;
+  }
+  return false;
 });
 
-onMounted(() => {
-  const id = +($route.params.id as string);
-  $auth.socket.on('lobby_change', (evt) => {
-    $lobbies.fetchCurrentLobby(id);
-  });
-  $auth.socket.on('start', (evt) => {
-    $router.push(`/lobby/${id}/game`);
-  });
-});
+// onMounted(async () => {
+//   const id = +($route.params.id as string);
+//   $auth.socket.on('start', (lobbyId: number) => {
+//     console.log(`GAMESTART : ${lobbyId} has started`);
+//     $router.push(`/lobby/${id}/game`);
+//   });
+//   $auth.socket.on('lobby_change', async (evt) => {
+//     $lobbies.fetchLobbies();
+//   });
+// });
 
-onUnmounted(() => {
-  $auth.socket.off('start');
-  $auth.socket.off('lobby_change');
-});
+// $auth.socket.on('start', async (lobbyId: number) => {
+//  console.log(`GAMESTART : ${lobbyId} has started`);
+//  if ($lobbies.activeLobby?.id === lobbyId) {
+//    router.push(`/lobby/${lobbyId}/game`);
+//  } else {
+//    await $lobbies.fetchAndJoinLobby(lobbyId);
+//    router.push(`/lobby/${lobbyId}/game`);
+//  }
+// });
+
+// onUnmounted(() => {
+//   $auth.socket.off('start');
+//   $auth.socket.off('lobby_change');
+// });
 
 const botLevels = [
   { color: 'green', label: 'easy' },

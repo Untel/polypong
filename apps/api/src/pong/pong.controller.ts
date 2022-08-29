@@ -39,7 +39,7 @@ export class PongController {
   }
 
   @Get('restart')
-  restart(@CurrentLobby() lobby: Lobby) {
-    return lobby.start().netScheme;
+  async restart(@CurrentLobby() lobby: Lobby) {
+    return (await lobby.start()).netScheme;
   }
 }

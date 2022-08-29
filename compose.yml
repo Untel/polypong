@@ -23,6 +23,8 @@ services:
     depends_on:
       - api
       - front
+    logging:
+      driver: none
 
   # Front end server for development, should not exist in production version
   # Built on top of Quasar

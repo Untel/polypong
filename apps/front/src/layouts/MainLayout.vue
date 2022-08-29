@@ -45,14 +45,15 @@
 </template>
 
 <script lang="ts" setup>
+import { usePageLeave } from '@vueuse/core';
 import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
-import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { lobbiesApi, useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
 import { defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 defineComponent({
   components: {
@@ -67,7 +68,7 @@ const $auth = useAuthStore();
 const soc = useSocialStore();
 const $thread = useThreadStore();
 const $lobbies = useLobbiesStore();
-const router = useRouter();
+const router = useRouter(); const route = useRoute();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
 $auth.socket.on('block', () => {
@@ -77,39 +78,128 @@ $auth.socket.on('block', () => {
 
 $thread.fetchThreads();
 
+function isActiveIn(lobbyId: number): boolean {
+  if ($lobbies.activeLobby) {
+    if ($lobbies.activeLobby.id === lobbyId) return true;
+  }
+  return false;
+}
+
 $auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: number) => {
   $lobbies.invitedBy(fromId, fromName, lobbyId);
 });
+
 $auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: number) => {
-  // console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
-  if (fromId === $auth.user.id) {
-    $lobbies.activeLobby = null;
-    router.push('/lobbies');
+  console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
+  if ($lobbies.activeLobby) {
+    if ($lobbies.activeLobby.id === lobbyId) {
+      if ($auth.user.id === fromId) {
+        $lobbies.activeLobby = null;
+        router.push('/lobbies');
+      } else {
+        await $lobbies.fetchCurrentLobby($lobbies.activeLobby.id);
+      }
+    }
   }
-  if ($lobbies.getActiveLobby) {
-    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
-  }
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
+
 $auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId: number) => {
-  // console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
-  if ($lobbies.getActiveLobby) {
-    await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
+  console.log(`LEAVER : ${fromName} has left the lobby ${lobbyId}`);
+  if (isActiveIn(lobbyId)) {
+    if ($auth.user.id === fromId) {
+      $lobbies.activeLobby = null;
+    }
   }
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
+
+$auth.socket.on('userJoinedLobby', async (userId: number, lobbyId: number) => {
+  console.log(`USERJOIN : ${userId} has joined the lobby ${lobbyId}`);
+  if (isActiveIn(lobbyId)) {
+    $lobbies.fetchCurrentLobby(lobbyId);
+  }
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+});
+
 $auth.socket.on('lobbyDeleted', async (lobbyId: number) => {
-  // console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
-  await $lobbies.fetchLobbies();
+  console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
+  if (isActiveIn(lobbyId)) {
+    $lobbies.activeLobby = null;
+    if (window.location.pathname === `/lobby/${lobbyId}`) {
+      router.push('/lobbies');
+    }
+  }
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
-$auth.socket.on('lobbyCreated', async (lobbyId: number) => {
-  // console.log(`LOBBYCREATED : ${lobbyId} has been created`);
-  await $lobbies.fetchLobbies();
+
+$auth.socket.on('lobbyCreated', async (lobbyId: number, Nplayers: number) => {
+  console.log(`LOBBYCREATED : ${lobbyId} has been created, it has ${Nplayers} players`);
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
+
 $auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
-  // console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
-  if ($lobbies.getActiveLobby) {
+  console.log(`LOBBYNEWHOST : ${lobbyId} has a new host`);
+  if (isActiveIn(lobbyId)) {
     await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
   }
 });
+
+$auth.socket.on('gameOver', async (lobbyId: number) => {
+  console.log(`GAMEOVER : ${lobbyId} has been closed`);
+  try {
+    await $lobbies.leave();
+  } catch (e) {
+    console.log(e);
+  }
+  router.push('/lobbies');
+  $lobbies.activeLobby = null;
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+});
+
+$auth.socket.on('other_game_over', async (lobbyId: number) => {
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+});
+
+$auth.socket.on('start', async (lobbyId: number) => {
+  console.log(`GAMESTART : your game in ${lobbyId} has started`);
+  if (isActiveIn(lobbyId)) {
+    router.push(`/lobby/${lobbyId}/game`);
+  }
+});
+
+$auth.socket.on('game_start', async (lobbyId: number) => {
+  console.log(`OTHER GAMESTART : ${lobbyId} has started`);
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+});
+
+$auth.socket.on('lobby_change', async (lobbyId: number) => {
+  console.log('LOBBY_CHANGE - lobbyId = ', lobbyId);
+  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+  if (isActiveIn(lobbyId)) {
+    await $lobbies.fetchCurrentLobby(lobbyId);
+  }
+});
+
+$auth.socket.onAny((eventName, ...args) => {
+  console.log('EMIT - ', eventName, ', ARGS :', ...args);
+});
+
+// onMounted(async () => {
+//   const id = +($route.params.id as string);
+//   $auth.socket.on('start', (lobbyId: number) => {
+//     console.log(`GAMESTART : ${lobbyId} has started`);
+//     $router.push(`/lobby/${id}/game`);
+//   });
+//   $auth.socket.on('lobby_change', async (evt) => {
+//     $lobbies.fetchLobbies();
+//   });
+// });
+
+// onUnmounted(() => {
+//   $auth.socket.off('start');
+//   $auth.socket.off('lobby_change');
+// });
 
 // onMounted(() => {
 //   auth.socket.on('online', ({ name, type }) => {

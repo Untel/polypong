@@ -61,6 +61,7 @@ export default {
     } = ctx;
     const $game = useGameStore();
     const id = currentRoute.params.id as string;
+    console.log('in GamePage prefetch, id = ', id);
     try {
       await $game.fetchCurrentGame(id);
     } catch (err) {
