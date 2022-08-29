@@ -115,7 +115,12 @@ export class LobbyService {
 
   async userLeaveLobby(lobby: Lobby, user: User) {
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('userLeaveLobby - user = ', user, ', lobby.id = ', lobby.id);
+    this.logger.log(
+      'userLeaveLobby - user = ',
+      user,
+      ', lobby.id = ',
+      lobby.id,
+    );
     const socketOfLeaver = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       this.removePlayer(lobby.id, user);
@@ -142,7 +147,12 @@ export class LobbyService {
 
   async kickUserFromLobby(lobby: Lobby, user: User) {
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('kickUserFromLobby - user = ', user, ', lobby.id = ', lobby.id);
+    this.logger.log(
+      'kickUserFromLobby - user = ',
+      user,
+      ', lobby.id = ',
+      lobby.id,
+    );
     const socketOfLeaver = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       lobby.sock.emit('lobbyKick', user.id, user.name, lobby.id);

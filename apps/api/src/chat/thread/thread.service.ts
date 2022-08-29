@@ -73,11 +73,7 @@ export class ThreadService {
     return Thread.findOne({
       where: { id },
       // eslint-disable-next-line prettier/prettier
-      relations: [
-        'participants.user',
-        'messages.sender.user',
-        'channel',
-      ],
+      relations: ['participants.user', 'messages.sender.user', 'channel'],
       order: { messages: { createdAt: 'DESC' } },
     });
   }

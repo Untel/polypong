@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "precommit": "yarn lint & yarn format & yarn index",
     "index": "cti create ./src -b -f -e templates node_modules @types typings",
     "prebuild": "rimraf dist",
     "build": "nest build",

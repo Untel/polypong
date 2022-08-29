@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/28 04:29:35 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 04:47:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Thread } from 'src/chat/thread/entities/thread.entity';
-import { ThreadMemberStatus } from './entities/thread-participant.entity';
 
 @Injectable()
 export default class ThreadGuard implements CanActivate {
@@ -47,13 +46,6 @@ export default class ThreadGuard implements CanActivate {
       throw new UnauthorizedException(
         'You are not allowed to access this thread',
       );
-    }
-    const meInThread = thread.participants.find((p) => p.user.id === userId);
-    if (meInThread.status === ThreadMemberStatus.INVITED) {
-      meInThread.status = ThreadMemberStatus.MEMBER;
-      meInThread.joinedAt = new Date();
-      const saved = await meInThread.save();
-      req.meInThread = saved;
     }
     req.thread = thread;
     return true;

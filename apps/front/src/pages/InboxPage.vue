@@ -1,10 +1,14 @@
 <style scoped lang="scss">
-  .wrapper {
+  .column-reverse {
+    display: flex;
+    flex-direction: column-reverse;
+    max-height: 100%;
+    overflow: scroll;
   }
 </style>
 
 <template>
-  <q-page class="row">
+  <q-page>
     <WhatsApp
       :threads="$thread.threads"
       :currentThread="$thread.current"
@@ -13,38 +17,40 @@
       @sendMessage="(m: string) => $thread.sendMessage(m)"
       @newChannel="() => $thread.newChannel()"
     >
-      <q-infinite-scroll @load="() => {}" reverse>
-        <!-- <template v-slot:loading>
-          <div class="row justify-center q-my-md">
-            <q-spinner color="primary" name="dots" size="40px" />
-          </div>
-        </template> -->
+      <q-page padding class="column-reverse">
+        <q-infinite-scroll @load="() => {}" reverse>
+          <!-- <template v-slot:loading>
+            <div class="row justify-center q-my-md">
+              <q-spinner color="primary" name="dots" size="40px" />
+            </div>
+          </template> -->
 
-        <template v-if="$thread.current">
-          <q-chat-message
-            label="This is the begining of your conversation"
-          />
-          <template
-            v-for="({ day, messages }) in splitByDay($thread.current.messages)"
-            :key="`day-${day}`"
-          >
+          <template v-if="$thread.current">
             <q-chat-message
-              :label="day"
+              label="This is the begining of your conversation"
             />
-            <q-chat-message
-              v-for="(message) in reduceClosestMessages(messages)"
-              :key="`message-${message.id}`"
-              :text="message.contents"
-              :name="message.sender.user.name"
-              :avatar="message.sender.user.avatar"
-              :sent="message.sender.user.id === $auth.user.id"
-              :stamp="moment(message.createdAt).fromNow()"
-            />
+            <template
+              v-for="({ day, messages }) in splitByDay($thread.current.messages)"
+              :key="`day-${day}`"
+            >
+              <q-chat-message
+                :label="day"
+              />
+              <q-chat-message
+                v-for="(message) in reduceClosestMessages(messages)"
+                :key="`message-${message.id}`"
+                :text="message.contents"
+                :name="message.sender.user.name"
+                :avatar="message.sender.user.avatar"
+                :sent="message.sender.user.id === $auth.user.id"
+                :stamp="moment(message.createdAt).fromNow()"
+              />
 
+            </template>
           </template>
-        </template>
-        <p v-else>Select a thread to start with</p>
-    </q-infinite-scroll>
+          <p v-else>Select a thread to start with</p>
+        </q-infinite-scroll>
+      </q-page>
     </WhatsApp>
   </q-page>
 </template>

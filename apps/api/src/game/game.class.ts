@@ -61,10 +61,7 @@ export default class Game {
   }
 
   addBall() {
-    const ball = new Ball(
-      this,
-      this.map.center.clone(),
-    );
+    const ball = new Ball(this, this.map.center.clone());
     // ball.setAngle(angleToRadians(this.map.angles[1]));
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     ball.findTarget();
@@ -197,7 +194,7 @@ export default class Game {
         console.log('Ded ball');
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
-//          if (e !== ball) e.stop();
+          //          if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
         this.reduce(ball.target.wall);

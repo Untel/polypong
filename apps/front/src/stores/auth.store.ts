@@ -24,6 +24,10 @@ export const twoFactorApi = mande('/api/2fa');
 export const onlineApi = mande('/api/online');
 export const userApi = mande('/api/user');
 
+export interface UserCon extends User {
+  status: 'online' | 'ingame' | 'inlobby';
+}
+
 type AuthState = {
   socket: Socket,
   user: User,
@@ -46,6 +50,18 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     getIsConnected: (state) => state.socket.connected,
     getConnectedUsers: (state) => state.connectedUsers,
+    connectedUserMap: (state) => state.connectedUsers
+      .reduce((acc: Record<string, UserCon>, user: User) => {
+        acc[user.id] = {
+          ...user,
+          status: user.inGame
+            ? 'ingame'
+            : user.inLobby
+              ? 'inlobby'
+              : 'online',
+        };
+        return acc;
+      }, {}),
     getUser: (state) => state.user,
   },
   actions: {
@@ -166,5 +182,10 @@ export const useAuthStore = defineStore('auth', {
       this.socket.close();
     },
 
+    async searchUsers(term: string) {
+      const results = await userApi.get<User[]>('/search', { query: { term } });
+      console.log('Search results', results);
+      return results;
+    },
   },
 });

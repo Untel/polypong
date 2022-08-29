@@ -60,8 +60,10 @@ export class ThreadController {
     if (!to) throw new UnprocessableEntityException('This user does not exist');
     const rel = await this.relService.findRel(user, to);
     if (rel) {
-      if (rel.block_received) throw new UnauthorizedException('This user has blocked you');
-      if (rel.block_sent) throw new UnauthorizedException('You have blocked this user');
+      if (rel.block_received)
+        throw new UnauthorizedException('This user has blocked you');
+      if (rel.block_sent)
+        throw new UnauthorizedException('You have blocked this user');
     }
     if (to.id === user.id)
       throw new UnprocessableEntityException("You can't thread with yourself");
@@ -70,28 +72,21 @@ export class ThreadController {
 
   @Get(':id/invite/:userId')
   @UseGuards(ThreadGuard, ThreadAdminGuard)
-  async invite(
-    @CurrentThread() thread: Thread,
-    @Param('userId') userId: ID,
-  ) {
+  async invite(@CurrentThread() thread: Thread, @Param('userId') userId: ID) {
     const user = await this.userService.findById(+userId);
-    if (!user) throw new UnprocessableEntityException('This user does not exist');
+    if (!user)
+      throw new UnprocessableEntityException('This user does not exist');
     await ThreadParticipant.create({
       user,
       thread,
-      joinedAt: null,
-      status: ThreadMemberStatus.INVITED,
+      status: ThreadMemberStatus.MEMBER,
     }).save();
-    this.socketService.getUserSocket(user.id)?.send('thread-invite', thread);
+    this.socketService.getUserSocket(user.id)?.emit('thread-invite', thread);
   }
 
   @Get(':id/kick/:targetId')
   @UseGuards(ThreadGuard, ThreadAdminGuard)
-  async kick(
-    @CurrentUser() user: User,
-    @CurrentThread() thread,
-    @Req() req,
-  ) {
+  async kick(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
     const target: ThreadParticipant = req.target;
     await target.softRemove();
   }
@@ -108,8 +103,7 @@ export class ThreadController {
     if (me.status === ThreadMemberStatus.OWNER) {
       // Les participants sont auto sort by status, donc les admins seront eligible en premier
       const others = thread.participants.filter((p) => p.user.id !== user.id);
-      // Les invite ne sont pas eligible
-      if (others[0] && others[0].status > ThreadMemberStatus.INVITED) {
+      if (others[0]) {
         others[0].status = ThreadMemberStatus.OWNER;
         const content = `${me.user.name} gave the ownership to ${others[0].user.name}`;
         this.logger.log(`Thread ${thread.id} => ${content}`);
@@ -127,7 +121,7 @@ export class ThreadController {
     this.logger.log(`Thread ${thread.id} => ${me.user.name} left`);
     const leaveMessage = await Message.create({
       thread,
-      content: `${me.user.name} left`
+      content: `${me.user.name} left`,
     }).save();
     await me.softRemove();
     await this.messageService.notifyThread(thread, leaveMessage);

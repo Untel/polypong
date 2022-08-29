@@ -25,6 +25,7 @@ import {
   UseInterceptors,
   Get,
   Res,
+  Query,
 } from '@nestjs/common';
 // import * as Express from 'multer';
 import JwtGuard from 'src/guards/jwt.guard';
@@ -52,9 +53,12 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
-  @Get('search/:term')
-  async search(@Param('term') term: string): Promise<User[]> {
-    return this.userService.search(term);
+  @Get('search')
+  async search(@Query('term') term: string): Promise<User[]> {
+    if (term) {
+      return await this.userService.search(term);
+    }
+    return [];
   }
 
   /**

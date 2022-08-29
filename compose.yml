@@ -16,6 +16,8 @@ services:
       - NGINX_SSL_PORT=${PORT_RANGE:-443}
       - DOMAIN_NAME=${DOMAIN_NAME:-localhost}
       - SSL_PATH=/etc/ssl/certs/${DOMAIN_NAME:-localhost}
+    logging:
+      driver: none
     networks:
       - proxy
     depends_on:

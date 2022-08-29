@@ -241,8 +241,8 @@ export class UserService {
   async search(term: string) {
     return User.find({
       where: {
-        name: Like(`${term}`),
-        email: Like(`${term}`),
+        name: Like(`%${term}%`),
+        email: Like(`%${term}%`),
       },
     });
   }

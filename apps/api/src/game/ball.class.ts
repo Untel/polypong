@@ -87,7 +87,7 @@ export class Ball extends Circle {
     for (let i = 0; i < walls.length; i++) {
       const wall: Wall = walls[i];
       if (ignorePreviousWall && wall === this.target?.wall) {
-        continue ;
+        continue;
       }
       const edge: Line = wall.line;
       const [[x3, y3], [x4, y4]] = edge;

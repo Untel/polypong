@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/28 03:35:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 02:13:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ import {
 } from 'typeorm';
 
 export enum ThreadMemberStatus {
-  INVITED,
   MEMBER,
   ADMIN,
   OWNER,
@@ -60,13 +59,9 @@ export class ThreadParticipant extends RootEntity {
   @Column({ type: 'timestamp', nullable: true })
   public isBanUntil: TS;
 
-
   @Column({ type: 'timestamp', nullable: true })
   public isMuteUntil: TS;
 
   @Column({ type: 'timestamp', nullable: true })
   public hasMuteUntil: TS;
-
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
-  public joinedAt: TS;
 }

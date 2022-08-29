@@ -6,16 +6,16 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/28 03:47:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 04:43:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande, MandeError } from 'mande';
+import { mande } from 'mande';
 import { Dialog, Notify } from 'quasar';
-import { User } from './lobbies.store';
+import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
 
 export const threadApi = mande('/api/thread');
@@ -29,7 +29,6 @@ export interface BaseObject {
 }
 
 export enum ThreadMemberStatus {
-  INVITED,
   MEMBER,
   ADMIN,
   OWNER,
@@ -137,9 +136,7 @@ export const useThreadStore = defineStore('thread', {
     async sendMessage(content: string) {
       const id = this._current?.id;
       if (!id) return;
-      console.log('Sendiiiing msg', content);
       const response = await threadApi.post(`${id}/message`, { content });
-      console.log('Message sent', response);
     },
 
     async newDirectMessage(userId: number) {
@@ -164,7 +161,7 @@ export const useThreadStore = defineStore('thread', {
       if (!id) return;
       Dialog.create({
         title: 'Leave thread',
-        message: `Are you sure you want to leave this thread ?`,
+        message: 'Are you sure you want to leave this thread ?',
         cancel: true,
       }).onOk(async () => {
         const response = await threadApi.delete(`${id}`);
@@ -178,12 +175,24 @@ export const useThreadStore = defineStore('thread', {
       if (!id) return;
       Dialog.create({
         title: 'Leave thread',
-        message: `Are you sure you want to leave this thread ?`,
+        message: 'Are you sure you want to leave this thread ?',
         cancel: true,
       }).onOk(async () => {
         const response = await threadApi.delete(`${id}`);
         this.router.push('/inbox');
         this._threads = this.threads.filter((t) => t.id !== id);
+      });
+    },
+
+    async invite(user: User) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Invite',
+        message: `Are you sure you want to invite ${user.name} in this thread ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.get(`${id}/invite/${user.id}`);
       });
     },
 

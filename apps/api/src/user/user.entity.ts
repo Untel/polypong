@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/15 01:10:24 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 16:15:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 00:52:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ export class User extends NoIdBaseEntity {
 
   @OneToMany(() => Relationship, (relationship) => relationship.to)
   related: Relationship[];
+
+  relationWithMe: Relationship;
 
   @Type(() => UserMatch)
   @OneToMany(() => UserMatch, (match) => match.user)

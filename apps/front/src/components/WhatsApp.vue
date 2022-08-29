@@ -2,10 +2,6 @@
   .q-drawer--on-top {
     z-index: 5000;
   }
-  .column-reverse {
-    display: flex;
-    flex-direction: column-reverse;
-  }
 
   .bold > * {
     font-weight: bold !important;
@@ -218,7 +214,10 @@
           <q-list>
             <template v-if="currentThread.channel && me.status === ThreadMemberStatus.OWNER">
               <q-item-label header>Channel Settings</q-item-label>
-
+              <SearchUser
+                :excludes="currentThread.participants.map(p => p.user)"
+                @select="$thread.invite"
+                />
               <q-separator />
             </template>
             <q-item-label header>Participants</q-item-label>
@@ -282,15 +281,13 @@
       </q-drawer>
 
       <q-page-container full-height container class="bg-grey-2">
-        <q-page class="column-reverse" padding>
           <slot />
           <q-page-scroller reverse position="top" :scroll-offset="20" :offset="[0, 18]">
             <q-btn fab icon="keyboard_arrow_down" color="primary" />
           </q-page-scroller>
-        </q-page>
       </q-page-container>
 
-      <q-footer>
+      <q-footer v-if="currentThread">
         <q-toolbar class="bg-grey-3 row text-black">
           <DiscordPicker
             @emoji="message += $event"
@@ -318,7 +315,6 @@ import {
   ref,
   computed,
   PropType,
-  defineComponent,
 } from 'vue';
 import {
   ActiveThread,
@@ -327,8 +323,9 @@ import {
   ThreadMemberStatus,
   useThreadStore,
 } from 'src/stores/thread.store';
-import DiscordPicker from 'vue3-discordpicker';
 import moment from 'moment';
+import DiscordPicker from 'vue3-discordpicker';
+import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
   threads: {
@@ -428,8 +425,7 @@ function actionable(target: Participant) : Action[] {
 
 function status(participant: Participant) {
   if (participant.status === ThreadMemberStatus.OWNER) return 'Owner';
-  if (participant.status === ThreadMemberStatus.ADMIN) return 'Owner';
-  if (participant.status === ThreadMemberStatus.INVITED) return 'Pending';
+  if (participant.status === ThreadMemberStatus.ADMIN) return 'Admin';
   return '';
 }
 </script>

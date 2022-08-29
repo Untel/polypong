@@ -14,7 +14,13 @@ import { Expose } from 'class-transformer';
 import { Channel } from 'src/chat/channel/entities/channel.entity';
 import { Message } from 'src/chat/message';
 import { NoIdBaseEntity, RootEntity } from 'src/entities/root.entity';
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ThreadParticipant } from './thread-participant.entity';
 
 @Entity()

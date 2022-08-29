@@ -30,12 +30,16 @@ export default class ThreadAdminGuard implements CanActivate {
 
     if (!me) throw new UnprocessableEntityException('something went wrong');
     else if (me.status < ThreadMemberStatus.ADMIN)
-    throw new UnauthorizedException('Only admins can do that');
+      throw new UnauthorizedException('Only admins can do that');
 
     if (req.params.targetId) {
-      const target = thread.participants.find((e) => e.user.id === (+req.params.targetId));
+      const target = thread.participants.find(
+        (e) => e.user.id === +req.params.targetId,
+      );
       if (target && target.status >= me.status)
-        throw new UnauthorizedException('You can t do this action to an administrator');
+        throw new UnauthorizedException(
+          'You can t do this action to an administrator',
+        );
       req.target = target;
     }
     return true;

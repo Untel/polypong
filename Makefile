@@ -29,7 +29,14 @@ enter:
 log:
 	$(COMPOSE) logs $(c)
 
+precommit:
+	yarn --cwd ./apps/api index &
+	yarn --cwd ./apps/api format &
+	yarn --cwd ./apps/api lint &
+	yarn --cwd ./apps/front lint &
+# yarn --cwd ./apps/api precommit
 run:
 	$(COMPOSE) up --build $(c)
 
-.PHONY: all build clear install config $(FRONT) $(API) $(COMMON) $(DB) $(NGINX)
+
+.PHONY: all build clear down run log config precommit

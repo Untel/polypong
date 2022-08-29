@@ -1,13 +1,11 @@
 import { Paddle } from './paddle.class';
 import { Ball } from './ball.class';
 import { Wall } from './wall.class';
-import {
-  lineLength,
-  Line,
-} from 'geometric';
+import { lineLength, Line } from 'geometric';
 import { LobbyBot } from './lobbyBot.class';
 export class Bot {
-  botPaddle: Paddle;s
+  botPaddle: Paddle;
+  s;
   maxSpeed: number;
   edge: Line;
   wall: Wall;
