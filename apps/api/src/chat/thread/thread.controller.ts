@@ -91,6 +91,20 @@ export class ThreadController {
     await target.softRemove();
   }
 
+  @Get(':id/promote/:targetId')
+  @UseGuards(ThreadGuard, ThreadAdminGuard)
+  async promote(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
+    const target: ThreadParticipant = req.target;
+    await target.softRemove();
+  }
+
+  @Get(':id/demote/:targetId')
+  @UseGuards(ThreadGuard, ThreadAdminGuard)
+  async demote(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
+    const target: ThreadParticipant = req.target;
+    await target.softRemove();
+  }
+
   @Delete(':id')
   @UseGuards(ThreadGuard)
   async leave(

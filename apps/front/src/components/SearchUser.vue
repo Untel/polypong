@@ -16,8 +16,8 @@
     hide-selected
     input-debounce="300"
     :options="options"
-    option-label="name"
     @filter="filterFn"
+    @filter-abort="() => {}"
     ref="select"
     @update:model-value="$emit('select', $event)"
   >
