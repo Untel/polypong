@@ -40,8 +40,8 @@ export class LobbiesController {
   }
 
   @Post()
-  createLobby(@CurrentUser() user, @Body('name') name): Lobby {
-    const lobby = this.lobbyService.createLobby(user, name);
+  async createLobby(@CurrentUser() user, @Body('name') name): Promise<Lobby> {
+    const lobby = await this.lobbyService.createLobby(user, name);
     return lobby;
   }
 

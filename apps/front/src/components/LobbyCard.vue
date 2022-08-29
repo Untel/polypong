@@ -32,9 +32,9 @@
       <q-separator />
       <q-card-actions class="q-pa-md row q-gutter-md">
         <q-btn
-          class="col" @click="emit('joinLobby')"
-          :icon="!props.isPrivate ? 'sports_tennis' : 'lock'"
-          :label="isInsideLobby ? 'Current Lobby' : props.joinText"
+          class="col" @click="click()"
+          :icon="btnIcon"
+          :label="buttonLabel"
           :color="btnColor"
           />
       </q-card-actions>
@@ -45,6 +45,7 @@
 <script lang="ts" setup>
 import { computed, PropType, ref } from 'vue';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { number } from '@intlify/core-base';
 
 const $lobbies = useLobbiesStore();
 
@@ -77,7 +78,16 @@ const props = defineProps({
   host: {
     type: Object as PropType<any>,
   },
+  isCreated: {
+    type: Boolean, default: false,
+  },
   isPrivate: {
+    type: Boolean,
+  },
+  isStarted: {
+    type: Boolean,
+  },
+  isFull: {
     type: Boolean,
   },
 });
@@ -89,13 +99,44 @@ const isInsideLobby = computed(() => {
   return false;
 });
 
+const buttonLabel = computed(() => {
+  if (!props.isCreated) return 'Create';
+  if (isInsideLobby.value) return 'Current';
+  if (props.isStarted) return 'Spectate';
+  if (props.isFull) return 'Full';
+  return 'Join';
+});
+
 const btnColor = computed(() => {
   if (props.isPrivate) return 'negative';
   if (isInsideLobby.value) return 'accent';
+  if (props.isStarted) return 'teal-9';
+  if (props.isFull) return 'warning';
   return 'primary';
 });
 
-const emit = defineEmits(['joinLobby']);
+const btnIcon = computed(() => {
+  if (props.isStarted) return 'fa-solid fa-eye';
+  if (props.isPrivate) return 'lock';
+  if (isInsideLobby.value) return 'fa-solid fa-house-chimney-user';
+  if (props.isFull) return 'fa-solid fa-hand';
+  return 'fa-solid fa-table-tennis-paddle-ball';
+});
+
+const emit = defineEmits(['joinLobby', 'joinGame', 'spectate']);
+
+function click() {
+  if (props.isStarted) {
+    if (isInsideLobby.value) {
+      emit('joinGame');
+    } else {
+      emit('spectate');
+    }
+  } else if (!props.isFull) {
+    emit('joinLobby');
+  }
+}
+
 const val = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
 const password = ref<string>();

@@ -56,7 +56,7 @@ export class LobbyController {
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
   ): Promise<Lobby> {
-    this.lobbyService.userJoinLobby(lobby, user);
+    await this.lobbyService.userJoinLobby(lobby, user);
     return lobby;
   }
 
@@ -104,8 +104,9 @@ export class LobbyController {
 
   @Get('start')
   @UseGuards(IsLobbyHost)
-  startGame(@CurrentLobby() lobby: Lobby): boolean {
-    lobby.start();
+  async startGame(@CurrentLobby() lobby: Lobby): Promise<boolean> {
+    await lobby.start();
+    this.socketService.socketio.emit('game_start', lobby.id);
     this.socketService.socketio
       .except(lobby.roomId)
       .emit('online', { type: 'game_start' });
@@ -121,6 +122,7 @@ export class LobbyController {
         lobby.game.resume();
       });
     }
+    this.socketService.getUserSocket(user.id)?.join(lobby.roomId);
     return lobby.game.netScheme;
   }
 

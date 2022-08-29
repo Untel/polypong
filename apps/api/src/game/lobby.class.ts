@@ -64,7 +64,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   @Expose()
   public get isStarted() {
-    return this.game && this.game.players.size;
+    return !!this.game;
   }
 
   @Exclude()
@@ -95,23 +95,29 @@ export default class Lobby implements ILobby, ILobbyConfig {
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
   removePlayer(player: Player | User) {
-    this.players.delete(player.id);
+    if (player) {
+      if (this.players.has(player.id)) {
+        this.players.delete(player.id);
+      }
+    }
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
-  start(): Game {
+  async start(): Promise<Game> {
     if (this.game) {
       this.game.stop();
       delete this.game;
     }
     this.game = new Game(this);
-    this.sock.emit('start');
-    this.createMatchEntry();
+    await this.createMatchEntry();
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('ABOUT TO EMIT THE START EVENT TO LOBBY, this.id = ', this.id);
+    this.sock.emit('start', this.id);
     this.logger.log(`Starting new game ${this.name}`);
     return this.game;
   }
@@ -127,7 +133,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   async createPlayerRank(player: Player, rank: number) {
     const um = new UserMatch();
     um.user = player.user;
-    um.rank = rank;
+    um.rank = rank + 1;
     um.match = this.match;
     const added = await um.save();
     console.log('Added rank', added, 'for', player.user.name);
@@ -149,7 +155,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
       this.playersMax = opts.playersMax;
       this.fillBots();
     }
-    this.sock.emit('lobby_change', null);
+    //this.sock.emit('lobby_change', this.id);
+    this.socketServer.sockets.emit('lobby_change', this.id);
   }
 
   fillBots() {
