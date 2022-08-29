@@ -56,7 +56,7 @@ export class LobbyController {
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
   ): Promise<Lobby> {
-    this.lobbyService.userJoinLobby(lobby, user);
+    await this.lobbyService.userJoinLobby(lobby, user);
     return lobby;
   }
 
@@ -106,10 +106,7 @@ export class LobbyController {
   @UseGuards(IsLobbyHost)
   async startGame(@CurrentLobby() lobby: Lobby): Promise<boolean> {
     await lobby.start();
-    lobby.players.forEach((p) => {
-      const playerSocket = this.socketService.getUserSocket(p.user.id);
-      playerSocket?.emit('start', lobby.id);
-    });
+    this.socketService.socketio.emit('game_start', lobby.id);
     this.socketService.socketio
       .except(lobby.roomId)
       .emit('online', { type: 'game_start' });

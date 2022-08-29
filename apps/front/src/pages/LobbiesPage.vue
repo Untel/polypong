@@ -47,9 +47,12 @@
         :subhead="`${lobby.host.name}'s party`"
         :avatar="lobby.host.avatar"
         :is-private="lobby.isPrivate"
-        :join-text="lobby.isStarted ? 'Spectate' : 'Join'"
+        :join-text="lobby.isStarted ? 'Spectate' :
+          lobby.players.length === lobby.playersMax ? 'Full' : 'Join'
+        "
         @joinLobby="router.push({ name: 'lobby', params: { id: lobby.id } })"
       >
+      lobby.players.length = {{ lobby.players.length }}
         <q-circular-progress
           show-value
           class="text-accent q-ma-md"
@@ -117,6 +120,7 @@ async function createLobby() {
   const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
     console.log('New lobby is', newLobby, newLobby.id);
+    await $lobbies.fetchAndJoinLobby(newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
   } else {
     console.log('Error lulz');

@@ -95,13 +95,17 @@ export default class Lobby implements ILobby, ILobbyConfig {
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
   removePlayer(player: Player | User) {
-    this.players.delete(player.id);
+    if (player) {
+      if (this.players.has(player.id)) {
+        this.players.delete(player.id);
+      }
+    }
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
   async start(): Promise<Game> {
@@ -111,6 +115,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
     }
     this.game = new Game(this);
     await this.createMatchEntry();
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('ABOUT TO EMIT THE START EVENT TO LOBBY, this.id = ', this.id);
     this.sock.emit('start', this.id);
     this.logger.log(`Starting new game ${this.name}`);
     return this.game;
@@ -149,7 +155,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
       this.playersMax = opts.playersMax;
       this.fillBots();
     }
-    this.sock.emit('lobby_change', null);
+    this.sock.emit('lobby_change', this.id);
   }
 
   fillBots() {

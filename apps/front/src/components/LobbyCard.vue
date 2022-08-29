@@ -33,7 +33,11 @@
       <q-card-actions class="q-pa-md row q-gutter-md">
         <q-btn
           class="col" @click="emit('joinLobby')"
-          :icon="!props.isPrivate ? 'sports_tennis' : 'lock'"
+          :icon="props.isPrivate ? 'lock'
+            : isInsideLobby ? 'fa-solid fa-house-chimney-user'
+              : props.joinText === 'Full' ? 'fa-solid fa-hand'
+                : 'fa-solid fa-table-tennis-paddle-ball'
+          "
           :label="isInsideLobby ? 'Current Lobby' : props.joinText"
           :color="btnColor"
           />
@@ -45,6 +49,7 @@
 <script lang="ts" setup>
 import { computed, PropType, ref } from 'vue';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { number } from '@intlify/core-base';
 
 const $lobbies = useLobbiesStore();
 
@@ -92,6 +97,7 @@ const isInsideLobby = computed(() => {
 const btnColor = computed(() => {
   if (props.isPrivate) return 'negative';
   if (isInsideLobby.value) return 'accent';
+  if (props.joinText === 'Full') return 'warning';
   return 'primary';
 });
 
