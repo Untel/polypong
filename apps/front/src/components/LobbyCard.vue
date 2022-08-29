@@ -110,7 +110,7 @@ const buttonLabel = computed(() => {
 const btnColor = computed(() => {
   if (props.isPrivate) return 'negative';
   if (isInsideLobby.value) return 'accent';
-  if (props.isStarted) return 'secondary';
+  if (props.isStarted) return 'teal-9';
   if (props.isFull) return 'warning';
   return 'primary';
 });
