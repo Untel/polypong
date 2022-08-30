@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 21:28:36 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/30 22:02:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ export class Finalist {
 export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
-  nBall = 1;
   players: Map<number, Player> = new Map();
   bots: Bot[];
   paddles: Paddle[] = [];
@@ -111,7 +110,7 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nBall; i++) this.addBall(true);
+    for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
   }
