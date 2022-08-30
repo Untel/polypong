@@ -66,7 +66,7 @@
 <script lang="ts" setup>
 import { useSettingsStore } from 'src/stores/settings';
 import BgSocial from 'src/components/BgSocial.vue';
-import { Notify, useQuasar } from 'quasar';
+import { Dialog, Notify, useQuasar } from 'quasar';
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -75,27 +75,31 @@ const $route = useRoute();
 const settings = useSettingsStore();
 
 const disabled = computed(() => {
-  const dis = $route.name === 'inbox' && $q.screen.width < 850;
+  const dis = $route.name === 'inbox' && $q.screen.lt.md;
   return dis;
 });
 
 const askPermission = (DeviceOrientationEvent as any).requestPermission;
+async function tryPermission() {
+  try {
+    if (await askPermission() !== 'granted') throw new Error('No perm granted');
+  } catch (error: Error) {
+    const dismiss = Dialog.create({
+      message: `Require gyroscope permissions: ${error.message}`,
+    }).onDismiss(async () => {
+      if (await askPermission() !== 'granted') {
+        Notify.create({
+          type: 'negative',
+          message: 'Fail to ask permissions, please reload your browser.',
+        });
+      }
+    });
+  }
+}
 
 onMounted(async () => {
   if ($q.platform.is.mobile) {
-    try {
-      if (await askPermission() !== 'granted') throw new Error();
-    } catch (error: Error) {
-      const dismiss = Notify.create({
-        message: 'You need browser permissions',
-        timeout: 0,
-        actions: [{
-          label: 'Ask',
-          color: 'danger',
-          handler: () => { askPermission().finaly(dismiss); },
-        }],
-      });
-    }
+    tryPermission();
   }
 });
 </script>

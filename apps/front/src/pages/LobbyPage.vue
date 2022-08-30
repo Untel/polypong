@@ -251,7 +251,7 @@ const rel = asyncComputed(async () => {
 });
 
 async function message(id: number) {
-  $router.push(`/inbox/user/${id}`);
+  $router.push(`/chat/${id}`);
 }
 async function stats(id: number) {
   $router.push(`/profile/${id}`);

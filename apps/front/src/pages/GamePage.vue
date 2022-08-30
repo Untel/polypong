@@ -122,7 +122,7 @@ onMounted(async () => {
     balls.value = b;
   });
   socket.on('object', (index, name, item) => {
-    console.log("index ", index, " name ", name, " item ", item);
+    console.log('index ', index, ' name ', name, ' item ', item);
     switch (name) {
       case 'ball':
         balls.value[index] = item;

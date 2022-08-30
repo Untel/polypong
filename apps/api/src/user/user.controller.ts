@@ -25,12 +25,15 @@ import {
   UseInterceptors,
   Get,
   Res,
+  Query,
 } from '@nestjs/common';
 // import * as Express from 'multer';
 import JwtGuard from 'src/guards/jwt.guard';
 import { UserService } from './user.service';
 import { updateUserDto } from './dtos/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { User } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -45,8 +48,17 @@ export class UserController {
    */
   @UseGuards(JwtGuard)
   @Get('user')
-  async getUser(@Req() req): Promise<any> {
-    return this.userService.findById(req.user.id);
+  async getUser(@CurrentUser() user): Promise<User> {
+    return user;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('search')
+  async search(@Query('term') term: string): Promise<User[]> {
+    if (term) {
+      return await this.userService.search(term);
+    }
+    return [];
   }
 
   /**

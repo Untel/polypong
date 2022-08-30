@@ -10,7 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable, Inject, forwardRef, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import Lobby, { LobbyId } from 'src/game/lobby.class';
 import Player from 'src/game/player.class';
 
@@ -120,7 +126,12 @@ export class LobbyService {
 
   async userLeaveLobby(lobby: Lobby, user: User) {
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('userLeaveLobby - user = ', user, ', lobby.id = ', lobby.id);
+    this.logger.log(
+      'userLeaveLobby - user = ',
+      user,
+      ', lobby.id = ',
+      lobby.id,
+    );
     const socketOfLeaver = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       this.removePlayer(lobby.id, user);
@@ -130,7 +141,12 @@ export class LobbyService {
       );
       // check if the lobby still exists
       // eslint-disable-next-line prettier/prettier
-      this.socketService.socketio.emit('lobbyLeaver', user.id, user.name, lobby.id);
+      this.socketService.socketio.emit(
+        'lobbyLeaver',
+        user.id,
+        user.name,
+        lobby.id,
+      );
       if (lobby.players.size === 0) {
         this.logger.log('userLeaveLobby - no more players, closing lobby');
         await this.closeLobby(lobby);
@@ -149,7 +165,12 @@ export class LobbyService {
 
   async kickUserFromLobby(lobby: Lobby, user: User) {
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('kickUserFromLobby - user = ', user, ', lobby.id = ', lobby.id);
+    this.logger.log(
+      'kickUserFromLobby - user = ',
+      user,
+      ', lobby.id = ',
+      lobby.id,
+    );
     const socketOfLeaver = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       lobby.sock.emit('lobbyKick', user.id, user.name, lobby.id);
@@ -209,9 +230,9 @@ export class LobbyService {
     console.log('Stored match', lobby.match);
     if (lobby.game) {
       lobby.game.stop();
-//      lobby.sock.emit('redirect', {
-//        name: 'profile',
-//      });
+      //      lobby.sock.emit('redirect', {
+      //        name: 'profile',
+      //      });
       lobby.sock.emit('gameOver', lobby.id);
       this.socketService.socketio.emit('other_game_over', lobby.id);
       lobby.match.finishedAt = TS.ts();

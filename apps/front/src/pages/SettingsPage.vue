@@ -120,7 +120,7 @@ function factoryFn(file: any): Promise<any> {
 // logout
 function logOut(): void {
   authStore.killws();
-  localStorage.setItem('token', '');
+  localStorage.removeItem('token');
   router.push({ name: 'login' });
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 17:44:00 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/30 22:02:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ export class Finalist {
 export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
-  nBall = 1;
   players: Map<number, Player> = new Map();
   bots: Bot[];
   paddles: Paddle[] = [];
@@ -77,19 +76,15 @@ export default class Game {
     this.newRound(7);
   }
 
-  logger = new Logger('Game')
+  logger = new Logger('Game');
 
-  addBall(hotBall : boolean = false) {
-    const ball = new Ball(
-      this,
-      this.map.center.clone(),
-    );
+  addBall(hotBall = false) {
+    const ball = new Ball(this, this.map.center.clone());
     // ball.setAngle(angleToRadians(this.map.angles[1]));
     this.balls.push(ball);
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
-    ball.findTarget();    
-    if (hotBall)
-      ball.unFreeze();
+    ball.findTarget();
+    if (hotBall) ball.unFreeze();
     console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
   }
 
@@ -115,7 +110,7 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nBall; i++) this.addBall(true);
+    for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
   }
@@ -145,10 +140,14 @@ export default class Game {
     console.log('New round', this.players.size, this.bots.length);
     this.paused = true;
     // eslint-disable-next-line prettier/prettier
-    this.logger.log(`&&&&&&&& RESUME this.isStopped = ${this.isStopped} &&&&&&&`);
+    this.logger.log(
+      `&&&&&&&& RESUME this.isStopped = ${this.isStopped} &&&&&&&`,
+    );
     if (this.isStopped) this.run();
     // eslint-disable-next-line prettier/prettier
-    this.logger.log(`&&&&&&&& After this.run, this.isStopped = ${this.isStopped} &&&&&&&`);
+    this.logger.log(
+      `&&&&&&&& After this.run, this.isStopped = ${this.isStopped} &&&&&&&`,
+    );
     clearInterval(this.sayInterval);
     this.sayInterval = setInterval(() => {
       timer -= 1;
@@ -168,24 +167,24 @@ export default class Game {
   }
 
   async runPhysics() {
-    this.balls.forEach( async (ball) => {
+    this.balls.forEach(async (ball) => {
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
       ]);
 
-      const testDist : number = lineLength(
-        [[this.map.center.x, this.map.center.y],
-        this.map.edges[0][0]]
-        );
+      const testDist: number = lineLength([
+        [this.map.center.x, this.map.center.y],
+        this.map.edges[0][0],
+      ]);
       // console.log("dtc vs dist ", dtc, " ", testDist)
       // console.log("edges ", this.map.edges[0])
 
-        if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
+      if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
         console.log('Ded ball :', dtc);
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
-//          if (e !== ball) e.stop();
+          //          if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
         if (this.nPlayers === 2) {
@@ -206,18 +205,19 @@ export default class Game {
           wall.line[1][1],
           ball.position.x,
           ball.position.y,
-          ball.radius,[0,0]
+          ball.radius,
+          [0, 0],
         );
         if (test === true) {
           ball.bounceTargetWall();
           // console.log('wall collision');
         }
       } else {
-        let ret = [0,0]; 
-        const test = GameTools.wallBallCollision(wall.paddle.line, ball,ret);
+        const ret = [0, 0];
+        const test = GameTools.wallBallCollision(wall.paddle.line, ball, ret);
         if (test === true) {
           ball.bouncePaddle(wall.paddle, ret);
-          // console.log('paddle collision at,', ret);    
+          // console.log('paddle collision at,', ret);
           ball.closestP[0] = ret[0];
           ball.closestP[1] = ret[1];
         }
@@ -255,24 +255,28 @@ export default class Game {
     this.logger.log('player = ', player.user.email);
     this.stop();
     // eslint-disable-next-line prettier/prettier
-    this.logger.log(`BEFORE players.delete, players.size = ${this.players.size}`);
+    this.logger.log(
+      `BEFORE players.delete, players.size = ${this.players.size}`,
+    );
     this.logger.log(`BEFORE players.delete, nPlayers = ${this.nPlayers}`);
     this.players.delete(player.user.id);
     // eslint-disable-next-line prettier/prettier
-    this.logger.log(`AFTER players.delete, players.size = ${this.players.size}`);
+    this.logger.log(
+      `AFTER players.delete, players.size = ${this.players.size}`,
+    );
     this.logger.log(`AFTER players.delete, nPlayers = ${this.nPlayers}`);
     await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
-//    if (this.ended) {
-//      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
-//      this.logger.log('=====================================');
-//      return await this.lobby.service.closeLobby(this.lobby);
-//    }
-//    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
-//    this.logger.log('1lala');
-//    this.newRound();
-//    this.logger.log('2lele');
-//    this.run();
-//    this.logger.log('3lolo');
+    //    if (this.ended) {
+    //      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
+    //      this.logger.log('=====================================');
+    //      return await this.lobby.service.closeLobby(this.lobby);
+    //    }
+    //    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
+    //    this.logger.log('1lala');
+    //    this.newRound();
+    //    this.logger.log('2lele');
+    //    this.run();
+    //    this.logger.log('3lolo');
   }
 
   public async reduce(wall: Wall) {
@@ -281,11 +285,11 @@ export default class Game {
     if (wall.bot) {
       this.logger.log('REDUCING BOT');
       this.bots = this.bots.filter((b) => b !== wall.bot);
-//      if (this.ended) {
-//        this.killPlayer([...this.players.values()][0]);
-//      } else {
-//        this.newRound();
-//      }
+      //      if (this.ended) {
+      //        this.killPlayer([...this.players.values()][0]);
+      //      } else {
+      //        this.newRound();
+      //      }
     } else if (wall.player) {
       this.logger.log('REDUCING PLAYER');
       await this.killPlayer(wall.player);
@@ -303,24 +307,25 @@ export default class Game {
     }
     return this.newRound();
 
-//    if (this.ended) {
-//      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
-//      this.logger.log('=====================================');
-//      return await this.lobby.service.closeLobby(this.lobby);
-//    }
-//    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
-//    this.logger.log('1lala');
-//    this.newRound();
-//    this.logger.log('2lele');
-//    this.run();
-//    this.logger.log('3lolo');
+    //    if (this.ended) {
+    //      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
+    //      this.logger.log('=====================================');
+    //      return await this.lobby.service.closeLobby(this.lobby);
+    //    }
+    //    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
+    //    this.logger.log('1lala');
+    //    this.newRound();
+    //    this.logger.log('2lele');
+    //    this.run();
+    //    this.logger.log('3lolo');
   }
 
   private setFinalists() {
     this.logger.log('~~~~~~~~~~~~~~setFinalists~~~~~~~~~~~~~~');
     const humans = [...this.players.values()];
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('humans = '); console.log(humans);
+    this.logger.log('humans = ');
+    console.log(humans);
     humans.forEach((p, index) => {
       const f = new Finalist(true, index, this.finalePoints);
       this.finalists.push(f);
@@ -388,10 +393,12 @@ export default class Game {
       this.setFinalists();
     }
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('Finalists : '); console.log(this.finalists);
+    this.logger.log('Finalists : ');
+    console.log(this.finalists);
     await this.decrementHp(wall);
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('After Decrement, Finalists : '); console.log(this.finalists);
+    this.logger.log('After Decrement, Finalists : ');
+    console.log(this.finalists);
     if (this.ended) {
       if (this.players.size === 1) {
         this.logger.log('$$$$$$ LONE PLAYER LEFT $$$$$');
@@ -500,7 +507,7 @@ export default class Game {
       powerObj.name,
       Object.keys(powerObj),
       typeof powerObj,
-    ); 
+    );
     // this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
     this.socket.emit(
       'powers',

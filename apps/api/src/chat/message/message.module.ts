@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:17 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/23 15:14:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/28 02:20:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,6 @@ import { SocketModule } from 'src/socket/socket.module';
   ],
   controllers: [MessageController],
   providers: [MessageService],
+  exports: [MessageService],
 })
 export class MessageModule {}

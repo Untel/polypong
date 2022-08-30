@@ -78,7 +78,9 @@ export class LobbyController {
   ): Promise<void> {
     const userToBeKicked = await this.userService.findById(+userId);
     // eslint-disable-next-line prettier/prettier
-    this.logger.log(`@Get('kick/:userId), userToBeKicked.name = ${userToBeKicked.name}`);
+    this.logger.log(
+      `@Get('kick/:userId), userToBeKicked.name = ${userToBeKicked.name}`,
+    );
     return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
   }
 
@@ -124,7 +126,7 @@ export class LobbyController {
   }
 
   @Get('game')
-//  @UseGuards(InLobbyGuard)
+  //  @UseGuards(InLobbyGuard)
   gameInfos(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
     const player = lobby.game.players.get(user.id);
     if (player?.afkInterval) {

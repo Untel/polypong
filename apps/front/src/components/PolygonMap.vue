@@ -170,17 +170,17 @@ function formatLine(line: Line) {
 function pickColor(pow : Power) : string {
   switch (pow.name) {
     case 'add-ball':
-      return "blue";
+      return 'blue';
     case 'reduce-enemies':
-      return "red";
+      return 'red';
     case 'upsize-allies':
-      return "green";
+      return 'green';
     case 'see-trajectories':
-      return "yellow";
+      return 'yellow';
     case 'sadi-slap':
-      return "pink";
+      return 'pink';
     default:
-      return "black";
+      return 'black';
   }
 }
 

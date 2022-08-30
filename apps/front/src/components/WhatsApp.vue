@@ -2,10 +2,6 @@
   .q-drawer--on-top {
     z-index: 5000;
   }
-  .column-reverse {
-    display: flex;
-    flex-direction: column-reverse;
-  }
 
   .bold > * {
     font-weight: bold !important;
@@ -154,8 +150,8 @@
           />
         </q-toolbar>
 
-        <q-toolbar class="bg-grey-2">
-          <q-input
+        <q-toolbar class="search-toolbar bg-grey-2">
+          <!-- <q-input
             rounded
             outlined
             dense
@@ -166,7 +162,8 @@
             <template v-slot:prepend>
               <q-icon name="search" />
             </template>
-          </q-input>
+          </q-input> -->
+          <SearchUser />
         </q-toolbar>
 
         <q-scroll-area style="height: calc(100% - 100px)">
@@ -212,9 +209,21 @@
         bordered
         v-if="currentThread"
         :model-value="rightDrawerOpen"
+        class="bg-grey-3"
       >
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
+            <template v-if="currentThread.channel && me.status === ThreadMemberStatus.OWNER">
+              <q-item-label header>Channel Settings</q-item-label>
+              <q-item>
+                <SearchUser
+                  :excludes="currentThread.participants.map(p => p.user)"
+                  @select="$thread.invite"
+                  />
+              </q-item>
+              <q-separator />
+            </template>
+            <q-item-label header>Participants</q-item-label>
             <q-item
               v-for="(participant, index) in currentThread.participants"
               :key="`participant-${index}`"
@@ -232,32 +241,56 @@
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
                   <q-icon name="check" v-if="participantSeenLastMessage(participant)" />
-                  <!-- <q-icon name="not_interested" v-if="conversation.deleted" />
-                  {{ thread.recipient.username }} -->
+                  <template
+                    v-if="participant.status === ThreadMemberStatus.OWNER"
+                  >
+                    <q-icon
+                      name="fas fa-crown"
+                      color="yellow"
+                    />
+                    Owner
+                  </template>
+                  <template
+                    v-else-if="participant.status === ThreadMemberStatus.ADMIN"
+                  >
+                    <q-icon
+                      name="fas fa-shield-dog"
+                      color="blue"
+                    />
+                    Admin
+                  </template>
                 </q-item-label>
               </q-item-section>
-
-              <!-- <q-item-section side>
-                <q-item-label caption>
-                  {{ thread.createdAt }}
-                </q-item-label>
-                <q-icon name="keyboard_arrow_down" />
-              </q-item-section> -->
+              <q-menu>
+                <q-list>
+                  <q-item
+                    v-for="action in actionable(participant)"
+                    clickable
+                    :key="`p-${participant.id}-${action.label}`"
+                    @click="action.fn(participant)"
+                  >
+                    <q-item-section avatar>
+                      <q-icon v-bind="action.icon || { name: 'action' }"></q-icon>
+                    </q-item-section>
+                    <q-item-section>
+                      {{ action.label }}
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
             </q-item>
           </q-list>
         </q-scroll-area>
       </q-drawer>
 
       <q-page-container full-height container class="bg-grey-2">
-        <q-page class="column-reverse" padding>
           <slot />
           <q-page-scroller reverse position="top" :scroll-offset="20" :offset="[0, 18]">
             <q-btn fab icon="keyboard_arrow_down" color="primary" />
           </q-page-scroller>
-        </q-page>
       </q-page-container>
 
-      <q-footer>
+      <q-footer v-if="currentThread">
         <q-toolbar class="bg-grey-3 row text-black">
           <DiscordPicker
             @emoji="message += $event"
@@ -280,16 +313,22 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuasar } from 'quasar';
+import { QIconProps, useQuasar } from 'quasar';
 import {
   ref,
   computed,
   PropType,
-  defineComponent,
 } from 'vue';
-import { ActiveThread, Thread, Participant } from 'src/stores/thread.store';
-import DiscordPicker from 'vue3-discordpicker';
+import {
+  ActiveThread,
+  Thread,
+  Participant,
+  ThreadMemberStatus,
+  useThreadStore,
+} from 'src/stores/thread.store';
 import moment from 'moment';
+import DiscordPicker from 'vue3-discordpicker';
+import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
   threads: {
@@ -300,11 +339,16 @@ const props = defineProps({
     type: Object as PropType<ActiveThread | null>,
     default: null,
   },
+  me: {
+    type: Object as PropType<Participant>,
+    default: null,
+  },
 });
 
 const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel']);
 
 const $q = useQuasar();
+const $thread = useThreadStore();
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 const search = ref('');
@@ -330,6 +374,67 @@ function participantSeenLastMessage(participant: Participant) {
   if (!messages || !messages.length) return false;
   const lastMessage = messages[messages.length - 1];
   return moment(participant.sawUntil).isBefore(lastMessage.createdAt);
+}
+
+interface Action {
+  label: string;
+  icon?: QIconProps;
+  fn: (p: Participant) => void;
+}
+
+const fn = (p: Participant) => {
+  console.log('Fn', p);
+};
+
+function actionable(target: Participant) : Action[] {
+  const actions: Action[] = [
+    { label: 'Profile', icon: { name: 'fas fa-user-astronaut' }, fn },
+  ];
+
+  if (props.me.id !== target.id) {
+    if (props.me.status >= ThreadMemberStatus.ADMIN
+      && target.status < props.me.status) {
+      actions.push(
+        { label: 'Kick', icon: { name: 'fas fa-person-through-window' }, fn: $thread.kick },
+        { label: 'Ban', icon: { name: 'fas fa-hand-middle-finger' }, fn: $thread.ban },
+        { label: 'Mute', icon: { name: 'fas fa-head-side-cough-slash' }, fn: $thread.mute },
+      );
+    }
+
+    if (props.me.status === ThreadMemberStatus.OWNER) {
+      if (target.status < ThreadMemberStatus.ADMIN) {
+        actions.push(
+          { label: 'Promote admin', icon: { name: 'fas fa-shield-heart' }, fn: $thread.promote },
+        );
+      } else if (target.status === ThreadMemberStatus.ADMIN) {
+        actions.push(
+          { label: 'Demote admin', icon: { name: 'fas fa-shield-virus' }, fn: $thread.demote },
+        );
+      }
+    }
+    actions.push(
+      { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn },
+      { label: 'Invite to play', icon: { name: 'sports_tennis' }, fn },
+      { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn },
+    );
+  } else {
+    actions.push(
+      { label: 'Cut notifications', icon: { name: 'fas fa-bell-slash' }, fn },
+    );
+    if (props.currentThread?.channel) {
+      actions.push(
+        { label: 'Leave', icon: { name: 'fas fa-door-open' }, fn: $thread.leave },
+      );
+    }
+  }
+
+  return actions;
+}
+
+function status(participant: Participant) {
+  if (participant.status === ThreadMemberStatus.OWNER) return 'Owner';
+  if (participant.status === ThreadMemberStatus.ADMIN) return 'Admin';
+  return '';
 }
 </script>
 

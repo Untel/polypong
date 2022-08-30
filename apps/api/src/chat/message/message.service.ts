@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   message.service.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 17:32:34 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/30 18:09:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,34 @@ export class MessageService {
     const message = new Message();
     message.content = createMessageDto.content;
     message.thread = thread;
-    message.sender = thread.participants.find((p) => p.user.id === user.id);
+    const participant = thread.participants.find((p) => p.user.id === user.id);
+    message.sender = participant.user;
     const savedMessage = await message.save();
 
-    message.sender.sawUntil = new Date();
+    participant.sawUntil = new Date();
     await message.sender.save();
+    this.notifyThread(thread, savedMessage);
+    return savedMessage;
+  }
+
+  async sendSystemMessage(thread: Thread, content: string) {
+    const message = Message.create({
+      thread,
+      content,
+    });
+    const savedMessage = await message.save();
+    this.notifyThread(thread, savedMessage);
+    return savedMessage;
+  }
+
+  async notifyThread(thread: Thread, message: Message) {
     thread.participants.forEach((p) => {
       const sock = this.socketService.getUserSocket(p.user.id);
       if (sock) {
-        sock.emit('thread-message', thread, savedMessage);
+        sock.emit('thread-message', thread, message);
       }
     });
-    return savedMessage;
+    return message;
   }
 
   findAll() {

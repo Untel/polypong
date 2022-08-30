@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 02:36:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/30 01:48:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 import { defineStore } from 'pinia';
 import { mande, MandeError } from 'mande';
-import { Notify } from 'quasar';
-import { User } from './lobbies.store';
+import { Dialog, Notify } from 'quasar';
+import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
 
 export const threadApi = mande('/api/thread');
@@ -28,20 +28,26 @@ export interface BaseObject {
   deletedAt: Date;
 }
 
-export interface Channel extends BaseObject {
-  name: string;
-  avatar: string;
+export enum ThreadMemberStatus {
+  MEMBER,
+  ADMIN,
+  OWNER,
 }
-
 export interface Participant extends BaseObject {
   user: User;
   sawUntil: Date;
+  status: ThreadMemberStatus,
 }
 
 export interface Message extends BaseObject {
   content: string;
   contents: string[];
-  sender: Participant;
+  sender?: User;
+}
+
+export interface Channel extends BaseObject {
+  name: string;
+  avatar: string;
 }
 
 export interface BaseThread extends BaseObject {
@@ -95,6 +101,7 @@ export const useThreadStore = defineStore('thread', {
       if (!state._current) return null;
       return state._current;
     },
+
   },
   actions: {
     async fetchThreads() {
@@ -129,9 +136,16 @@ export const useThreadStore = defineStore('thread', {
     async sendMessage(content: string) {
       const id = this._current?.id;
       if (!id) return;
-      console.log('Sendiiiing msg', content);
-      const response = await threadApi.post(`${id}/message`, { content });
-      console.log('Message sent', response);
+      try {
+        const response = await threadApi.post(`${id}/message`, { content });
+      } catch (e: MandeError) {
+        Notify.create({
+          message: `${e.message}`,
+          caption: `${e.body.message}`,
+          icon: 'fas fa-bug',
+          color: 'negative',
+        });
+      }
     },
 
     async newDirectMessage(userId: number) {
@@ -139,9 +153,9 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async newChannel() {
-      const thread = await channelApi.post<Thread>();
+      const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
-      this.router.push({ name: 'inbox', params: { id: thread.id } });
+      this.router.push({ name: 'inbox', params: { id: channel.thread.id } });
     },
 
     async socketAddMessage(thread: Thread, message: Message) {
@@ -149,6 +163,136 @@ export const useThreadStore = defineStore('thread', {
         this.getThread(thread.id);
       }
       this.fetchThreads();
+    },
+
+    async join() {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Leave thread',
+        message: 'Are you sure you want to leave this thread ?',
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.delete(`${id}`);
+        this._threads = this.threads.filter((t) => t.id !== id);
+        this.router.push('/inbox');
+      });
+    },
+
+    async leave() {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Leave thread',
+        message: 'Are you sure you want to leave this thread ?',
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.delete(`${id}`);
+        this.router.push('/inbox');
+        this._threads = this.threads.filter((t) => t.id !== id);
+      });
+    },
+
+    async invite(user: User) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Invite user',
+        message: `Are you sure you want to invite ${user.name} in this thread ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.get(`${id}/invite/${user.id}`);
+      });
+    },
+
+    async promote(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Promote user',
+        message: `Are you sure you want to promote ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/promote`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
+    async demote(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Demote user',
+        message: `Are you sure you want to demote ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/demote`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
+    async kick(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Kick user',
+        message: `Are you sure you want to kick ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async () => {
+        const response = await threadApi.put(`${id}/kick`, {
+          targetId: participant.user.id,
+        });
+      });
+    },
+
+    async mute(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: 'Mute user',
+        message: `How much time do you want to mute ${participant.user.name} on this thread ?`,
+        options: {
+          model: 'duration',
+          type: 'radio',
+          items: [
+            { label: '10 mins', value: 10 },
+            { label: '1 hour', value: 60, color: 'accent' },
+            { label: 'Forever', value: null, color: 'negative' },
+          ],
+        },
+        cancel: true,
+      }).onOk(async (duration) => {
+        const response = await threadApi.put(`${id}/mute`, {
+          targetId: participant.user.id,
+          duration,
+        });
+      });
+    },
+
+    async ban(participant: Participant) {
+      const id = this._current?.id;
+      if (!id) return;
+      Dialog.create({
+        title: `Ban ${participant.user.name} thread`,
+        options: {
+          model: 'duration',
+          type: 'radio',
+          items: [
+            { label: '10 mins', value: 10 },
+            { label: '1 hour', value: 60, color: 'accent' },
+            { label: 'Forever', value: null, color: 'negative' },
+          ],
+        },
+        message: `Are you sure you want to ban ${participant.user.name} ?`,
+        cancel: true,
+      }).onOk(async (duration: number) => {
+        const response = await threadApi.put(`${id}/ban`, {
+          targetId: participant.user.id,
+          duration,
+        });
+      });
     },
   },
 });

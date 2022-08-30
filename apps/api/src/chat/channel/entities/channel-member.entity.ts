@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 17:43:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/29 02:12:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ export enum ChannelMemberStatus {
   OWNER = 'owner',
   ADMIN = 'admin',
   MEMBER = 'member',
-  INVITED = 'invited',
   BAN = 'ban',
 }
 
