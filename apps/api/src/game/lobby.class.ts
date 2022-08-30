@@ -118,7 +118,10 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.game = new Game(this);
     await this.createMatchEntry();
     // eslint-disable-next-line prettier/prettier
-    this.logger.log('ABOUT TO EMIT THE START EVENT TO LOBBY, this.id = ', this.id);
+    this.logger.log(
+      'ABOUT TO EMIT THE START EVENT TO LOBBY, this.id = ',
+      this.id,
+    );
     this.sock.emit('start', this.id);
     this.logger.log(`Starting new game ${this.name}`);
     return this.game;

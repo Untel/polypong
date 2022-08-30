@@ -31,7 +31,7 @@ export class Ball extends Circle {
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
-  closestP: number[] = [0,0];
+  closestP: number[] = [0, 0];
   target: {
     hit: Point;
     wall: Wall;
@@ -47,7 +47,7 @@ export class Ball extends Circle {
     super(startPos, radius);
     this.game = game;
     this.color = `#${GameTools.genRanHex(6)}`;
-    this.direction = new Vector(0,0);
+    this.direction = new Vector(0, 0);
     this.freezeTime = 150;
   }
 
@@ -111,8 +111,7 @@ export class Ball extends Circle {
           hit: [intersection.x, intersection.y],
           wall,
         };
-        if (!this.unFreeze(0))
-          wall.addBall(this);
+        if (!this.unFreeze(0)) wall.addBall(this);
 
         const incidenceAngle = angleToDegrees(this.angle);
 
@@ -122,7 +121,7 @@ export class Ball extends Circle {
           this.target.wall.line[0][1] - this.target.wall.line[1][1],
         ).normalize();
 
-        let alpha: number = wall.angle - incidenceAngle;
+        const alpha: number = wall.angle - incidenceAngle;
         GameTools.angleNormalize(alpha, 0, 360);
 
         //Come constants used to solve the pythagorean equation
@@ -156,8 +155,7 @@ export class Ball extends Circle {
     );
   }
   move() {
-    if (this.unFreeze(1))
-      return;
+    if (this.unFreeze(1)) return;
     this.position.x = this.position.x + this.direction.x;
     this.position.y = this.position.y + this.direction.y;
   }
@@ -168,20 +166,16 @@ export class Ball extends Circle {
     this.position.y = position.y;
   }
 
-  unFreeze(value : number = 150)
-  {
-    if (this.freezeTime === 0)
-      return false;
-    this.freezeTime = ((this.freezeTime - value) < 0) ? 0 : this.freezeTime - value
-    if (this.freezeTime > 0)
-      return true;
+  unFreeze(value = 150) {
+    if (this.freezeTime === 0) return false;
+    this.freezeTime = this.freezeTime - value < 0 ? 0 : this.freezeTime - value;
+    if (this.freezeTime > 0) return true;
     this.target.wall.addBall(this);
     return false;
   }
 
   collideWithBall(compared: Ball) {
-    if (this.unFreeze(0))
-      return;
+    if (this.unFreeze(0)) return;
     const dist = lineLength([this.point, compared.point]);
     if (dist < this.radius + compared.radius) {
       const delta = compared.position.clone().sub(this.position);
@@ -225,7 +219,9 @@ export class Ball extends Circle {
     const maxAngle = 25;
     const addDeg = maxAngle * percent;
 
-    const newAngle = angleToRadians(newDegree + GameTools.angleNormalize(addDeg, 0, 360)) ;
+    const newAngle = angleToRadians(
+      newDegree + GameTools.angleNormalize(addDeg, 0, 360),
+    );
     // console.log(`New angle is : ${newAngle} made from ${angleToRadians(newDegree)} and ${addDeg}`)
     this.lastHitten = paddle;
     this.color = paddle.color;
@@ -234,8 +230,7 @@ export class Ball extends Circle {
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {
-    if (this.unFreeze(0))
-      return ;
+    if (this.unFreeze(0)) return;
     this.speed += ratio;
     if (this.speed > this.maxSpeed) {
       this.speed = this.maxSpeed;
@@ -264,18 +259,17 @@ export class Ball extends Circle {
     return [this.position.x, this.position.y];
   }
   public get netScheme() {
-      return {
-        color: this.color,
-        position: {
-          x: this.position.x,
-          y: this.position.y,
-        },
-        radius: this.radius,
-        target: {
-          x: this.target.hit[0],
-          y: this.target.hit[1],
-        },
-      };
-
+    return {
+      color: this.color,
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      radius: this.radius,
+      target: {
+        x: this.target.hit[0],
+        y: this.target.hit[1],
+      },
+    };
   }
 }

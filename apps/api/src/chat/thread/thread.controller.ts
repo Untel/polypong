@@ -77,7 +77,7 @@ export class ThreadController {
   async invite(
     @CurrentUser() inviter: User,
     @CurrentThread() thread: Thread,
-    @Param('userId') userId: ID
+    @Param('userId') userId: ID,
   ) {
     const user = await this.userService.findById(+userId);
     if (!user)
@@ -102,40 +102,43 @@ export class ThreadController {
       status: ThreadMemberStatus.MEMBER,
     });
     await ThreadParticipant.insert(tp);
-    this.messageService.sendSystemMessage(thread, `${user.name} was invited by ${inviter.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${user.name} was invited by ${inviter.name}`,
+    );
   }
 
   @Put(':id/kick')
   @ThreadRole(ThreadMemberStatus.ADMIN)
   @UseGuards(ThreadGuard)
-  async kick(
-    @CurrentUser() user: User,
-    @CurrentThread() thread,
-    @Req() req
-  ) {
+  async kick(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
     const target: ThreadParticipant = req.target;
     await target.remove();
-    this.messageService.sendSystemMessage(thread, `${target.user.name} was kicked by ${user.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${target.user.name} was kicked by ${user.name}`,
+    );
   }
 
   @Put(':id/ban')
   @ThreadRole(ThreadMemberStatus.ADMIN)
   @UseGuards(ThreadGuard)
-  async ban(
-    @CurrentUser() user: User,
-    @CurrentThread() thread,
-    @Req() req
-  ) {
+  async ban(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
     const target: ThreadParticipant = req.target;
-    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
+    if (!target)
+      throw new UnprocessableEntityException('This user is not in this thread');
     const duration = +req.body.duration;
-    const endDate = !duration ? moment(8.64e15) : moment().add(duration, 'minutes');
+    const endDate = !duration
+      ? moment(8.64e15)
+      : moment().add(duration, 'minutes');
     target.isBanUntil = endDate.toDate();
     await target.save();
     await target.softRemove();
-    this.messageService.sendSystemMessage(thread, `${target.user.name} was kicked by ${user.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${target.user.name} was kicked by ${user.name}`,
+    );
   }
-
 
   @Put(':id/promote')
   @ThreadRole(ThreadMemberStatus.OWNER)
@@ -143,32 +146,38 @@ export class ThreadController {
   async promote(
     @CurrentUser() user: User,
     @CurrentThread() thread,
-    @Req() req
+    @Req() req,
   ) {
     const target: ThreadParticipant = req.target;
-    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
+    if (!target)
+      throw new UnprocessableEntityException('This user is not in this thread');
     target.status = ThreadMemberStatus.ADMIN;
     await target.save();
-    this.messageService.sendSystemMessage(thread, `${target.user.name} was promoted to admin by ${user.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${target.user.name} was promoted to admin by ${user.name}`,
+    );
   }
 
   @Put(':id/mute')
   @ThreadRole(ThreadMemberStatus.ADMIN)
   @UseGuards(ThreadGuard)
-  async mute(
-    @CurrentUser() user: User,
-    @CurrentThread() thread,
-    @Req() req
-  ) {
+  async mute(@CurrentUser() user: User, @CurrentThread() thread, @Req() req) {
     const target: ThreadParticipant = req.target;
-    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
+    if (!target)
+      throw new UnprocessableEntityException('This user is not in this thread');
     const duration = +req.body.duration;
-    const endDate = !duration ? moment(8.64e15) : moment().add(duration, 'minutes');
+    const endDate = !duration
+      ? moment(8.64e15)
+      : moment().add(duration, 'minutes');
     target.isMuteUntil = endDate.toDate();
     await target.save();
-    this.messageService.sendSystemMessage(thread, `${target.user.name} was mute for ${
-      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
-    } by ${user.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${target.user.name} was mute for ${
+        !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
+      } by ${user.name}`,
+    );
   }
 
   @Put(':id/demote')
@@ -178,15 +187,15 @@ export class ThreadController {
     const target: ThreadParticipant = req.target;
     target.status = ThreadMemberStatus.MEMBER;
     await target.save();
-    this.messageService.sendSystemMessage(thread, `${target.user.name} was demoted to member by ${user.name}`);
+    this.messageService.sendSystemMessage(
+      thread,
+      `${target.user.name} was demoted to member by ${user.name}`,
+    );
   }
 
   @Delete(':id')
   @UseGuards(ThreadGuard)
-  async leave(
-    @CurrentUser() user: User,
-    @CurrentThread() thread: Thread,
-  ) {
+  async leave(@CurrentUser() user: User, @CurrentThread() thread: Thread) {
     const me = thread.participants.find((p) => p.user.id === user.id);
     // Si l'owner leave, on transfert le status d'owner
     if (me.status === ThreadMemberStatus.OWNER) {

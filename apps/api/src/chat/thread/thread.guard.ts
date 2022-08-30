@@ -26,7 +26,8 @@ import { ThreadMemberStatus } from './entities/thread-participant.entity';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import moment from 'moment';
 
-export const ThreadRole = (...roles: ThreadMemberStatus[]) => SetMetadata('roles', roles);
+export const ThreadRole = (...roles: ThreadMemberStatus[]) =>
+  SetMetadata('roles', roles);
 
 @Injectable()
 export default class ThreadGuard implements CanActivate {

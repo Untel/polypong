@@ -17,15 +17,15 @@ import { Ball } from './ball.class';
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
 
-  static calculateRatio(num_1 : number, num_2: number){
-    for(let num : number = num_2; num >1; num--) {
-        if((num_1 % num) == 0 && (num_2 % num) == 0) {
-            num_1=num_1/num;
-            num_2=num_2/num;
-        }
+  static calculateRatio(num_1: number, num_2: number) {
+    for (let num: number = num_2; num > 1; num--) {
+      if (num_1 % num == 0 && num_2 % num == 0) {
+        num_1 = num_1 / num;
+        num_2 = num_2 / num;
+      }
     }
     // var ratio = num_1+":"+num_2;
-    var ratio = num_1/num_2;
+    const ratio = num_1 / num_2;
     return ratio;
   }
   static angleNormalize(val: number, r_start: number, r_end: number) {
@@ -147,16 +147,18 @@ export default class GameTools {
     return false;
   }
 
-  static wallBallCollision(w :Line, b:Ball, ret :number[])
-  {
+  static wallBallCollision(w: Line, b: Ball, ret: number[]) {
     // let ret = [0,0];
-    return this.lineCircleCollision(w[0][0],w[0][1],
-      w[1][0],w[1][1],
+    return this.lineCircleCollision(
+      w[0][0],
+      w[0][1],
+      w[1][0],
+      w[1][1],
       b.position.x,
       b.position.y,
       b.radius,
-      ret
-      );
+      ret,
+    );
   }
 
   static lineCircleCollision(
@@ -166,10 +168,9 @@ export default class GameTools {
     y2: number,
     cx: number,
     cy: number,
-    r : number,
-    closestP
+    r: number,
+    closestP,
   ) {
-    
     // const inside1 : boolean = this.pointCircle(x1,y1, cx,cy,r); // Need pointcircle
     // const inside2 : boolean = this.pointCircle(x2,y2, cx,cy,r);
     // if (inside1 || inside2) return true;

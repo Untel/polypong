@@ -1,12 +1,7 @@
 import { Paddle } from './paddle.class';
 import { Ball } from './ball.class';
 import { Wall } from './wall.class';
-import {
-  lineLength,
-  Line,
-  Point,
-  lineMidpoint,
-} from 'geometric';
+import { lineLength, Line, Point, lineMidpoint } from 'geometric';
 import { LobbyBot } from './lobbyBot.class';
 import { copyFileSync } from 'fs';
 import { Vector } from 'collider2d';
@@ -49,8 +44,7 @@ export class Bot {
     }
   }
   level3() {
-    if (this.tasks.length === 0)
-    {
+    if (this.tasks.length === 0) {
       this.level2();
       return;
     }
@@ -59,8 +53,7 @@ export class Bot {
     this.level1();
   }
   level2() {
-    if (this.tasks.length !== 0)
-    {
+    if (this.tasks.length !== 0) {
       this.level1();
       return;
     }
@@ -75,31 +68,31 @@ export class Bot {
       this.wall.paddle.updatePercentOnAxis(ratio + offset);
     }
   }
-  level1(coords = [0,0]) {
+  level1(coords = [0, 0]) {
     if (this.tasks.length === 0) {
       return;
     }
-    let focus : Point = [coords[0], coords[1]];
-    if (!coords[0] && !coords[1])
-      focus = this.tasks[0].targetInfo.actualhit;
+    let focus: Point = [coords[0], coords[1]];
+    if (!coords[0] && !coords[1]) focus = this.tasks[0].targetInfo.actualhit;
 
-    let dir : number = 0;
-    const leftSideDist = lineLength([focus,this.wall.line[0]]);
+    let dir = 0;
+    const leftSideDist = lineLength([focus, this.wall.line[0]]);
     const totalDist = lineLength(this.wall.line);
     const paddleMidpoint = lineMidpoint(this.wall.paddle.line);
     const paddleMidpointDist = lineLength([paddleMidpoint, this.wall.line[0]]);
 
-    const paddleMidRatio = GameTools.calculateRatio(paddleMidpointDist, totalDist);
+    const paddleMidRatio = GameTools.calculateRatio(
+      paddleMidpointDist,
+      totalDist,
+    );
     const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
-    if (ratio > paddleMidRatio + (this.precision / 2))
-      dir = 1;
-    else if (ratio < paddleMidRatio - (this.precision / 2))
-      dir = -1;
+    if (ratio > paddleMidRatio + this.precision / 2) dir = 1;
+    else if (ratio < paddleMidRatio - this.precision / 2) dir = -1;
     // God mode
     // let newPercent = ratio;
-    let newPercent = this.wall.paddle.ratio + (dir * this.precision);
-    newPercent = (newPercent < 0) ? 0 : newPercent;
-    newPercent = (newPercent > 1) ? 1 : newPercent;
+    let newPercent = this.wall.paddle.ratio + dir * this.precision;
+    newPercent = newPercent < 0 ? 0 : newPercent;
+    newPercent = newPercent > 1 ? 1 : newPercent;
     this.wall.paddle.updatePercentOnAxis(newPercent);
   }
 
