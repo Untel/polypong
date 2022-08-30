@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/21 16:00:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/30 17:44:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,20 @@ export default class Game {
     this.newRound(7);
   }
 
-  logger = new Logger('Game');
+  logger = new Logger('Game')
 
-  addBall() {
-    const ball = new Ball(this, this.map.center.clone());
+  addBall(hotBall : boolean = false) {
+    const ball = new Ball(
+      this,
+      this.map.center.clone(),
+    );
     // ball.setAngle(angleToRadians(this.map.angles[1]));
-    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
-    ball.findTarget();
     this.balls.push(ball);
+    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.findTarget();    
+    if (hotBall)
+      ball.unFreeze();
+    console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
   }
 
   generateMap(n = 0) {
@@ -109,7 +115,7 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nBall; i++) this.addBall();
+    for (let i = 0; i < this.nBall; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
   }
@@ -161,60 +167,22 @@ export default class Game {
     if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
-  old_runPhysics() {
-    this.balls.forEach((ball, index) => {
-      if (ball.targetDistance <= ball.targetInfo.limit + 5) {
-        const paddle: Paddle = ball.target.wall.paddle;
-
-        if (paddle) {
-          const paddleTouchTheBall = (pointOnLine as any)(
-            ball.targetInfo.actualhit,
-            paddle.line,
-            1,
-          );
-
-          if (paddleTouchTheBall) {
-            ball.bouncePaddle(paddle);
-          } else {
-            // En mode coalition, si le joueur qui envoie la balle est de la meme equipe de celui qui se prend le goal, alors ca rebondit
-            if (
-              TEST_MODE ||
-              (this.mode === MODE.Coalition &&
-                paddle.color === ball.lastHitten.color)
-            ) {
-              ball.bounceTargetWall();
-            } else {
-              this.reduce(ball.target.wall);
-            }
-          }
-        } else {
-          this.balls.forEach((e) => {
-            if (e !== ball) {
-              e.direction = new Vector(0, 0);
-              e._speed = 0;
-            }
-          });
-
-          return;
-
-          ball.bounceTargetWall();
-        }
-        ball.increaseSpeed();
-      }
-      ball.move();
-    });
-  }
-
   async runPhysics() {
-    this.balls.forEach(async (ball) => {
+    this.balls.forEach( async (ball) => {
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
       ]);
-      // console.log(dtc)
 
-      if (dtc > 50 && dtc < 70) {
-        console.log('Ded ball');
+      const testDist : number = lineLength(
+        [[this.map.center.x, this.map.center.y],
+        this.map.edges[0][0]]
+        );
+      // console.log("dtc vs dist ", dtc, " ", testDist)
+      // console.log("edges ", this.map.edges[0])
+
+        if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
+        console.log('Ded ball :', dtc);
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
 //          if (e !== ball) e.stop();
@@ -225,6 +193,8 @@ export default class Game {
         } else {
           await this.reduce(ball.target.wall);
         }
+
+        // this.reduce(ball.target.wall);
       }
       const wall = ball.target.wall;
 
@@ -236,27 +206,21 @@ export default class Game {
           wall.line[1][1],
           ball.position.x,
           ball.position.y,
-          ball.radius,
+          ball.radius,[0,0]
         );
         if (test === true) {
           ball.bounceTargetWall();
-          console.log('wall collision');
+          // console.log('wall collision');
         }
       } else {
-        const test = GameTools.lineCircleCollision(
-          wall.paddle.line[0][0],
-          wall.paddle.line[0][1],
-          wall.paddle.line[1][0],
-          wall.paddle.line[1][1],
-          ball.position.x,
-          ball.position.y,
-          ball.radius,
-        );
+        let ret = [0,0]; 
+        const test = GameTools.wallBallCollision(wall.paddle.line, ball,ret);
         if (test === true) {
-          ball.bouncePaddle(wall.paddle);
-          console.log('paddle collision');
+          ball.bouncePaddle(wall.paddle, ret);
+          // console.log('paddle collision at,', ret);    
+          ball.closestP[0] = ret[0];
+          ball.closestP[1] = ret[1];
         }
-        // console.log("no collision");
       }
       ball.move();
     });
@@ -520,6 +484,7 @@ export default class Game {
           power.effect(currBall);
           this.powers.splice(pIdx, 1);
           this.socket.emit('powers', this.powersNetScheme);
+          // this.socket.emit('removePower', power.netScheme, pIdx);
         }
       }
     }
@@ -535,7 +500,8 @@ export default class Game {
       powerObj.name,
       Object.keys(powerObj),
       typeof powerObj,
-    );
+    ); 
+    // this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
     this.socket.emit(
       'powers',
       this.powers.map((p) => p.netScheme),

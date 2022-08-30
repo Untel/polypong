@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pong.controller.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 11:56:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/25 04:35:43 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ export class PongController {
   togglePause(@CurrentLobby() lobby: Lobby): boolean {
     console.log('Lobby is', lobby.name);
     if (lobby.game.isStopped) lobby.game.run();
-    else lobby.game.stop();
+    else if (!lobby.game.paused) lobby.game.stop();
     return lobby.game.isStopped;
   }
 

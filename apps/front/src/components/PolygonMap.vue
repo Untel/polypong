@@ -92,7 +92,7 @@
       <circle
         v-for="(power, idx) in powers"
         :key="`power-${idx}`"
-        stroke="yellow" r="2"
+        :stroke="`${pickColor(power)}`" r="2"
         v-bind="formatCirclePosition(power.position)"
       />
     </svg>
@@ -165,6 +165,23 @@ function formatLine(line: Line) {
     y1: line[0][1],
     y2: line[1][1],
   };
+}
+
+function pickColor(pow : Power) : string {
+  switch (pow.name) {
+    case 'add-ball':
+      return "blue";
+    case 'reduce-enemies':
+      return "red";
+    case 'upsize-allies':
+      return "green";
+    case 'see-trajectories':
+      return "yellow";
+    case 'sadi-slap':
+      return "pink";
+    default:
+      return "black";
+  }
 }
 
 function formatCirclePosition(position: Position) {

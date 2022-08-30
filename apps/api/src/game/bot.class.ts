@@ -4,8 +4,14 @@ import { Wall } from './wall.class';
 import {
   lineLength,
   Line,
+  Point,
+  lineMidpoint,
 } from 'geometric';
 import { LobbyBot } from './lobbyBot.class';
+import { copyFileSync } from 'fs';
+import { Vector } from 'collider2d';
+import GameTools from './gametools.class';
+
 export class Bot {
   botPaddle: Paddle;
   maxSpeed: number;
@@ -16,9 +22,12 @@ export class Bot {
   name: string;
   color: string;
   level: number;
+  precision: number;
 
   constructor(datas: Partial<Bot | LobbyBot> = {}) {
     Object.assign(this, datas);
+    this.maxSpeed = this.level + 1;
+    this.precision = 0.05;
   }
   attachWall(wall: Wall) {
     this.wall = wall;
@@ -31,22 +40,28 @@ export class Bot {
         break;
       case 1:
         this.level2();
-        this.level1();
         break;
       case 2:
         this.level3();
-        this.level2();
-        this.level1();
         break;
       default:
         this.level1();
     }
   }
   level3() {
+    if (this.tasks.length === 0)
+    {
+      this.level2();
+      return;
+    }
     this.tasks.sort((b) => b.targetDistance / b.direction.len());
+    // this.level1(this.tasks[0].closestP)
+    this.level1();
   }
   level2() {
-    if (this.tasks.length !== 0 || this.wall.paddle.ratio === 0.5) {
+    if (this.tasks.length !== 0)
+    {
+      this.level1();
       return;
     }
     const offset = this.wall.paddle.ratio > 0.5 ? -0.01 : +0.01;
@@ -60,68 +75,34 @@ export class Bot {
       this.wall.paddle.updatePercentOnAxis(ratio + offset);
     }
   }
-  level1(id = 0) {
+  level1(coords = [0,0]) {
     if (this.tasks.length === 0) {
       return;
     }
+    let focus : Point = [coords[0], coords[1]];
+    if (!coords[0] && !coords[1])
+      focus = this.tasks[0].targetInfo.actualhit;
 
-    const focus: Ball = this.tasks[id];
-    // console.log(this.tasks.length);
+    let dir : number = 0;
+    const leftSideDist = lineLength([focus,this.wall.line[0]]);
+    const totalDist = lineLength(this.wall.line);
+    const paddleMidpoint = lineMidpoint(this.wall.paddle.line);
+    const paddleMidpointDist = lineLength([paddleMidpoint, this.wall.line[0]]);
 
-    const rSideDist = lineLength([
-      this.wall.paddle.line[1],
-      focus.targetInfo.actualhit,
-    ]);
-    const lSideDist = lineLength([
-      this.wall.paddle.line[0],
-      focus.targetInfo.actualhit,
-    ]);
-
-    if (Math.abs(rSideDist - lSideDist) < 0.5) {
-      return;
-    }
-    if (rSideDist > lSideDist) {
-      this.wall.paddle.updatePercentOnAxis(
-        this.wall.paddle.ratio - 0.01 >= 0 ? this.wall.paddle.ratio - 0.01 : 0,
-      );
-    } //if (lSideDist > rSideDist) {
-    else if (rSideDist < lSideDist) {
-      this.wall.paddle.updatePercentOnAxis(
-        this.wall.paddle.ratio + 0.01 <= 1 ? this.wall.paddle.ratio + 0.01 : 1,
-      );
-    }
+    const paddleMidRatio = GameTools.calculateRatio(paddleMidpointDist, totalDist);
+    const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
+    if (ratio > paddleMidRatio + (this.precision / 2))
+      dir = 1;
+    else if (ratio < paddleMidRatio - (this.precision / 2))
+      dir = -1;
+    // God mode
+    // let newPercent = ratio;
+    let newPercent = this.wall.paddle.ratio + (dir * this.precision);
+    newPercent = (newPercent < 0) ? 0 : newPercent; 
+    newPercent = (newPercent > 1) ? 1 : newPercent; 
+    this.wall.paddle.updatePercentOnAxis(newPercent);
   }
 
-  // think() {
-  //   // console.log("thinking")
-  //   if (this.tasks.length === 0) return; //Maybe go towards center instead?
-  //   const focus: Ball = this.tasks[0];
-  //   // let distToTgt = lineLength([lineMidpoint(this.wall.paddle.line), focus.targetInfo.actualhit]);
-  //   const rSideDist = lineLength([
-  //     this.wall.paddle.line[1],
-  //     focus.targetInfo.actualhit,
-  //   ]);
-  //   const lSideDist = lineLength([
-  //     this.wall.paddle.line[0],
-  //     focus.targetInfo.actualhit,
-  //   ]);
-
-  //   if (Math.abs(rSideDist - lSideDist) < 0.5) {
-  //     return;
-  //   }
-  //   if (rSideDist > lSideDist) {
-  //     this.wall.paddle.updatePercentOnAxis(
-  //       this.wall.paddle.ratio - 0.01 >= 0 ? this.wall.paddle.ratio - 0.01 : 0,
-  //     );
-  //   } //if (lSideDist > rSideDist) {
-  //   else {
-  //     this.wall.paddle.updatePercentOnAxis(
-  //       this.wall.paddle.ratio + 0.01 <= 1 ? this.wall.paddle.ratio + 0.01 : 1,
-  //     );
-  //   }
-
-  //   // }
-  // }
   popBall(target: Ball) {
     this.tasks.splice(this.tasks.indexOf(target), 1);
   }

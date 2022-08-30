@@ -122,12 +122,18 @@ onMounted(async () => {
     balls.value = b;
   });
   socket.on('object', (index, name, item) => {
+    console.log("index ", index, " name ", name, " item ", item);
     switch (name) {
       case 'ball':
         balls.value[index] = item;
         break;
       case 'power':
+        // console.log("power time")
         powers.value[index] = item;
+        break;
+      case 'removePower':
+      //   powers.value[index] = item;
+      //   powers.value.splice(index,1);
         break;
       case 'paddle':
         paddles.value[index] = item;
@@ -148,7 +154,6 @@ onMounted(async () => {
   socket.on('powers', (pow) => {
     powers.value = pow;
   });
-
   socket.once('end', (winner = { name: 'Error' }) => {
     Notify.create({
       message: `Chicken chiken dinner we have a winner ${winner.name}`,
