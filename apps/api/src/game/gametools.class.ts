@@ -6,15 +6,28 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/17 19:34:38 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/25 07:03:09 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Vector } from 'collider2d';
+import { Line } from 'geometric';
+import { Ball } from './ball.class';
 
 export default class GameTools {
   // static colors =  ['red', 'blue', 'magenta', 'purple', 'green'];
 
+  static calculateRatio(num_1 : number, num_2: number){
+    for(let num : number = num_2; num >1; num--) {
+        if((num_1 % num) == 0 && (num_2 % num) == 0) {
+            num_1=num_1/num;
+            num_2=num_2/num;
+        }
+    }
+    // var ratio = num_1+":"+num_2;
+    var ratio = num_1/num_2;
+    return ratio;
+  }
   static angleNormalize(val: number, r_start: number, r_end: number) {
     const width: number = r_end - r_start; //
     const offsetValue: number = val - r_start; // value relative to 0
@@ -134,6 +147,18 @@ export default class GameTools {
     return false;
   }
 
+  static wallBallCollision(w :Line, b:Ball, ret :number[])
+  {
+    // let ret = [0,0];
+    return this.lineCircleCollision(w[0][0],w[0][1],
+      w[1][0],w[1][1],
+      b.position.x,
+      b.position.y,
+      b.radius,
+      ret
+      );
+  }
+
   static lineCircleCollision(
     x1: number,
     y1: number,
@@ -141,12 +166,12 @@ export default class GameTools {
     y2: number,
     cx: number,
     cy: number,
-    r,
+    r : number,
+    closestP
   ) {
-    // let x1, y1, cx, cy, r : number;
-    // x1
-    // boolean inside1 = pointCircle(x1,y1, cx,cy,r); // Need pointcircle
-    // boolean inside2 = pointCircle(x2,y2, cx,cy,r);
+    
+    // const inside1 : boolean = this.pointCircle(x1,y1, cx,cy,r); // Need pointcircle
+    // const inside2 : boolean = this.pointCircle(x2,y2, cx,cy,r);
     // if (inside1 || inside2) return true;
 
     let distX: number = x1 - x2;
@@ -157,7 +182,8 @@ export default class GameTools {
 
     const closestX: number = x1 + dot * (x2 - x1);
     const closestY: number = y1 + dot * (y2 - y1);
-
+    closestP[0] = closestX;
+    closestP[1] = closestY;
     const onSegment = this.linePoint(x1, y1, x2, y2, closestX, closestY); //Need linepoint
     if (!onSegment) return false;
 

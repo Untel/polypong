@@ -67,6 +67,7 @@ export interface Match extends BaseObject {
   id: number; // the match's unique Id
   players: Player[];
   finishedAt?: string;
+  totalPlayers: number;
 }
 
 export interface UserStats {
@@ -140,10 +141,10 @@ export const useMatchHistoryStore = defineStore('history', {
     },
 
     computeStats(userId: number, matches: Match[]): UserStats {
+      console.log(' matches = ', matches);
       const res: UserStats = { wins: 0, losses: 0, ratio: 1 };
-      const nPlayed = matches.length;
       matches.forEach((m) => {
-        const nplayers = m.players.length;
+        const nplayers = m.totalPlayers;
         const winThreshold = nplayers / 2;
         m.players.forEach((p) => {
           if (p.user.id === userId) {
@@ -153,6 +154,7 @@ export const useMatchHistoryStore = defineStore('history', {
           }
         });
       });
+      const nPlayed = matches.length;
       res.losses = nPlayed - res.wins;
       if (nPlayed > 0) {
         res.ratio = res.wins / nPlayed;
