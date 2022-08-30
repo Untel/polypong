@@ -55,7 +55,6 @@
         @joinGame="router.push({ name: 'game', params: { id: lobby.id } })"
         @spectate="router.push({ name: 'game', params: { id: lobby.id } })"
       >
-      lobby.players.length = {{ lobby.players.length }}
         <q-circular-progress
           show-value
           class="text-accent q-ma-md"

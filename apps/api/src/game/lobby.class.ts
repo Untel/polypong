@@ -43,6 +43,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   id: LobbyId;
   name: string;
   playersMax: number;
+  finalePoints: number;
   logger = new Logger('Lobby');
 
   @Exclude()
@@ -87,6 +88,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.players = new Map<number, Player>();
     this.spectators = [];
     this.playersMax = 8;
+    this.finalePoints = 3;
     this.spectatorsMax = 10;
     this.bots = [];
     this.fillBots();

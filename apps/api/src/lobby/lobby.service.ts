@@ -159,6 +159,16 @@ export class LobbyService {
     return null;
   }
 
+  setFinalePoints(lobby: Lobby, points: number) {
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log(`setFinalPoints - points = ${points}`);
+    lobby.finalePoints = points;
+    this.logger.log(`setFinalPoints - lobby.game.finalCap = ${points}`);
+    lobby.sock.emit('lobby_change', lobby.id);
+    lobby.sock.emit('setFinalPoints', points);
+    return null;
+  }
+
   async killLobby(lobby: Lobby) {
     await this.closeLobby(lobby);
     this.socketService.socketio.emit('lobbyDeleted');

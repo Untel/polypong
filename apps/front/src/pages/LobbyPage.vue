@@ -104,6 +104,21 @@
             label
           />
         </q-field>
+        <q-field
+          label="Points to win (1v1)">
+          <q-slider
+            :disable="!canUpdate"
+            name="finalePoints"
+            :model-value="$lobbies.activeLobby?.finalePoints"
+            @change="(evt) => $lobbies.setFinalePoints(evt)"
+            :min="1"
+            :max="11"
+            snap
+            markers
+            label-always
+            label
+          />
+        </q-field>
         <q-input
           :model-value="$lobbies.getActiveLobby?.name"
           label="Lobby name"
