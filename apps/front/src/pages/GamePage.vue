@@ -121,6 +121,7 @@ onMounted(async () => {
     balls.value = b;
   });
   socket.on('object', (index, name, item) => {
+    console.log("index ", index, " name ", name, " item ", item);
     switch (name) {
       case 'ball':
         balls.value[index] = item;
@@ -162,6 +163,9 @@ onUnmounted(() => {
   socket.off('gameUpdate');
   socket.off('mapChange');
   socket.off('powers');
+  socket.off('p');
+  socket.off('end');
+  socket.off('object');
 });
 
 </script>
