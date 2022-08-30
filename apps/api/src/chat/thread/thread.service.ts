@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 20:16:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/30 01:20:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,12 @@ export class ThreadService {
 
   async findAll(user: User) {
     const threads = await Thread.createQueryBuilder('thread')
-      .innerJoinAndSelect('thread.participants', 'me', 'me.user_id = :id', {
-        id: user.id,
-      })
+      .innerJoinAndSelect(
+        'thread.participants',
+        'me',
+        'me.user_id = :id AND (me.isBanUntil IS NULL OR me.isBanUntil < NOW())',
+        { id: user.id },
+      )
       .leftJoinAndMapMany(
         'thread.unreadMessages',
         'thread.messages',

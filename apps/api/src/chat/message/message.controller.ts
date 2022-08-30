@@ -18,7 +18,6 @@ import ThreadGuard, { CurrentThread } from '../thread/thread.guard';
 import { CurrentUser } from 'src/decorators';
 import { Thread, ThreadParticipant } from '../thread';
 import { User } from 'src/user';
-import { TS } from 'src/entities';
 import moment from 'moment';
 
 @UseGuards(JwtGuard, ThreadGuard)
@@ -27,7 +26,7 @@ export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
   @Post()
-  create(
+  async create(
     @CurrentThread() thread: Thread,
     @CurrentUser() user: User,
     @Body() createMessageDto: CreateMessageDto,
@@ -35,13 +34,18 @@ export class MessageController {
   ) {
     const me: ThreadParticipant = req.me;
     if (me.isMuteUntil) {
-      const m = moment(me.isMuteUntil).diff(moment(), 'seconds');
-      const dur = moment.duration(m, 'seconds');
-      throw new UnauthorizedException(
-        `You are muted for ${dur.humanize()} remaining`,
-      );
+      const m = moment(me.isMuteUntil).diff(moment());
+      if (m > 0) {
+        const dur = moment.duration(m);
+        throw new UnauthorizedException(
+          `You are muted for ${dur.humanize()} remaining`,
+        );
+      } else {
+        me.isMuteUntil = null;
+        await me.save();
+      }
     }
-    return this.messageService.create(thread, user, createMessageDto);
+    return await this.messageService.create(thread, user, createMessageDto);
   }
 
   @Get()

@@ -82,11 +82,26 @@ export class ThreadController {
     const user = await this.userService.findById(+userId);
     if (!user)
       throw new UnprocessableEntityException('This user does not exist');
-    await ThreadParticipant.create({
+
+    const me = thread.participants.find((e) => e.user.id === user.id);
+    if (me.deletedAt && me.isBanUntil) {
+      const m = moment(me.isBanUntil).diff(moment());
+      if (m > 0) {
+        const dur = moment.duration(m);
+        throw new UnauthorizedException(
+          `User is bannished from this thread for ${dur.humanize()} remaining`,
+        );
+      } else {
+        await me.remove();
+      }
+    }
+
+    const tp = ThreadParticipant.create({
       user,
       thread,
       status: ThreadMemberStatus.MEMBER,
-    }).save();
+    });
+    await ThreadParticipant.insert(tp);
     this.messageService.sendSystemMessage(thread, `${user.name} was invited by ${inviter.name}`);
   }
 
@@ -103,6 +118,25 @@ export class ThreadController {
     this.messageService.sendSystemMessage(thread, `${target.user.name} was kicked by ${user.name}`);
   }
 
+  @Put(':id/ban')
+  @ThreadRole(ThreadMemberStatus.ADMIN)
+  @UseGuards(ThreadGuard)
+  async ban(
+    @CurrentUser() user: User,
+    @CurrentThread() thread,
+    @Req() req
+  ) {
+    const target: ThreadParticipant = req.target;
+    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
+    const duration = +req.body.duration;
+    const endDate = !duration ? moment(8.64e15) : moment().add(duration, 'minutes');
+    target.isBanUntil = endDate.toDate();
+    await target.save();
+    await target.softRemove();
+    this.messageService.sendSystemMessage(thread, `${target.user.name} was kicked by ${user.name}`);
+  }
+
+
   @Put(':id/promote')
   @ThreadRole(ThreadMemberStatus.OWNER)
   @UseGuards(ThreadGuard)
@@ -112,6 +146,7 @@ export class ThreadController {
     @Req() req
   ) {
     const target: ThreadParticipant = req.target;
+    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
     target.status = ThreadMemberStatus.ADMIN;
     await target.save();
     this.messageService.sendSystemMessage(thread, `${target.user.name} was promoted to admin by ${user.name}`);
@@ -126,6 +161,7 @@ export class ThreadController {
     @Req() req
   ) {
     const target: ThreadParticipant = req.target;
+    if (!target) throw new UnprocessableEntityException('This user is not in this thread');
     const duration = +req.body.duration;
     const endDate = !duration ? moment(8.64e15) : moment().add(duration, 'minutes');
     target.isMuteUntil = endDate.toDate();

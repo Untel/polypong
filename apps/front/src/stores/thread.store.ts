@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 22:48:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/30 01:48:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,7 +288,10 @@ export const useThreadStore = defineStore('thread', {
         message: `Are you sure you want to ban ${participant.user.name} ?`,
         cancel: true,
       }).onOk(async (duration: number) => {
-        const response = await threadApi.put(`${id}/ban`, { duration });
+        const response = await threadApi.put(`${id}/ban`, {
+          targetId: participant.user.id,
+          duration,
+        });
       });
     },
   },
