@@ -138,7 +138,7 @@ function inviteToLobby(id: number) {
   }
 }
 
-async function message(id: number) { router.push(`/inbox/user/${id}`); }
+async function message(id: number) { router.push(`/chat/${id}`); }
 async function stats(id: number) { router.push(`/profile/${id}`); }
 async function addFriend(name: string) { await soc.send_friendship(name); }
 async function unfriend(name: string) { await soc.unsend_friendship(name); }
