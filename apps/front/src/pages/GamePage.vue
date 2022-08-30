@@ -61,6 +61,7 @@ export default {
     } = ctx;
     const $game = useGameStore();
     const id = currentRoute.params.id as string;
+    console.log('in GamePage prefetch, id = ', id);
     try {
       await $game.fetchCurrentGame(id);
     } catch (err) {
@@ -163,9 +164,7 @@ onUnmounted(() => {
   socket.off('gameUpdate');
   socket.off('mapChange');
   socket.off('powers');
-  socket.off('p');
-  socket.off('end');
-  socket.off('object');
+  $game.$reset();
 });
 
 </script>

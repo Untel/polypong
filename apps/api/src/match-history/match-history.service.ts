@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
-import { Equal, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateMatchHistoryDto } from './dto/create-match-history.dto';
 import { UpdateMatchHistoryDto } from './dto/update-match-history.dto';
 import { Match } from './entities';
@@ -27,6 +27,22 @@ export class MatchHistoryService {
       relations: ['match.players.user'],
     });
     return userMatch.map((um) => um.match);
+  }
+
+  async getAllMatches() {
+    const allMatches = await this.matchRep.find({
+      relations: ['players.user'],
+    });
+    return allMatches;
+  }
+
+  async getAllPlayersUsersIds() {
+    const playersUsersIds = await this.userMatchRep
+      .createQueryBuilder('')
+      .select('user_id')
+      .distinct(true)
+      .getRawMany();
+    return playersUsersIds;
   }
 
   findOne(id: number) {

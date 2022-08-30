@@ -18,6 +18,9 @@ import {
   UseGuards,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Param,
+  Logger,
+  Post,
 } from '@nestjs/common';
 import { CurrentLobby, CurrentUser } from 'src/decorators';
 import Lobby from 'src/game/lobby.class';
@@ -28,7 +31,7 @@ import LobbyExistGuard from './guards/lobby-exist.guard';
 import SocketGuard from './guards/socket.guard';
 import { LobbyService } from './lobby.service';
 import { SocketService } from 'src/socket';
-import { User } from 'src/user';
+import { User, UserService } from 'src/user';
 
 @UseGuards(JwtGuard, LobbyExistGuard)
 @Controller('/lobbies/:id')
@@ -36,7 +39,11 @@ export class LobbyController {
   constructor(
     private readonly lobbyService: LobbyService,
     private readonly socketService: SocketService,
+    private readonly userService: UserService,
   ) {}
+
+  logger = new Logger('LobbyController');
+
   @Get()
   @UseGuards(InLobbyGuard)
   getLobby(@CurrentLobby() lobby): Lobby {
@@ -49,14 +56,67 @@ export class LobbyController {
     @CurrentUser() user,
     @CurrentLobby() lobby: Lobby,
   ): Promise<Lobby> {
-    this.lobbyService.userJoinLobby(lobby, user);
+    await this.lobbyService.userJoinLobby(lobby, user);
     return lobby;
+  }
+
+  @Post('leave')
+  // @UseGuards(SocketGuard)
+  async leaveLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+  ): Promise<void> {
+    return this.lobbyService.userLeaveLobby(lobby, user);
+  }
+
+  @Post('kick/:userId')
+  @UseGuards(IsLobbyHost)
+  async kickUserFromLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+    @Param('userId') userId: string,
+  ): Promise<void> {
+    const userToBeKicked = await this.userService.findById(+userId);
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log(`@Get('kick/:userId), userToBeKicked.name = ${userToBeKicked.name}`);
+    return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
+  }
+
+  @Post('setFinalePoints/:points')
+  @UseGuards(IsLobbyHost)
+  setFinalPoints(
+    @CurrentLobby() lobby: Lobby,
+    @Param('points') points: string,
+  ): Promise<void> {
+    return this.lobbyService.setFinalePoints(lobby, +points);
+    // eslint-disable-next-line prettier/prettier
+  }
+
+  @Post('kill')
+  @UseGuards(IsLobbyHost)
+  // @UseGuards(SocketGuard)
+  async killLobby(@CurrentLobby() lobby: Lobby): Promise<void> {
+    return this.lobbyService.killLobby(lobby);
+  }
+
+  @Post('invite/:userId')
+  // @UseGuards(SocketGuard)
+  async inviteUserToLobby(
+    @CurrentUser() user,
+    @CurrentLobby() lobby: Lobby,
+    @Param('userId') userId: string,
+  ): Promise<void> {
+    this.logger.log(`@Get('invite/:userId), userId = ${userId}`);
+    const invitee = await this.userService.findById(+userId);
+    this.logger.log(`@Get('invite/:userId), invitee.name = ${invitee.name}`);
+    this.lobbyService.inviteUserToLobby(lobby, user, invitee);
   }
 
   @Get('start')
   @UseGuards(IsLobbyHost)
-  startGame(@CurrentLobby() lobby: Lobby): boolean {
-    lobby.start();
+  async startGame(@CurrentLobby() lobby: Lobby): Promise<boolean> {
+    await lobby.start();
+    this.socketService.socketio.emit('game_start', lobby.id);
     this.socketService.socketio
       .except(lobby.roomId)
       .emit('online', { type: 'game_start' });
@@ -64,14 +124,15 @@ export class LobbyController {
   }
 
   @Get('game')
-  @UseGuards(InLobbyGuard)
+//  @UseGuards(InLobbyGuard)
   gameInfos(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
     const player = lobby.game.players.get(user.id);
-    if (player.afkInterval) {
+    if (player?.afkInterval) {
       player.unsetAfk(() => {
         lobby.game.resume();
       });
     }
+    this.socketService.getUserSocket(user.id)?.join(lobby.roomId);
     return lobby.game.netScheme;
   }
 

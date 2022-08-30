@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 07:02:27 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/08/30 17:43:31 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,6 @@ export class Ball extends Circle {
         t.solve();
         normvector.scale(t.sides.c);
 
-        console.log("TARGETING WALL ", i);
         this.targetInfo = {
           actualhit: [
             normvector.x + this.target.hit[0],
@@ -222,7 +221,7 @@ export class Ball extends Circle {
     // x2 pour aller de -1 a x1;
     const percent = (hitLen / paddle.width - 0.5) * 2;
     // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
-    console.log('Hit percent', percent);
+    // console.log('Hit percent', percent);
     const maxAngle = 25;
     const addDeg = maxAngle * percent;
 

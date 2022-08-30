@@ -8,4 +8,5 @@ export interface User {
   avatar: string,
   inLobby?: boolean,
   inGame?: boolean,
+  isTwoFactorAuthenticationEnabled?: boolean,
 }

@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <q-card class="my-card" :label="rel.to.name">
+  <q-card v-if="rel" class="my-card" :label="rel.to.name">
     <div style="position: relative">
       <q-img :src="rel.to.avatar" height="280px" :ratio="4/3" fit="cover">
           <div class="absolute-top text-center text-weight-bolder">
@@ -85,21 +85,28 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, PropType, ref } from 'vue';
-import { Relationship } from '../stores/social.store';
+import {
+  computed,
+  ComputedRef,
+  defineComponent, PropType, ref, watch,
+} from 'vue';
+import { useRouter } from 'vue-router';
+import { authApi, useAuthStore } from 'src/stores/auth.store';
+import { User } from 'src/types/user';
+import { onlineApi, useLobbiesStore } from 'src/stores/lobbies.store';
+import { Relationship, useSocialStore } from '../stores/social.store';
 import StatusBadge from './StatusBadge.vue';
 import SocialButton from './SocialButton.vue';
 
+const soc = useSocialStore();
+const router = useRouter();
+const auth = useAuthStore();
+const lobbies = useLobbiesStore();
+
 defineComponent({ name: 'SocialCard' });
-defineProps({
-  rel: {
-    type: Object as PropType<Relationship>,
-    default: null,
-  },
-  toggle: {
-    type: Boolean,
-    default: false,
-  },
+
+const props = defineProps({
+  relname: String,
 });
 
 const emit = defineEmits([
@@ -107,28 +114,39 @@ const emit = defineEmits([
   'addFriend', 'unfriend', 'block', 'unblock',
 ]);
 
-function friendOrNot(rel: Relationship): string {
-  if (rel.friendship_sent && rel.friendship_received) { return 'green'; }
-  if (rel.block_sent || rel.block_received) { return 'red'; }
-  return '';
+const rel: ComputedRef<Relationship | undefined> = computed(() => soc.getRelByName(props.relname || ''));
+
+const status: ComputedRef<'in game' | 'in lobby' | 'online' | 'offline' | ''> = computed(() => {
+  if (!rel.value) return '';
+  const user: User | undefined = auth.getConnectedUsers
+    .find((u: User) => u.id === rel.value?.toId);
+  if (!user) return 'offline';
+  if (user.inGame) return 'in game';
+  if (user.inLobby) return 'in lobby';
+  return 'online';
+});
+
+function inviteToLobby(id: number) {
+  // emit('inviteToLobby', id);
+  if (status.value === 'offline' || status.value === 'in game') {
+    // console.log('cannot invite, status = ', status);
+    return;
+  }
+  // console.log('lobbies.activeLobby : ', lobbies.activeLobby);
+  if (lobbies.activeLobby) {
+    lobbies.inviteUserToLobby(id);
+  }
 }
 
-const showGutter = ref('');
-const toggleWidth = ref('0');
-
-function toggleGutter(name: string) {
-  showGutter.value = (showGutter.value === name ? '' : name);
-  toggleWidth.value = showGutter.value ? '1' : '0';
-  console.log(`emitting toggleGutter event, name = ${showGutter.value}`);
-  emit('toggleGutter', showGutter.value);
-}
-
-function inviteToLobby(id: number) { emit('inviteToLobby', id); }
-function message(id: number) { emit('message', id); }
-function stats(id: number) { emit('stats', id); }
-function addFriend(name: string) { emit('addFriend', name); }
-function unfriend(name: string) { emit('unfriend', name); }
-function block(name: string) { emit('block', name); }
-function unblock(name: string) { emit('unblock', name); }
+async function message(id: number) { router.push(`/inbox/user/${id}`); }
+async function stats(id: number) { router.push(`/profile/${id}`); }
+async function addFriend(name: string) { await soc.send_friendship(name); }
+async function unfriend(name: string) { await soc.unsend_friendship(name); }
+async function block(name: string) { await soc.send_block(name); }
+async function unblock(name: string) { await soc.unsend_block(name); }
+// function addFriend(name: string) { emit('addFriend', name); }
+// function unfriend(name: string) { emit('unfriend', name); }
+// function block(name: string) { emit('block', name); }
+// function unblock(name: string) { emit('unblock', name); }
 
 </script>

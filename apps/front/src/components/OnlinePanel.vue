@@ -38,20 +38,23 @@
 
 <script lang="ts" setup>
 import { defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 defineComponent({});
 defineProps({
   users: [Object],
 });
 
+const router = useRouter();
+
 const userAvailable = true;
 
 async function addFriend() {
   console.log('addfriend');
 }
-async function message() {
-  console.log('addfriend');
-}
+// async function message(id) {
+//   router.push(`/chat/${id}`);
+// }
 async function inviteToLobby() {
   console.log('addfriend');
 }

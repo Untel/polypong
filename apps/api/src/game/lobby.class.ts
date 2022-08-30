@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 16:50:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 00:45:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ import { Match, UserMatch } from 'src/match-history';
 
 export type LobbyId = number;
 
+let nextid = 42000;
+
 export interface ILobby {
   id: LobbyId;
   players: Map<number, Player>;
@@ -41,6 +43,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   id: LobbyId;
   name: string;
   playersMax: number;
+  finalePoints: number;
   logger = new Logger('Lobby');
 
   @Exclude()
@@ -62,18 +65,12 @@ export default class Lobby implements ILobby, ILobbyConfig {
 
   @Expose()
   public get isStarted() {
-    return this.game && this.game.players.size;
+    return !!this.game;
   }
 
   @Exclude()
   game: Game | null;
 
-  @Exclude()
-  winner: Player | Bot;
-
-  // @Exclude()
-  // private readonly socketService: SocketService;
-  // socket: BroadcastOperator<DefaultEventsMap, SocketData>;
   @Exclude()
   socketServer: Server;
   @Exclude()
@@ -85,12 +82,13 @@ export default class Lobby implements ILobby, ILobbyConfig {
   constructor(service: LobbyService, host: User, name = 'Unamed lobby') {
     this.socketServer = service.socketService.socketio;
     this.service = service;
-    this.id = host.id;
+    this.id = nextid++;
     this.name = name;
     this.host = host;
     this.players = new Map<number, Player>();
     this.spectators = [];
     this.playersMax = 8;
+    this.finalePoints = 3;
     this.spectatorsMax = 10;
     this.bots = [];
     this.fillBots();
@@ -99,25 +97,29 @@ export default class Lobby implements ILobby, ILobbyConfig {
   addPlayer(player: Player) {
     this.players.set(player.id, player);
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
   removePlayer(player: Player | User) {
-    this.players.delete(player.id);
+    if (player) {
+      if (this.players.has(player.id)) {
+        this.players.delete(player.id);
+      }
+    }
     this.fillBots();
-    this.sock.emit('lobby_change');
+    this.sock.emit('lobby_change', this.id);
   }
 
-  start(): Game {
-    // if (this.winner) return;
+  async start(): Promise<Game> {
     if (this.game) {
-      this.winner = null;
       this.game.stop();
       delete this.game;
     }
     this.game = new Game(this);
-    this.sock.emit('start');
-    this.createMatchEntry();
+    await this.createMatchEntry();
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('ABOUT TO EMIT THE START EVENT TO LOBBY, this.id = ', this.id);
+    this.sock.emit('start', this.id);
     this.logger.log(`Starting new game ${this.name}`);
     return this.game;
   }
@@ -133,7 +135,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   async createPlayerRank(player: Player, rank: number) {
     const um = new UserMatch();
     um.user = player.user;
-    um.rank = rank;
+    um.rank = rank + 1;
     um.match = this.match;
     const added = await um.save();
     console.log('Added rank', added, 'for', player.user.name);
@@ -155,7 +157,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
       this.playersMax = opts.playersMax;
       this.fillBots();
     }
-    this.sock.emit('lobby_change', null);
+    //this.sock.emit('lobby_change', this.id);
+    this.socketServer.sockets.emit('lobby_change', this.id);
   }
 
   fillBots() {

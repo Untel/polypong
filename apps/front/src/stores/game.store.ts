@@ -19,6 +19,7 @@ import {
   Power,
 } from 'src/utils/game';
 
+export const gameApi = mande('/api/lobbies');
 export interface GameState {
   id?: string,
   paddles: Paddle[],
@@ -31,7 +32,6 @@ export interface GameState {
 export const useGameStore = defineStore('game', {
   state: () => ({} as GameState),
   getters: {
-    gameApi: (state) => mande(`/api/lobbies/${state.id}/game`),
     getBalls: (state) => {
       console.log('Get');
       return state.balls;
@@ -39,18 +39,21 @@ export const useGameStore = defineStore('game', {
   },
   actions: {
     async fetchCurrentGame(id: string) {
+      console.log('in fetchCurrentGame, id = ', id);
       this.id = id;
-      const gameInfos = await this.gameApi.get<GameState>('');
+      const gameInfos = await gameApi.get<GameState>(`/${id}/game`);
       this.map = gameInfos.map;
       this.balls = gameInfos.balls;
       this.paddles = gameInfos.paddles;
       this.powers = gameInfos.powers;
     },
     async pauseGame() {
-      await this.gameApi.get('pause');
+      gameApi.get<GameState>(`/${this.id}/game`);
+      await gameApi.get('pause');
     },
     async restart() {
-      await this.gameApi.get('restart');
+      gameApi.get<GameState>(`/${this.id}/game`);
+      await gameApi.get('restart');
     },
   },
 });

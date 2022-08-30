@@ -15,11 +15,7 @@ import {
   ExecutionContext,
   Injectable,
   UnprocessableEntityException,
-  createParamDecorator,
-  Inject,
-  forwardRef,
 } from '@nestjs/common';
-import Lobby from 'src/game/lobby.class';
 import { LobbyService } from 'src/lobby/lobby.service';
 
 @Injectable()
@@ -48,6 +44,7 @@ export default class LobbyExistGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const params = req.params;
     const lobbyId = +params.id;
+    console.log('++++++++lobbyId = ', lobbyId);
     const lobby = this.lobbyService.getLobby(lobbyId);
     if (!lobby) {
       throw new UnprocessableEntityException();

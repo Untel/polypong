@@ -91,8 +91,6 @@ export class Bot {
 
     const paddleMidRatio = GameTools.calculateRatio(paddleMidpointDist, totalDist);
     const ratio = GameTools.calculateRatio(leftSideDist, totalDist);
-    console.log("paddleMid",paddleMidRatio);
-    console.log(`Ball Ratio:${ratio}`);
     if (ratio > paddleMidRatio + (this.precision / 2))
       dir = 1;
     else if (ratio < paddleMidRatio - (this.precision / 2))

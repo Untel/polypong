@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 06:53:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/08/27 02:33:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,6 @@ export class ThreadService {
     @InjectRepository(ThreadParticipant)
     private threadParticipantRep: Repository<ThreadParticipant>,
   ) {}
-
-  async create(th: Partial<Thread>) {
-    const thread = Thread.create(th);
-    return thread;
-  }
 
   async newDirectMessage(message: Partial<Message>, from: User, to: User) {
     return;
@@ -60,7 +55,6 @@ export class ThreadService {
       .leftJoinAndSelect('participants.user', 'user')
       .leftJoinAndSelect('thread.channel', 'channel')
       .leftJoinAndSelect('channel.initiator', 'initiator')
-      .leftJoinAndSelect('initiator.user', 'initiator_user')
       // LAST MESSAGE
       .leftJoinAndMapOne(
         'thread.lastMessage',
@@ -72,22 +66,7 @@ export class ThreadService {
       .leftJoinAndSelect('lastMessage.sender', 'sender')
       .leftJoinAndSelect('sender.user', 'sender_user')
       .getMany();
-
-    // console.log('Threads', threads);
-    const mapped = threads.map((t) => {
-      // console.log('T is', t);
-      const recipient = t.channel
-        ? t.channel.initiator.user
-        : t.participants.find((p) => p.user.id !== user.id).user;
-      const me = t.participants.find((p) => p.user.id === user.id);
-      return {
-        ...t,
-        recipient,
-        me,
-      };
-    });
-    // console.log('Mapped', mapped);
-    return mapped;
+    return threads;
   }
 
   async findThreadWithMessages(id: ID) {
@@ -120,28 +99,19 @@ export class ThreadService {
     });
   }
 
-  async findOneOrCreate(users: User[] = []) {
-    const th = await this.threadRep.findOne({
-      // join: { alias: 'p', leftJoin: {  }},
-      where: {
-        // participants: users.map((u) => ({ user: { id: u.id } })),
-        participants: { user: { id: In(users.map((u) => u.id)) } },
-        channel: IsNull(),
-      },
-      relations: ['participants.user', 'messages'],
-    });
+  async findOneOrCreate(user: User, to: User) {
+    const key = `th-${[user.id, to.id].sort().join('-')}`;
+    const th = await Thread.findOneBy({ key });
     if (th) return th;
 
-    this.logger.log(
-      `Trying to get unexisting thread between ${users
-        .map((u) => u.name)
-        .join(', ')}. Creating...`,
-    );
+    return this.create([user, to], key);
+  }
 
-    const thread = new Thread();
-    // console.log('thread', thread);
-    const participants = users.map((user) => new ThreadParticipant({ user }));
-    thread.participants = participants;
+  async create(users: User[], key = null) {
+    const thread = Thread.create({
+      key,
+      participants: users.map((user) => ThreadParticipant.create({ user })),
+    });
     return await thread.save();
   }
 

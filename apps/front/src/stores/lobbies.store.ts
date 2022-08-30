@@ -45,8 +45,9 @@ export interface Lobby {
   spectatorsMax: number;
   description: string;
   isPrivate?: boolean;
-  isStarted: number;
+  isStarted: boolean;
   host: User
+  finalePoints: number;
 }
 
 interface LobbiesState {
@@ -83,7 +84,50 @@ export const useLobbiesStore = defineStore('lobbies', {
     async fetchCurrentLobby(lobbyId: number | string) {
       this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
     },
+    async leave() {
+      this.router.push('/lobbies');
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        this.activeLobby = null;
+      }
+    },
+    async kick(lobbyId: number, userId: number) {
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/kick/${userId}`);
+      }
+    },
+    async inviteUserToLobby(userId: number) {
+      const { getIsConnected } = useAuthStore();
+      if (!getIsConnected) return;
+      if (!this.activeLobby) return;
+      lobbiesApi.post(`${this.activeLobby.id}/invite/${userId}`);
+    },
+    async invitedBy(fromId: number, fromName: string, lobbyId: number) {
+      Notify.create({
+        type: 'neutral',
+        color: 'primary',
+        message: `You have been invited by ${fromName} to join lobby ${lobbyId}`,
+        actions: [
+          {
+            label: 'Accept',
+            color: 'white',
+            handler: () => {
+              // console.log('about to reroute to /lobby/', lobbyId);
+              this.router.push(`/lobby/${lobbyId}`);
+            },
+          },
+        ],
+      });
+    },
     async createLobby(lobbyName: string) {
+      if (this.activeLobby) {
+        try {
+          await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        } catch (e) {
+          console.log(e);
+        }
+        this.activeLobby = null;
+      }
       try {
         const newLobby: Lobby = await lobbiesApi.post('', {
           name: lobbyName,
@@ -108,6 +152,12 @@ export const useLobbiesStore = defineStore('lobbies', {
           message: 'Error while updating lobby',
         });
         return null;
+      }
+    },
+    async setFinalePoints(finalePoints: string) {
+      console.log('setFinalePoints - finalepoints = ', finalePoints);
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/setFinalePoints/${finalePoints}`);
       }
     },
     async joinLobby(lobbyId: number) {
