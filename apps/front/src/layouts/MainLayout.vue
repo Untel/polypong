@@ -175,10 +175,11 @@ $auth.socket.on('game_start', async (lobbyId: number) => {
 
 $auth.socket.on('lobby_change', async (lobbyId: number) => {
   console.log('LOBBY_CHANGE - lobbyId = ', lobbyId);
-  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+  await $lobbies.fetchLobbies();
   if (isActiveIn(lobbyId)) {
     await $lobbies.fetchCurrentLobby(lobbyId);
   }
+  await $auth.fetchConnectedUsers();
 });
 
 $auth.socket.onAny((eventName, ...args) => {

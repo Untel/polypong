@@ -7,7 +7,7 @@ import {
 } from 'geometric';
 import { LobbyBot } from './lobbyBot.class';
 export class Bot {
-  botPaddle: Paddle;s
+  botPaddle: Paddle;
   maxSpeed: number;
   edge: Line;
   wall: Wall;

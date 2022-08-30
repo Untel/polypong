@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -33,6 +32,18 @@ export enum MODE {
   Battleground = 'battleground',
 }
 
+export class Finalist {
+  isHuman: boolean;
+  index: number;
+  hp = 11;
+
+  constructor(isHuman: boolean, index: number, hp: number) {
+    this.isHuman = isHuman;
+    this.index = index;
+    this.hp = hp;
+  }
+}
+
 export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
@@ -45,6 +56,8 @@ export default class Game {
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
   timeElapsed = 0;
+  finalePoints = 1;
+  finalists: Finalist[] = [];
   paused = false;
 
   @Exclude()
@@ -60,16 +73,14 @@ export default class Game {
     this.lobby = lobby;
     this.bots = lobby.bots.map((v) => new Bot(v));
     this.players = new Map(this.lobby.players);
+    this.finalePoints = lobby.finalePoints;
     this.newRound(7);
   }
 
-  logger = new Logger('Game')
+  logger = new Logger('Game');
 
   addBall() {
-    const ball = new Ball(
-      this,
-      this.map.center.clone(),
-    );
+    const ball = new Ball(this, this.map.center.clone());
     // ball.setAngle(angleToRadians(this.map.angles[1]));
     ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
     ball.findTarget();
@@ -127,8 +138,10 @@ export default class Game {
   resume(timer = 5) {
     console.log('New round', this.players.size, this.bots.length);
     this.paused = true;
+    // eslint-disable-next-line prettier/prettier
     this.logger.log(`&&&&&&&& RESUME this.isStopped = ${this.isStopped} &&&&&&&`);
     if (this.isStopped) this.run();
+    // eslint-disable-next-line prettier/prettier
     this.logger.log(`&&&&&&&& After this.run, this.isStopped = ${this.isStopped} &&&&&&&`);
     clearInterval(this.sayInterval);
     this.sayInterval = setInterval(() => {
@@ -207,7 +220,11 @@ export default class Game {
 //          if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
-        await this.reduce(ball.target.wall);
+        if (this.nPlayers === 2) {
+          await this.finalReduce(ball.target.wall);
+        } else {
+          await this.reduce(ball.target.wall);
+        }
       }
       const wall = ball.target.wall;
 
@@ -273,9 +290,11 @@ export default class Game {
     this.logger.log('===============killPlayer============');
     this.logger.log('player = ', player.user.email);
     this.stop();
+    // eslint-disable-next-line prettier/prettier
     this.logger.log(`BEFORE players.delete, players.size = ${this.players.size}`);
     this.logger.log(`BEFORE players.delete, nPlayers = ${this.nPlayers}`);
     this.players.delete(player.user.id);
+    // eslint-disable-next-line prettier/prettier
     this.logger.log(`AFTER players.delete, players.size = ${this.players.size}`);
     this.logger.log(`AFTER players.delete, nPlayers = ${this.nPlayers}`);
     await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
@@ -310,7 +329,7 @@ export default class Game {
     }
     if (this.ended) {
       if (this.players.size === 1) {
-        this.logger.log(`$$$$$$ LONE PLAYER LEFT $$$$$`);
+        this.logger.log('$$$$$$ LONE PLAYER LEFT $$$$$');
         const lastHuman = [...this.players.values()][0];
         this.logger.log(`last human : ${lastHuman.user.email}`);
         await this.killPlayer(lastHuman);
@@ -331,6 +350,95 @@ export default class Game {
 //    this.logger.log('2lele');
 //    this.run();
 //    this.logger.log('3lolo');
+  }
+
+  private setFinalists() {
+    this.logger.log('~~~~~~~~~~~~~~setFinalists~~~~~~~~~~~~~~');
+    const humans = [...this.players.values()];
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('humans = '); console.log(humans);
+    humans.forEach((p, index) => {
+      const f = new Finalist(true, index, this.finalePoints);
+      this.finalists.push(f);
+    });
+    this.bots.forEach((b, index) => {
+      const f = new Finalist(false, index, this.finalePoints);
+      this.finalists.push(f);
+    });
+  }
+
+  private async decrementHp(wall: Wall) {
+    if (wall.bot) {
+      this.logger.log(`BOT ${wall.bot.name} took a hit`);
+      const botIndex = this.bots.findIndex((bot) => bot.name === wall.bot.name);
+      this.logger.log(`BOTINDEX = ${botIndex}`);
+      for (let i = 0; i < 2; i++) {
+        const f = this.finalists[i];
+        if (!f.isHuman) {
+          if (f.index === botIndex) {
+            f.hp--;
+            this.logger.log(`REMOVED HP FROM FINALIST: ${f}`);
+            if (f.hp <= 0) {
+              this.logger.log(`FINALIST: ${f} IS DEAD`);
+              this.bots = this.bots.filter((b) => b !== wall.bot);
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      this.logger.log(`HUMAN ${wall.player.user.name} took a hit`);
+      const humanIndex = [...this.players.values()].findIndex((p) => {
+        console.log(
+          'p.user.id = ',
+          p.user.id,
+          ', wall.player.user.id = ',
+          wall.player.user.id,
+          ' === : ',
+          p.user.id === wall.player.user.id,
+        );
+        return p.user.id === wall.player.user.id;
+      });
+      this.logger.log(`HUMANINDEX = ${humanIndex}`);
+      for (let i = 0; i < 2; i++) {
+        const f = this.finalists[i];
+        if (f.isHuman) {
+          if (f.index === humanIndex) {
+            f.hp--;
+            this.logger.log(`REMOVED HP FROM FINALIST: ${f}`);
+            if (f.hp <= 0) {
+              this.logger.log(`FINALIST: ${f} IS DEAD`);
+              await this.killPlayer(wall.player);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public async finalReduce(wall: Wall) {
+    this.stop();
+    this.logger.log('~~~~~~~~~~~~~~finalReduce~~~~~~~~~~~~~~');
+    if (this.finalists.length !== 2) {
+      this.setFinalists();
+    }
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('Finalists : '); console.log(this.finalists);
+    await this.decrementHp(wall);
+    // eslint-disable-next-line prettier/prettier
+    this.logger.log('After Decrement, Finalists : '); console.log(this.finalists);
+    if (this.ended) {
+      if (this.players.size === 1) {
+        this.logger.log('$$$$$$ LONE PLAYER LEFT $$$$$');
+        const lastHuman = [...this.players.values()][0];
+        this.logger.log(`last human : ${lastHuman.user.email}`);
+        await this.killPlayer(lastHuman);
+        this.logger.log('$$$$$$$$$$$$$$$$$$$$$$$$$');
+      }
+      return await this.lobby.service.closeLobby(this.lobby);
+    }
+    return this.newRound();
   }
 
   @Expose()

@@ -47,6 +47,7 @@ export interface Lobby {
   isPrivate?: boolean;
   isStarted: boolean;
   host: User
+  finalePoints: number;
 }
 
 interface LobbiesState {
@@ -151,6 +152,12 @@ export const useLobbiesStore = defineStore('lobbies', {
           message: 'Error while updating lobby',
         });
         return null;
+      }
+    },
+    async setFinalePoints(finalePoints: string) {
+      console.log('setFinalePoints - finalepoints = ', finalePoints);
+      if (this.activeLobby) {
+        await lobbiesApi.post(`${this.activeLobby.id}/setFinalePoints/${finalePoints}`);
       }
     },
     async joinLobby(lobbyId: number) {

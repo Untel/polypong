@@ -82,6 +82,16 @@ export class LobbyController {
     return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
   }
 
+  @Post('setFinalePoints/:points')
+  @UseGuards(IsLobbyHost)
+  setFinalPoints(
+    @CurrentLobby() lobby: Lobby,
+    @Param('points') points: string,
+  ): Promise<void> {
+    return this.lobbyService.setFinalePoints(lobby, +points);
+    // eslint-disable-next-line prettier/prettier
+  }
+
   @Post('kill')
   @UseGuards(IsLobbyHost)
   // @UseGuards(SocketGuard)
