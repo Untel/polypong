@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.service.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 18:03:29 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/01 01:55:12 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,8 +226,8 @@ export class LobbyService {
     return lobby;
   }
 
-  async closeLobby(lobby: Lobby, winner = null) {
-    console.log('Stored match', lobby.match);
+  closeLobby(lobby: Lobby, winner = null) {
+    console.log('Stored match')//, lobby.match);
     if (lobby.game) {
       lobby.game.stop();
       //      lobby.sock.emit('redirect', {
@@ -236,8 +236,10 @@ export class LobbyService {
       lobby.sock.emit('gameOver', lobby.id);
       this.socketService.socketio.emit('other_game_over', lobby.id);
       lobby.match.finishedAt = TS.ts();
-      lobby.match = await lobby.match.save();
-      console.log('Updated match', lobby.match);
+      lobby.match.save().then(() => {
+        this.logger.log('Updated match', lobby.match)
+      });
+
     }
     lobby.sock.socketsLeave(lobby.roomId);
     this.lobbies.delete(lobby.id);

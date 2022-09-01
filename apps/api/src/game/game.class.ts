@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 22:02:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/01 04:10:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,34 @@ export enum MODE {
   Battleground = 'battleground',
 }
 
-export class Finalist {
-  isHuman: boolean;
-  index: number;
-  hp = 11;
+export class Finalists {
+  scores: number[] = [0, 0];
+  type: number;
+  players: Player[] | Bot[] | [];
 
-  constructor(isHuman: boolean, index: number, hp: number) {
-    this.isHuman = isHuman;
-    this.index = index;
-    this.hp = hp;
+  constructor(players) {
+    this.players = players;
+  }
+
+  public gameDone(targetScore: number, gapPoints: number = 2) {
+    console.log("scores says", this.scores);
+    const absdiff = Math.abs(this.scores[0] - this.scores[1]);
+    let ret;
+    if (absdiff < gapPoints)
+      ret = (false);
+    else if (this.scores[0] >= targetScore || this.scores[1] >= targetScore)
+      ret = true;
+    else
+      ret = false;
+    return ret;
+  }
+
+  public wallGotGoaled(wall: Wall) {
+    const compare = (wall.bot === undefined) ? wall.player : wall.bot;
+    if (compare === this.players[0])
+      this.scores[1]++;
+    else if (compare === this.players[1])
+      this.scores[0]++;
   }
 }
 
@@ -54,9 +73,10 @@ export default class Game {
   powers: Power[] = [];
   map: PolygonMap;
   mode: MODE = MODE.Battleground;
+  finaleScore = [0, 0];
   timeElapsed = 0;
   finalePoints = 1;
-  finalists: Finalist[] = [];
+  finalists: Finalists | null;
   paused = false;
 
   @Exclude()
@@ -74,6 +94,9 @@ export default class Game {
     this.players = new Map(this.lobby.players);
     this.finalePoints = lobby.finalePoints;
     this.newRound(7);
+    this.finalists = null;
+    if (this.nPlayers === 2)
+      this.registerFinalists();
   }
 
   logger = new Logger('Game');
@@ -131,6 +154,7 @@ export default class Game {
   }
 
   newRound(timer = 5) {
+    // console.log("finalists ?", (this.finalists !== null));
     this.generateMap();
     this.socket.emit('mapChange', this.mapNetScheme);
     this.resume(timer);
@@ -166,8 +190,8 @@ export default class Game {
     if (player) player.wall.paddle.updatePercentOnAxis(percent);
   }
 
-  async runPhysics() {
-    this.balls.forEach(async (ball) => {
+  runPhysics() {
+    this.balls.forEach((ball) => {
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
@@ -181,19 +205,13 @@ export default class Game {
       // console.log("edges ", this.map.edges[0])
 
       if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
-        console.log('Ded ball :', dtc);
+        // console.log('Ded ball :', dtc);
         // ball.lastHitten.score++
         this.balls.forEach((e) => {
           //          if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
-        if (this.nPlayers === 2) {
-          await this.finalReduce(ball.target.wall);
-        } else {
-          await this.reduce(ball.target.wall);
-        }
-
-        // this.reduce(ball.target.wall);
+        this.reduce(ball.target.wall);
       }
       const wall = ball.target.wall;
 
@@ -250,168 +268,77 @@ export default class Game {
     return true;
   }
 
-  async killPlayer(player: Player) {
+  killPlayer(player: Player) {
     this.logger.log('===============killPlayer============');
-    this.logger.log('player = ', player.user.email);
+    // this.logger.log('player = ', player.user.email);
     this.stop();
     // eslint-disable-next-line prettier/prettier
     this.logger.log(
       `BEFORE players.delete, players.size = ${this.players.size}`,
     );
     this.logger.log(`BEFORE players.delete, nPlayers = ${this.nPlayers}`);
+    console.log("player is", player);
     this.players.delete(player.user.id);
     // eslint-disable-next-line prettier/prettier
     this.logger.log(
       `AFTER players.delete, players.size = ${this.players.size}`,
     );
     this.logger.log(`AFTER players.delete, nPlayers = ${this.nPlayers}`);
-    await this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers);
-    //    if (this.ended) {
-    //      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
-    //      this.logger.log('=====================================');
-    //      return await this.lobby.service.closeLobby(this.lobby);
-    //    }
-    //    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
-    //    this.logger.log('1lala');
-    //    this.newRound();
-    //    this.logger.log('2lele');
-    //    this.run();
-    //    this.logger.log('3lolo');
+    this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers).then(() => { });
   }
 
-  public async reduce(wall: Wall) {
+  registerFinalists() {
+    let collection = [];
+    this.players.forEach(p => {
+      collection.push(p);
+    });
+    this.bots.forEach(p => {
+      collection.push(p);
+    });
+    this.finalists = new Finalists(collection);
+  }
+
+  killWall(wall: Wall) {
+    if (wall.bot !== undefined) {
+      this.logger.log('Bot getting killed');
+      this.bots = this.bots.filter((b) => b !== wall.bot);
+    } else if (wall.player !== undefined) {
+      this.logger.log('Player getting killed');
+      this.killPlayer(wall.player);
+    }
+    else {
+      console.log("didn't kill that one");
+    }
+  }
+
+
+  public reduce(wall: Wall) {
     this.stop();
     this.logger.log('~~~~~~~~~~~~~~reduce~~~~~~~~~~~~~~');
-    if (wall.bot) {
-      this.logger.log('REDUCING BOT');
-      this.bots = this.bots.filter((b) => b !== wall.bot);
-      //      if (this.ended) {
-      //        this.killPlayer([...this.players.values()][0]);
-      //      } else {
-      //        this.newRound();
-      //      }
-    } else if (wall.player) {
-      this.logger.log('REDUCING PLAYER');
-      await this.killPlayer(wall.player);
-      this.logger.log('4lulu');
-    }
-    if (this.ended) {
-      if (this.players.size === 1) {
-        this.logger.log('$$$$$$ LONE PLAYER LEFT $$$$$');
-        const lastHuman = [...this.players.values()][0];
-        this.logger.log(`last human : ${lastHuman.user.email}`);
-        await this.killPlayer(lastHuman);
-        this.logger.log('$$$$$$$$$$$$$$$$$$$$$$$$$');
+    //If we're more than two than the game will still go on afterwards
+    if (this.nPlayers > 2) {
+      this.killWall(wall);
+      if (this.nPlayers === 2) {
+        console.log("Only two left, time for baston");
+        this.registerFinalists();
       }
-      return await this.lobby.service.closeLobby(this.lobby);
+      return this.newRound(); //So we ret newRound
     }
-    return this.newRound();
+    //Otherwise let's look at points  
+    this.finalists.wallGotGoaled(wall)
 
-    //    if (this.ended) {
-    //      this.logger.log('{{{{{{{{{{{{{{ CLOSING LOBBY }}}}}}}}}}}}}}');
-    //      this.logger.log('=====================================');
-    //      return await this.lobby.service.closeLobby(this.lobby);
-    //    }
-    //    this.logger.log('[[[[[[[[[[[CONTINUING]]]]]]]]]]]');
-    //    this.logger.log('1lala');
-    //    this.newRound();
-    //    this.logger.log('2lele');
-    //    this.run();
-    //    this.logger.log('3lolo');
-  }
-
-  private setFinalists() {
-    this.logger.log('~~~~~~~~~~~~~~setFinalists~~~~~~~~~~~~~~');
-    const humans = [...this.players.values()];
-    // eslint-disable-next-line prettier/prettier
-    this.logger.log('humans = ');
-    console.log(humans);
-    humans.forEach((p, index) => {
-      const f = new Finalist(true, index, this.finalePoints);
-      this.finalists.push(f);
+    if (!this.finalists.gameDone(this.finalePoints)) {
+      this.logger.log(`Score is, ${this.finalists.scores}, entertain us some more`);
+      return this.newRound();
+    }
+    //Now this is safe to assume that's the end, get rid of the looser
+    this.killWall(wall);
+    this.logger.log('Winner getting killed');
+    this.players.forEach(element => {
+      this.killPlayer(element);
     });
-    this.bots.forEach((b, index) => {
-      const f = new Finalist(false, index, this.finalePoints);
-      this.finalists.push(f);
-    });
+    return this.lobby.service.closeLobby(this.lobby);
   }
-
-  private async decrementHp(wall: Wall) {
-    if (wall.bot) {
-      this.logger.log(`BOT ${wall.bot.name} took a hit`);
-      const botIndex = this.bots.findIndex((bot) => bot.name === wall.bot.name);
-      this.logger.log(`BOTINDEX = ${botIndex}`);
-      for (let i = 0; i < 2; i++) {
-        const f = this.finalists[i];
-        if (!f.isHuman) {
-          if (f.index === botIndex) {
-            f.hp--;
-            this.logger.log(`REMOVED HP FROM FINALIST: ${f}`);
-            if (f.hp <= 0) {
-              this.logger.log(`FINALIST: ${f} IS DEAD`);
-              this.bots = this.bots.filter((b) => b !== wall.bot);
-              break;
-            }
-          }
-        }
-      }
-    } else {
-      this.logger.log(`HUMAN ${wall.player.user.name} took a hit`);
-      const humanIndex = [...this.players.values()].findIndex((p) => {
-        console.log(
-          'p.user.id = ',
-          p.user.id,
-          ', wall.player.user.id = ',
-          wall.player.user.id,
-          ' === : ',
-          p.user.id === wall.player.user.id,
-        );
-        return p.user.id === wall.player.user.id;
-      });
-      this.logger.log(`HUMANINDEX = ${humanIndex}`);
-      for (let i = 0; i < 2; i++) {
-        const f = this.finalists[i];
-        if (f.isHuman) {
-          if (f.index === humanIndex) {
-            f.hp--;
-            this.logger.log(`REMOVED HP FROM FINALIST: ${f}`);
-            if (f.hp <= 0) {
-              this.logger.log(`FINALIST: ${f} IS DEAD`);
-              await this.killPlayer(wall.player);
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public async finalReduce(wall: Wall) {
-    this.stop();
-    this.logger.log('~~~~~~~~~~~~~~finalReduce~~~~~~~~~~~~~~');
-    if (this.finalists.length !== 2) {
-      this.setFinalists();
-    }
-    // eslint-disable-next-line prettier/prettier
-    this.logger.log('Finalists : ');
-    console.log(this.finalists);
-    await this.decrementHp(wall);
-    // eslint-disable-next-line prettier/prettier
-    this.logger.log('After Decrement, Finalists : ');
-    console.log(this.finalists);
-    if (this.ended) {
-      if (this.players.size === 1) {
-        this.logger.log('$$$$$$ LONE PLAYER LEFT $$$$$');
-        const lastHuman = [...this.players.values()][0];
-        this.logger.log(`last human : ${lastHuman.user.email}`);
-        await this.killPlayer(lastHuman);
-        this.logger.log('$$$$$$$$$$$$$$$$$$$$$$$$$');
-      }
-      return await this.lobby.service.closeLobby(this.lobby);
-    }
-    return this.newRound();
-  }
-
   @Expose()
   public get isStopped() {
     return !this.interval;
@@ -502,12 +429,12 @@ export default class Game {
       PowerList[GameTools.getRandomArbitrary(0, PowerList.length)];
     const powerObj: Power = new powerClass(this, this.map.randomPosition());
     this.powers.push(powerObj);
-    console.log(
-      'Adding new power',
-      powerObj.name,
-      Object.keys(powerObj),
-      typeof powerObj,
-    );
+    // console.log(
+    //   'Adding new power',
+    //   powerObj.name,
+    //   Object.keys(powerObj),
+    //   typeof powerObj,
+    // );
     // this.socket.emit('power', (this.powers.indexOf(powerObj), powerObj.netScheme))
     this.socket.emit(
       'powers',
