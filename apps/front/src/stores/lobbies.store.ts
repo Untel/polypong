@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobbies.store.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 02:05:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/01 10:01:47 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,9 @@ export const useLobbiesStore = defineStore('lobbies', {
           },
         ],
       });
+    },
+    async joinMatchmake() {
+      lobbiesApi.get(`/matchmake`);
     },
     async createLobby(lobbyName: string) {
       if (this.activeLobby) {

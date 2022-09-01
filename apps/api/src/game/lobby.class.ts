@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.class.ts                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 00:45:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/01 09:38:37 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.players = new Map<number, Player>();
     this.spectators = [];
     this.playersMax = 8;
+    if (name === "matchmade")
+      this.playersMax = 2;
     this.finalePoints = 3;
     this.spectatorsMax = 10;
     this.bots = [];

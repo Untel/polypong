@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.controller.ts                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/17 03:56:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/01 10:11:05 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,15 @@ export class LobbyController {
     @CurrentLobby() lobby: Lobby,
   ): Promise<Lobby> {
     await this.lobbyService.userJoinLobby(lobby, user);
+    return lobby;
+  }
+
+  @Get('matchmake')
+  // @UseGuards(SocketGuard)
+  async addToMatchmake(
+    @CurrentUser() user,
+  ): Promise<Lobby> {
+    const lobby = await this.lobbyService.userMatchmake(user);
     return lobby;
   }
 

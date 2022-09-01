@@ -19,6 +19,7 @@
         subhead="Find the regular opponent"
         avatar="/matchmaking.png"
         :isCreated=true
+        @joinLobby="joinMatchmake"
       >
         <q-circular-progress
           show-value
@@ -129,10 +130,22 @@ async function createLobby() {
   }
 }
 
+async function joinMatchmake() {
+  console.log("Join matchmake");
+  await $lobbies.joinMatchmake();
+}
+
 onMounted(() => {
   socket.on('update_lobbies', (evt) => {
     console.log('Refreshed lobbies', evt);
     $lobbies.lobbies = evt;
+  });
+  socket.on('matchmake_done', (lobbyid) => {
+    console.log("Matchmaking done !");
+    // console.log("lobbyid done !", lobbyid);
+    $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
+      router.push(`/lobby/${lobbyid}/game`);
+    });
   });
 });
 
