@@ -34,7 +34,5 @@ export interface Power {
   name: string
 }
 export interface Score {
-  x : number;
-  y : number;
   value: number
 }

@@ -36,6 +36,13 @@
 
 <template>
   <div class="svg-test wrapper">
+    <!-- <g v-for="(score, idx) in scores"
+      :key="`score-${idx}`"
+        > -->
+        <p v-if="(scores.length === 2)" >
+          {{scores[0]}} - {{scores[1]}}
+        </p>
+      <!-- </g> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
@@ -61,13 +68,6 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
-      <g v-for="(score, idx) in scores"
-      :key="`score-${idx}`"
-        >
-        <text v-if="(scores.length === 2)" v-bind="formatPoint(score.x, score.y)" >
-          {{score.value}}
-        </text>
-      </g>
       <g v-for="(ball, idx) in balls"
         :key="`ball-${idx}`"
         >

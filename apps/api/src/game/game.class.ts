@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 10:15:26 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 11:01:05 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ export class Participant {
   isBot : boolean;
   ref : Bot | Player;
   score : number;
-
   constructor(ref : Bot | Player, bot : boolean = true)
   {
     this.ref = ref;
@@ -108,6 +107,7 @@ export default class Game {
   sayInterval: NodeJS.Timeout;
 
   constructor(lobby: Lobby) {
+    this.finalists = null;
     this.lobby = lobby;
     this.bots = lobby.bots.map((v) => new Bot(v));
     this.players = new Map(this.lobby.players);
@@ -115,7 +115,7 @@ export default class Game {
     this.players.forEach(p => {this.participants.push(new Participant(p, false))});
     this.finalePoints = lobby.finalePoints;
     this.newRound(7);
-    this.finalists = null;
+    // this.finalists = null;
     if (this.nPlayers === 2)
       this.registerFinalists();
   }
@@ -386,7 +386,9 @@ export default class Game {
     return this.powers.map((p) => p.netScheme);
   }
   public get scoreNetScheme() {
-    return (this.participants.map(e => e.netScheme))
+    if (this.finalists !== null)
+      return (this.finalists.scores)
+    return [];
   }
 
   public get nPlayers() {
