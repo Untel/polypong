@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/02 23:40:41 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 13:20:04 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,10 +97,7 @@ export class SocketGateway
   handleDisconnect(client: Socket) {
     const user: User = client.data.user;
     const lobby: Lobby = client.data.lobby;
-    console.log("Disconnect usr : ", user);
-    console.log("Disconnect lobby : ", lobby);
 
-    // const lobby: Lobby = this.lobbyService.userIsInLobby(user.id);
     if (lobby) {
       if (lobby.game) {
         const player = lobby.game.players.get(user.id); // user is still alive

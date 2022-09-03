@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 12:35:39 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 13:39:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,12 +233,11 @@ export default class Game {
       } else if (dtc >= 70) {
         this.reduce(ball.target.wall);
       }
-      const wall = ball.target.wall;
-
-      if (wall.paddle === null) {
+      const wall = ball.target?.wall;
+      if (wall?.paddle === null) {
         const test : boolean = GameTools.lineCircleCollision(wall.line, ball,[0, 0],);
         if (test) ball.bounceTargetWall();
-      } else {
+      } else if (wall){
         let impact : Point = [0, 0];
         const test : boolean = GameTools.wallBallCollision(wall.paddle.line, ball, impact);
         if (test) {

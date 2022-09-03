@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 12:41:53 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 13:53:04 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,28 +35,28 @@ export default class GameTools {
     return offsetValue - Math.floor(offsetValue / width) * width + r_start;
     // + start to reset back to start of original range
   }
-  static lineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
-    const s1_x = p1_x - p0_x;
-    const s1_y = p1_y - p0_y;
-    const s2_x = p3_x - p2_x;
-    const s2_y = p3_y - p2_y;
+  static lineIntersection(line1:Line, line2:Line) {
+    const s1_x = line1[1][0] - line1[0][0];
+    const s1_y = line1[1][1] - line1[0][1];
+    const s2_x =  line2[1][0] - line2[0][0];
+    const s2_y = line2[1][1] - line2[0][1];
 
     const s =
-      (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) /
+      (-s1_y * (line1[0][0] - line2[0][0]) + s1_x * (line1[0][1] - line2[0][1])) /
       (-s2_x * s1_y + s1_x * s2_y);
     const t =
-      (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) /
+      (s2_x * (line1[0][1] - line2[0][1]) - s2_y * (line1[0][0] - line2[0][0])) /
       (-s2_x * s1_y + s1_x * s2_y);
 
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
       return {
-        x: p0_x + t * s1_x,
-        y: p0_y + t * s1_y,
+        x: line1[0][0] + t * s1_x,
+        y: line1[0][1] + t * s1_y,
       };
     }
-
     return null; // No collision
   }
+
   static getRandomArbitrary(min, max): number {
     return Math.floor(Math.random() * (max - min) + min);
   }

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 13:07:58 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 13:51:56 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,16 +97,7 @@ export class Ball extends Circle {
       }
       const edge: Line = wall.line;
       const [[x3, y3], [x4, y4]] = edge;
-      const intersection = GameTools.lineIntersection(
-        x1,
-        y1,
-        x2,
-        y2,
-        x3,
-        y3,
-        x4,
-        y4,
-      );
+      const intersection = GameTools.lineIntersection([[x1,y1],[x2,y2]],[[x3,y3],[x4,y4]]);
 
       if (intersection) {
         this.target = {
@@ -261,17 +252,21 @@ export class Ball extends Circle {
     return [this.position.x, this.position.y];
   }
   public get netScheme() {
-    return {
-      color: this.color,
-      position: {
-        x: this.position.x,
-        y: this.position.y,
-      },
-      radius: this.radius,
-      target: {
-        x: this.target?.hit[0] | 0,
-        y: this.target?.hit[1] | 0,
-      },
-    };
+    const x = (this.target?.hit[0]) ? this.target.hit[0] : 0 ;
+    const y = (this.target?.hit[1]) ? this.target.hit[1] : 0 ;
+    if (this.target){
+      return {
+        color: this.color,
+        position: {
+          x: this.position.x,
+          y: this.position.y,
+        },
+        radius: this.radius,
+        target: {
+          x: x,
+          y: y,
+        },
+      };
+    }
   }
 }
