@@ -82,8 +82,7 @@ export class Ball extends Circle {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
-    if (walls.length < 3)
-      return;
+    if (walls.length < 3) return;
     const line: Line = [
       [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
@@ -97,7 +96,16 @@ export class Ball extends Circle {
       }
       const edge: Line = wall.line;
       const [[x3, y3], [x4, y4]] = edge;
-      const intersection = GameTools.lineIntersection([[x1,y1],[x2,y2]],[[x3,y3],[x4,y4]]);
+      const intersection = GameTools.lineIntersection(
+        [
+          [x1, y1],
+          [x2, y2],
+        ],
+        [
+          [x3, y3],
+          [x4, y4],
+        ],
+      );
 
       if (intersection) {
         this.target = {
@@ -252,9 +260,9 @@ export class Ball extends Circle {
     return [this.position.x, this.position.y];
   }
   public get netScheme() {
-    const x = (this.target?.hit[0]) ? this.target.hit[0] : 0 ;
-    const y = (this.target?.hit[1]) ? this.target.hit[1] : 0 ;
-    if (this.target){
+    const x = this.target?.hit[0] ? this.target.hit[0] : 0;
+    const y = this.target?.hit[1] ? this.target.hit[1] : 0;
+    if (this.target) {
       return {
         color: this.color,
         position: {

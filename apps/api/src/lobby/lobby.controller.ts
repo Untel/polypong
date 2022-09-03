@@ -84,7 +84,6 @@ export class LobbyController {
     return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
   }
 
-
   @Post('kill')
   @UseGuards(IsLobbyHost)
   // @UseGuards(SocketGuard)

@@ -6,15 +6,13 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 06:43:47 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:07:41 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Circle, Vector } from 'collider2d';
 import {
   Line,
   lineAngle,
-  Point,
   lineInterpolate,
   lineLength,
   LineInterpolator,

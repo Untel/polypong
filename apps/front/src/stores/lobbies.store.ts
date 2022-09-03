@@ -124,12 +124,12 @@ export const useLobbiesStore = defineStore('lobbies', {
       });
     },
     async joinMatchmake() {
-      if (this.matchmaking) lobbiesApi.get(`/matchmake`);// Maybe check the return of here
-      else lobbiesApi.get(`/matchmake`);
+      if (this.matchmaking) lobbiesApi.get('/matchmake');// Maybe check the return of here
+      else lobbiesApi.get('/matchmake');
       this.matchmaking = true;
     },
     async leaveMatchmake() {
-      lobbiesApi.get(`/leaveMatchmake`);
+      lobbiesApi.get('/leaveMatchmake');
       this.matchmaking = false;
     },
     async createLobby(lobbyName: string) {

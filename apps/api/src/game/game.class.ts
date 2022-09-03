@@ -6,14 +6,13 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 13:39:26 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:11:35 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
 import { Line, lineLength, lineMidpoint, Point } from 'geometric';
-import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
@@ -22,7 +21,6 @@ import GameTools from './gametools.class';
 import Player from './player.class';
 import { Exclude, Expose } from 'class-transformer';
 import { Logger } from '@nestjs/common';
-import { last } from 'rxjs';
 
 const FRAME_RATE = 30;
 const TEST_MODE = false;
@@ -41,43 +39,37 @@ export class Finalists {
     this.players = players;
   }
 
-  public gameDone(targetScore: number, gapPoints: number = 2) {
-    console.log("scores says", this.scores);
+  public gameDone(targetScore: number, gapPoints = 2) {
+    console.log('scores says', this.scores);
     const absdiff = Math.abs(this.scores[0] - this.scores[1]);
     let ret;
-    if (absdiff < gapPoints)
-      ret = (false);
+    if (absdiff < gapPoints) ret = false;
     else if (this.scores[0] >= targetScore || this.scores[1] >= targetScore)
       ret = true;
-    else
-      ret = false;
+    else ret = false;
     return ret;
   }
 
   public wallGotGoaled(wall: Wall) {
-    const compare = (wall.bot === undefined) ? wall.player : wall.bot;
-    if (compare === this.players[0])
-      this.scores[1]++;
-    else if (compare === this.players[1])
-      this.scores[0]++;
+    const compare = wall.bot === undefined ? wall.player : wall.bot;
+    if (compare === this.players[0]) this.scores[1]++;
+    else if (compare === this.players[1]) this.scores[0]++;
   }
 }
 
 export class Participant {
-  isBot : boolean;
-  ref : Bot | Player;
-  score : number;
-  constructor(ref : Bot | Player, bot : boolean = true)
-  {
+  isBot: boolean;
+  ref: Bot | Player;
+  score: number;
+  constructor(ref: Bot | Player, bot = true) {
     this.ref = ref;
     this.isBot = bot;
     this.score = 0;
   }
 
-  public get netScheme()
-  {
-    const t : Point = lineMidpoint(this.ref.wall.line);
-    return {x : t[0], y : t[1], value : this.score}
+  public get netScheme() {
+    const t: Point = lineMidpoint(this.ref.wall.line);
+    return { x: t[0], y: t[1], value: this.score };
   }
 }
 export default class Game {
@@ -111,13 +103,16 @@ export default class Game {
     this.lobby = lobby;
     this.bots = lobby.bots.map((v) => new Bot(v));
     this.players = new Map(this.lobby.players);
-    this.bots.forEach(b => {this.participants.push(new Participant(b, true))});
-    this.players.forEach(p => {this.participants.push(new Participant(p, false))});
+    this.bots.forEach((b) => {
+      this.participants.push(new Participant(b, true));
+    });
+    this.players.forEach((p) => {
+      this.participants.push(new Participant(p, false));
+    });
     this.finalePoints = lobby.finalePoints;
     this.newRound(7);
     // this.finalists = null;
-    if (this.nPlayers === 2)
-      this.registerFinalists();
+    if (this.nPlayers === 2) this.registerFinalists();
   }
 
   logger = new Logger('Game');
@@ -132,7 +127,7 @@ export default class Game {
     console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
   }
 
-  generateMap(n = 0) {
+  generateMap() {
     this.balls = [];
     this.powers = [];
     this.timeElapsed = 0;
@@ -157,8 +152,7 @@ export default class Game {
     for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
-    if (this.nPlayers === 2)
-      this.socket.emit('score', this.scoreNetScheme);
+    if (this.nPlayers === 2) this.socket.emit('score', this.scoreNetScheme);
   }
 
   run() {
@@ -235,14 +229,22 @@ export default class Game {
       }
       const wall = ball.target?.wall;
       if (wall?.paddle === null) {
-        const test : boolean = GameTools.lineCircleCollision(wall.line, ball,[0, 0],);
+        const test: boolean = GameTools.lineCircleCollision(
+          wall.line,
+          ball,
+          [0, 0],
+        );
         if (test) ball.bounceTargetWall();
-      } else if (wall){
-        let impact : Point = [0, 0];
-        const test : boolean = GameTools.wallBallCollision(wall.paddle.line, ball, impact);
+      } else if (wall) {
+        const impact: Point = [0, 0];
+        const test: boolean = GameTools.wallBallCollision(
+          wall.paddle.line,
+          ball,
+          impact,
+        );
         if (test) {
           ball.bouncePaddle(wall.paddle, impact);
-          ball.closestP = impact
+          ball.closestP = impact;
         }
       }
       ball.move();
@@ -282,47 +284,42 @@ export default class Game {
       `BEFORE players.delete, players.size = ${this.players.size}`,
     );
     this.logger.log(`BEFORE players.delete, nPlayers = ${this.nPlayers}`);
-    console.log("player is", player);
+    console.log('player is', player);
     this.players.delete(player.user.id);
     // eslint-disable-next-line prettier/prettier
     this.logger.log(
       `AFTER players.delete, players.size = ${this.players.size}`,
     );
     this.logger.log(`AFTER players.delete, nPlayers = ${this.nPlayers}`);
-    this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers).then(() => { });
+    this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers).then();
   }
 
   registerFinalists() {
-    let collection = [];
-    this.players.forEach(p => {
+    const collection = [];
+    this.players.forEach((p) => {
       collection.push(p);
     });
-    this.bots.forEach(p => {
+    this.bots.forEach((p) => {
       collection.push(p);
     });
     this.finalists = new Finalists(collection);
   }
 
   killWall(wall: Wall) {
-    this.participants = this.participants.filter((b) =>
-    {
-      if (b.isBot)
-        return (b.ref !== wall.bot)
-      else
-        return (b.ref !== wall.player)
-      });
+    this.participants = this.participants.filter((b) => {
+      if (b.isBot) return b.ref !== wall.bot;
+      else return b.ref !== wall.player;
+    });
     if (wall.bot !== undefined) {
       this.logger.log('Bot getting killed');
       this.bots = this.bots.filter((b) => b !== wall.bot);
     } else if (wall.player !== undefined) {
       this.logger.log('Player getting killed');
       this.killPlayer(wall.player);
-    }
-    else {
+    } else {
       console.log("didn't kill that one");
     }
   }
-
 
   public reduce(wall: Wall) {
     this.stop();
@@ -331,22 +328,24 @@ export default class Game {
     if (this.nPlayers > 2) {
       this.killWall(wall);
       if (this.nPlayers === 2) {
-        console.log("Only two left, time for baston");
+        console.log('Only two left, time for baston');
         this.registerFinalists();
       }
       return this.newRound(); //So we ret newRound
     }
     //Otherwise let's look at points
-    this.finalists.wallGotGoaled(wall)
+    this.finalists.wallGotGoaled(wall);
 
     if (!this.finalists.gameDone(this.finalePoints)) {
-      this.logger.log(`Score is, ${this.finalists.scores}, entertain us some more`);
+      this.logger.log(
+        `Score is, ${this.finalists.scores}, entertain us some more`,
+      );
       return this.newRound();
     }
     //Now this is safe to assume that's the end, get rid of the looser
     this.killWall(wall);
     this.logger.log('Winner getting killed');
-    this.players.forEach(element => {
+    this.players.forEach((element) => {
       this.killPlayer(element);
     });
     return this.lobby.service.closeLobby(this.lobby);
@@ -368,8 +367,7 @@ export default class Game {
     return this.powers.map((p) => p.netScheme);
   }
   public get scoreNetScheme() {
-    if (this.finalists !== null)
-      return (this.finalists.scores)
+    if (this.finalists !== null) return this.finalists.scores;
     return [];
   }
 

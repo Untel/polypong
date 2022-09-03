@@ -41,7 +41,7 @@ export class LobbiesController {
 
   @Get('matchmake')
   async matchmake(@CurrentUser() user) {
-    this.lobbyService.userMatchmake(user)
+    this.lobbyService.userMatchmake(user);
   }
   @Get('leaveMatchmake')
   async leaveMatchmake(@CurrentUser() user) {

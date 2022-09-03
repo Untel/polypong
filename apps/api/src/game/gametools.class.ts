@@ -35,17 +35,19 @@ export default class GameTools {
     return offsetValue - Math.floor(offsetValue / width) * width + r_start;
     // + start to reset back to start of original range
   }
-  static lineIntersection(line1:Line, line2:Line) {
+  static lineIntersection(line1: Line, line2: Line) {
     const s1_x = line1[1][0] - line1[0][0];
     const s1_y = line1[1][1] - line1[0][1];
-    const s2_x =  line2[1][0] - line2[0][0];
+    const s2_x = line2[1][0] - line2[0][0];
     const s2_y = line2[1][1] - line2[0][1];
 
     const s =
-      (-s1_y * (line1[0][0] - line2[0][0]) + s1_x * (line1[0][1] - line2[0][1])) /
+      (-s1_y * (line1[0][0] - line2[0][0]) +
+        s1_x * (line1[0][1] - line2[0][1])) /
       (-s2_x * s1_y + s1_x * s2_y);
     const t =
-      (s2_x * (line1[0][1] - line2[0][1]) - s2_y * (line1[0][0] - line2[0][0])) /
+      (s2_x * (line1[0][1] - line2[0][1]) -
+        s2_y * (line1[0][0] - line2[0][0])) /
       (-s2_x * s1_y + s1_x * s2_y);
 
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
@@ -109,11 +111,11 @@ export default class GameTools {
       .map(() => Math.floor(Math.random() * 16).toString(16))
       .join('');
 
-  static linePoint(line :Line, point : Point){
-    const x1: number = line[0][0]
-    const y1: number = line[0][1]
-    const x2: number = line[1][0]
-    const y2: number = line[1][1]
+  static linePoint(line: Line, point: Point) {
+    const x1: number = line[0][0];
+    const y1: number = line[0][1];
+    const x2: number = line[1][0];
+    const y2: number = line[1][1];
     const px: number = point[0];
     const py: number = point[1];
     const lineLen: number = GameTools.distance(x1, y1, x2, y2);
@@ -150,8 +152,7 @@ export default class GameTools {
     return this.lineCircleCollision(w, b, impact);
   }
 
-  static lineCircleCollision(line : Line, c : Circle, closestP : Point = [0,0]){
-
+  static lineCircleCollision(line: Line, c: Circle, closestP: Point = [0, 0]) {
     const x1: number = line[0][0];
     const y1: number = line[0][1];
     const x2: number = line[1][0];
@@ -159,8 +160,8 @@ export default class GameTools {
     const cx: number = c.position.x;
     const cy: number = c.position.y;
     const r: number = c.radius;
-    const inside1 : boolean = this.pointCircle(x1,y1, cx,cy,r); // Need pointcircle
-    const inside2 : boolean = this.pointCircle(x2,y2, cx,cy,r);
+    const inside1: boolean = this.pointCircle(x1, y1, cx, cy, r); // Need pointcircle
+    const inside2: boolean = this.pointCircle(x2, y2, cx, cy, r);
     if (inside1 || inside2) return true;
 
     let distX: number = x1 - x2;
@@ -169,7 +170,7 @@ export default class GameTools {
     const dot: number =
       ((cx - x1) * (x2 - x1) + (cy - y1) * (y2 - y1)) / Math.pow(len, 2);
 
-    const closestPt : Point = [(x1 + dot * (x2 - x1)),(y1 + dot * (y2 - y1)) ]
+    const closestPt: Point = [x1 + dot * (x2 - x1), y1 + dot * (y2 - y1)];
     closestP[0] = closestPt[0];
     closestP[1] = closestPt[1];
     const onSegment = this.linePoint(line, closestPt); //Need linepoint

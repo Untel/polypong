@@ -2,7 +2,6 @@ import { Circle, Collider2d, Vector } from 'collider2d';
 import { Paddle } from 'src';
 import { Ball } from './ball.class';
 import Game from './game.class';
-import GameTools from './gametools.class';
 
 const collider = new Collider2d();
 

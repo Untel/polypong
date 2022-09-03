@@ -6,12 +6,11 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 07:50:23 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:09:30 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Exclude, Type } from 'class-transformer';
-import { Vector } from 'collider2d';
 import { Line, lineLength, lineAngle, lineMidpoint } from 'geometric';
 import { Ball } from './ball.class';
 import { Bot } from './bot.class';
@@ -52,7 +51,7 @@ export class Wall {
     }
   }
   getMiddlePoint() {
-    return (lineMidpoint(this.line));
+    return lineMidpoint(this.line);
   }
 
   public get netScheme() {
