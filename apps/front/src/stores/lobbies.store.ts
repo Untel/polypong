@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 05:21:42 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 07:13:20 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ interface LobbiesState {
   lobbies: Lobby[];
   activeLobby: Lobby | null;
   matchmaking: boolean;
+  madeMatches: number;
 }
 
 export const onlineApi = mande('/api/online');
@@ -61,6 +62,7 @@ export const useLobbiesStore = defineStore('lobbies', {
     lobbies: [],
     activeLobby: null,
     matchmaking: false,
+    madeMatches: 0,
   } as LobbiesState),
   getters: {
     getLobbies: (state) => state.lobbies,
@@ -121,7 +123,11 @@ export const useLobbiesStore = defineStore('lobbies', {
     async joinMatchmake() {
       if (this.matchmaking) lobbiesApi.get(`/matchmake`);// Maybe check the return of here
       else lobbiesApi.get(`/matchmake`);
-      this.matchmaking = !this.matchmaking;
+      this.matchmaking = true;
+    },
+    async leaveMatchmake() {
+      lobbiesApi.get(`/leaveMatchmake`);
+      this.matchmaking = false;
     },
     async createLobby(lobbyName: string) {
       if (this.activeLobby) {

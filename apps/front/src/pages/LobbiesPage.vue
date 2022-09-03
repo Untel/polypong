@@ -19,8 +19,11 @@
         subhead="Find a regular opponent"
         avatar="/matchmaking.png"
         :isCreated=true
-        @joinLobby="joinMatchmake"
+        :madeMatches=$lobbies.madeMatches
+        @joinMatchmake="joinMatchmake"
+        @leaveMatchmake="leaveMatchmake"
         >
+        Recent matches : {{$lobbies.madeMatches}} !
       </MatchmakingCard>
       <LobbyCard
         :id="-1"
@@ -125,6 +128,9 @@ async function createLobby() {
 
 async function joinMatchmake() {
   $lobbies.joinMatchmake();
+}
+async function leaveMatchmake() {
+  $lobbies.leaveMatchmake();
 }
 
 onMounted(() => {

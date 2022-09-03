@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/01 09:38:37 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 05:30:12 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     um.rank = rank + 1;
     um.match = this.match;
     const added = await um.save();
-    console.log('Added rank', added, 'for', player.user.name);
+    console.log('Added rank','for', player.user.name);
   }
 
   configure(opts: Partial<Lobby>) {

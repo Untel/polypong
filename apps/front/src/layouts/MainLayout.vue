@@ -122,6 +122,11 @@ $auth.socket.on('userJoinedLobby', async (userId: number, lobbyId: number) => {
   await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
 
+$auth.socket.on('madeMatch', () => {
+  $lobbies.madeMatches += 1;
+  console.log(`Updated ! ${$lobbies.madeMatches}`);
+});
+
 $auth.socket.on('lobbyDeleted', async (lobbyId: number) => {
   console.log(`LOBBYDELETED : ${lobbyId} has been deleted`);
   if (isActiveIn(lobbyId)) {

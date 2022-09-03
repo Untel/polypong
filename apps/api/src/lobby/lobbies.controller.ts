@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 05:19:19 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 07:03:03 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,12 @@ export class LobbiesController {
   }
 
   @Get('matchmake')
-  async matchmake(@CurrentUser() user): Promise<Lobby> {
-    return this.lobbyService.userMatchmake(user);
+  async matchmake(@CurrentUser() user) {
+    this.lobbyService.userMatchmake(user)
+  }
+  @Get('leaveMatchmake')
+  async leaveMatchmake(@CurrentUser() user) {
+    this.lobbyService.removeMatchmake(user);
   }
   @Post()
   async createLobby(@CurrentUser() user, @Body('name') name): Promise<Lobby> {

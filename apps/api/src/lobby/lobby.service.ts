@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 05:17:55 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 07:24:41 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,15 @@ import Player from 'src/game/player.class';
 // import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
-import { Match, MatchHistoryService } from 'src/match-history';
+// import { Match, MatchHistoryService } from 'src/match-history';
 import { TS } from 'src/entities/root.entity';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
   afks = new Map<LobbyId, Lobby>();
   queue = new Array<User>();
+  // match
+  interval: NodeJS.Timer | null = null;
   // store: Store<Lobby>;
   logger = new Logger('LobbyService');
   constructor(
@@ -59,19 +61,28 @@ export class LobbyService {
   matchmake()
   {
     console.log("Matchmaking...")
+    if (this.queue.length < 2) return this.setMatchmaker(false);
     const u1 = this.queue.shift();
     const u2 = this.queue.shift();
     const u1_sock = this.socketService.getUserSocket(u1.id);
     const u2_sock = this.socketService.getUserSocket(u2.id);
-    return this.createLobby(u1, 'matchmade').then((value : Lobby) => {
+    this.createLobby(u1, 'matchmade').then((value : Lobby) => {
       this.userJoinLobby(value, u1);
       this.userJoinLobby(value, u2);
       u1_sock.emit('matchmake_done', value.id);
       u2_sock.emit('matchmake_done', value.id);
       value.start();
     });
+    this.socketService.socketio.emit('madeMatch');
   }
-  
+
+  setMatchmaker(bool : boolean = true){
+    if (bool && this.interval === null)
+      return this.interval = setInterval(() => this.matchmake(), 5000);
+    clearInterval(this.interval);
+    this.interval = null;
+  }
+
   getLobbies(): Lobby[] {
     const lobbies = this.lobbies.values();
     return [...lobbies];
@@ -266,9 +277,10 @@ export class LobbyService {
     const pos : number = this.queue.findIndex(u => u.id === disco.id);
     if (pos !== -1)
       this.queue.splice(pos,1);
-  }
+      console.log(`queue is now ${this.queue.length} ppl`)
+    }
 
-  userMatchmake(host: User) {
+  userMatchmake(host: User) : number {
     const currentLobbyOfUser = this.userIsInLobby(host.id);
     if (currentLobbyOfUser) {
       this.userLeaveLobby(currentLobbyOfUser, host);
@@ -278,14 +290,8 @@ export class LobbyService {
     }
     if (this.queue.find(e => e.id === host.id) === undefined)
       this.queue.push(host);
-    else 
-      this.removeMatchmake(host)
-
-    if (this.queue.length >= 2)
-      this.matchmake()
-
+    if (this.queue.length === 2 && this.interval === null)
+      this.setMatchmaker();
     console.log(`queue is now ${this.queue.length} ppl`)
-
-    return null;
   }
 }

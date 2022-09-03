@@ -56,6 +56,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  madeMatches: {
+    type: Number,
+    default: 0,
+  },
   subhead: {
     type: String,
     default: '',
@@ -85,11 +89,11 @@ const btnIcon = computed(() => {
   return 'fa-solid fa-table-tennis-paddle-ball';
 });
 
-const emit = defineEmits(['joinLobby', 'joinGame', 'spectate']);
+const emit = defineEmits(['joinMatchmake', 'leaveMatchmake', 'spectate']);
 
 function click() {
-  if (!$lobbies.matchmaking) emit('joinLobby');
-  else emit('joinLobby');
+  if ($lobbies.matchmaking) emit('leaveMatchmake');
+  else emit('joinMatchmake');
 }
 
 const val = ref<boolean>(false);
