@@ -139,7 +139,7 @@ onMounted(async () => {
       //   powers.value.splice(index,1);
         break;
       case 'score':
-        scores.value[index] = item;
+        scores.value = item;
         break;
       case 'paddle':
         paddles.value[index] = item;
@@ -156,6 +156,9 @@ onMounted(async () => {
   socket.on('mapChange', (map) => {
     mapProps.value = map;
     powers.value = [];
+  });
+  socket.on('score', (s) => {
+    scores.value = s;
   });
   socket.on('powers', (pow) => {
     powers.value = pow;

@@ -46,14 +46,6 @@
         :r="map.inradius"
         :x="0" :y="0"
       />
-      <!-- <line
-        v-for="(wall, idx) in map.walls || []"
-        :key="`wall-${idx}`"
-        ref="wallsRef"
-        class="wall"
-        stroke-width=".1px"
-        v-bind="formatLine(wall.line)"
-      /> -->
       <line
         v-if="myWall"
         ref="myWallRef"
@@ -70,9 +62,9 @@
         v-bind="formatLine(paddle.line)"
       />
       <g v-for="(score, idx) in scores"
-      :key="`${idx}`"
+      :key="`score-${idx}`"
         >
-        <text v-bind="formatPoint(score.x, score.y)">
+        <text v-bind="formatPoint(score.x, score.y)" >
           {{score.value}}
         </text>
       </g>

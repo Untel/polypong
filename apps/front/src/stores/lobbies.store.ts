@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 07:13:20 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 10:06:16 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,9 @@ export const useLobbiesStore = defineStore('lobbies', {
       }
     },
     async fetchAndJoinLobby(lobbyId: number | string) {
+      if (this.matchmaking) {
+        this.leaveMatchmake();
+      }
       this.activeLobby = await lobbiesApi.get(`${lobbyId}/join`);
     },
     async fetchCurrentLobby(lobbyId: number | string) {
