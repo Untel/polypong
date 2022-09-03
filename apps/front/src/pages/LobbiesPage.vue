@@ -124,8 +124,7 @@ async function createLobby() {
 }
 
 async function joinMatchmake() {
-  console.log("Join matchmake");
-  await $lobbies.joinMatchmake();
+  $lobbies.joinMatchmake();
 }
 
 onMounted(() => {
@@ -135,7 +134,7 @@ onMounted(() => {
   });
   socket.on('matchmake_done', (lobbyid) => {
     console.log("Matchmaking done !");
-    // console.log("lobbyid done !", lobbyid);
+    $lobbies.matchmaking = false;
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
       router.push(`/lobby/${lobbyid}/game`);
     });
