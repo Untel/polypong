@@ -64,7 +64,7 @@
       <g v-for="(score, idx) in scores"
       :key="`score-${idx}`"
         >
-        <text v-bind="formatPoint(score.x, score.y)" >
+        <text v-if="(scores.length === 2)" v-bind="formatPoint(score.x, score.y)" >
           {{score.value}}
         </text>
       </g>

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 10:10:52 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 10:15:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,8 @@ export default class Game {
     for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
-    this.socket.emit('score', this.scoreNetScheme);
+    if (this.nPlayers === 2)
+      this.socket.emit('score', this.scoreNetScheme);
   }
 
   run() {
