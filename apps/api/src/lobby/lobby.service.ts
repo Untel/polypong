@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/01 10:10:52 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 05:17:55 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,23 +59,19 @@ export class LobbyService {
   matchmake()
   {
     console.log("Matchmaking...")
-    if (this.queue.length >= 2)
-    {
-      console.log("Creating lobby");
-      const u1 = this.queue.shift();
-      const u2 = this.queue.shift();
-      const u1_sock = this.socketService.getUserSocket(u1.id);
-      const u2_sock = this.socketService.getUserSocket(u2.id);
-      return this.createLobby(u1, 'matchmade').then((value : Lobby) => {
-        this.userJoinLobby(value, u1);
-        this.userJoinLobby(value, u2);
-        u1_sock.emit('matchmake_done', value.id);
-        u2_sock.emit('matchmake_done', value.id);
-        console.log("gave their matches");
-        value.start();
-      });
-    }
+    const u1 = this.queue.shift();
+    const u2 = this.queue.shift();
+    const u1_sock = this.socketService.getUserSocket(u1.id);
+    const u2_sock = this.socketService.getUserSocket(u2.id);
+    return this.createLobby(u1, 'matchmade').then((value : Lobby) => {
+      this.userJoinLobby(value, u1);
+      this.userJoinLobby(value, u2);
+      u1_sock.emit('matchmake_done', value.id);
+      u2_sock.emit('matchmake_done', value.id);
+      value.start();
+    });
   }
+  
   getLobbies(): Lobby[] {
     const lobbies = this.lobbies.values();
     return [...lobbies];
@@ -266,16 +262,24 @@ export class LobbyService {
     this.lobbies.delete(lobby.id);
   }
 
-  async userMatchmake(host: User) {
+  removeMatchmake(disco : User) {
+    const pos : number = this.queue.findIndex(u => u.id === disco.id);
+    if (pos !== -1)
+      this.queue.splice(pos,1);
+  }
+
+  userMatchmake(host: User) {
     const currentLobbyOfUser = this.userIsInLobby(host.id);
     if (currentLobbyOfUser) {
-      await this.userLeaveLobby(currentLobbyOfUser, host);
+      this.userLeaveLobby(currentLobbyOfUser, host);
       this.logger.warn(
         `User ${host.id} already is in this lobby ${currentLobbyOfUser.roomId}, leaving the socket and the lobby`,
       );
     }
     if (this.queue.find(e => e.id === host.id) === undefined)
       this.queue.push(host);
+    else 
+      this.removeMatchmake(host)
 
     if (this.queue.length >= 2)
       this.matchmake()

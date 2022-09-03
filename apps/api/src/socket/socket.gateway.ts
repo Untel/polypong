@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 06:55:35 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/02 23:40:41 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,9 @@ export class SocketGateway
   handleDisconnect(client: Socket) {
     const user: User = client.data.user;
     const lobby: Lobby = client.data.lobby;
+    console.log("Disconnect usr : ", user);
+    console.log("Disconnect lobby : ", lobby);
+
     // const lobby: Lobby = this.lobbyService.userIsInLobby(user.id);
     if (lobby) {
       if (lobby.game) {
@@ -121,6 +124,16 @@ export class SocketGateway
         this.lobbyService.removePlayer(lobby.id, user);
       }
     }
+    this.lobbyService.removeMatchmake(user);
+    // this.lobbyService.queue.splice
+    // console.log(this.lobbyService.queue.find((p) =>  p.id === user.id ))
+    // if (this.lobbyService.queue.find((p) =>  p.id === user.id ))
+    // {
+    //   this.logger.log('Trying to dodge matchmaking i see')
+    // }
+    // else
+    //   this.logger.log('Cant find ya')
+
     this.server.emit('online', {
       name: user.name,
       type: 'disconnect',

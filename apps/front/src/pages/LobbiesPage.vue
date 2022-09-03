@@ -13,23 +13,15 @@
   <q-page padding>
     <!-- <pre>Response: {{ lobbies.getLobbies }}</pre> -->
     <div class="card-grid">
-      <LobbyCard
+      <MatchmakingCard
         :id="0"
-        name="MatchMaking"
-        subhead="Find the regular opponent"
+        name="Matchmaking"
+        subhead="Find a regular opponent"
         avatar="/matchmaking.png"
         :isCreated=true
         @joinLobby="joinMatchmake"
-      >
-        <q-circular-progress
-          show-value
-          class="text-primary q-ma-md"
-          :value="3"
-          indeterminate
-          size="50px"
-          color="primary"
-        /> Searching players
-      </LobbyCard>
+        >
+      </MatchmakingCard>
       <LobbyCard
         :id="-1"
         name="Create"
@@ -103,6 +95,7 @@ import {
   ref,
   defineComponent,
 } from 'vue';
+import MatchmakingCard from 'src/components/MatchmakingCard.vue';
 
 defineComponent({
   components: {
