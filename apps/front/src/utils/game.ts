@@ -33,3 +33,8 @@ export interface Power {
   position: Position;
   name: string
 }
+export interface Score {
+  x : number;
+  y : number;
+  value: number
+}

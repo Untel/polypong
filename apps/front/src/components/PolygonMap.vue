@@ -69,6 +69,13 @@
         stroke-width="2px"
         v-bind="formatLine(paddle.line)"
       />
+      <g v-for="(score, idx) in scores"
+      :key="`${idx}`"
+        >
+        <text v-bind="formatPoint(score.x, score.y)">
+          {{score.value}}
+        </text>
+      </g>
       <g v-for="(ball, idx) in balls"
         :key="`ball-${idx}`"
         >
@@ -115,6 +122,7 @@ import {
   Power,
   Line,
   PolygonMap,
+  Score,
 } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { useMouseInElement, useDeviceOrientation, watchDebounced } from '@vueuse/core';
@@ -142,6 +150,10 @@ const props = defineProps({
     type: Array as PropType<Array<Power>>,
     default: () => [],
   },
+  scores: {
+    type: Array as PropType<Array<Score>>,
+    default: () => [],
+  },
 });
 const emit = defineEmits(['paddleMove']);
 
@@ -156,6 +168,9 @@ function formatBallTrajectoryPoints(ball: Ball) {
     y1: ball.position.y,
     y2: ball.target.y,
   };
+}
+function formatPoint(x : number, y : number) {
+  return { x, y };
 }
 
 function formatLine(line: Line) {

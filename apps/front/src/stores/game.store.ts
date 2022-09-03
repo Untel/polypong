@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.store.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 22:14:21 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 09:56:59 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ import {
   Ball,
   PolygonMap,
   Power,
+  Score,
 } from 'src/utils/game';
 
 export const gameApi = mande('/api/lobbies');
@@ -26,6 +27,7 @@ export interface GameState {
   balls: Ball[],
   map: PolygonMap,
   powers: Power[],
+  scores: Score[],
   isPaused: boolean;
 }
 
@@ -46,6 +48,7 @@ export const useGameStore = defineStore('game', {
       this.balls = gameInfos.balls;
       this.paddles = gameInfos.paddles;
       this.powers = gameInfos.powers;
+      this.scores = gameInfos.scores;
     },
     async pauseGame() {
       gameApi.get<GameState>(`/${this.id}/game`);

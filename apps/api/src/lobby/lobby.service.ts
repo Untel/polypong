@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 07:24:41 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 08:35:03 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,7 @@ export class LobbyService {
       console.log(`queue is now ${this.queue.length} ppl`)
     }
 
-  userMatchmake(host: User) : number {
+  userMatchmake(host: User) {
     const currentLobbyOfUser = this.userIsInLobby(host.id);
     if (currentLobbyOfUser) {
       this.userLeaveLobby(currentLobbyOfUser, host);

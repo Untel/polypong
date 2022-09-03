@@ -6,13 +6,13 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/01 04:10:26 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 09:53:38 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
-import { pointOnLine, Line, lineLength } from 'geometric';
+import { Line, lineLength, lineMidpoint, Point } from 'geometric';
 import { Vector } from 'collider2d';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
@@ -63,6 +63,24 @@ export class Finalists {
   }
 }
 
+export class Participant {
+  isBot : boolean;
+  ref : Bot | Player;
+  score : number;
+
+  constructor(ref : Bot | Player, bot : boolean = true)
+  {
+    this.ref = ref;
+    this.isBot = bot;
+    this.score = 0;
+  }
+
+  public get netScheme()
+  {
+    const t : Point = lineMidpoint(this.ref.wall.line);
+    return {x : t[0], y : t[1], value : this.score}
+  }
+}
 export default class Game {
   lobby: Lobby;
   balls: Ball[] = [];
@@ -76,6 +94,7 @@ export default class Game {
   finaleScore = [0, 0];
   timeElapsed = 0;
   finalePoints = 1;
+  participants: Participant[] = [];
   finalists: Finalists | null;
   paused = false;
 
@@ -92,6 +111,8 @@ export default class Game {
     this.lobby = lobby;
     this.bots = lobby.bots.map((v) => new Bot(v));
     this.players = new Map(this.lobby.players);
+    this.bots.forEach(b => {this.participants.push(new Participant(b, true))});
+    this.players.forEach(p => {this.participants.push(new Participant(p, false))});
     this.finalePoints = lobby.finalePoints;
     this.newRound(7);
     this.finalists = null;
@@ -299,6 +320,13 @@ export default class Game {
   }
 
   killWall(wall: Wall) {
+    this.participants = this.participants.filter((b) =>
+    {
+      if (b.isBot)
+        return (b.ref !== wall.bot)
+      else
+        return (b.ref !== wall.player)
+      });
     if (wall.bot !== undefined) {
       this.logger.log('Bot getting killed');
       this.bots = this.bots.filter((b) => b !== wall.bot);
@@ -324,7 +352,7 @@ export default class Game {
       }
       return this.newRound(); //So we ret newRound
     }
-    //Otherwise let's look at points  
+    //Otherwise let's look at points
     this.finalists.wallGotGoaled(wall)
 
     if (!this.finalists.gameDone(this.finalePoints)) {
@@ -355,6 +383,9 @@ export default class Game {
   public get powersNetScheme() {
     return this.powers.map((p) => p.netScheme);
   }
+  public get scoreNetScheme() {
+    return (this.participants.map(e => e.netScheme))
+  }
 
   public get nPlayers() {
     return this.players.size + this.bots.length;
@@ -382,6 +413,7 @@ export default class Game {
       balls: this.ballsNetScheme,
       paddles: this.paddlesNetScheme,
       powers: this.powersNetScheme,
+      scores: this.scoreNetScheme,
     };
   }
 

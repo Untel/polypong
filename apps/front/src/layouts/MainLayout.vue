@@ -187,9 +187,9 @@ $auth.socket.on('lobby_change', async (lobbyId: number) => {
   await $auth.fetchConnectedUsers();
 });
 
-$auth.socket.onAny((eventName, ...args) => {
-  console.log('EMIT - ', eventName, ', ARGS :', ...args);
-});
+// $auth.socket.onAny((eventName, ...args) => {
+//   console.log('EMIT - ', eventName, ', ARGS :', ...args);
+// });
 
 // onMounted(async () => {
 //   const id = +($route.params.id as string);

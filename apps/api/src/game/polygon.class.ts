@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   polygon.class.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/21 16:02:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 07:54:33 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ export default class MyPolygon {
   shape: Polygon;
   sides = [];
   verticles = [];
-  edges = [];
+  edges : Line[] = [];
   angles = [];
   edgeWidth = 0;
   center: Vector;
