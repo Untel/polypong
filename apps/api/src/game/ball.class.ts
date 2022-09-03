@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 17:43:31 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:45:33 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ export class Ball extends Circle {
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
-  closestP: number[] = [0, 0];
+  closestP: Point = [0, 0];
   target: {
     hit: Point;
     wall: Wall;
@@ -82,6 +82,8 @@ export class Ball extends Circle {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
+    if (walls.length < 3)
+      return;
     const line: Line = [
       [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
@@ -170,7 +172,7 @@ export class Ball extends Circle {
     if (this.freezeTime === 0) return false;
     this.freezeTime = this.freezeTime - value < 0 ? 0 : this.freezeTime - value;
     if (this.freezeTime > 0) return true;
-    this.target.wall.addBall(this);
+    if (this.target?.wall) this.target.wall.addBall(this);
     return false;
   }
 

@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: column;
   max-height: inherit;
+  .score{
+      font-weight: bold;
+      font-size:x-large;
+    }
   svg {
     margin: 20px;
     width: auto;
@@ -39,7 +43,7 @@
     <!-- <g v-for="(score, idx) in scores"
       :key="`score-${idx}`"
         > -->
-        <p v-if="(scores.length === 2)" >
+        <p class="score" v-if="(scores.length === 2)" >
           {{scores[0]}} - {{scores[1]}}
         </p>
       <!-- </g> -->

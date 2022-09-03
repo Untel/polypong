@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 08:35:03 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:51:08 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ export class LobbyService {
 
   setMatchmaker(bool : boolean = true){
     if (bool && this.interval === null)
-      return this.interval = setInterval(() => this.matchmake(), 5000);
+      return this.interval = setInterval(() => this.matchmake(), 2000);
     clearInterval(this.interval);
     this.interval = null;
   }
@@ -205,16 +205,6 @@ export class LobbyService {
       this.removePlayer(lobby.id, user);
       socketOfLeaver.leave(lobby.roomId);
     }
-    return null;
-  }
-
-  setFinalePoints(lobby: Lobby, points: number) {
-    // eslint-disable-next-line prettier/prettier
-    this.logger.log(`setFinalPoints - points = ${points}`);
-    lobby.finalePoints = points;
-    this.logger.log(`setFinalPoints - lobby.game.finalCap = ${points}`);
-    lobby.sock.emit('lobby_change', lobby.id);
-    lobby.sock.emit('setFinalPoints', points);
     return null;
   }
 

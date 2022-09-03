@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 05:30:12 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:59:47 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   configure(opts: Partial<Lobby>) {
     if (opts.name) this.name = opts.name;
     if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
+    if (opts.finalePoints) this.finalePoints = opts.finalePoints;
     if (opts.bots)
       Object.keys(opts.bots).forEach((key) => {
         Object.assign(this.bots[key], opts.bots[key]);

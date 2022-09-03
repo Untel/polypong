@@ -6,12 +6,12 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/25 07:03:09 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:41:53 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Vector } from 'collider2d';
-import { Line } from 'geometric';
+import { Circle } from 'collider2d';
+import { Line, Point } from 'geometric';
 import { Ball } from './ball.class';
 
 export default class GameTools {
@@ -109,14 +109,13 @@ export default class GameTools {
       .map(() => Math.floor(Math.random() * 16).toString(16))
       .join('');
 
-  static linePoint(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    px: number,
-    py: number,
-  ) {
+  static linePoint(line :Line, point : Point){
+    const x1: number = line[0][0]
+    const y1: number = line[0][1]
+    const x2: number = line[1][0]
+    const y2: number = line[1][1]
+    const px: number = point[0];
+    const py: number = point[1];
     const lineLen: number = GameTools.distance(x1, y1, x2, y2);
 
     const d1: number = GameTools.distance(px, py, x1, y1);
@@ -147,33 +146,22 @@ export default class GameTools {
     return false;
   }
 
-  static wallBallCollision(w: Line, b: Ball, ret: number[]) {
-    // let ret = [0,0];
-    return this.lineCircleCollision(
-      w[0][0],
-      w[0][1],
-      w[1][0],
-      w[1][1],
-      b.position.x,
-      b.position.y,
-      b.radius,
-      ret,
-    );
+  static wallBallCollision(w: Line, b: Ball, impact: Point) {
+    return this.lineCircleCollision(w, b, impact);
   }
 
-  static lineCircleCollision(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    cx: number,
-    cy: number,
-    r: number,
-    closestP,
-  ) {
-    // const inside1 : boolean = this.pointCircle(x1,y1, cx,cy,r); // Need pointcircle
-    // const inside2 : boolean = this.pointCircle(x2,y2, cx,cy,r);
-    // if (inside1 || inside2) return true;
+  static lineCircleCollision(line : Line, c : Circle, closestP : Point = [0,0]){
+
+    const x1: number = line[0][0];
+    const y1: number = line[0][1];
+    const x2: number = line[1][0];
+    const y2: number = line[1][1];
+    const cx: number = c.position.x;
+    const cy: number = c.position.y;
+    const r: number = c.radius;
+    const inside1 : boolean = this.pointCircle(x1,y1, cx,cy,r); // Need pointcircle
+    const inside2 : boolean = this.pointCircle(x2,y2, cx,cy,r);
+    if (inside1 || inside2) return true;
 
     let distX: number = x1 - x2;
     let distY: number = y1 - y2;
@@ -181,15 +169,14 @@ export default class GameTools {
     const dot: number =
       ((cx - x1) * (x2 - x1) + (cy - y1) * (y2 - y1)) / Math.pow(len, 2);
 
-    const closestX: number = x1 + dot * (x2 - x1);
-    const closestY: number = y1 + dot * (y2 - y1);
-    closestP[0] = closestX;
-    closestP[1] = closestY;
-    const onSegment = this.linePoint(x1, y1, x2, y2, closestX, closestY); //Need linepoint
+    const closestPt : Point = [(x1 + dot * (x2 - x1)),(y1 + dot * (y2 - y1)) ]
+    closestP[0] = closestPt[0];
+    closestP[1] = closestPt[1];
+    const onSegment = this.linePoint(line, closestPt); //Need linepoint
     if (!onSegment) return false;
 
-    distX = closestX - cx;
-    distY = closestY - cy;
+    distX = closestPt[0] - cx;
+    distY = closestPt[1] - cy;
     const distance: number = Math.sqrt(distX * distX + distY * distY); //Pythagore
 
     if (distance <= r) {
