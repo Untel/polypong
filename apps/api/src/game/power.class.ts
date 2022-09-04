@@ -58,12 +58,14 @@ export class ReduceAllOtherPaddlesPower extends Power {
 
   fade(paddle: Paddle) {
     paddle.setRelativeSize();
+    paddle.updatePercentOnAxis(paddle.ratio);
   }
 
   effect(ball: Ball) {
     this.game.paddles.forEach((paddle) => {
       if (paddle.color != ball.lastHitten?.color) {
         paddle.setRelativeSize(0.15);
+        paddle.updatePercentOnAxis(paddle.ratio);
         paddle.affectPower(this);
       }
     });
@@ -82,6 +84,7 @@ export class AugmentPaddlePower extends Power {
 
   fade(paddle: Paddle) {
     paddle.setRelativeSize();
+    paddle.updatePercentOnAxis(paddle.ratio);
   }
 
   effect(ball: Ball) {
@@ -89,6 +92,7 @@ export class AugmentPaddlePower extends Power {
       if (paddle.color === ball.lastHitten?.color) {
         paddle.setRelativeSize(0.7);
         paddle.affectPower(this);
+        paddle.updatePercentOnAxis(paddle.ratio);
       }
     });
   }
