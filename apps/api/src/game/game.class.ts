@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 14:11:35 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/05 18:09:16 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,8 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
+    // for (let i = 0; i < this.nPlayers / 2; i++)
+    this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
     if (this.nPlayers === 2) this.socket.emit('score', this.scoreNetScheme);
@@ -208,7 +209,7 @@ export default class Game {
   }
 
   runPhysics() {
-    this.balls.forEach((ball) => {
+    this.balls.forEach((ball) => { if (ball.stopped) return;
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
@@ -218,7 +219,6 @@ export default class Game {
         [this.map.center.x, this.map.center.y],
         this.map.edges[0][0],
       ]);
-
       if (testDist != 0 && dtc > testDist * 1.1 && dtc < testDist * 1.3) {
         // console.log('Ded ball :', dtc);
         this.balls.forEach((e) => {

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/04 02:36:40 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/05 18:08:23 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ export class Ball extends Circle {
     hit: Point;
     wall: Wall;
   };
+  stopped : boolean = false;
   color: string;
   targetInfo: any;
   adjacent: any;
@@ -243,6 +244,7 @@ export class Ball extends Circle {
   stop() {
     this.speed = 0;
     this.direction = new Vector(0, 0);
+    this.stopped = true;
   }
 
   /**
