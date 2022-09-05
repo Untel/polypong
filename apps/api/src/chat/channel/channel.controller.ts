@@ -26,8 +26,8 @@ export class ChannelController {
   }
 
   @Get()
-  findAll() {
-    return this.channelService.findAll();
+  findAll(@CurrentUser() user: User) {
+    return this.channelService.findAll(user);
   }
 
   @Get(':id')

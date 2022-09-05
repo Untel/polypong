@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user';
+import { Not } from 'typeorm';
 import {
   Thread,
   ThreadMemberStatus,
@@ -29,8 +30,19 @@ export class ChannelService {
 
   update(id: number, updateChannelDto: UpdateChannelDto) {}
 
-  findAll() {
-    return `This action returns all channel`;
+  findAll(user = { id: null }) {
+    Channel.find({
+      relations: ['thread.participants.user'],
+      where: {
+        thread: {
+          participants: {
+            user: {
+              id: Not(user.id),
+            },
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {

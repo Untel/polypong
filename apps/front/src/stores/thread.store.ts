@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 01:48:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/05 22:49:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ export interface BaseThread extends BaseObject {
   id: number;
   participants: Participant[];
   channel?: Channel;
+  threadName: string;
 }
 
 export interface Thread extends BaseThread {
@@ -69,22 +70,28 @@ export interface ActiveThread extends BaseThread {
 
 interface ThreadState {
   _threads: Thread[];
+  _channels: Channel[];
   _current: ActiveThread | null;
 }
 
 export const useThreadStore = defineStore('thread', {
   state: () => ({
     _threads: [],
+    _channels: [],
     _current: null,
   } as ThreadState),
   getters: {
-    threads(state): Thread[] {
+    channels(state): Channel[] {
+      return state._channels;
+    },
+    threads(state) {
       const $auth = useAuthStore();
       const threads = state._threads.map((thread) => {
         const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
         const mapped = {
           ...thread,
           recipient,
+          threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
           avatar: !thread.channel
             ? recipient?.avatar
             : (thread.channel.avatar || 'group'),
@@ -97,9 +104,19 @@ export const useThreadStore = defineStore('thread', {
     totalUnread(state): number {
       return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
     },
-    current(state): ActiveThread | null {
-      if (!state._current) return null;
-      return state._current;
+    current(state) {
+      const thread = state._current;
+      if (!thread) return null;
+      const $auth = useAuthStore();
+      const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
+      return {
+        ...state._current,
+        recipient,
+        threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+        avatar: !thread.channel
+          ? recipient?.avatar
+          : (thread.channel.avatar || 'group'),
+      };
     },
 
   },
@@ -156,6 +173,11 @@ export const useThreadStore = defineStore('thread', {
       const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
       this.router.push({ name: 'inbox', params: { id: channel.thread.id } });
+    },
+
+    async getChannels() {
+      const channels = await channelApi.get<Channel[]>('');
+      return channels;
     },
 
     async socketAddMessage(thread: Thread, message: Message) {

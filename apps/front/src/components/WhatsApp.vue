@@ -56,48 +56,30 @@
             @click="toggleLeftDrawer"
           />
 
-          <q-btn round flat>
-            <q-avatar>
-              <!-- <img :src="currentThread.avatar"> -->
-            </q-avatar>
-          </q-btn>
+          <template v-if="currentThread">
+            <q-btn round flat>
+              <q-avatar class="bg-grey-2">
+                <img
+                  v-if="!currentThread.channel"
+                  :src="currentThread
+                    .participants
+                    .find(p => p.user.id !== $auth.user.id)
+                      ?.user.avatar
+                  "
+                />
+                <q-icon v-else name="group" />
+              </q-avatar>
+            </q-btn>
 
-          <span class="q-subtitle-1 q-pl-md">
-            <!-- {{ currentConversation.person }} -->
-          </span>
+            <span class="q-subtitle-1 q-pl-md">
+              {{ currentThread.threadName }}
+            </span>
+          </template>
 
           <q-space/>
 
-          <q-btn round flat icon="search" />
-          <q-btn round flat>
-            <q-icon name="attachment" class="rotate-135" />
-          </q-btn>
           <q-btn round flat @click="rightDrawerOpen = !rightDrawerOpen">
-            {{ rightDrawerOpen ? 'X' : 'V' }}
-          </q-btn>
-          <q-btn round flat icon="more_vert">
-            <q-menu auto-close :offset="[110, 0]">
-              <q-list style="min-width: 150px">
-                <q-item clickable>
-                  <q-item-section>Contact data</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Block</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Select messages</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Silence</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Clear messages</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Erase messages</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+            <q-icon name="group" />
           </q-btn>
         </q-toolbar>
       </q-header>
@@ -114,32 +96,6 @@
           </q-avatar>
 
           <q-space />
-
-          <q-btn round flat icon="message" />
-          <q-btn round flat icon="more_vert">
-            <q-menu auto-close :offset="[110, 8]">
-              <q-list style="min-width: 150px">
-                <q-item clickable @click="emit('newChannel')">
-                  <q-item-section>New channel</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Profile</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Archived</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Favorites</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Settings</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Logout</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
 
           <q-btn
             round
@@ -240,7 +196,6 @@
                   {{ participant.user.name }}
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
-                  <q-icon name="check" v-if="participantSeenLastMessage(participant)" />
                   <template
                     v-if="participant.status === ThreadMemberStatus.OWNER"
                   >
@@ -326,8 +281,9 @@ import {
   ThreadMemberStatus,
   useThreadStore,
 } from 'src/stores/thread.store';
-import moment from 'moment';
 import DiscordPicker from 'vue3-discordpicker';
+import moment from 'moment';
+import { useAuthStore } from 'src/stores/auth.store';
 import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
@@ -349,6 +305,7 @@ const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel']);
 
 const $q = useQuasar();
 const $thread = useThreadStore();
+const $auth = useAuthStore();
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 const search = ref('');
