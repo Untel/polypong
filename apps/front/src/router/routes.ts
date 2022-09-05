@@ -77,16 +77,15 @@ const authRoutes: RouteRecordRaw[] = [{
     try {
       const res = await $thread.getDmThreadByUserId(+userId);
       if (res) {
-        next(`/inbox/${res?.id}`);
-      } else {
-        throw new Error('wut');
+        return next(`/inbox/${res?.id}`);
       }
+      throw new Error('wut');
     } catch (e) {
       Notify.create({
         message: `Failed to get thread ${e.message}`,
         type: 'negative',
       });
-      next(false);
+      return next(false);
     }
   },
 },
