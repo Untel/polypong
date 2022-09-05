@@ -82,7 +82,7 @@ function splitByDay(messages: Message[]) {
     const day = moment(next.createdAt).format('dddd, MMMM Do YYYY');
     const dayIndex = acc.findIndex((d) => d.day === day);
     if (dayIndex === -1) {
-      console.log('Creating day indx', day, 'from messages', messages);
+      //      console.log('Creating day indx', day, 'from messages', messages);
       acc.unshift({
         day,
         messages: [next],

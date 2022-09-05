@@ -122,12 +122,12 @@ export const useMatchHistoryStore = defineStore('history', {
         userId = useAuthStore().getUser.id;
       }
       const matches = await historyApi.get<Match[]>(`user/${userId}`);
-      console.log(
-        'history store - fetchUserMatchesHistory - userId = ',
-        userId,
-        ', matches = ',
-        matches,
-      );
+      //      console.log(
+      //        'history store - fetchUserMatchesHistory - userId = ',
+      //        userId,
+      //        ', matches = ',
+      //        matches,
+      //      );
       const curHis = this.getUserMatchesHistory(userId);
       if (curHis) {
         curHis.matches = matches;
@@ -141,7 +141,7 @@ export const useMatchHistoryStore = defineStore('history', {
     },
 
     computeStats(userId: number, matches: Match[]): UserStats {
-      console.log(' matches = ', matches);
+      //      console.log(' matches = ', matches);
       const res: UserStats = { wins: 0, losses: 0, ratio: 1 };
       matches.forEach((m) => {
         const nplayers = m.totalPlayers;
@@ -163,13 +163,13 @@ export const useMatchHistoryStore = defineStore('history', {
     },
 
     async getAllMatches(): Promise<Match[] | undefined> {
-      console.log('history store - getAllMatches');
+      //      console.log('history store - getAllMatches');
       const allMatches = await historyApi.get<Match[]>('all');
-      console.log('history store - getAllMatches - matches = ', allMatches);
+      //      console.log('history store - getAllMatches - matches = ', allMatches);
       return allMatches;
     },
     async getPlayersUsersIds(): Promise<[any]> {
-      console.log('history store - getPlayersUsersIds');
+      //      console.log('history store - getPlayersUsersIds');
       return historyApi.get<[any]>('playersUsersIds');
     },
   },

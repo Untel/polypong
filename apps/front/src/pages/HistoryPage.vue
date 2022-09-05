@@ -217,7 +217,7 @@ const usersIds = asyncComputed(async () => {
 });
 
 async function inviteToLobby(id: number) {
-  console.log(`invite to lobby ${id}`);
+//  console.log(`invite to lobby ${id}`);
 }
 async function message(id: number) {
   router.push(`/chat/${id}`);

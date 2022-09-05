@@ -95,7 +95,7 @@ export const useAuthStore = defineStore('auth', {
         });
 
         this.socket.on('thread-message', (thread, message) => {
-          console.log('New socket message', thread, message);
+          //          console.log('New socket message', thread, message);
           const $thread = useThreadStore();
           $thread.socketAddMessage(thread, message);
         });
@@ -123,7 +123,7 @@ export const useAuthStore = defineStore('auth', {
       }
       defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
       const res: User = await userApi.get('/user');
-      console.log('in whoamI, user = ', res);
+      //      console.log('in whoamI, user = ', res);
       this.user = res;
     },
 

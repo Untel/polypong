@@ -68,7 +68,7 @@ export const useSocialStore = defineStore('social', {
       try {
         this.relationships = await relsApi.get('rels');
       } catch (error) {
-        console.log('error', error);
+        //        console.log('error', error);
         Notify.create({
           type: 'negative', message: 'Error while fetching relationships',
         });
@@ -103,7 +103,7 @@ export const useSocialStore = defineStore('social', {
       try {
         this.relationships = await relsApi.post('sendFriendship', { name });
       } catch (error) {
-        console.log('error', error);
+        //        console.log('error', error);
         Notify.create({
           type: 'negative', message: 'Error while requesting friendship',
         });
@@ -117,7 +117,7 @@ export const useSocialStore = defineStore('social', {
       try {
         this.relationships = await relsApi.post('unsendFriendship', { name });
       } catch (error) {
-        console.log('error', error);
+        //        console.log('error', error);
         Notify.create({
           type: 'negative', message: 'Error while revoking friendship',
         });
@@ -131,7 +131,7 @@ export const useSocialStore = defineStore('social', {
       try {
         this.relationships = await relsApi.post('sendBlock', { name });
       } catch (error) {
-        console.log('error', error);
+        //        console.log('error', error);
         Notify.create({
           type: 'negative', message: 'Error while blocking',
         });
@@ -145,7 +145,7 @@ export const useSocialStore = defineStore('social', {
       try {
         this.relationships = await relsApi.post('unsendBlock', { name });
       } catch (error) {
-        console.log('error', error);
+        //        console.log('error', error);
         Notify.create({
           type: 'negative', message: 'Error while unblocking',
         });

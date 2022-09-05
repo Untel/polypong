@@ -71,7 +71,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       try {
         this.lobbies = await lobbiesApi.get('');
       } catch (err) {
-        console.log('err', err);
+        //        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while fetching lobbies',
@@ -87,7 +87,12 @@ export const useLobbiesStore = defineStore('lobbies', {
     async leave() {
       this.router.push('/lobbies');
       if (this.activeLobby) {
-        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        try {
+          await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          // console.log(e);
+        }
         this.activeLobby = null;
       }
     },
@@ -124,7 +129,7 @@ export const useLobbiesStore = defineStore('lobbies', {
         try {
           await lobbiesApi.post(`${this.activeLobby.id}/leave`);
         } catch (e) {
-          console.log(e);
+          // console.log(e);
         }
         this.activeLobby = null;
       }
@@ -146,7 +151,7 @@ export const useLobbiesStore = defineStore('lobbies', {
         const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, lobby);
         return newLobby;
       } catch (err) {
-        console.log('err', err);
+        //        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while updating lobby',
@@ -155,7 +160,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       }
     },
     async setFinalePoints(finalePoints: string) {
-      console.log('setFinalePoints - finalepoints = ', finalePoints);
+      //      console.log('setFinalePoints - finalepoints = ', finalePoints);
       if (this.activeLobby) {
         await lobbiesApi.post(`${this.activeLobby.id}/setFinalePoints/${finalePoints}`);
       }

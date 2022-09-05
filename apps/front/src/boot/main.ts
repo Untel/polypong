@@ -11,12 +11,22 @@ export default boot(({ app }) => {
   window.fetch = function (url, init?) {
     // url = url.toString().replace('g.tenor.com/v1', 'tenor.googleapis.com/v2');
     if (!url.toString().includes('g.tenor.com/v1')) {
-      return originalFetch(url, init);
+      try {
+        return originalFetch(url, init);
+      } catch (e) {
+        console.log(e);
+      }
     }
     return Promise.resolve()
-      .then(() => {
-        const resp = new Response('[]');
-        return resp;
-      });
+      .then(
+        () => {
+          const resp = new Response('[]');
+          return resp;
+        },
+        (e) => {
+          // eslint-disable-next-line no-console
+          console.log(e);
+        },
+      );
   };
 });

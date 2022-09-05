@@ -121,17 +121,17 @@ const router = useRouter();
 async function createLobby() {
   const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
-    console.log('New lobby is', newLobby, newLobby.id);
+    //    console.log('New lobby is', newLobby, newLobby.id);
     await $lobbies.fetchAndJoinLobby(newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
   } else {
-    console.log('Error lulz');
+    //    console.log('Error lulz');
   }
 }
 
 onMounted(() => {
   socket.on('update_lobbies', (evt) => {
-    console.log('Refreshed lobbies', evt);
+    //    console.log('Refreshed lobbies', evt);
     $lobbies.lobbies = evt;
   });
 });

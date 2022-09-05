@@ -129,9 +129,9 @@ export const useThreadStore = defineStore('thread', {
     async sendMessage(content: string) {
       const id = this._current?.id;
       if (!id) return;
-      console.log('Sendiiiing msg', content);
+      //      console.log('Sendiiiing msg', content);
       const response = await threadApi.post(`${id}/message`, { content });
-      console.log('Message sent', response);
+      //      console.log('Message sent', response);
     },
 
     async newDirectMessage(userId: number) {
