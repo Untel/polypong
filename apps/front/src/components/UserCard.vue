@@ -27,8 +27,10 @@
 
             <q-item-section>
               <q-item-label>
-                {{ name }}
-                <q-badge v-if="isHost" color="teal-10">host</q-badge>
+                <span>
+                  {{ name }}
+                  <q-badge v-if="isHost" color="teal-10">host</q-badge>
+                </span>
               </q-item-label>
               <q-item-label>
                 <div class="color" :style="`background-color: ${color || 'transparent'}`">

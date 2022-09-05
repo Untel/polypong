@@ -10,13 +10,17 @@
 </style>
 
 <template>
+  <!--
 <pre>
   host : {{ $lobbies.getActiveLobby?.host.name }}
   lobbyId : {{ $lobbies.getActiveLobby?.id }}
 </pre>
+  -->
   <q-page padding>
+    <!--
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
+    -->
     <q-card-section>
       <q-btn
         @click="$lobbies.startGame(+$route.params.id);"
@@ -26,7 +30,53 @@
       </q-btn>
     </q-card-section>
 
-    <!--<section class="user-list">-->
+    <section>
+      <q-form ref="lobbyForm">
+        <q-field
+          label="Players max">
+          <q-slider
+            :disable="!canUpdate"
+            name="playersMax"
+            :model-value="$lobbies.activeLobby?.playersMax"
+            @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
+            :min="minPlayers"
+            :max="16"
+            snap
+            markers
+            label-always
+            label
+          />
+        </q-field>
+        <q-field
+          label="Points to win (1v1)">
+          <q-slider
+            :disable="!canUpdate"
+            name="finalePoints"
+            :model-value="$lobbies.activeLobby?.finalePoints"
+            @change="(evt) => $lobbies.setFinalePoints(evt)"
+            :min="1"
+            :max="11"
+            snap
+            markers
+            label-always
+            label
+          />
+        </q-field>
+        <q-input
+          :model-value="$lobbies.getActiveLobby?.name"
+          label="Lobby name"
+          @change="(evt) => $lobbies.updateLobby(
+            $lobbies.getActiveLobby.id, { name: evt }
+          )"
+          :disable="!canUpdate"
+          name="name"
+          lazy-rules
+          :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
+        />
+      </q-form>
+    </section>
+
+    <!-- PLAYERS -->
     <section class="row justify-center">
       <UserCard class="col-md-6"
         v-for="player in $lobbies.getActiveLobby?.players"
@@ -87,54 +137,8 @@
       </UserCard>
     </section>
 
-    <section>
-      <q-form ref="lobbyForm">
-        <q-field
-          label="Players max">
-          <q-slider
-            :disable="!canUpdate"
-            name="playersMax"
-            :model-value="$lobbies.activeLobby?.playersMax"
-            @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
-            :min="minPlayers"
-            :max="16"
-            snap
-            markers
-            label-always
-            label
-          />
-        </q-field>
-        <q-field
-          label="Points to win (1v1)">
-          <q-slider
-            :disable="!canUpdate"
-            name="finalePoints"
-            :model-value="$lobbies.activeLobby?.finalePoints"
-            @change="(evt) => $lobbies.setFinalePoints(evt)"
-            :min="1"
-            :max="11"
-            snap
-            markers
-            label-always
-            label
-          />
-        </q-field>
-        <q-input
-          :model-value="$lobbies.getActiveLobby?.name"
-          label="Lobby name"
-          @change="(evt) => $lobbies.updateLobby(
-            $lobbies.getActiveLobby.id, { name: evt }
-          )"
-          :disable="!canUpdate"
-          name="name"
-          lazy-rules
-          :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
-        />
-      </q-form>
-    </section>
-
+    <!-- SEARCH RESULTS -->
     <section v-if="rel" class="row justify-center">
-      <!-- SEARCH RESULTS -->
       <social-card :relname="rel.to.name"
         @message="(id) => message(id)"
         @stats="(id) => stats(id)"
@@ -144,6 +148,7 @@
         @unblock="(name) => unblock(name)"
       />
     </section>
+
   </q-page>
 </template>
 <script lang="ts">
