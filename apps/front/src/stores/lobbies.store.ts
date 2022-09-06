@@ -6,13 +6,13 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 02:05:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 15:13:45 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
-import { mande } from 'mande';
+import { mande } from 'src/libs/mande';
 import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
 

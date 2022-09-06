@@ -147,12 +147,10 @@
   </q-page>
 </template>
 <script lang="ts">
-import { Notify } from 'quasar';
 import { PreFetchOptions } from '@quasar/app-vite';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { asyncComputed } from '@vueuse/core';
-import { MandeError } from 'mande';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -163,11 +161,7 @@ export default {
     const id = currentRoute.params.id as string;
     try {
       await $lobbies.fetchAndJoinLobby(id);
-    } catch (err: MandeError) {
-      Notify.create({
-        type: 'negative',
-        message: err.body.message || 'Error while joining lobby',
-      });
+    } catch (_e) {
       redirect({ name: 'lobbies' });
     }
   },

@@ -15,7 +15,7 @@ import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
-import { mande, defaults } from 'mande';
+import { mande, defaults } from 'src/libs/mande';
 import { User } from 'src/types/user';
 import { useThreadStore } from './thread.store';
 
