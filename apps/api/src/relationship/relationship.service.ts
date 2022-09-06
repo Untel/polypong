@@ -26,7 +26,7 @@ export class RelationshipService {
   async findRel(from: User, to: User): Promise<Relationship> | null {
     const res = await this.relRepo
       .createQueryBuilder('')
-      .where({ from: from, to: to })
+      .where({ fromId: from.id, toId: to.id })
       .getOne(); // idk why but getMany() doesnt return all the data
     this.logger.log(`in findRel, res = ${JSON.stringify(res)}`);
     return res;

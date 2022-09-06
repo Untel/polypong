@@ -126,7 +126,9 @@ import { useRoute, useRouter } from 'vue-router';
 import MatchCard from 'src/components/MatchCard.vue';
 import SocialCard from 'src/components/SocialCard.vue';
 import StatsCard from 'src/components/StatsCard.vue';
-import { computed, ComputedRef, ref } from 'vue';
+import {
+  computed, ComputedRef, onMounted, ref,
+} from 'vue';
 import { asyncComputed } from '@vueuse/core';
 import StatsBanner from 'src/components/StatsBanner.vue';
 import SocialButton from 'src/components/SocialButton.vue';
@@ -134,8 +136,12 @@ import LadderBoard from 'src/components/LadderBoard.vue';
 import AchievementsCard from 'src/components/AchievementsCard.vue';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
-const soc = useSocialStore(); soc.fetchRelationships();
+const soc = useSocialStore();
 const $route = useRoute(); const router = useRouter();
+
+onMounted(async () => {
+  await soc.fetchRelationships();
+});
 
 const userId = computed(() => {
   if ($route.params.userId) {
@@ -153,7 +159,11 @@ const owningRel = asyncComputed(async () => {
   if (isSelf.value) { return undefined; }
   const ret = soc.getRelByUserId(userId.value);
   if (ret) { return ret; }
-  await soc.addRelByUserId(userId.value);
+  try {
+    await soc.addRelByUserId(userId.value);
+  } catch (e) {
+    // e
+  }
   return soc.getRelByUserId(userId.value);
 });
 
@@ -165,7 +175,11 @@ async function searchRel(name: string) {
   }
   let rel = soc.getRelByName(name);
   if (!rel) {
-    await soc.addRel(name);
+    try {
+      await soc.addRel(name);
+    } catch (e) {
+      // e
+    }
     rel = soc.getRelByName(name);
   }
   if (rel) {
@@ -186,7 +200,11 @@ const rel = asyncComputed(async () => {
   if (!playerClicked.value || playerClicked.value === auth.user.name) { return undefined; }
   const ret = soc.getRelByName(playerClicked.value);
   if (ret) { return ret; }
-  await soc.addRel(playerClicked.value);
+  try {
+    await soc.addRel(playerClicked.value);
+  } catch (e) {
+    // e
+  }
   return soc.getRelByName(playerClicked.value);
 });
 
