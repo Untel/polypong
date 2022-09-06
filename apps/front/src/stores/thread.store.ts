@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 17:49:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 20:15:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ export interface Message extends BaseObject {
 export interface Channel extends BaseObject {
   name: string;
   avatar: string;
+  joined: boolean;
 }
 
 export interface BaseThread extends BaseObject {
@@ -83,7 +84,9 @@ export const useThreadStore = defineStore('thread', {
   } as ThreadState),
   getters: {
     channels(state): Channel[] {
-      return state._channels;
+      return state._channels.map((c) => ({
+        ...c,
+      }));
     },
     threads(state) {
       const $auth = useAuthStore();

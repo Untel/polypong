@@ -118,6 +118,19 @@
 
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
+            <q-item exact :to="{ name: 'channels' }">
+              <q-item-section avatar>
+                <q-avatar class="bg-grey-2">
+                  <q-icon name="search" />
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>
+                  Browse channels
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator></q-separator>
             <q-item
               v-for="(thread, index) in threads"
               :key="`thread-${index}`"
