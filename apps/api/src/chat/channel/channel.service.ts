@@ -42,20 +42,20 @@ export class ChannelService {
 
   update(id: number, updateChannelDto: UpdateChannelDto) {}
 
-  findAll(user = { id: null }) {
-    return Channel.find({
+  async findAll(user = { id: null }) {
+    const chans = await Channel.find({
       relations: ['thread.participants.user'],
-      where: {
-        thread: {
-          participants: {
-            user: {
-              id: Not(user.id),
-            },
-          },
-          key: IsNull(),
-        },
-      },
     });
+    // const chans = await Channel.createQueryBuilder('channel')
+    //   .innerJoinAndSelect('channel.thread', 'thread')
+    //   .leftJoinAndSelect('thread.participants', 'participants')
+    //   .leftJoinAndSelect('participants.user', 'user')
+    //   .getMany();
+
+    return chans.map((channel) => ({
+      ...channel,
+      name: channel.thread.participants.map((p) => p.user.name).join(', '),
+    }));
   }
 
   findOne(id: number) {

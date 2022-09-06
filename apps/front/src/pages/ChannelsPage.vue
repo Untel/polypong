@@ -6,10 +6,22 @@
     <q-infinite-scroll @load="() => {}" reverse>
       <q-list>
         <q-item
+          clickable
           v-for="channel in $thread.channels"
           :key="`chan-${channel.id}`"
+          :to="{ name: 'thread', params: { id: channel.thread.id } }"
         >
-          Channel {{ channel.id }}
+          <q-item-section avatar>
+            <q-avatar class="bg-grey-2">
+              <img v-if="!channel.joined" :src="channel.initiator.avatar"/>
+              <q-icon v-else color="green" name="fa-regular fa-circle-check" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>
+              {{ channel.name }}
+            </q-item-label>
+          </q-item-section>
         </q-item>
       </q-list>
     </q-infinite-scroll>

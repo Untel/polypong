@@ -26,8 +26,18 @@ export class ChannelController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: User) {
-    return this.channelService.findAll(user);
+  async findAll(@CurrentUser() user: User) {
+    const chans = await this.channelService.findAll(user);
+    const mapped = chans
+      .map((channel) => ({
+        ...channel,
+        name: channel.thread.participants.map((p) => p.user.name).join(', '),
+        joined: !!channel.thread.participants.find(
+          (p) => p.user.id === user.id,
+        ),
+      }))
+      .sort((a, b) => +a.joined - +b.joined);
+    return mapped;
   }
 
   @Get(':id')
