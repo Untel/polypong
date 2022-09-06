@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 15:30:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:32:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@ import { defineStore } from 'pinia';
 import { mande, MandeError } from 'src/libs/mande';
 import { Dialog, Notify } from 'quasar';
 import { User } from 'src/types/user';
+import { onError } from 'src/utils/mande-error';
 import { useAuthStore } from './auth.store';
 
-export const threadApi = mande('/api/thread');
-export const channelApi = mande('/api/channel');
+export const threadApi = mande('/api/thread', { onError });
+export const channelApi = mande('/api/channel', { onError });
 
 export interface BaseObject {
   id: number;
@@ -159,7 +160,7 @@ export const useThreadStore = defineStore('thread', {
     async newChannel() {
       const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
-      this.router.push({ name: 'inbox', params: { id: channel.thread.id } });
+      this.router.push({ name: 'thread', params: { id: channel.thread.id } });
     },
 
     async getChannels() {

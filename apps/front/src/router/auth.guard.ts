@@ -1,3 +1,4 @@
+import { MandeError } from 'mande';
 import { useAuthStore } from 'src/stores/auth.store';
 import { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
@@ -44,16 +45,12 @@ export default async (
     await auth.whoAmI();
     await auth.connectToSocket();
     return next();
-  } catch (error: any) {
-    if (Object.hasOwn(error, 'body')) {
-      if (error.body.statusCode === 401) {
-        if (error.body.message === '2FA') {
-          return next({ name: '2fa' });
-        }
-      }
+  } catch (error: MandeError<unknown>) {
+    if (error.body?.statusCode === 401
+      && error.body?.message === '2FA') {
+      return next({ name: '2fa' });
     }
     const redirect = buildRedirectObject(to);
-    console.log('Auth guard fail', error, to.name, redirect);
     return next({ name: 'login', query: redirect });
   }
 };
