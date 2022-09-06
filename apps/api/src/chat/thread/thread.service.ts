@@ -13,14 +13,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ID, TS } from 'src/entities/root.entity';
+import { RelationshipService } from 'src/relationship';
+import { UserService } from 'src/user';
 import { User } from 'src/user/user.entity';
-import { In, IsNull, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { Message } from '../message/entities/message.entity';
 import { UpdateThreadDto } from './dto/update-thread.dto';
 import { Thread, ThreadParticipant } from './entities';
 
 @Injectable()
 export class ThreadService {
+  constructor(
+    private userService: UserService,
+    private relService: RelationshipService,
+  ) {}
+
   logger = new Logger('ThreadService');
 
   async newDirectMessage(message: Partial<Message>, from: User, to: User) {
@@ -64,13 +71,31 @@ export class ThreadService {
     return threads;
   }
 
-  async findThreadWithMessages(id: ID) {
-    return Thread.findOne({
+  async findThreadWithMessages(user: User, id: ID) {
+    console.log('user = ', user, 'id = ', id);
+    const thread = await Thread.findOne({
+      relations: [
+        'participants.user',
+        'messages.sender.relationships',
+        'channel',
+      ],
       where: { id },
-      // eslint-disable-next-line prettier/prettier
-      relations: ['participants.user', 'messages.sender', 'channel'],
       order: { messages: { createdAt: 'DESC' } },
     });
+    thread.messages.forEach(async (m) => {
+      if (m.sender) {
+        const other: User = await this.userService.findById(m.sender.id);
+        const rel = await this.relService.findRel(user, other);
+        if (rel) {
+          if (rel.fromId === user.id) {
+            if (rel.block_received || rel.block_sent) {
+              m.content = 'content cannot be displayed';
+            }
+          }
+        }
+      }
+    });
+    return thread;
   }
 
   async setThreadAsRead(thread: Thread, user: User) {
