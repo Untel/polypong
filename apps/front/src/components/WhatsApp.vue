@@ -353,18 +353,9 @@ const fn = (p: Participant) => {
   console.log('Fn', p);
 };
 
-async function actionable(target: Participant) : Promise<Action[]> {
-  const rel = computedAsync(async () => {
-    await $social.fetchRelationships();
-    const ret = $social.getRelByUserId(target.user.id);
-    console.log('ret = ', ret);
-    if (ret === undefined) {
-      await $social.addRelByUserId(target.user.id);
-      await $social.fetchRelationships();
-      return $social.getRelByUserId(target.user.id);
-    }
-    return ret;
-  });
+function actionable(target: Participant) : Promise<Action[]> {
+  const rel = $social.getRelByUserId(target.user.id);
+  console.log('rel = ', rel);
   const actions: Action[] = [
     { label: 'Profile', icon: { name: 'fa-solid fa-chart-line' }, fn: (p) => $router.push(`/profile/${p.user.id}`) },
   ];
@@ -391,8 +382,8 @@ async function actionable(target: Participant) : Promise<Action[]> {
       }
     }
 
-    if (rel.value) {
-      if (!rel.value.block_received && !rel.value.block_sent) {
+    if (rel !== undefined) {
+      if (!rel.block_received && !rel.block_sent) {
         actions.push(
           {
             label: 'Invite to Play',
@@ -405,7 +396,7 @@ async function actionable(target: Participant) : Promise<Action[]> {
             fn: (p) => $router.push(`/profile/${p.user.id}`),
           },
         );
-        if (!rel.value.friendship_received && !rel.value.friendship_sent) {
+        if (!rel.friendship_received && !rel.friendship_sent) {
           actions.push(
             {
               label: 'Add Friend',
@@ -414,7 +405,7 @@ async function actionable(target: Participant) : Promise<Action[]> {
             },
           );
         }
-        if (rel.value.friendship_received && !rel.value.friendship_sent) {
+        if (rel.friendship_received && !rel.friendship_sent) {
           actions.push(
             {
               label: 'Accept Friend Request',
@@ -428,7 +419,7 @@ async function actionable(target: Participant) : Promise<Action[]> {
             },
           );
         }
-        if (!rel.value.friendship_received && rel.value.friendship_sent) {
+        if (!rel.friendship_received && rel.friendship_sent) {
           actions.push(
             {
               label: 'Cancel Friend Request',
@@ -437,7 +428,7 @@ async function actionable(target: Participant) : Promise<Action[]> {
             },
           );
         }
-        if (rel.value.friendship_received && rel.value.friendship_sent) {
+        if (rel.friendship_received && rel.friendship_sent) {
           actions.push(
             {
               label: 'Unfriend',
@@ -447,12 +438,12 @@ async function actionable(target: Participant) : Promise<Action[]> {
           );
         }
       }
-      if (!rel.value.block_sent) {
+      if (!rel.block_sent) {
         actions.push(
           { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn: (p) => $social.send_block(p.user.name) },
         );
       }
-      if (rel.value.block_sent) {
+      if (rel.block_sent) {
         actions.push(
           { label: 'Unblock', icon: { name: 'fas fa-user-unlock' }, fn: (p) => $social.unsend_block(p.user.name) },
         );
@@ -468,7 +459,6 @@ async function actionable(target: Participant) : Promise<Action[]> {
       );
     }
   }
-
   return actions;
 }
 

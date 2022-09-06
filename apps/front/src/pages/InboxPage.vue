@@ -22,10 +22,12 @@ import { useRoute } from 'vue-router';
 import { Thread, useThreadStore } from 'src/stores/thread.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import WhatsApp from 'src/components/WhatsApp.vue';
+import { useSocialStore } from 'src/stores/social.store';
 
 const $auth = useAuthStore();
 const $thread = useThreadStore();
 const $route = useRoute();
+const $social = useSocialStore();
 
 watch(
   () => $route.params.id,
@@ -38,6 +40,7 @@ onUnmounted(() => {
 });
 onMounted(() => {
   $thread.fetchThreads();
+  $social.fetchRelationships();
 });
 
 </script>
