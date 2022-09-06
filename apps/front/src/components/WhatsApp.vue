@@ -56,48 +56,30 @@
             @click="toggleLeftDrawer"
           />
 
-          <q-btn round flat>
-            <q-avatar>
-              <!-- <img :src="currentThread.avatar"> -->
-            </q-avatar>
-          </q-btn>
+          <template v-if="currentThread">
+            <q-btn round flat>
+              <q-avatar class="bg-grey-2">
+                <img
+                  v-if="!currentThread.channel"
+                  :src="currentThread
+                    .participants
+                    .find(p => p.user.id !== $auth.user.id)
+                      ?.user.avatar
+                  "
+                />
+                <q-icon v-else name="group" />
+              </q-avatar>
+            </q-btn>
 
-          <span class="q-subtitle-1 q-pl-md">
-            <!-- {{ currentConversation.person }} -->
-          </span>
+            <span class="q-subtitle-1 q-pl-md ellipsis">
+              {{ currentThread.threadName }}
+            </span>
+          </template>
 
           <q-space/>
 
-          <q-btn round flat icon="search" />
-          <q-btn round flat>
-            <q-icon name="attachment" class="rotate-135" />
-          </q-btn>
           <q-btn round flat @click="rightDrawerOpen = !rightDrawerOpen">
-            {{ rightDrawerOpen ? 'X' : 'V' }}
-          </q-btn>
-          <q-btn round flat icon="more_vert">
-            <q-menu auto-close :offset="[110, 0]">
-              <q-list style="min-width: 150px">
-                <q-item clickable>
-                  <q-item-section>Contact data</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Block</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Select messages</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Silence</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Clear messages</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Erase messages</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+            <q-icon name="group" />
           </q-btn>
         </q-toolbar>
       </q-header>
@@ -115,32 +97,12 @@
 
           <q-space />
 
-          <q-btn round flat icon="message" />
-          <q-btn round flat icon="more_vert">
-            <q-menu auto-close :offset="[110, 8]">
-              <q-list style="min-width: 150px">
-                <q-item clickable @click="emit('newChannel')">
-                  <q-item-section>New channel</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Profile</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Archived</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Favorites</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Settings</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Logout</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-
+          <q-btn
+            round
+            flat
+            icon="fas fa-plus"
+            @click="$thread.newChannel"
+          />
           <q-btn
             round
             flat
@@ -151,23 +113,24 @@
         </q-toolbar>
 
         <q-toolbar class="search-toolbar bg-grey-2">
-          <!-- <q-input
-            rounded
-            outlined
-            dense
-            class="WAL__field full-width"
-            v-model="search"
-            placeholder="Search or start a new conversation"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input> -->
           <SearchUser />
         </q-toolbar>
 
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
+            <q-item exact :to="{ name: 'channels' }">
+              <q-item-section avatar>
+                <q-avatar class="bg-grey-2">
+                  <q-icon name="search" />
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>
+                  Browse channels
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator></q-separator>
             <q-item
               v-for="(thread, index) in threads"
               :key="`thread-${index}`"
@@ -183,21 +146,30 @@
                 </q-avatar>
               </q-item-section>
 
-              <q-item-section>
-                <q-item-label>{{ thread.recipient?.name }}</q-item-label>
-                <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
-              </q-item-section>
+              <template v-if="thread.lastMessage">
+                <q-item-section style="width: 120px">
+                  <q-item-label lines="1">
+                      {{ thread.threadName }}
+                  </q-item-label>
+                  <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
+                </q-item-section>
 
-              <q-item-section side top>
-                <q-item-label caption>
-                  {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
-                </q-item-label>
-                <q-badge
-                  v-if="thread.unreadMessages.length"
-                  color="red"
-                  :label="`${thread.unreadMessages.length}`"
-                />
-              </q-item-section>
+                <q-item-section side top>
+                  <q-item-label caption>
+                    {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
+                  </q-item-label>
+                  <q-badge
+                    v-if="thread.unreadMessages.length"
+                    color="red"
+                    :label="`${thread.unreadMessages.length}`"
+                  />
+                </q-item-section>
+              </template>
+              <template v-else>
+                <q-item-section>
+                  <q-item-label>Empty thread</q-item-label>
+                </q-item-section>
+              </template>
             </q-item>
           </q-list>
         </q-scroll-area>
@@ -208,7 +180,7 @@
         show-if-above
         bordered
         v-if="currentThread"
-        :model-value="rightDrawerOpen"
+        v-model="rightDrawerOpen"
         class="bg-grey-3"
       >
         <q-scroll-area style="height: calc(100% - 100px)">
@@ -240,7 +212,6 @@
                   {{ participant.user.name }}
                 </q-item-label>
                 <q-item-label class="conversation__summary" caption>
-                  <q-icon name="check" v-if="participantSeenLastMessage(participant)" />
                   <template
                     v-if="participant.status === ThreadMemberStatus.OWNER"
                   >
@@ -318,6 +289,7 @@ import {
   ref,
   computed,
   PropType,
+  onMounted,
 } from 'vue';
 import {
   ActiveThread,
@@ -326,8 +298,14 @@ import {
   ThreadMemberStatus,
   useThreadStore,
 } from 'src/stores/thread.store';
-import moment from 'moment';
 import DiscordPicker from 'vue3-discordpicker';
+import moment from 'moment';
+import { useAuthStore } from 'src/stores/auth.store';
+import { useSocialStore } from 'src/stores/social.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { useRouter } from 'vue-router';
+import { computedAsync } from '@vueuse/core';
+import { rawListeners } from 'process';
 import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
@@ -345,10 +323,16 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel']);
+const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel', 'click']);
+
+function clicked(description: string) { emit('click', description); }
 
 const $q = useQuasar();
 const $thread = useThreadStore();
+const $social = useSocialStore();
+const $lobbies = useLobbiesStore();
+const $router = useRouter();
+const $auth = useAuthStore();
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 const search = ref('');
@@ -387,8 +371,10 @@ const fn = (p: Participant) => {
 };
 
 function actionable(target: Participant) : Action[] {
+  const rel = $social.getRelByUserId(target.user.id);
+  console.log('rel = ', rel);
   const actions: Action[] = [
-    { label: 'Profile', icon: { name: 'fas fa-user-astronaut' }, fn },
+    { label: 'Profile', icon: { name: 'fa-solid fa-chart-line' }, fn: (p) => $router.push(`/profile/${p.user.id}`) },
   ];
 
   if (props.me.id !== target.id) {
@@ -412,11 +398,97 @@ function actionable(target: Participant) : Action[] {
         );
       }
     }
-    actions.push(
-      { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn },
-      { label: 'Invite to play', icon: { name: 'sports_tennis' }, fn },
-      { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn },
-    );
+
+    if (rel) {
+      if (!rel.block_received && !rel.block_sent) {
+        actions.push(
+          {
+            label: 'Invite to Play',
+            icon: { name: 'fa-solid fa-table-tennis-paddle-ball' },
+            fn: (p) => $lobbies.inviteUserToLobby(p.user.id),
+          },
+          {
+            label: 'Stats',
+            icon: { name: 'fa-solid fa-chart-line' },
+            fn: (p) => $router.push(`/profile/${p.user.id}`),
+          },
+        );
+        if (!rel.friendship_received && !rel.friendship_sent) {
+          actions.push(
+            {
+              label: 'Add Friend',
+              icon: { name: 'fa-solid fa-user-group' },
+              fn: (p) => $social.send_friendship(p.user.name),
+            },
+          );
+        }
+        if (rel.friendship_received && !rel.friendship_sent) {
+          actions.push(
+            {
+              label: 'Accept Friend Request',
+              icon: { name: 'fa-solid fa-heart' },
+              fn: (p) => $social.send_friendship(p.user.name),
+            },
+            {
+              label: 'Decline Friend Request',
+              icon: { name: 'fa-solid fa-heart-broken' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+        if (!rel.friendship_received && rel.friendship_sent) {
+          actions.push(
+            {
+              label: 'Cancel Friend Request',
+              icon: { name: 'fa-solid fa-user' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+        if (rel.friendship_received && rel.friendship_sent) {
+          actions.push(
+            {
+              label: 'Unfriend',
+              icon: { name: 'fas fa-sad-tear' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+      }
+      if (!rel.block_sent) {
+        actions.push(
+          { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn: (p) => $social.send_block(p.user.name) },
+        );
+      }
+      if (rel.block_sent) {
+        actions.push(
+          { label: 'Unblock', icon: { name: 'fas fa-user-unlock' }, fn: (p) => $social.unsend_block(p.user.name) },
+        );
+      }
+    } else {
+      actions.push(
+        {
+          label: 'Invite to Play',
+          icon: { name: 'fa-solid fa-table-tennis-paddle-ball' },
+          fn: (p) => $lobbies.inviteUserToLobby(p.user.id),
+        },
+        {
+          label: 'Stats',
+          icon: { name: 'fa-solid fa-chart-line' },
+          fn: (p) => $router.push(`/profile/${p.user.id}`),
+        },
+        {
+          label: 'Add Friend',
+          icon: { name: 'fa-solid fa-user-group' },
+          fn: (p) => $social.send_friendship(p.user.name),
+        },
+        {
+          label: 'Block',
+          icon: { name: 'fas fa-user-lock' },
+          fn: (p) => $social.send_block(p.user.name),
+        },
+      );
+    }
   } else {
     actions.push(
       { label: 'Cut notifications', icon: { name: 'fas fa-bell-slash' }, fn },
@@ -427,7 +499,6 @@ function actionable(target: Participant) : Action[] {
       );
     }
   }
-
   return actions;
 }
 

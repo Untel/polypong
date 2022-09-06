@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { mande } from 'mande';
+import { mande } from 'src/libs/mande';
 import { Notify } from 'quasar';
 import { CoalitionChoice } from 'src/types';
 

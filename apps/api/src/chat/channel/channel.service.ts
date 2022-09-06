@@ -1,19 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { User } from 'src/user';
+import { IsNull, Not } from 'typeorm';
+import { Message } from '../message/entities/message.entity';
+import { MessageService } from '../message/message.service';
 import {
   Thread,
   ThreadMemberStatus,
   ThreadParticipant,
   ThreadService,
 } from '../thread';
-import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
-import { ChannelMember, ChannelMemberStatus } from './entities';
 import { Channel } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {
-  constructor(private readonly threadService: ThreadService) {}
+  constructor(
+    @Inject(forwardRef(() => ThreadService))
+    private threadService: ThreadService,
+  ) {}
+
   async create(user: User) {
     const thread = await Thread.create({
       participants: [
@@ -24,13 +29,33 @@ export class ChannelService {
       thread,
       initiator: user,
     });
+    // await Message.create({
+    //   thread,
+    //   content: `${user.name} has created this channel`,
+    // }).save();
+    await this.threadService.createSystemMessage(
+      thread,
+      `${user.name} has created the channel`,
+    );
     return await channel.save();
   }
 
   update(id: number, updateChannelDto: UpdateChannelDto) {}
 
-  findAll() {
-    return `This action returns all channel`;
+  async findAll(user = { id: null }) {
+    const chans = await Channel.find({
+      relations: ['thread.participants.user'],
+    });
+    // const chans = await Channel.createQueryBuilder('channel')
+    //   .innerJoinAndSelect('channel.thread', 'thread')
+    //   .leftJoinAndSelect('thread.participants', 'participants')
+    //   .leftJoinAndSelect('participants.user', 'user')
+    //   .getMany();
+
+    return chans.map((channel) => ({
+      ...channel,
+      name: channel.thread.participants.map((p) => p.user.name).join(', '),
+    }));
   }
 
   findOne(id: number) {

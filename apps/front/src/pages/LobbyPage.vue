@@ -26,67 +26,6 @@
       </q-btn>
     </q-card-section>
 
-    <!--<section class="user-list">-->
-    <section class="row justify-center">
-      <UserCard class="col-md-6"
-        v-for="player in $lobbies.getActiveLobby?.players"
-        :key="`player-${player.user.id}`"
-        :avatar="player.user.avatar"
-        :name="player.user.name"
-        :caption="player.user.email"
-        :color="player.color"
-        :canUpdate="canUpdate"
-        :isHost="player.user.id === $lobbies.getActiveLobby.host.id"
-        @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
-        @avatarClick="(name) => {
-          clickedUserName = clickedUserName === name ? '' : name
-        }"
-      >
-        <template #exit>
-            <!-- leave lobby -->
-            <q-btn
-              v-if="player.user.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.leave()"
-            />
-            <!-- kick player (host only)-->
-            <q-btn
-              v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.kick(lobby.id, player.user.id)"
-            />
-        </template>
-      </UserCard>
-      <UserCard class="col-md-6"
-        v-for="(bot, index) in $lobbies.getActiveLobby?.bots"
-        :key="`bot-${index}`"
-        :avatar="bot.avatar"
-        :color="bot.color"
-        :name="bot.name"
-        :canUpdate="canUpdate"
-        @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: evt } })"
-        caption="Invite someone to replace this bot"
-      >
-        <q-btn>Invite</q-btn>
-        <!-- :model-value="bot.level" -->
-        <q-slider
-          :disable="!canUpdate"
-          v-model="bot.level"
-          @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: { level: evt } } })"
-          name="strength"
-          :min="0"
-          :max="2"
-          :color="botLevels[bot.level || 0].color"
-          track-color="green"
-          selection-color="red"
-          markers
-          label-always
-          :label-value="botLevels[bot.level || 0].label"
-          label
-        />
-      </UserCard>
-    </section>
-
     <section>
       <q-form ref="lobbyForm">
         <q-field
@@ -144,15 +83,77 @@
         @unblock="(name) => unblock(name)"
       />
     </section>
+
+    <!--<section class="user-list">-->
+    <section class="row justify-center">
+      <UserCard class="col-md-6"
+        v-for="player in $lobbies.getActiveLobby?.players"
+        :key="`player-${player.user.id}`"
+        :avatar="player.user.avatar"
+        :name="player.user.name"
+        :caption="player.user.email"
+        :color="player.color"
+        :canUpdate="canUpdate"
+        :isHost="player.user.id === $lobbies.getActiveLobby.host.id"
+        @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
+        @avatarClick="(name) => {
+          clickedUserName = clickedUserName === name ? '' : name
+        }"
+      >
+        <template #exit>
+            <!-- leave lobby -->
+            <q-btn
+              v-if="player.user.id === $auth.user.id"
+              round icon="fa-solid fa-xmark" size="s"
+              @click="async () => $lobbies.leave()"
+            />
+            <!-- kick player (host only)-->
+            <q-btn
+              v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
+              round icon="fa-solid fa-xmark" size="s"
+              @click="async () => $lobbies.kick(lobby.id, player.user.id)"
+            />
+        </template>
+      </UserCard>
+      <UserCard class="col-md-6"
+        v-for="(bot, index) in $lobbies.getActiveLobby?.bots"
+        :key="`bot-${index}`"
+        :avatar="bot.avatar"
+        :color="bot.color"
+        :name="bot.name"
+        :canUpdate="canUpdate"
+        @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: evt } })"
+        caption="Invite someone to replace this bot"
+      >
+        <!--
+        <q-btn>Invite</q-btn>
+        :model-value="bot.level"
+        -->
+        <q-slider
+          :disable="!canUpdate"
+          v-model="bot.level"
+          @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: { level: evt } } })"
+          name="strength"
+          :min="0"
+          :max="2"
+          :color="botLevels[bot.level || 0].color"
+          track-color="green"
+          selection-color="red"
+          markers
+          label-always
+          :label-value="botLevels[bot.level || 0].label"
+          label
+        />
+      </UserCard>
+    </section>
+
   </q-page>
 </template>
 <script lang="ts">
-import { Notify } from 'quasar';
 import { PreFetchOptions } from '@quasar/app-vite';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { asyncComputed } from '@vueuse/core';
-import { MandeError } from 'mande';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -163,11 +164,7 @@ export default {
     const id = currentRoute.params.id as string;
     try {
       await $lobbies.fetchAndJoinLobby(id);
-    } catch (err: MandeError) {
-      Notify.create({
-        type: 'negative',
-        message: err.body.message || 'Error while joining lobby',
-      });
+    } catch (_e) {
       redirect({ name: 'lobbies' });
     }
   },

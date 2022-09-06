@@ -86,12 +86,18 @@ function exclude(input: Array<U>) {
 const auths = computed(() => exclude($auth.connectedUsers));
 
 function filterFn(val: string, update: (callback: () => void) => void) {
-  $auth.searchUsers(val)
-    .then((searching) => {
-      update(() => {
-        options.value = exclude(searching);
+  if (val.length >= 3) {
+    $auth.searchUsers(val)
+      .then((searching) => {
+        update(() => {
+          options.value = exclude(searching);
+        });
       });
+  } else {
+    update(() => {
+      console.log('Not enough characters');
     });
+  }
 }
 
 </script>

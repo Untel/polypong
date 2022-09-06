@@ -2,26 +2,21 @@
 import {
   Controller,
   Get,
-  Body,
-  Patch,
   Param,
   Delete,
   UnprocessableEntityException,
   UseGuards,
   Logger,
   UnauthorizedException,
-  Post,
   Put,
   Req,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
-import { UpdateThreadDto } from './dto/update-thread.dto';
 import { User } from 'src/user/user.entity';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserService } from 'src/user';
 import JwtGuard from 'src/guards/jwt.guard';
 import ThreadGuard, { CurrentThread, ThreadRole } from './thread.guard';
-import ThreadAdminGuard from './thread-admin.guard';
 import { RelationshipService } from 'src/relationship';
 import { ID } from 'src/entities';
 import { Thread, ThreadMemberStatus, ThreadParticipant } from './entities';
@@ -37,7 +32,6 @@ export class ThreadController {
     private readonly userService: UserService, // private readonly channelService: ChannelService,
     private readonly relService: RelationshipService,
     private readonly messageService: MessageService,
-    private readonly socketService: SocketService,
   ) {}
 
   logger = new Logger('ThreadController');
@@ -84,7 +78,7 @@ export class ThreadController {
       throw new UnprocessableEntityException('This user does not exist');
 
     const me = thread.participants.find((e) => e.user.id === user.id);
-    if (me.deletedAt && me.isBanUntil) {
+    if (me && me.deletedAt && me.isBanUntil) {
       const m = moment(me.isBanUntil).diff(moment());
       if (m > 0) {
         const dur = moment.duration(m);

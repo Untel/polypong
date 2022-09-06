@@ -66,10 +66,6 @@ export default {
     try {
       await $game.fetchCurrentGame(id);
     } catch (err) {
-      Notify.create({
-        type: 'negative',
-        message: 'Error while joining game',
-      });
       redirect({ name: 'lobbies' });
     }
   },

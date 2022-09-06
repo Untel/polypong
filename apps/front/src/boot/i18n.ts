@@ -3,7 +3,7 @@ import { createI18n } from 'vue-i18n';
 
 import messages from 'src/i18n';
 import 'src/libs/fss';
-import { defaults } from 'mande';
+import { defaults } from 'src/libs/mande';
 
 export default boot(({ app }) => {
   const i18n = createI18n({

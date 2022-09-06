@@ -3,20 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   lobbies.store.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 12:44:22 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/06 21:28:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
-import { mande } from 'mande';
+import { mande } from 'src/libs/mande';
+import { onError } from 'src/utils/mande-error';
 import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
 
-export const lobbiesApi = mande('/api/lobbies');
+export const lobbiesApi = mande('/api/lobbies', { onError });
 
 export interface BasePlayer {
   name: string;

@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, Like, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, In, Like, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/UserInterface';
 import { User } from './user.entity';
 import * as gravatar from 'gravatar';
@@ -240,10 +240,7 @@ export class UserService {
 
   async search(term: string) {
     return User.find({
-      where: {
-        name: Like(`%${term}%`),
-        email: Like(`%${term}%`),
-      },
+      where: [{ name: ILike(`%${term}%`) }, { email: ILike(`%${term}%`) }],
     });
   }
 }

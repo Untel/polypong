@@ -15,14 +15,15 @@ import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { io, Socket } from 'socket.io-client';
 import { CoalitionChoice } from 'src/types';
-import { mande, defaults } from 'mande';
+import { mande, defaults } from 'src/libs/mande';
 import { User } from 'src/types/user';
+import { onError } from 'src/utils/mande-error';
 import { useThreadStore } from './thread.store';
 
-export const authApi = mande('/api/auth');
-export const twoFactorApi = mande('/api/2fa');
-export const onlineApi = mande('/api/online');
-export const userApi = mande('/api/user');
+export const authApi = mande('/api/auth', { onError });
+export const twoFactorApi = mande('/api/2fa', { onError });
+export const onlineApi = mande('/api/online', { onError });
+export const userApi = mande('/api/user', { onError });
 
 export interface UserCon extends User {
   status: 'online' | 'ingame' | 'inlobby';

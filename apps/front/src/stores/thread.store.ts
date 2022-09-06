@@ -6,20 +6,21 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 01:48:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 20:15:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande, MandeError } from 'mande';
+import { mande, MandeError } from 'src/libs/mande';
 import { Dialog, Notify } from 'quasar';
 import { User } from 'src/types/user';
+import { onError } from 'src/utils/mande-error';
 import { useAuthStore } from './auth.store';
 
-export const threadApi = mande('/api/thread');
-export const channelApi = mande('/api/channel');
+export const threadApi = mande('/api/thread', { onError });
+export const channelApi = mande('/api/channel', { onError });
 
 export interface BaseObject {
   id: number;
@@ -48,12 +49,14 @@ export interface Message extends BaseObject {
 export interface Channel extends BaseObject {
   name: string;
   avatar: string;
+  joined: boolean;
 }
 
 export interface BaseThread extends BaseObject {
   id: number;
   participants: Participant[];
   channel?: Channel;
+  threadName: string;
 }
 
 export interface Thread extends BaseThread {
@@ -69,26 +72,34 @@ export interface ActiveThread extends BaseThread {
 
 interface ThreadState {
   _threads: Thread[];
+  _channels: Channel[];
   _current: ActiveThread | null;
 }
 
 export const useThreadStore = defineStore('thread', {
   state: () => ({
     _threads: [],
+    _channels: [],
     _current: null,
   } as ThreadState),
   getters: {
-    threads(state): Thread[] {
+    channels(state): Channel[] {
+      return state._channels.map((c) => ({
+        ...c,
+      }));
+    },
+    threads(state) {
       const $auth = useAuthStore();
       const threads = state._threads.map((thread) => {
         const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
         const mapped = {
           ...thread,
           recipient,
+          threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
           avatar: !thread.channel
             ? recipient?.avatar
             : (thread.channel.avatar || 'group'),
-          lastMessage: thread.lastMessage || { createdAt: Date.now(), content: 'Empty thread' },
+          lastMessage: thread.lastMessage || null,
         };
         return mapped;
       });
@@ -97,9 +108,19 @@ export const useThreadStore = defineStore('thread', {
     totalUnread(state): number {
       return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
     },
-    current(state): ActiveThread | null {
-      if (!state._current) return null;
-      return state._current;
+    current(state) {
+      const thread = state._current;
+      if (!thread) return null;
+      const $auth = useAuthStore();
+      const recipient = thread.participants.find((p) => p.user.id !== $auth.user.id)?.user;
+      return {
+        ...state._current,
+        recipient,
+        threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+        avatar: !thread.channel
+          ? recipient?.avatar
+          : (thread.channel.avatar || 'group'),
+      };
     },
 
   },
@@ -108,17 +129,17 @@ export const useThreadStore = defineStore('thread', {
       this._threads = await threadApi.get<Thread[]>('');
     },
 
+    async fetchChannels() {
+      this._channels = await channelApi.get<Channel[]>('');
+    },
+
     async getThread(threadId: number | null | undefined) {
       if (threadId) {
         try {
           this._current = await threadApi.get<ActiveThread>(threadId);
           this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
-        } catch (e: MandeError<unknown>) {
+        } catch (_e) {
           this.router.push('/inbox');
-          Notify.create({
-            message: e.message,
-            color: 'negative',
-          });
         }
       } else {
         this._current = null;
@@ -135,17 +156,8 @@ export const useThreadStore = defineStore('thread', {
 
     async sendMessage(content: string) {
       const id = this._current?.id;
-      if (!id) return;
-      try {
-        const response = await threadApi.post(`${id}/message`, { content });
-      } catch (e: MandeError) {
-        Notify.create({
-          message: `${e.message}`,
-          caption: `${e.body.message}`,
-          icon: 'fas fa-bug',
-          color: 'negative',
-        });
-      }
+      if (!id || !content) return;
+      await threadApi.post(`${id}/message`, { content });
     },
 
     async newDirectMessage(userId: number) {
@@ -155,7 +167,12 @@ export const useThreadStore = defineStore('thread', {
     async newChannel() {
       const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
-      this.router.push({ name: 'inbox', params: { id: channel.thread.id } });
+      this.router.push({ name: 'thread', params: { id: channel.thread.id } });
+    },
+
+    async getChannels() {
+      const channels = await channelApi.get<Channel[]>('');
+      return channels;
     },
 
     async socketAddMessage(thread: Thread, message: Message) {
@@ -170,11 +187,11 @@ export const useThreadStore = defineStore('thread', {
       if (!id) return;
       Dialog.create({
         title: 'Leave thread',
-        message: 'Are you sure you want to leave this thread ?',
+        message: 'Are you sure you want to join this thread ?',
         cancel: true,
       }).onOk(async () => {
-        const response = await threadApi.delete(`${id}`);
-        this._threads = this.threads.filter((t) => t.id !== id);
+        // const response = await threadApi.delete(`${id}`);
+        // this._threads = this._threads..
         this.router.push('/inbox');
       });
     },
@@ -189,7 +206,7 @@ export const useThreadStore = defineStore('thread', {
       }).onOk(async () => {
         const response = await threadApi.delete(`${id}`);
         this.router.push('/inbox');
-        this._threads = this.threads.filter((t) => t.id !== id);
+        this._threads = this._threads.filter((t) => t.id !== id);
       });
     },
 

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 18:09:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 18:40:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ import { Message } from './entities';
 @Injectable()
 export class MessageService {
   constructor(
-    @InjectRepository(Message)
-    private messageRep: Repository<Message>,
     @Inject(forwardRef(() => SocketService))
     private socketService: SocketService,
   ) {}

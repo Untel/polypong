@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/10 22:03:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 15:28:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ export default class LobbyExistGuard implements CanActivate {
     console.log('++++++++lobbyId = ', lobbyId);
     const lobby = this.lobbyService.getLobby(lobbyId);
     if (!lobby) {
-      throw new UnprocessableEntityException();
+      throw new UnprocessableEntityException('Lobby does not exist');
     }
     req.lobby = lobby;
     return true;
