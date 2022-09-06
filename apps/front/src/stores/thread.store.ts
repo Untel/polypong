@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/05 22:49:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 15:30:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande, MandeError } from 'mande';
+import { mande, MandeError } from 'src/libs/mande';
 import { Dialog, Notify } from 'quasar';
 import { User } from 'src/types/user';
 import { useAuthStore } from './auth.store';
@@ -130,12 +130,8 @@ export const useThreadStore = defineStore('thread', {
         try {
           this._current = await threadApi.get<ActiveThread>(threadId);
           this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
-        } catch (e: MandeError<unknown>) {
+        } catch (_e) {
           this.router.push('/inbox');
-          Notify.create({
-            message: e.message,
-            color: 'negative',
-          });
         }
       } else {
         this._current = null;
@@ -152,17 +148,8 @@ export const useThreadStore = defineStore('thread', {
 
     async sendMessage(content: string) {
       const id = this._current?.id;
-      if (!id) return;
-      try {
-        const response = await threadApi.post(`${id}/message`, { content });
-      } catch (e: MandeError) {
-        Notify.create({
-          message: `${e.message}`,
-          caption: `${e.body.message}`,
-          icon: 'fas fa-bug',
-          color: 'negative',
-        });
-      }
+      if (!id || !content) return;
+      await threadApi.post(`${id}/message`, { content });
     },
 
     async newDirectMessage(userId: number) {
@@ -192,11 +179,11 @@ export const useThreadStore = defineStore('thread', {
       if (!id) return;
       Dialog.create({
         title: 'Leave thread',
-        message: 'Are you sure you want to leave this thread ?',
+        message: 'Are you sure you want to join this thread ?',
         cancel: true,
       }).onOk(async () => {
-        const response = await threadApi.delete(`${id}`);
-        this._threads = this.threads.filter((t) => t.id !== id);
+        // const response = await threadApi.delete(`${id}`);
+        // this._threads = this._threads..
         this.router.push('/inbox');
       });
     },
@@ -211,7 +198,7 @@ export const useThreadStore = defineStore('thread', {
       }).onOk(async () => {
         const response = await threadApi.delete(`${id}`);
         this.router.push('/inbox');
-        this._threads = this.threads.filter((t) => t.id !== id);
+        this._threads = this._threads.filter((t) => t.id !== id);
       });
     },
 

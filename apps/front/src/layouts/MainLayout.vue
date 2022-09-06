@@ -182,43 +182,4 @@ $auth.socket.on('lobby_change', async (lobbyId: number) => {
   await $auth.fetchConnectedUsers();
 });
 
-$auth.socket.onAny((eventName, ...args) => {
-  console.log('EMIT - ', eventName, ', ARGS :', ...args);
-});
-
-// onMounted(async () => {
-//   const id = +($route.params.id as string);
-//   $auth.socket.on('start', (lobbyId: number) => {
-//     console.log(`GAMESTART : ${lobbyId} has started`);
-//     $router.push(`/lobby/${id}/game`);
-//   });
-//   $auth.socket.on('lobby_change', async (evt) => {
-//     $lobbies.fetchLobbies();
-//   });
-// });
-
-// onUnmounted(() => {
-//   $auth.socket.off('start');
-//   $auth.socket.off('lobby_change');
-// });
-
-// onMounted(() => {
-//   auth.socket.on('online', ({ name, type }) => {
-//     Notify.create({
-//       message: `${name} just is now ${
-//         type === 'connect' ? 'connected' : 'disconnected'
-//       }`,
-//     });
-//     auth.fetchConnectedUsers();
-//   });
-//   auth.socket.on('message', (message) => {
-//     Notify.create({
-//       message: `Server say ${message}`,
-//     });
-//   });
-//   auth.socket.on('redirect', (url) => {
-//     console.log('Shoudl redirect', url, this, (this as any).router);
-//     setTimeout(() => router.push(url), 2000);
-//   });
-// });
 </script>

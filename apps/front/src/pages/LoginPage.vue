@@ -57,7 +57,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Notify } from 'quasar';
-import { mande, defaults, MandeError } from 'mande';
+import { mande, defaults, MandeError } from 'src/libs/mande';
 
 const auth = useAuthStore();
 
@@ -68,18 +68,11 @@ const router = useRouter();
 const route = useRoute();
 
 const connectWithLocal = async (form: Event) => {
-  try {
-    const redirect = route.query.redirect
-      ? JSON.parse((route.query.redirect as string))
-      : { name: 'home' };
-    await auth.login(login.value, password.value);
-    router.push(redirect);
-  } catch (error: MandeError) {
-    Notify.create({
-      type: 'negative',
-      message: error.message || error.error,
-    });
-  }
+  const redirect = route.query.redirect
+    ? JSON.parse((route.query.redirect as string))
+    : { name: 'home' };
+  await auth.login(login.value, password.value);
+  router.push(redirect);
 };
 
 </script>
