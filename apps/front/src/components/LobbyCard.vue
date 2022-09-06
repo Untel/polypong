@@ -132,7 +132,7 @@ function click() {
     } else {
       emit('spectate');
     }
-  } else if (!props.isFull) {
+  } else if (isInsideLobby.value || !props.isFull) {
     emit('joinLobby');
   }
 }
