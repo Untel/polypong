@@ -273,6 +273,7 @@ import {
   ref,
   computed,
   PropType,
+  onMounted,
 } from 'vue';
 import {
   ActiveThread,
@@ -353,7 +354,7 @@ const fn = (p: Participant) => {
   console.log('Fn', p);
 };
 
-function actionable(target: Participant) : Promise<Action[]> {
+function actionable(target: Participant) : Action[] {
   const rel = $social.getRelByUserId(target.user.id);
   console.log('rel = ', rel);
   const actions: Action[] = [
@@ -448,6 +449,29 @@ function actionable(target: Participant) : Promise<Action[]> {
           { label: 'Unblock', icon: { name: 'fas fa-user-unlock' }, fn: (p) => $social.unsend_block(p.user.name) },
         );
       }
+    } else {
+      actions.push(
+        {
+          label: 'Invite to Play',
+          icon: { name: 'fa-solid fa-table-tennis-paddle-ball' },
+          fn: (p) => $lobbies.inviteUserToLobby(p.user.id),
+        },
+        {
+          label: 'Stats',
+          icon: { name: 'fa-solid fa-chart-line' },
+          fn: (p) => $router.push(`/profile/${p.user.id}`),
+        },
+        {
+          label: 'Add Friend',
+          icon: { name: 'fa-solid fa-user-group' },
+          fn: (p) => $social.send_friendship(p.user.name),
+        },
+        {
+          label: 'Block',
+          icon: { name: 'fas fa-user-lock' },
+          fn: (p) => $social.send_block(p.user.name),
+        },
+      );
     }
   } else {
     actions.push(
