@@ -100,6 +100,12 @@
           <q-btn
             round
             flat
+            icon="fas fa-plus"
+            @click="$thread.newChannel"
+          />
+          <q-btn
+            round
+            flat
             icon="close"
             class="WAL__drawer-close"
             @click="toggleLeftDrawer"
@@ -107,18 +113,6 @@
         </q-toolbar>
 
         <q-toolbar class="search-toolbar bg-grey-2">
-          <!-- <q-input
-            rounded
-            outlined
-            dense
-            class="WAL__field full-width"
-            v-model="search"
-            placeholder="Search or start a new conversation"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input> -->
           <SearchUser />
         </q-toolbar>
 
@@ -164,7 +158,7 @@
         show-if-above
         bordered
         v-if="currentThread"
-        :model-value="rightDrawerOpen"
+        v-model="rightDrawerOpen"
         class="bg-grey-3"
       >
         <q-scroll-area style="height: calc(100% - 100px)">
@@ -382,7 +376,7 @@ function actionable(target: Participant) : Promise<Action[]> {
       }
     }
 
-    if (rel !== undefined) {
+    if (rel) {
       if (!rel.block_received && !rel.block_sent) {
         actions.push(
           {
