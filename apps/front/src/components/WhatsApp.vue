@@ -331,6 +331,8 @@ import DiscordPicker from 'vue3-discordpicker';
 import { useSocialStore } from 'src/stores/social.store';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useRouter } from 'vue-router';
+import { computedAsync } from '@vueuse/core';
+import { rawListeners } from 'process';
 import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
@@ -394,7 +396,18 @@ const fn = (p: Participant) => {
   console.log('Fn', p);
 };
 
-function actionable(target: Participant) : Action[] {
+async function actionable(target: Participant) : Promise<Action[]> {
+  const rel = computedAsync(async () => {
+    await $social.fetchRelationships();
+    const ret = $social.getRelByUserId(target.user.id);
+    console.log('ret = ', ret);
+    if (ret === undefined) {
+      await $social.addRelByUserId(target.user.id);
+      await $social.fetchRelationships();
+      return $social.getRelByUserId(target.user.id);
+    }
+    return ret;
+  });
   const actions: Action[] = [
     { label: 'Profile', icon: { name: 'fa-solid fa-chart-line' }, fn: (p) => $router.push(`/profile/${p.user.id}`) },
   ];
@@ -420,11 +433,74 @@ function actionable(target: Participant) : Action[] {
         );
       }
     }
-    actions.push(
-      { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn: (p) => $social.send_friendship(p.user.name) },
-      { label: 'Invite to play', icon: { name: 'sports_tennis' }, fn: (p) => $lobbies.inviteUserToLobby(p.user.id) },
-      { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn: (p) => $social.send_block(p.user.name) },
-    );
+
+    if (rel.value) {
+      if (!rel.value.block_received && !rel.value.block_sent) {
+        actions.push(
+          {
+            label: 'Invite to Play',
+            icon: { name: 'fa-solid fa-table-tennis-paddle-ball' },
+            fn: (p) => $lobbies.inviteUserToLobby(p.user.id),
+          },
+          {
+            label: 'Stats',
+            icon: { name: 'fa-solid fa-chart-line' },
+            fn: (p) => $router.push(`/profile/${p.user.id}`),
+          },
+        );
+        if (!rel.value.friendship_received && !rel.value.friendship_sent) {
+          actions.push(
+            {
+              label: 'Add Friend',
+              icon: { name: 'fa-solid fa-user-group' },
+              fn: (p) => $social.send_friendship(p.user.name),
+            },
+          );
+        }
+        if (rel.value.friendship_received && !rel.value.friendship_sent) {
+          actions.push(
+            {
+              label: 'Accept Friend Request',
+              icon: { name: 'fa-solid fa-heart' },
+              fn: (p) => $social.send_friendship(p.user.name),
+            },
+            {
+              label: 'Decline Friend Request',
+              icon: { name: 'fa-solid fa-heart-broken' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+        if (!rel.value.friendship_received && rel.value.friendship_sent) {
+          actions.push(
+            {
+              label: 'Cancel Friend Request',
+              icon: { name: 'fa-solid fa-user' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+        if (rel.value.friendship_received && rel.value.friendship_sent) {
+          actions.push(
+            {
+              label: 'Unfriend',
+              icon: { name: 'fas fa-sad-tear' },
+              fn: (p) => $social.unsend_friendship(p.user.name),
+            },
+          );
+        }
+      }
+      if (!rel.value.block_sent) {
+        actions.push(
+          { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn: (p) => $social.send_block(p.user.name) },
+        );
+      }
+      if (rel.value.block_sent) {
+        actions.push(
+          { label: 'Unblock', icon: { name: 'fas fa-user-unlock' }, fn: (p) => $social.unsend_block(p.user.name) },
+        );
+      }
+    }
   } else {
     actions.push(
       { label: 'Cut notifications', icon: { name: 'fas fa-bell-slash' }, fn },
