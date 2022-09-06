@@ -133,21 +133,28 @@
                 </q-avatar>
               </q-item-section>
 
-              <q-item-section>
-                <q-item-label>{{ thread.recipient?.name }}</q-item-label>
-                <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
-              </q-item-section>
+              <template v-if="thread.lastMessage">
+                <q-item-section>
+                  <q-item-label>{{ thread.threadName }}</q-item-label>
+                  <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
+                </q-item-section>
 
-              <q-item-section side top>
-                <q-item-label caption>
-                  {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
-                </q-item-label>
-                <q-badge
-                  v-if="thread.unreadMessages.length"
-                  color="red"
-                  :label="`${thread.unreadMessages.length}`"
-                />
-              </q-item-section>
+                <q-item-section side top>
+                  <q-item-label caption>
+                    {{ moment(thread.lastMessage.createdAt).format('HH:mm') }}
+                  </q-item-label>
+                  <q-badge
+                    v-if="thread.unreadMessages.length"
+                    color="red"
+                    :label="`${thread.unreadMessages.length}`"
+                  />
+                </q-item-section>
+              </template>
+              <template v-else>
+                <q-item-section>
+                  <q-item-label>Empty thread</q-item-label>
+                </q-item-section>
+              </template>
             </q-item>
           </q-list>
         </q-scroll-area>

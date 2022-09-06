@@ -1,20 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { User } from 'src/user';
-import { Not } from 'typeorm';
+import { IsNull, Not } from 'typeorm';
+import { Message } from '../message/entities/message.entity';
+import { MessageService } from '../message/message.service';
 import {
   Thread,
   ThreadMemberStatus,
   ThreadParticipant,
   ThreadService,
 } from '../thread';
-import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
-import { ChannelMember, ChannelMemberStatus } from './entities';
 import { Channel } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {
-  constructor(private readonly threadService: ThreadService) {}
+  constructor(
+    @Inject(forwardRef(() => ThreadService))
+    private threadService: ThreadService,
+  ) {}
+
   async create(user: User) {
     const thread = await Thread.create({
       participants: [
@@ -25,13 +29,21 @@ export class ChannelService {
       thread,
       initiator: user,
     });
+    // await Message.create({
+    //   thread,
+    //   content: `${user.name} has created this channel`,
+    // }).save();
+    await this.threadService.createSystemMessage(
+      thread,
+      `${user.name} has created the channel`,
+    );
     return await channel.save();
   }
 
   update(id: number, updateChannelDto: UpdateChannelDto) {}
 
   findAll(user = { id: null }) {
-    Channel.find({
+    return Channel.find({
       relations: ['thread.participants.user'],
       where: {
         thread: {
@@ -40,6 +52,7 @@ export class ChannelService {
               id: Not(user.id),
             },
           },
+          key: IsNull(),
         },
       },
     });

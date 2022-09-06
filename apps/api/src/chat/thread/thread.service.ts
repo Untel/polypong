@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 01:20:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 18:44:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,6 @@ import { Thread, ThreadParticipant } from './entities';
 @Injectable()
 export class ThreadService {
   logger = new Logger('ThreadService');
-
-  constructor(
-    @InjectRepository(Thread)
-    private threadRep: Repository<Thread>,
-    @InjectRepository(ThreadParticipant)
-    private threadParticipantRep: Repository<ThreadParticipant>,
-  ) {}
 
   async newDirectMessage(message: Partial<Message>, from: User, to: User) {
     return;
@@ -111,6 +104,13 @@ export class ThreadService {
       ...datas,
     });
     return await thread.save();
+  }
+
+  async createSystemMessage(thread: Thread, message: string) {
+    return await Message.create({
+      thread,
+      content: message,
+    }).save();
   }
 
   update(id: number, updateThreadDto: UpdateThreadDto) {

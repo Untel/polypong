@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 17:32:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 17:49:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ export const useThreadStore = defineStore('thread', {
           avatar: !thread.channel
             ? recipient?.avatar
             : (thread.channel.avatar || 'group'),
-          lastMessage: thread.lastMessage || { createdAt: Date.now(), content: 'Empty thread' },
+          lastMessage: thread.lastMessage || null,
         };
         return mapped;
       });
@@ -124,6 +124,10 @@ export const useThreadStore = defineStore('thread', {
   actions: {
     async fetchThreads() {
       this._threads = await threadApi.get<Thread[]>('');
+    },
+
+    async fetchChannels() {
+      this._channels = await channelApi.get<Channel[]>('');
     },
 
     async getThread(threadId: number | null | undefined) {
