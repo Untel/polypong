@@ -71,7 +71,7 @@
               </q-avatar>
             </q-btn>
 
-            <span class="q-subtitle-1 q-pl-md">
+            <span class="q-subtitle-1 q-pl-md ellipsis">
               {{ currentThread.threadName }}
             </span>
           </template>
@@ -134,8 +134,10 @@
               </q-item-section>
 
               <template v-if="thread.lastMessage">
-                <q-item-section>
-                  <q-item-label>{{ thread.threadName }}</q-item-label>
+                <q-item-section style="width: 120px">
+                  <q-item-label lines="1">
+                      {{ thread.threadName }}
+                  </q-item-label>
                   <q-item-label caption lines="2">{{ thread.lastMessage?.content }}</q-item-label>
                 </q-item-section>
 
