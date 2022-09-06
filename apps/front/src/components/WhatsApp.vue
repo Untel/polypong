@@ -284,6 +284,9 @@ import {
 import DiscordPicker from 'vue3-discordpicker';
 import moment from 'moment';
 import { useAuthStore } from 'src/stores/auth.store';
+import { useSocialStore } from 'src/stores/social.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
+import { useRouter } from 'vue-router';
 import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
@@ -301,10 +304,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel']);
+const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel', 'click']);
+
+function clicked(description: string) { emit('click', description); }
 
 const $q = useQuasar();
 const $thread = useThreadStore();
+const $social = useSocialStore();
+const $lobbies = useLobbiesStore();
+const $router = useRouter();
 const $auth = useAuthStore();
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
@@ -345,7 +353,7 @@ const fn = (p: Participant) => {
 
 function actionable(target: Participant) : Action[] {
   const actions: Action[] = [
-    { label: 'Profile', icon: { name: 'fas fa-user-astronaut' }, fn },
+    { label: 'Profile', icon: { name: 'fa-solid fa-chart-line' }, fn: (p) => $router.push(`/profile/${p.user.id}`) },
   ];
 
   if (props.me.id !== target.id) {
@@ -370,9 +378,9 @@ function actionable(target: Participant) : Action[] {
       }
     }
     actions.push(
-      { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn },
-      { label: 'Invite to play', icon: { name: 'sports_tennis' }, fn },
-      { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn },
+      { label: 'Add friend', icon: { name: 'fas fa-user-plus' }, fn: (p) => $social.send_friendship(p.user.name) },
+      { label: 'Invite to play', icon: { name: 'sports_tennis' }, fn: (p) => $lobbies.inviteUserToLobby(p.user.id) },
+      { label: 'Block', icon: { name: 'fas fa-user-lock' }, fn: (p) => $social.send_block(p.user.name) },
     );
   } else {
     actions.push(
