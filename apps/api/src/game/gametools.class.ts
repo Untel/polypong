@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 13:53:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/07 08:54:01 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,9 +160,6 @@ export default class GameTools {
     const cx: number = c.position.x;
     const cy: number = c.position.y;
     const r: number = c.radius;
-    const inside1: boolean = this.pointCircle(x1, y1, cx, cy, r); // Need pointcircle
-    const inside2: boolean = this.pointCircle(x2, y2, cx, cy, r);
-    if (inside1 || inside2) return true;
 
     let distX: number = x1 - x2;
     let distY: number = y1 - y2;
@@ -173,6 +170,9 @@ export default class GameTools {
     const closestPt: Point = [x1 + dot * (x2 - x1), y1 + dot * (y2 - y1)];
     closestP[0] = closestPt[0];
     closestP[1] = closestPt[1];
+    const inside1: boolean = this.pointCircle(x1, y1, cx, cy, r); // Need pointcircle
+    const inside2: boolean = this.pointCircle(x2, y2, cx, cy, r);
+    if (inside1 || inside2) return true;
     const onSegment = this.linePoint(line, closestPt); //Need linepoint
     if (!onSegment) return false;
 

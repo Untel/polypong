@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 06:16:00 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/07 08:53:37 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,14 +215,14 @@ export class Ball extends Circle {
     }
   bouncePaddle(paddle: Paddle, hitloc: number[]) {
     
-    const ballR = this.angle;
+    // const ballR = this.angle;
     const ballD = angleToDegrees(this.angle);
 
     const paddleR = paddle.angle;
 
     console.log("-----------------Hit Data-----------------");
-    const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
-    const surfaceAngleDeg = paddle.angle; //paddle.angle;
+    // const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
+    // const surfaceAngleDeg = paddle.angle; //paddle.angle;
     
     console.log("Deg ball:", ballD.toFixed(2),"/ paddle:", paddleR)
     const nball = this.testfun(ballD);
@@ -231,38 +231,35 @@ export class Ball extends Circle {
     console.log("alt norm ball:", nball);
     console.log("alt norm paddle:", npad);
 
-//    dist to center line
-// const lDist = lineLength([paddle.line[0],this.targetInfo.actualhit]);
-// const rDist = lineLength([paddle.line[1], this.targetInfo.actualhit]);
   const lDist = lineLength([paddle.line[0],[ hitloc[0],hitloc[1]]]);
-  const rDist = lineLength([paddle.line[1], [ hitloc[0],hitloc[1]]]);
-  //Sometimes these values get way too big and fucks shit up
 
-  // const angleBoost = 45;
   console.log("left dist", lDist)
-  console.log("right dist", rDist)
 
   const left = lDist / lineLength(paddle.line) - 0.5;
 
   console.log("total dist", lineLength(paddle.line));
   console.log("left ratio", left)
 
-  let out: number = left * 45;
+  let out: number = left * 90;
 
-    console.log("adding deg ", out )
 
 
     let newDegree = angleReflect(nball, npad);
     console.log("Reflected is ", newDegree);
-
+    console.log("adding deg ", out )
     newDegree = newDegree - out
     console.log("New degree is", newDegree)
-    // newDegree += out * angleBoost;
 
-    if (newDegree > npad)
-      console.log("over the limit glitch")
-    if (newDegree < npad - 180)
-      console.log("under the limit glitch")
+    if (newDegree < npad){
+      console.log("under limit!!!!!!!!!!!!!!!!!");
+      newDegree = npad;
+    }
+    if (newDegree > npad + 180){
+      console.log("over limit!!!!!!!!!!!!!!!!!");
+      newDegree = npad + 180;
+
+    }
+
 
     this.lastHitten = paddle;
     this.color = paddle.color;
