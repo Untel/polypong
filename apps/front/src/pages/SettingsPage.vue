@@ -1,5 +1,7 @@
 <template>
+  <!--
   <span>{{authStore.user}}</span>
+  -->
   <q-page padding>
     <q-card> <!-- NAME CHANGE -->
       <q-card-section>

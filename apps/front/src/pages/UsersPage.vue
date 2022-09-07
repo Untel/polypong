@@ -82,6 +82,7 @@
     </q-card>
 -->
     <!-- actual friends -->
+    <pre v-if="!soc.getFriendsRelationships.length">Your friends will be displayed here</pre>
     <q-card v-if="soc.getFriendsRelationships.length" label="friends">
       <pre>your friends</pre>
         <div class="q-pa-md row items-start q-gutter-md">
