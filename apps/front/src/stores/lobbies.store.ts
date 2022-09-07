@@ -105,7 +105,13 @@ export const useLobbiesStore = defineStore('lobbies', {
     async inviteUserToLobby(userId: number) {
       const { getIsConnected } = useAuthStore();
       if (!getIsConnected) return;
-      if (!this.activeLobby) return;
+      if (!this.activeLobby) {
+        Notify.create({
+          type: 'negative',
+          message: 'You need to create a lobby first in order to invite people',
+        });
+        return;
+      }
       lobbiesApi.post(`${this.activeLobby.id}/invite/${userId}`);
     },
     async invitedBy(fromId: number, fromName: string, lobbyId: number) {
