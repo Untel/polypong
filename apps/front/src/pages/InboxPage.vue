@@ -31,7 +31,11 @@ const $social = useSocialStore();
 
 watch(
   () => $route.params.id,
-  (id) => $thread.getThread(+id),
+  (id) => {
+    if ($route.path.includes('inbox')) {
+      $thread.getThread(+id);
+    }
+  },
   { immediate: true },
 );
 onUnmounted(() => {
