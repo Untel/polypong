@@ -11,6 +11,9 @@ import {
 import { CurrentUser } from 'src/decorators';
 import JwtGuard from 'src/guards/jwt.guard';
 import { User } from 'src/user';
+import { ThreadMemberStatus } from '../thread/entities/thread-participant.entity';
+import { Thread } from '../thread/entities/thread.entity';
+import ThreadGuard, { CurrentThread, ThreadRole } from '../thread/thread.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -43,11 +46,6 @@ export class ChannelController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.channelService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChannelDto: UpdateChannelDto) {
-    return this.channelService.update(+id, updateChannelDto);
   }
 
   @Delete(':id')

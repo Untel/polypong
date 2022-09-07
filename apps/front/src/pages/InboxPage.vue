@@ -10,6 +10,7 @@
       @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
       @newChannel="() => $thread.newChannel()"
+      @channelUpdate="(evt) => $thread.updateChannel(evt)"
     >
       <router-view />
     </WhatsApp>

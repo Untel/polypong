@@ -194,6 +194,50 @@
                   />
               </q-item>
               <q-separator />
+              <q-form @submit="emit('channelUpdate', $thread.channelSettings)">
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>
+                      <q-input
+                        label="Channel name"
+                        v-model="$thread.channelSettings.name">
+                      </q-input>
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-btn-toggle
+                      name="privacy"
+                      toggle-color="primary"
+                      spread
+                      v-model="$thread.channelSettings.privacy"
+                      :options="[
+                        { label: 'Public', value: 'public' },
+                        { label: 'Private', value: 'private' },
+                        { label: 'Protected', value: 'protected' }
+                      ]"
+                    />
+                  </q-item-section>
+                </q-item>
+                <q-item v-if="$thread.channelSettings.privacy === 'protected'">
+                  <q-item-section>
+                    <q-item-label>
+                      <PasswordInput
+                        v-model="$thread.channelSettings.password"
+                        class="full-width"
+                        dense
+                        filled
+                        label="password"
+                      />
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-btn type="submit" grow primary>Save</q-btn>
+                </q-item>
+              </q-form>
+              <q-separator />
             </template>
             <q-item-label header>Participants</q-item-label>
             <q-item
@@ -289,7 +333,7 @@ import {
   ref,
   computed,
   PropType,
-  onMounted,
+  reactive,
 } from 'vue';
 import {
   ActiveThread,
@@ -303,9 +347,8 @@ import moment from 'moment';
 import { useAuthStore } from 'src/stores/auth.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
+import PasswordInput from 'src/components/PasswordInput.vue';
 import { useRouter } from 'vue-router';
-import { computedAsync } from '@vueuse/core';
-import { rawListeners } from 'process';
 import SearchUser from './SearchUser.vue';
 
 const props = defineProps({
@@ -323,9 +366,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['selectThread', 'sendMessage', 'newChannel', 'click']);
-
-function clicked(description: string) { emit('click', description); }
+const emit = defineEmits([
+  'selectThread',
+  'sendMessage',
+  'newChannel',
+  'channelUpdate',
+]);
 
 const $q = useQuasar();
 const $thread = useThreadStore();
@@ -337,6 +383,7 @@ const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 const search = ref('');
 const message = ref('');
+const settingsForm = reactive({ name: '', privacy: 'public', password: '' });
 const style = computed(() => ({
   height: `${$q.screen.height - 50}px`,
 }));

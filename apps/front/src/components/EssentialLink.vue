@@ -2,7 +2,7 @@
   <q-item
     clickable
     tag="a"
-    :to="{ name: to || '/' }"
+    :to="typeof to === 'string' ? { name: to } : to"
     exact
   >
     <q-item-section
@@ -43,7 +43,7 @@ export default defineComponent({
       default: '#',
     },
     to: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     icon: {

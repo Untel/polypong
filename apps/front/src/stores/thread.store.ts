@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 20:15:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 17:57:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ export interface Channel extends BaseObject {
   name: string;
   avatar: string;
   joined: boolean;
+  privacy: 'public' | 'private' | 'protected';
 }
 
 export interface BaseThread extends BaseObject {
@@ -74,6 +75,11 @@ interface ThreadState {
   _threads: Thread[];
   _channels: Channel[];
   _current: ActiveThread | null;
+  channelSettings: {
+    name: string,
+    privacy: 'public' | 'private' | 'protected',
+    password: string,
+  };
 }
 
 export const useThreadStore = defineStore('thread', {
@@ -81,6 +87,11 @@ export const useThreadStore = defineStore('thread', {
     _threads: [],
     _channels: [],
     _current: null,
+    channelSettings: {
+      name: '',
+      privacy: 'public',
+      password: '',
+    },
   } as ThreadState),
   getters: {
     channels(state): Channel[] {
@@ -95,7 +106,9 @@ export const useThreadStore = defineStore('thread', {
         const mapped = {
           ...thread,
           recipient,
-          threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+          threadName: thread.channel
+            ? thread.channel.name || thread.participants.map((p) => p.user.name).join(', ')
+            : recipient?.name,
           avatar: !thread.channel
             ? recipient?.avatar
             : (thread.channel.avatar || 'group'),
@@ -105,6 +118,7 @@ export const useThreadStore = defineStore('thread', {
       });
       return threads;
     },
+
     totalUnread(state): number {
       return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
     },
@@ -116,7 +130,9 @@ export const useThreadStore = defineStore('thread', {
       return {
         ...state._current,
         recipient,
-        threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+        threadName: thread.channel
+          ? thread.channel.name || thread.participants.map((p) => p.user.name).join(', ')
+          : recipient?.name,
         avatar: !thread.channel
           ? recipient?.avatar
           : (thread.channel.avatar || 'group'),
@@ -138,6 +154,11 @@ export const useThreadStore = defineStore('thread', {
         try {
           this._current = await threadApi.get<ActiveThread>(threadId);
           this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
+          this.channelSettings = {
+            name: this._current.channel?.name,
+            privacy: this._current.channel?.privacy,
+            password: '',
+          };
         } catch (_e) {
           this.router.push('/inbox');
         }
@@ -168,6 +189,13 @@ export const useThreadStore = defineStore('thread', {
       const channel = await channelApi.post<{ thread: Thread }>();
       await this.fetchThreads();
       this.router.push({ name: 'thread', params: { id: channel.thread.id } });
+    },
+
+    async updateChannel(settings) {
+      console.log('Updating channel', settings);
+      const id = this._current?.id;
+      const patched = await threadApi.patch(`${id}/channel`, settings);
+      console.log('Patched', patched);
     },
 
     async getChannels() {
@@ -274,6 +302,7 @@ export const useThreadStore = defineStore('thread', {
           model: 'duration',
           type: 'radio',
           items: [
+            { label: 'Unmute', value: -1 },
             { label: '10 mins', value: 10 },
             { label: '1 hour', value: 60, color: 'accent' },
             { label: 'Forever', value: null, color: 'negative' },
@@ -297,6 +326,7 @@ export const useThreadStore = defineStore('thread', {
           model: 'duration',
           type: 'radio',
           items: [
+            { label: 'Unban', value: -1 },
             { label: '10 mins', value: 10 },
             { label: '1 hour', value: 60, color: 'accent' },
             { label: 'Forever', value: null, color: 'negative' },
@@ -311,5 +341,6 @@ export const useThreadStore = defineStore('thread', {
         });
       });
     },
+
   },
 });

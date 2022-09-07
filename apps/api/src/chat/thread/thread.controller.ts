@@ -10,6 +10,8 @@ import {
   UnauthorizedException,
   Put,
   Req,
+  Patch,
+  Body,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { User } from 'src/user/user.entity';
@@ -21,15 +23,16 @@ import { RelationshipService } from 'src/relationship';
 import { ID } from 'src/entities';
 import { Thread, ThreadMemberStatus, ThreadParticipant } from './entities';
 import { Message, MessageService } from '../message';
-import { SocketService } from 'src/socket/socket.service';
 import moment from 'moment';
+import { ChannelPrivacy } from '../channel';
+import bcrypt from 'bcrypt';
 
 @UseGuards(JwtGuard)
 @Controller('thread')
 export class ThreadController {
   constructor(
     private readonly threadService: ThreadService,
-    private readonly userService: UserService, // private readonly channelService: ChannelService,
+    private readonly userService: UserService,
     private readonly relService: RelationshipService,
     private readonly messageService: MessageService,
   ) {}
@@ -77,25 +80,8 @@ export class ThreadController {
     if (!user)
       throw new UnprocessableEntityException('This user does not exist');
 
-    const me = thread.participants.find((e) => e.user.id === user.id);
-    if (me && me.deletedAt && me.isBanUntil) {
-      const m = moment(me.isBanUntil).diff(moment());
-      if (m > 0) {
-        const dur = moment.duration(m);
-        throw new UnauthorizedException(
-          `User is bannished from this thread for ${dur.humanize()} remaining`,
-        );
-      } else {
-        await me.remove();
-      }
-    }
+    this.threadService.inviteUser(thread, user);
 
-    const tp = ThreadParticipant.create({
-      user,
-      thread,
-      status: ThreadMemberStatus.MEMBER,
-    });
-    await ThreadParticipant.insert(tp);
     this.messageService.sendSystemMessage(
       thread,
       `${user.name} was invited by ${inviter.name}`,
@@ -128,9 +114,14 @@ export class ThreadController {
     target.isBanUntil = endDate.toDate();
     await target.save();
     await target.softRemove();
+    let message =  `${target.user.name} was `;
+    if (duration === -1) message += 'unban';
+    else message += `ban for ${
+      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()}`,
+    message += ` by ${user.name}`;
     this.messageService.sendSystemMessage(
       thread,
-      `${target.user.name} was kicked by ${user.name}`,
+      message,
     );
   }
 
@@ -166,11 +157,14 @@ export class ThreadController {
       : moment().add(duration, 'minutes');
     target.isMuteUntil = endDate.toDate();
     await target.save();
+    let message =  `${target.user.name} was `;
+    if (duration === -1) message += 'unmuted';
+    else message += `mute for ${
+      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()}`,
+    message += ` by ${user.name}`;
     this.messageService.sendSystemMessage(
       thread,
-      `${target.user.name} was mute for ${
-        !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
-      } by ${user.name}`,
+      message,
     );
   }
 
@@ -217,5 +211,34 @@ export class ThreadController {
     }).save();
     await me.remove();
     await this.messageService.notifyThread(thread, leaveMessage);
+  }
+
+
+  @ThreadRole(ThreadMemberStatus.OWNER)
+  @UseGuards(ThreadGuard)
+  @Patch(':id/channel')
+  async update(
+    @CurrentThread() thread,
+    @Body() body: {
+      privacy: ChannelPrivacy,
+      name: string,
+      password: string
+    }) {
+    if (!thread.channel)
+      throw new UnauthorizedException('Its not a channel');
+    if (body.name)
+      thread.channel.name = body.name;
+    if (body.privacy)
+      thread.channel.privacy = body.privacy;
+    if (body.privacy === ChannelPrivacy.PROTECTED) {
+      if (!body.password || body.password.length < 3)
+        throw new UnprocessableEntityException('Password too short');
+      const pwd = bcrypt.hashSync(body.password, 4);
+      thread.channel.password = pwd;
+    }
+    console.log('Updating', thread.channel);
+    const saved = await thread.channel.save();
+    console.log('Saved', saved);
+    return;
   }
 }

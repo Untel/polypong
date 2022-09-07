@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/05 18:09:16 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/07 17:34:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,7 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    // for (let i = 0; i < this.nPlayers / 2; i++)
-    this.addBall(true);
+    for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
     if (this.nPlayers === 2) this.socket.emit('score', this.scoreNetScheme);
@@ -228,7 +227,7 @@ export default class Game {
         this.reduce(ball.target.wall);
       }
       const wall = ball.target?.wall;
-      if (wall?.paddle === null) {
+      if (!wall?.paddle || TEST_MODE) {
         const test: boolean = GameTools.lineCircleCollision(
           wall.line,
           ball,

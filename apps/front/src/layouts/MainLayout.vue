@@ -31,7 +31,7 @@
       <EssentialLink title="Community" caption="Out and about"
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
       <EssentialLink title="Inbox" caption="bla bla"
-        icon="fa-solid fa-comments" to="inbox" :notif="$thread.totalUnread"/>
+        icon="fa-solid fa-comments" to="channels" :notif="$thread.totalUnread"/>
       <EssentialLink title="Profile" caption="Stats, check em"
         icon="fa-solid fa-chart-line" to="profile" />
       <EssentialLink title="Settings" caption="Account settings"
