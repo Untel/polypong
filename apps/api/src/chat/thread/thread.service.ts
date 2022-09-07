@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 18:08:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 18:09:42 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,14 @@ export class ThreadService {
     await ThreadParticipant.insert(tp);
   }
 
-  async findThreadWithMessages(id: ID) {
-    return Thread.findOne({
+  async findThreadWithMessages(user: User, id: ID) {
+    console.log('user = ', user, 'id = ', id);
+    const thread = await Thread.findOne({
+      relations: [
+        'participants.user',
+        'messages.sender.relationships',
+        'channel',
+      ],
       where: { id },
       order: { messages: { createdAt: 'DESC' } },
     });
