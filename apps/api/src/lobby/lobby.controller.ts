@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 12:51:25 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/07 06:17:36 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,18 @@ export class LobbyController {
     }
     this.socketService.getUserSocket(user.id)?.join(lobby.roomId);
     return lobby.game.netScheme;
+  }
+
+  @Get('game/restart')
+  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
+  }
+  @Get('game/pause')
+  //  @UseGuards(InLobbyGuard)
+  pause(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
+
+    if (lobby.game.isStopped) lobby.game.run();
+    else if (!lobby.game.paused) lobby.game.stop();
+    return lobby.game.isStopped;
   }
 
   @Put()

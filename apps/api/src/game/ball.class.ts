@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/05 18:08:23 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/07 06:16:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,35 +201,75 @@ export class Ball extends Circle {
     this.findTarget();
   }
 
+  testfun(angle : number)
+  {
+    angle =  angle % 360; 
+
+// force it to be the positive remainder, so that 0 <= angle < 360  
+  angle = (angle + 360) % 360;  
+
+// force into the minimum absolute value residue class, so that -180 < angle <= 180  
+  if (angle > 180)  
+      angle -= 360;  
+  return angle
+    }
   bouncePaddle(paddle: Paddle, hitloc: number[]) {
+    
+    const ballR = this.angle;
+    const ballD = angleToDegrees(this.angle);
+
+    const paddleR = paddle.angle;
+
+    console.log("-----------------Hit Data-----------------");
     const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
+    
+    console.log("Deg ball:", ballD.toFixed(2),"/ paddle:", paddleR)
+    const nball = this.testfun(ballD);
+    const npad =  this.testfun(paddleR);
 
-    /**
-     * @TODO Le but ici etait de rajouter plus ou moins d'angle suivant ou on tape
-     * sur la raquette. Cependant ca mene a des bugs sur certaines map en passant la balle derriere
-     * le paddle. Peut etre remettre ca en 1v1 only?
-     */
-    const hitLen = lineLength([paddle.line[1], [hitloc[0], hitloc[1]]]);
-    // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
-    // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
-    // x2 pour aller de -1 a x1;
-    const percent = (hitLen / lineLength(paddle.line) * 2);
-    // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
-    // console.log('Hit percent', percent);
-    const maxAngle = 25;
-    const addDeg = maxAngle * percent;
+    console.log("alt norm ball:", nball);
+    console.log("alt norm paddle:", npad);
 
-    const newAngle = angleToRadians(
-      newDegree + GameTools.angleNormalize(addDeg, 0, 360),
-    );
-    // console.log(`New angle is : ${newAngle} made from ${angleToRadians(newDegree)} and ${addDeg}`)
+//    dist to center line
+// const lDist = lineLength([paddle.line[0],this.targetInfo.actualhit]);
+// const rDist = lineLength([paddle.line[1], this.targetInfo.actualhit]);
+  const lDist = lineLength([paddle.line[0],[ hitloc[0],hitloc[1]]]);
+  const rDist = lineLength([paddle.line[1], [ hitloc[0],hitloc[1]]]);
+  //Sometimes these values get way too big and fucks shit up
+
+  // const angleBoost = 45;
+  console.log("left dist", lDist)
+  console.log("right dist", rDist)
+
+  const left = lDist / lineLength(paddle.line) - 0.5;
+
+  console.log("total dist", lineLength(paddle.line));
+  console.log("left ratio", left)
+
+  let out: number = left * 45;
+
+    console.log("adding deg ", out )
+
+
+    let newDegree = angleReflect(nball, npad);
+    console.log("Reflected is ", newDegree);
+
+    newDegree = newDegree - out
+    console.log("New degree is", newDegree)
+    // newDegree += out * angleBoost;
+
+    if (newDegree > npad)
+      console.log("over the limit glitch")
+    if (newDegree < npad - 180)
+      console.log("under the limit glitch")
+
     this.lastHitten = paddle;
     this.color = paddle.color;
     // this.setAngle(newAngle);
     this.setAngle(angleToRadians(newDegree));
     this.findTarget();
+    console.log("------------------------------------------");
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {
