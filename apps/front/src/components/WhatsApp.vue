@@ -116,7 +116,9 @@
           <SearchUser />
         </q-toolbar>
 
-        <q-scroll-area style="height: calc(100% - 100px)">
+        <q-scroll-area
+          :style="`height: calc(100% - ${$q.screen.width >= 850 ? 100 : 0}px)`"
+        >
           <q-list>
             <q-item exact :to="{ name: 'channels' }">
               <q-item-section avatar>
@@ -183,7 +185,9 @@
         v-model="rightDrawerOpen"
         class="bg-grey-3"
       >
-        <q-scroll-area style="height: calc(100% - 100px)">
+        <q-scroll-area
+          :style="`height: calc(100% - ${$q.screen.width >= 850 ? 0 : 0}px)`"
+        >
           <q-list>
             <template v-if="currentThread.channel && me.status === ThreadMemberStatus.OWNER">
               <q-item-label header>Channel Settings</q-item-label>
@@ -215,7 +219,7 @@
                       :options="[
                         { label: 'Public', value: 'public' },
                         { label: 'Private', value: 'private' },
-                        { label: 'Protected', value: 'protected' }
+                        { label: 'Protect', value: 'protected' }
                       ]"
                     />
                   </q-item-section>

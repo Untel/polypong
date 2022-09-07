@@ -30,11 +30,10 @@ export class ChannelController {
 
   @Get()
   async findAll(@CurrentUser() user: User) {
-    const chans = await this.channelService.findAll(user);
+    const chans = await this.channelService.findAll();
     const mapped = chans
       .map((channel) => ({
         ...channel,
-        name: channel.thread.participants.map((p) => p.user.name).join(', '),
         joined: !!channel.thread.participants.find(
           (p) => p.user.id === user.id,
         ),

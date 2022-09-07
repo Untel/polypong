@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 19:01:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 19:39:32 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ export interface Message extends BaseObject {
 
 export interface Channel extends BaseObject {
   name: string;
-  avatar: string;
   joined: boolean;
   privacy: 'public' | 'private' | 'protected';
 }
@@ -67,19 +66,24 @@ export interface Thread extends BaseThread {
   unreadMessages: Message[];
 }
 
+export interface ChannelItem extends Channel {
+  thread: Thread;
+}
+
 export interface ActiveThread extends BaseThread {
   messages: Message[];
 }
 
+interface ChannelSettings {
+  name: string;
+  privacy: 'public' | 'private' | 'protected';
+  password: string;
+}
 interface ThreadState {
   _threads: Thread[];
-  _channels: Channel[];
+  _channels: ChannelItem[];
   _current: ActiveThread | null;
-  channelSettings: {
-    name: string,
-    privacy: 'public' | 'private' | 'protected',
-    password: string,
-  };
+  channelSettings: ChannelSettings;
 }
 
 export const useThreadStore = defineStore('thread', {
@@ -94,9 +98,15 @@ export const useThreadStore = defineStore('thread', {
     },
   } as ThreadState),
   getters: {
-    channels(state): Channel[] {
+    channels(state): ChannelItem[] {
+      console.log('Channels', state._channels);
       return state._channels.map((c) => ({
         ...c,
+        name: c.name
+          || (c.thread as Thread).participants
+            .map((p) => p.user.name)
+            .join(', '),
+
       }));
     },
     threads(state) {
@@ -146,7 +156,7 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async fetchChannels() {
-      this._channels = await channelApi.get<Channel[]>('');
+      this._channels = await channelApi.get<ChannelItem[]>('');
     },
 
     async getThread(threadId: number | null | undefined, password = null) {
@@ -209,11 +219,9 @@ export const useThreadStore = defineStore('thread', {
       this.router.push({ name: 'thread', params: { id: channel.thread.id } });
     },
 
-    async updateChannel(settings) {
-      console.log('Updating channel', settings);
+    async updateChannel(settings: ChannelSettings) {
       const id = this._current?.id;
       const patched = await threadApi.patch(`${id}/channel`, settings);
-      console.log('Patched', patched);
     },
 
     async getChannels() {

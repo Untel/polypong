@@ -10,7 +10,7 @@ import {
   ThreadService,
 } from '../thread';
 import { UpdateChannelDto } from './dto/update-channel.dto';
-import { Channel } from './entities/channel.entity';
+import { Channel, ChannelPrivacy } from './entities/channel.entity';
 
 @Injectable()
 export class ChannelService {
@@ -42,20 +42,24 @@ export class ChannelService {
 
   update(id: number, updateChannelDto: UpdateChannelDto) {}
 
-  async findAll(user = { id: null }) {
+  async findAll() {
     const chans = await Channel.find({
       relations: ['thread.participants.user'],
+      where: [
+        { privacy: ChannelPrivacy.PUBLIC },
+        { privacy: ChannelPrivacy.PROTECTED },
+      ],
     });
     // const chans = await Channel.createQueryBuilder('channel')
     //   .innerJoinAndSelect('channel.thread', 'thread')
     //   .leftJoinAndSelect('thread.participants', 'participants')
     //   .leftJoinAndSelect('participants.user', 'user')
     //   .getMany();
-
-    return chans.map((channel) => ({
-      ...channel,
-      name: channel.thread.participants.map((p) => p.user.name).join(', '),
-    }));
+    return chans;
+    // return chans.map((channel) => ({
+    //   ...channel,
+    //   name: channel.thread.participants.map((p) => p.user.name).join(', '),
+    // }));
   }
 
   findOne(id: number) {

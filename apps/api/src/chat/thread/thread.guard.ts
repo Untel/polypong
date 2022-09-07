@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 18:57:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 19:22:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,6 @@ import {
   Injectable,
   createParamDecorator,
   UnauthorizedException,
-  UnprocessableEntityException,
-  Inject,
-  forwardRef,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -28,7 +25,6 @@ import { Reflector } from '@nestjs/core';
 import { Thread } from 'src/chat/thread/entities/thread.entity';
 import { ThreadMemberStatus, ThreadParticipant } from './entities/thread-participant.entity';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
-import { ThreadService } from './thread.service';
 import { ChannelPrivacy } from '../channel';
 import { Message } from '../message';
 import bcrypt from 'bcrypt';

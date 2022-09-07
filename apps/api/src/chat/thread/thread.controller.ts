@@ -220,6 +220,7 @@ export class ThreadController {
   @Patch(':id/channel')
   async update(
     @CurrentThread() thread,
+    @CurrentUser() user,
     @Body() body: {
       privacy: ChannelPrivacy,
       name: string,
@@ -227,19 +228,30 @@ export class ThreadController {
     }) {
     if (!thread.channel)
       throw new UnauthorizedException('Its not a channel');
-    if (body.name)
+    const changed = [];
+    if (body.name && thread.channel.name !== body.name) {
       thread.channel.name = body.name;
-    if (body.privacy)
+      changed.push('name');
+    }
+    if (body.privacy && thread.channel.privacy !== body.privacy) {
       thread.channel.privacy = body.privacy;
+      changed.push('privacy');
+    }
     if (body.privacy === ChannelPrivacy.PROTECTED) {
       if (!body.password || body.password.length < 3)
         throw new UnprocessableEntityException('Password too short');
       const pwd = bcrypt.hashSync(body.password, 4);
       thread.channel.password = pwd;
+      changed.push('password');
     }
-    console.log('Updating', thread.channel);
-    const saved = await thread.channel.save();
-    console.log('Saved', saved);
-    return;
+
+    if (changed.length) {
+      const saved = await thread.channel.save();
+      this.messageService.sendSystemMessage(thread, `
+        ${user.name} have change the settings ${changed.join(', ')} of the channel
+      `)
+      return saved;
+    }
+    return ;
   }
 }
