@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 16:47:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 18:57:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ import {
   UnprocessableEntityException,
   Inject,
   forwardRef,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import moment from 'moment';
 import { SetMetadata } from '@nestjs/common';
@@ -29,6 +31,7 @@ import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import { ThreadService } from './thread.service';
 import { ChannelPrivacy } from '../channel';
 import { Message } from '../message';
+import bcrypt from 'bcrypt';
 
 export const ThreadRole = (...roles: ThreadMemberStatus[]) =>
   SetMetadata('roles', roles);
@@ -60,9 +63,13 @@ export default class ThreadGuard implements CanActivate {
     );
     let me = thread.participants.find((e) => e.user.id === req.user.id);
     if (!me) {
+      const pwd = req.query['password'] as string;
       if (
         thread.channel?.privacy === ChannelPrivacy.PUBLIC ||
-        thread.channel?.privacy === ChannelPrivacy.PRIVATE
+        thread.channel?.privacy === ChannelPrivacy.PRIVATE ||
+        (thread.channel?.privacy === ChannelPrivacy.PROTECTED &&
+          pwd &&
+          bcrypt.compareSync(pwd, thread.channel.password))
       ) {
         me = await ThreadParticipant.create({ thread, user }).save();
         await Message.create({
@@ -70,8 +77,13 @@ export default class ThreadGuard implements CanActivate {
           content: `${user.name} joined the channel`,
         }).save();
       } else if (thread.channel?.privacy === ChannelPrivacy.PROTECTED)
-        throw new UnauthorizedException(
-          'Require password to enter this channel',
+        throw new HttpException(
+          {
+            status: 466,
+            error: 'Password required',
+            message: 'This channel require a password',
+          },
+          HttpStatus.FORBIDDEN,
         );
     } else if (me.deletedAt && me.isBanUntil) {
       const m = moment(me.isBanUntil).diff(moment());

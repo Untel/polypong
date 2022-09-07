@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 17:57:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 19:01:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,18 +149,36 @@ export const useThreadStore = defineStore('thread', {
       this._channels = await channelApi.get<Channel[]>('');
     },
 
-    async getThread(threadId: number | null | undefined) {
+    async getThread(threadId: number | null | undefined, password = null) {
       if (threadId) {
         try {
-          this._current = await threadApi.get<ActiveThread>(threadId);
+          const opts = password ? { query: { password } } : {};
+          this._current = await threadApi.get<ActiveThread>(threadId, opts);
           this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
           this.channelSettings = {
-            name: this._current.channel?.name,
-            privacy: this._current.channel?.privacy,
+            name: this._current.channel?.name || '',
+            privacy: this._current.channel?.privacy || 'public',
             password: '',
           };
-        } catch (_e) {
-          this.router.push('/inbox');
+        } catch (e: MandeError<{ message: string, status: number }>) {
+          if (e.body.status === 466) {
+            console.log('Thread join error', e, e.body);
+            Dialog.create({
+              title: 'Password required',
+              message: 'This thread require a password, please fill it',
+              prompt: {
+                model: 'password',
+                type: 'password',
+              },
+              cancel: true,
+            }).onOk(async (data) => {
+              this.getThread(threadId, data);
+            }).onCancel(() => {
+              this.router.push('/inbox');
+            });
+          } else {
+            this.router.push('/inbox');
+          }
         }
       } else {
         this._current = null;
