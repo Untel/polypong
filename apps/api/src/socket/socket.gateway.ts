@@ -119,6 +119,9 @@ export class SocketGateway
         }
       } else {
         this.lobbyService.removePlayer(lobby.id, user);
+        if (lobby.players.size === 0) {
+          this.lobbyService.closeLobby(lobby);
+        }
       }
     }
     this.lobbyService.removeMatchmake(user);
