@@ -8,6 +8,11 @@
         <q-toolbar-title>
           {{ $auth.user.name }}
         </q-toolbar-title>
+        <q-btn v-if="$lobbies.activeLobby" color="purple"
+          @click="() => {router.push(`/lobby/${$lobbies.activeLobby.id}`)}"
+        >
+          CURRENT LOBBY
+        </q-btn>
       </q-toolbar>
     </q-header>
 
