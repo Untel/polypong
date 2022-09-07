@@ -126,16 +126,14 @@ const status: ComputedRef<'in game' | 'in lobby' | 'online' | 'offline' | ''> = 
   return 'online';
 });
 
-function inviteToLobby(id: number) {
+async function inviteToLobby(id: number) {
   // emit('inviteToLobby', id);
   if (status.value === 'offline' || status.value === 'in game') {
     // console.log('cannot invite, status = ', status);
     return;
   }
   // console.log('lobbies.activeLobby : ', lobbies.activeLobby);
-  if (lobbies.activeLobby) {
-    lobbies.inviteUserToLobby(id);
-  }
+  await lobbies.inviteUserToLobby(id);
 }
 
 async function message(id: number) { router.push(`/chat/${id}`); }
