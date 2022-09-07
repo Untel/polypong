@@ -6,12 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 16:13:22 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 18:08:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Global, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ID, TS } from 'src/entities/root.entity';
+import { RelationshipService } from 'src/relationship';
+import { UserService } from 'src/user';
 import { User } from 'src/user/user.entity';
 import { Message } from '../message/entities/message.entity';
 import { UpdateThreadDto } from './dto/update-thread.dto';
@@ -20,6 +22,11 @@ import moment from 'moment';
 
 @Injectable()
 export class ThreadService {
+  constructor(
+    private userService: UserService,
+    private relService: RelationshipService,
+  ) {}
+
   logger = new Logger('ThreadService');
 
   async newDirectMessage(message: Partial<Message>, from: User, to: User) {
@@ -88,10 +95,22 @@ export class ThreadService {
   async findThreadWithMessages(id: ID) {
     return Thread.findOne({
       where: { id },
-      // eslint-disable-next-line prettier/prettier
-      relations: ['participants.user', 'messages.sender', 'channel'],
       order: { messages: { createdAt: 'DESC' } },
     });
+    thread.messages.forEach(async (m) => {
+      if (m.sender) {
+        const other: User = await this.userService.findById(m.sender.id);
+        const rel = await this.relService.findRel(user, other);
+        if (rel) {
+          if (rel.fromId === user.id) {
+            if (rel.block_received || rel.block_sent) {
+              m.content = 'content cannot be displayed';
+            }
+          }
+        }
+      }
+    });
+    return thread;
   }
 
   async setThreadAsRead(thread: Thread, user: User) {

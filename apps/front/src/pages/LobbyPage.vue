@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 <style>
   .user-list {
     display: grid;
@@ -28,6 +29,9 @@
 
     <section>
       <q-form ref="lobbyForm">
+        <q-field>
+          <SearchUser @select="(opt) => { inviteSearchedUserToLobby(opt) }"/>
+        </q-field>
         <q-field
           label="Players max">
           <q-slider
@@ -67,21 +71,10 @@
           :disable="!canUpdate"
           name="name"
           lazy-rules
-          :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
+          :rules="[ (val: string | any[]) => val && val.length > 2
+            || 'Username should have at least 2 chars']"
         />
       </q-form>
-    </section>
-
-    <section v-if="rel" class="row justify-center">
-      <!-- SEARCH RESULTS -->
-      <social-card :relname="rel.to.name"
-        @message="(id) => message(id)"
-        @stats="(id) => stats(id)"
-        @add-friend="(name) => addFriend(name)"
-        @unfriend="(name) => unfriend(name)"
-        @block="(name) => block(name)"
-        @unblock="(name) => unblock(name)"
-      />
     </section>
 
     <!--<section class="user-list">-->
@@ -154,6 +147,7 @@ import { PreFetchOptions } from '@quasar/app-vite';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { asyncComputed } from '@vueuse/core';
+import { Notify } from 'quasar';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -179,6 +173,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import UserCard from 'src/components/UserCard.vue';
 import { useRoute, useRouter } from 'vue-router';
 import SocialCard from 'src/components/SocialCard.vue';
+import SearchUser from 'src/components/SearchUser.vue';
 
 const props = defineProps({
   id: {
@@ -257,6 +252,10 @@ async function addFriend(name: string) { await $soc.send_friendship(name); }
 async function unfriend(name: string) { await $soc.unsend_friendship(name); }
 async function block(name: string) { await $soc.send_block(name); }
 async function unblock(name: string) { await $soc.unsend_block(name); }
+
+async function inviteSearchedUserToLobby(opt: any) {
+  await $lobbies.inviteUserToLobby(opt.id);
+}
 
 // function isHost(id: number): boolean {
 //  if (!id) return false;

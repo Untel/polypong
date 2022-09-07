@@ -139,7 +139,7 @@ export const useAuthStore = defineStore('auth', {
         throw new Error('No token, no need to query the api');
       }
       defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-      const res: User = await userApi.get('/user');
+      const res: User = await authApi.get('/user');
       console.log('in whoamI, user = ', res);
       this.user = res;
     },
