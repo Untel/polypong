@@ -113,7 +113,7 @@
         </q-toolbar>
 
         <q-toolbar class="search-toolbar bg-grey-2">
-          <SearchUser />
+          <SearchUser @select="$router.push(`/chat/${$event.id}`)"/>
         </q-toolbar>
 
         <q-scroll-area

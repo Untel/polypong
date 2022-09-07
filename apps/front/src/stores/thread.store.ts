@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 20:55:09 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 21:03:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,9 @@ export const useThreadStore = defineStore('thread', {
         try {
           const opts = password ? { query: { password } } : {};
           this._current = await threadApi.get<ActiveThread>(threadId, opts);
-          this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
+          const inThreadList = this._threads.find((t) => t.id === threadId);
+          if (inThreadList) inThreadList.unreadMessages.splice(0);
+          else this.fetchThreads();
           this.channelSettings = {
             name: this._current.channel?.name || '',
             privacy: this._current.channel?.privacy || 'public',
