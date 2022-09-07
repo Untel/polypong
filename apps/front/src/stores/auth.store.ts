@@ -111,10 +111,10 @@ export const useAuthStore = defineStore('auth', {
           });
         });
 
-        this.socket.on('thread-message', (thread, message) => {
-          console.log('New socket message', thread, message);
+        this.socket.on('thread-message', (threadId, message) => {
+          console.log('New socket message', threadId, message);
           const $thread = useThreadStore();
-          $thread.socketAddMessage(thread, message);
+          $thread.socketAddMessage(threadId, message);
         });
       });
     },

@@ -211,7 +211,7 @@ export class ThreadController {
       content: `${me.user.name} left`,
     }).save();
     await me.remove();
-    await this.messageService.notifyThread(thread, leaveMessage);
+    await this.messageService.notifyThread(thread.id, leaveMessage);
   }
 
 
