@@ -3,22 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   polygon.class.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/21 16:02:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:08:09 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Vector, Polygon, Circle } from 'collider2d';
-import {
-  polygonRegular,
-  lineAngle,
-  Line,
-  Point,
-  angleToDegrees,
-  lineLength,
-} from 'geometric';
+import { Vector, Polygon } from 'collider2d';
+import { lineAngle, Line, lineLength } from 'geometric';
 // import Polygon from 'polygon';
 
 export default class MyPolygon {
@@ -26,7 +19,7 @@ export default class MyPolygon {
   shape: Polygon;
   sides = [];
   verticles = [];
-  edges = [];
+  edges: Line[] = [];
   angles = [];
   edgeWidth = 0;
   center: Vector;

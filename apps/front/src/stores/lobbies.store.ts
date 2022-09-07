@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 17:23:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/06 21:28:35 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ export interface Player {
 export interface Lobby {
   id: number;
   name: string;
+  matching: boolean;
   players: Array<Player>;
   bots: Array<Bot>;
   playersMax: number;
@@ -51,6 +52,8 @@ export interface Lobby {
 interface LobbiesState {
   lobbies: Lobby[];
   activeLobby: Lobby | null;
+  matchmaking: boolean;
+  madeMatches: number;
 }
 
 export const onlineApi = mande('/api/online');
@@ -59,6 +62,8 @@ export const useLobbiesStore = defineStore('lobbies', {
   state: () => ({
     lobbies: [],
     activeLobby: null,
+    matchmaking: false,
+    madeMatches: 0,
   } as LobbiesState),
   getters: {
     getLobbies: (state) => state.lobbies,
@@ -77,6 +82,9 @@ export const useLobbiesStore = defineStore('lobbies', {
       }
     },
     async fetchAndJoinLobby(lobbyId: number | string) {
+      if (this.matchmaking) {
+        this.leaveMatchmake();
+      }
       this.activeLobby = await lobbiesApi.get(`${lobbyId}/join`);
     },
     async fetchCurrentLobby(lobbyId: number | string) {
@@ -110,12 +118,20 @@ export const useLobbiesStore = defineStore('lobbies', {
             label: 'Accept',
             color: 'white',
             handler: () => {
-              // console.log('about to reroute to /lobby/', lobbyId);
               this.router.push(`/lobby/${lobbyId}`);
             },
           },
         ],
       });
+    },
+    async joinMatchmake() {
+      if (this.matchmaking) lobbiesApi.get('/matchmake');// Maybe check the return of here
+      else lobbiesApi.get('/matchmake');
+      this.matchmaking = true;
+    },
+    async leaveMatchmake() {
+      lobbiesApi.get('/leaveMatchmake');
+      this.matchmaking = false;
     },
     async createLobby(lobbyName: string) {
       if (this.activeLobby) {
@@ -150,12 +166,6 @@ export const useLobbiesStore = defineStore('lobbies', {
           message: 'Error while updating lobby',
         });
         return null;
-      }
-    },
-    async setFinalePoints(finalePoints: string) {
-      console.log('setFinalePoints - finalepoints = ', finalePoints);
-      if (this.activeLobby) {
-        await lobbiesApi.post(`${this.activeLobby.id}/setFinalePoints/${finalePoints}`);
       }
     },
     async joinLobby(lobbyId: number) {

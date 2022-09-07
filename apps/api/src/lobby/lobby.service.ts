@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.service.ts                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/14 11:38:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/22 18:03:29 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:51:08 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,15 @@ import Player from 'src/game/player.class';
 // import Store from 'redis-json';
 import { User, UserService } from 'src/user';
 import { SocketService } from 'src/socket';
-import { Match, MatchHistoryService } from 'src/match-history';
+// import { Match, MatchHistoryService } from 'src/match-history';
 import { TS } from 'src/entities/root.entity';
 @Injectable()
 export class LobbyService {
   lobbies = new Map<LobbyId, Lobby>();
   afks = new Map<LobbyId, Lobby>();
+  queue = new Array<User>();
+  // match
+  interval: NodeJS.Timer | null = null;
   // store: Store<Lobby>;
   logger = new Logger('LobbyService');
   constructor(
@@ -53,6 +56,30 @@ export class LobbyService {
     for (let i = 0; i < 2; i++) lobby.addPlayer(new Player(players[i]));
     lobby.configure({ playersMax: 5 });
     // lobby.start();
+  }
+
+  matchmake() {
+    console.log('Matchmaking...');
+    if (this.queue.length < 2) return this.setMatchmaker(false);
+    const u1 = this.queue.shift();
+    const u2 = this.queue.shift();
+    const u1_sock = this.socketService.getUserSocket(u1.id);
+    const u2_sock = this.socketService.getUserSocket(u2.id);
+    this.createLobby(u1, 'matchmade').then((value: Lobby) => {
+      this.userJoinLobby(value, u1);
+      this.userJoinLobby(value, u2);
+      u1_sock.emit('matchmake_done', value.id);
+      u2_sock.emit('matchmake_done', value.id);
+      value.start();
+    });
+    this.socketService.socketio.emit('madeMatch');
+  }
+
+  setMatchmaker(bool = true) {
+    if (bool && this.interval === null)
+      return (this.interval = setInterval(() => this.matchmake(), 2000));
+    clearInterval(this.interval);
+    this.interval = null;
   }
 
   getLobbies(): Lobby[] {
@@ -180,16 +207,6 @@ export class LobbyService {
     return null;
   }
 
-  setFinalePoints(lobby: Lobby, points: number) {
-    // eslint-disable-next-line prettier/prettier
-    this.logger.log(`setFinalPoints - points = ${points}`);
-    lobby.finalePoints = points;
-    this.logger.log(`setFinalPoints - lobby.game.finalCap = ${points}`);
-    lobby.sock.emit('lobby_change', lobby.id);
-    lobby.sock.emit('setFinalPoints', points);
-    return null;
-  }
-
   async killLobby(lobby: Lobby) {
     await this.closeLobby(lobby);
     this.socketService.socketio.emit('lobbyDeleted');
@@ -226,8 +243,8 @@ export class LobbyService {
     return lobby;
   }
 
-  async closeLobby(lobby: Lobby, winner = null) {
-    console.log('Stored match', lobby.match);
+  closeLobby(lobby: Lobby, winner = null) {
+    console.log('Stored match'); //, lobby.match);
     if (lobby.game) {
       lobby.game.stop();
       //      lobby.sock.emit('redirect', {
@@ -236,10 +253,31 @@ export class LobbyService {
       lobby.sock.emit('gameOver', lobby.id);
       this.socketService.socketio.emit('other_game_over', lobby.id);
       lobby.match.finishedAt = TS.ts();
-      lobby.match = await lobby.match.save();
-      console.log('Updated match', lobby.match);
+      lobby.match.save().then(() => {
+        this.logger.log('Updated match', lobby.match);
+      });
     }
     lobby.sock.socketsLeave(lobby.roomId);
     this.lobbies.delete(lobby.id);
+  }
+
+  removeMatchmake(disco: User) {
+    const pos: number = this.queue.findIndex((u) => u.id === disco.id);
+    if (pos !== -1) this.queue.splice(pos, 1);
+    console.log(`queue is now ${this.queue.length} ppl`);
+  }
+
+  userMatchmake(host: User) {
+    const currentLobbyOfUser = this.userIsInLobby(host.id);
+    if (currentLobbyOfUser) {
+      this.userLeaveLobby(currentLobbyOfUser, host);
+      this.logger.warn(
+        `User ${host.id} already is in this lobby ${currentLobbyOfUser.roomId}, leaving the socket and the lobby`,
+      );
+    }
+    if (this.queue.find((e) => e.id === host.id) === undefined)
+      this.queue.push(host);
+    if (this.queue.length === 2 && this.interval === null) this.setMatchmaker();
+    console.log(`queue is now ${this.queue.length} ppl`);
   }
 }

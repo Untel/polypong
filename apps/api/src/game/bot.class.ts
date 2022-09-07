@@ -3,8 +3,6 @@ import { Ball } from './ball.class';
 import { Wall } from './wall.class';
 import { lineLength, Line, Point, lineMidpoint } from 'geometric';
 import { LobbyBot } from './lobbyBot.class';
-import { copyFileSync } from 'fs';
-import { Vector } from 'collider2d';
 import GameTools from './gametools.class';
 
 export class Bot {

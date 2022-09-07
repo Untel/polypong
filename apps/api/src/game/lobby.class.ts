@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.class.ts                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 00:45:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:07:15 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@ import Player from './player.class';
 import Spectator from './spectator.class';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { User } from 'src/user';
-import { Bot } from './bot.class';
 import { Logger, UnprocessableEntityException } from '@nestjs/common';
 import { LobbyBot } from './lobbyBot.class';
-import { SocketService } from 'src/socket';
 import { Server } from 'socket.io';
 import { LobbyService } from 'src/lobby';
 import { Match, UserMatch } from 'src/match-history';
@@ -88,6 +86,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
     this.players = new Map<number, Player>();
     this.spectators = [];
     this.playersMax = 8;
+    if (name === 'matchmade') this.playersMax = 2;
     this.finalePoints = 3;
     this.spectatorsMax = 10;
     this.bots = [];
@@ -140,13 +139,14 @@ export default class Lobby implements ILobby, ILobbyConfig {
     um.user = player.user;
     um.rank = rank + 1;
     um.match = this.match;
-    const added = await um.save();
-    console.log('Added rank', added, 'for', player.user.name);
+    await um.save();
+    console.log('Added rank', 'for', player.user.name);
   }
 
   configure(opts: Partial<Lobby>) {
     if (opts.name) this.name = opts.name;
     if (opts.spectatorsMax) this.spectatorsMax = opts.spectatorsMax;
+    if (opts.finalePoints) this.finalePoints = opts.finalePoints;
     if (opts.bots)
       Object.keys(opts.bots).forEach((key) => {
         Object.assign(this.bots[key], opts.bots[key]);

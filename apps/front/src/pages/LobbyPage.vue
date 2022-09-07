@@ -49,8 +49,8 @@
             :disable="!canUpdate"
             name="finalePoints"
             :model-value="$lobbies.activeLobby?.finalePoints"
-            @change="(evt) => $lobbies.setFinalePoints(evt)"
-            :min="1"
+            @change="(evt) => $lobbies.updateLobby(lobby.id, { finalePoints: evt })"
+            :min="2"
             :max="11"
             snap
             markers

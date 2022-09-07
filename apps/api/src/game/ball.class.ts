@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 17:43:31 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/05 18:08:23 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,12 @@ export class Ball extends Circle {
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
-  closestP: number[] = [0, 0];
+  closestP: Point = [0, 0];
   target: {
     hit: Point;
     wall: Wall;
   };
+  stopped : boolean = false;
   color: string;
   targetInfo: any;
   adjacent: any;
@@ -82,6 +83,7 @@ export class Ball extends Circle {
     const walls = this.game.walls;
     const reach = this.direction.clone().scale(100);
     const fakePos = this.position.clone().add(reach);
+    if (walls.length < 3) return;
     const line: Line = [
       [fakePos.x, fakePos.y],
       [this.position.x, this.position.y],
@@ -96,14 +98,14 @@ export class Ball extends Circle {
       const edge: Line = wall.line;
       const [[x3, y3], [x4, y4]] = edge;
       const intersection = GameTools.lineIntersection(
-        x1,
-        y1,
-        x2,
-        y2,
-        x3,
-        y3,
-        x4,
-        y4,
+        [
+          [x1, y1],
+          [x2, y2],
+        ],
+        [
+          [x3, y3],
+          [x4, y4],
+        ],
       );
 
       if (intersection) {
@@ -170,7 +172,7 @@ export class Ball extends Circle {
     if (this.freezeTime === 0) return false;
     this.freezeTime = this.freezeTime - value < 0 ? 0 : this.freezeTime - value;
     if (this.freezeTime > 0) return true;
-    this.target.wall.addBall(this);
+    if (this.target?.wall) this.target.wall.addBall(this);
     return false;
   }
 
@@ -213,7 +215,7 @@ export class Ball extends Circle {
     // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
     // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
     // x2 pour aller de -1 a x1;
-    const percent = (hitLen / paddle.width - 0.5) * 2;
+    const percent = (hitLen / lineLength(paddle.line) * 2);
     // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
     // console.log('Hit percent', percent);
     const maxAngle = 25;
@@ -225,7 +227,8 @@ export class Ball extends Circle {
     // console.log(`New angle is : ${newAngle} made from ${angleToRadians(newDegree)} and ${addDeg}`)
     this.lastHitten = paddle;
     this.color = paddle.color;
-    this.setAngle(newAngle);
+    // this.setAngle(newAngle);
+    this.setAngle(angleToRadians(newDegree));
     this.findTarget();
   }
 
@@ -241,6 +244,7 @@ export class Ball extends Circle {
   stop() {
     this.speed = 0;
     this.direction = new Vector(0, 0);
+    this.stopped = true;
   }
 
   /**
@@ -259,17 +263,21 @@ export class Ball extends Circle {
     return [this.position.x, this.position.y];
   }
   public get netScheme() {
-    return {
-      color: this.color,
-      position: {
-        x: this.position.x,
-        y: this.position.y,
-      },
-      radius: this.radius,
-      target: {
-        x: this.target.hit[0],
-        y: this.target.hit[1],
-      },
-    };
+    const x = this.target?.hit[0] ? this.target.hit[0] : 0;
+    const y = this.target?.hit[1] ? this.target.hit[1] : 0;
+    if (this.target) {
+      return {
+        color: this.color,
+        position: {
+          x: this.position.x,
+          y: this.position.y,
+        },
+        radius: this.radius,
+        target: {
+          x: x,
+          y: y,
+        },
+      };
+    }
   }
 }

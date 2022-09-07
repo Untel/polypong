@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   wall.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 09:44:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 14:09:30 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { Exclude, Type } from 'class-transformer';
-import { Vector } from 'collider2d';
-import { Line, lineLength, lineAngle } from 'geometric';
+import { Line, lineLength, lineAngle, lineMidpoint } from 'geometric';
 import { Ball } from './ball.class';
 import { Bot } from './bot.class';
 import { Paddle } from './paddle.class';
@@ -50,6 +49,9 @@ export class Wall {
     if (this.bot) {
       this.bot.addBall(target);
     }
+  }
+  getMiddlePoint() {
+    return lineMidpoint(this.line);
   }
 
   public get netScheme() {

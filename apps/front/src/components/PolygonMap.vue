@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: column;
   max-height: inherit;
+  .score{
+      font-weight: bold;
+      font-size:x-large;
+    }
   svg {
     margin: 20px;
     width: auto;
@@ -36,6 +40,13 @@
 
 <template>
   <div class="svg-test wrapper">
+    <!-- <g v-for="(score, idx) in scores"
+      :key="`score-${idx}`"
+        > -->
+        <p class="score" v-if="(scores.length === 2)" >
+          {{scores[0]}} - {{scores[1]}}
+        </p>
+      <!-- </g> -->
     <svg
       viewBox="-50 -50 100 100"
       ref="svgRef"
@@ -46,14 +57,6 @@
         :r="map.inradius"
         :x="0" :y="0"
       />
-      <!-- <line
-        v-for="(wall, idx) in map.walls || []"
-        :key="`wall-${idx}`"
-        ref="wallsRef"
-        class="wall"
-        stroke-width=".1px"
-        v-bind="formatLine(wall.line)"
-      /> -->
       <line
         v-if="myWall"
         ref="myWallRef"
@@ -115,6 +118,7 @@ import {
   Power,
   Line,
   PolygonMap,
+  Score,
 } from 'src/utils/game';
 import anime from 'animejs/lib/anime.es.js';
 import { useMouseInElement, useDeviceOrientation, watchDebounced } from '@vueuse/core';
@@ -142,6 +146,10 @@ const props = defineProps({
     type: Array as PropType<Array<Power>>,
     default: () => [],
   },
+  scores: {
+    type: Array as PropType<Array<Score>>,
+    default: () => [],
+  },
 });
 const emit = defineEmits(['paddleMove']);
 
@@ -156,6 +164,9 @@ function formatBallTrajectoryPoints(ball: Ball) {
     y1: ball.position.y,
     y2: ball.target.y,
   };
+}
+function formatPoint(x : number, y : number) {
+  return { x, y };
 }
 
 function formatLine(line: Line) {

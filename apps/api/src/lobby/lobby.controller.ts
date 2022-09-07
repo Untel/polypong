@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.controller.ts                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/17 03:56:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/03 12:51:25 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,16 +82,6 @@ export class LobbyController {
       `@Get('kick/:userId), userToBeKicked.name = ${userToBeKicked.name}`,
     );
     return this.lobbyService.kickUserFromLobby(lobby, userToBeKicked);
-  }
-
-  @Post('setFinalePoints/:points')
-  @UseGuards(IsLobbyHost)
-  setFinalPoints(
-    @CurrentLobby() lobby: Lobby,
-    @Param('points') points: string,
-  ): Promise<void> {
-    return this.lobbyService.setFinalePoints(lobby, +points);
-    // eslint-disable-next-line prettier/prettier
   }
 
   @Post('kill')

@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <pre>Response: {{ lobbies.getLobbies }}</pre>
-    <q-card v-for="lobby of lobbies.getLobbies">
+    <q-card v-for="(lobby, idx) of lobbies.getLobbies" v-bind:key=idx>
       <pre>{{ lobby }}</pre>
       <q-btn @click="lobbies.joinLobby(lobby.id)">Join lobby {{ lobby.id }}</q-btn>
     </q-card>

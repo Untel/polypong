@@ -35,6 +35,7 @@
         :paddles="paddles"
         :balls="balls"
         :powers="powers"
+        :scores="scores"
         @paddleMove="updatePaddlePercent"
       >
       </PolygonMap>
@@ -82,6 +83,7 @@ import {
   PolygonMap as PolyMap,
   Line,
   Position,
+  Score,
 } from 'src/utils/game';
 import PolygonMap from 'src/components/PolygonMap.vue';
 import FssFallback from 'src/components/FssFallback.vue';
@@ -94,6 +96,7 @@ const $game = useGameStore();
 const paddles: Ref<Paddle[]> = ref([]);
 const balls: Ref<Ball[]> = ref([]);
 const powers: Ref<Power[]> = ref([]);
+const scores: Ref<Score[]> = ref([]);
 const mapProps: Ref<PolyMap> = ref({
   verticles: [],
   angles: [],
@@ -112,7 +115,7 @@ onMounted(async () => {
   paddles.value = $game.paddles;
   mapProps.value = $game.map;
   balls.value = $game.balls;
-
+  scores.value = $game.scores;
   socket.on('gameUpdate', ({ balls: b, paddles: p }) => {
     paddles.value = p;
     balls.value = b;
@@ -131,6 +134,9 @@ onMounted(async () => {
       //   powers.value[index] = item;
       //   powers.value.splice(index,1);
         break;
+      case 'score':
+        scores.value = item;
+        break;
       case 'paddle':
         paddles.value[index] = item;
         break;
@@ -147,6 +153,9 @@ onMounted(async () => {
     mapProps.value = map;
     powers.value = [];
   });
+  socket.on('score', (s) => {
+    scores.value = s;
+  });
   socket.on('powers', (pow) => {
     powers.value = pow;
   });
@@ -160,6 +169,7 @@ onUnmounted(() => {
   socket.off('gameUpdate');
   socket.off('mapChange');
   socket.off('powers');
+  socket.off('objects');
   $game.$reset();
 });
 

@@ -13,22 +13,18 @@
   <q-page padding>
     <!-- <pre>Response: {{ lobbies.getLobbies }}</pre> -->
     <div class="card-grid">
-      <LobbyCard
+      <MatchmakingCard
         :id="0"
-        name="MatchMaking"
-        subhead="Find the regular opponent"
+        name="Matchmaking"
+        subhead="Find a regular opponent"
         avatar="/matchmaking.png"
         :isCreated=true
-      >
-        <q-circular-progress
-          show-value
-          class="text-primary q-ma-md"
-          :value="3"
-          indeterminate
-          size="50px"
-          color="primary"
-        /> Searching players
-      </LobbyCard>
+        :madeMatches=$lobbies.madeMatches
+        @joinMatchmake="joinMatchmake"
+        @leaveMatchmake="leaveMatchmake"
+        >
+        Recent matches : {{$lobbies.madeMatches}} !
+      </MatchmakingCard>
       <LobbyCard
         :id="-1"
         name="Create"
@@ -102,6 +98,7 @@ import {
   ref,
   defineComponent,
 } from 'vue';
+import MatchmakingCard from 'src/components/MatchmakingCard.vue';
 
 defineComponent({
   components: {
@@ -129,10 +126,24 @@ async function createLobby() {
   }
 }
 
+async function joinMatchmake() {
+  $lobbies.joinMatchmake();
+}
+async function leaveMatchmake() {
+  $lobbies.leaveMatchmake();
+}
+
 onMounted(() => {
   socket.on('update_lobbies', (evt) => {
     console.log('Refreshed lobbies', evt);
     $lobbies.lobbies = evt;
+  });
+  socket.on('matchmake_done', (lobbyid) => {
+    console.log('Matchmaking done !');
+    $lobbies.matchmaking = false;
+    $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
+      router.push(`/lobby/${lobbyid}/game`);
+    });
   });
 });
 
