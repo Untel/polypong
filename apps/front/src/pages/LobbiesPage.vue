@@ -141,6 +141,7 @@ onMounted(() => {
     //    console.log('Matchmaking done !');
     $lobbies.matchmaking = false;
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
+      console.log('OOOOOOAAAA');
       router.push(`/lobby/${lobbyid}/game`);
     });
   });
