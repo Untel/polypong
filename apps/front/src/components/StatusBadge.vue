@@ -7,18 +7,29 @@
     :icon="icon"
     :hide-icon="status !== 'in lobby' && status !== 'in game' ? true : false"
     padding="xs"
+  />
+  <!--
+  <q-fab
+    :label="status"
+    :color="color"
+    direction="left"
+    push
+    :icon="icon"
+    :hide-icon="status !== 'in lobby' && status !== 'in game' ? true : false"
+    padding="xs"
   >
     <q-fab-action v-if="status === 'in lobby'" label="join lobby"
-      @click="onClick"
+      @click="onClickJoinLobby"
       :color="color" hide-icon padding="xs"
       push
     />
     <q-fab-action v-if="status === 'in game'" label="spectate game"
-      @click="onClick"
+      @click="onClickSpectateGame"
       :color="color" hide-icon padding="xs"
       push
     />
   </q-fab>
+  -->
 </template>
 
 <script lang="ts" setup>
@@ -36,9 +47,9 @@ const props = defineProps({
   },
 });
 
-function onClick(): void {
+// function onClickJoinLobby(): void {
 //  console.log('click');
-}
+// }
 
 const users = computed(() => auth.getConnectedUsers);
 
