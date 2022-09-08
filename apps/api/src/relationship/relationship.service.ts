@@ -159,7 +159,7 @@ export class RelationshipService {
     this.logger.log(`in sendFriendship, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
     console.log('in sendFriendship, sock = ', sock);
-    sock?.emit('friendship', from.id, 'received');
+    sock?.forEach((s)=> s.emit('friendship', from.id, 'received'));
     return await this.fetchRels(from);
   }
 
@@ -194,7 +194,7 @@ export class RelationshipService {
     });
     await this.socketService
       .getUserSocket(to.id)
-      ?.emit('friendship', from.id, 'revoked', false);
+      ?.forEach((s) => s.emit('friendship', from.id, 'revoked', false));
     return await this.fetchRels(from);
   }
 
@@ -229,7 +229,7 @@ export class RelationshipService {
     this.logger.log(`in sendBlock, to = ${JSON.stringify(to)}`);
     const sock = await this.socketService.getUserSocket(to.id);
     console.log('in sendBlock, sock = ', sock);
-    sock?.emit('block', from.id, 'received');
+    sock?.forEach((s)=> s.emit('block', from.id, 'received'));
     return await this.fetchRels(from);
   }
 
@@ -254,7 +254,7 @@ export class RelationshipService {
     await this.updateRel(toRel, { block_received: false });
     await this.socketService
       .getUserSocket(to.id)
-      ?.emit('block', from.id, 'revoked', false);
+      ?.forEach((s)=> s.emit('block', from.id, 'revoked', false));
     return await this.fetchRels(from);
   }
 }

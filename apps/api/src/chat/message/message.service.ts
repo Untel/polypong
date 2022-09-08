@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   message.service.ts                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 20:54:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 22:58:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ export class MessageService {
     participants.forEach((p) => {
       const sock = this.socketService.getUserSocket(p.user.id);
       if (sock) {
-        sock.emit('thread-message', threadId, message);
+        sock.forEach((s)=> s.emit('thread-message', threadId, message));
       }
     });
     return message;
