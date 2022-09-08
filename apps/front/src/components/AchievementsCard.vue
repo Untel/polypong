@@ -1,7 +1,8 @@
 <template>
 <q-card>
   <q-card-section v-if="achievements.length === 0" class="column items-center">
-    <pre>achievements will be displayed here</pre>
+    <div class="text-h6">Achievements</div>
+    <div class="text-subtitle2">Your achievements will be displayed here</div>
   </q-card-section>
   <q-card-section v-else class="column items-center" horizontal>
     <q-card-section

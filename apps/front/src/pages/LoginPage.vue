@@ -20,8 +20,7 @@
     v-model="login"
     class="full-width"
     filled
-    label="Login"
-    hint="Username or email"
+    label="Email"
     lazy-rules
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   />

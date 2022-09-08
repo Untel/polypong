@@ -26,7 +26,9 @@
       :width="200"
       :breakpoint="0"
     >
-      <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
+      <div class="logo-place">
+        <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
+      </div>
       <EssentialLink title="Home" caption="Sweet home" icon="fas fa-igloo" to="home"/>
       <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
       <EssentialLink title="Coalitions" caption="Mine's better"
@@ -50,8 +52,14 @@
 </template>
 
 <style lang="scss" scoped>
+  .logo-place {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
   .bg-triangle {
     min-height: inherit;
+    background-size: cover;
   }
   .alliance {
     background-image: url('/src/assets/alliance_background.jpg');
@@ -198,7 +206,8 @@ $auth.socket.on('gameOver', async (lobbyId: number) => {
 });
 
 $auth.socket.on('other_game_over', async (lobbyId: number) => {
-  await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
+  await $lobbies.fetchLobbies();
+  await $auth.fetchConnectedUsers();
 });
 
 $auth.socket.on('start', async (lobbyId: number) => {

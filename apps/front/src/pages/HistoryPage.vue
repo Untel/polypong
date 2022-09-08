@@ -1,121 +1,108 @@
 <template>
-<div>
-<q-card>
-  <q-card-section>
-    <q-input
-      filled v-model="searchedRel" label="Enter a name"
-      @keydown.enter.prevent="searchRel(searchedRel)"
-      stack-label dense>
-      <template v-slot:append>
-        <q-btn @click="searchRel(searchedRel)">search</q-btn>
-      </template>
-    </q-input>
-  </q-card-section>
-  <stats-banner
-    :userId="userId"
-    :name="userId === $auth.user.id ? $auth.user.name : owningRel?.to.name"
-    :nWins="his.getUserMatchesHistory(userId)?.stats.wins"
-    :nLosses="his.getUserMatchesHistory(userId)?.stats.losses"
-    :nRatio="his.getUserMatchesHistory(userId)?.stats.ratio"
-  />
-</q-card>
-<q-tabs
-  v-model="tab" dense class="text-grey" active-color="primary"
-  indicator-color="primary" narrow-indicator
->
-  <q-tab name="history" label="history"/>
-  <q-tab name="achievements" label="achievements"/>
-  <q-tab name="ladder" label="ladder"/>
-</q-tabs>
 
-<q-tab-panels v-model="tab" animated>
-<q-tab-panel name="history">
-<div>
-  <!--
---- userId = {{ userId }} --- <br/>
---- isSelf = {{ isSelf }} --- <br/>
---- toggledMatchId = {{ toggledMatchId }} --- <br/>
---- playerClicked = {{ playerClicked }} --- <br/>
---- HistoryOwner = {{ OwningRel }} --- <br/>
-  -->
-  <div>
-    <q-card v-for="
-      match in his.getUserMatchesHistory(userId)?.matches"
-      :key="`${userId}-${match.id}`"
-    >
+  <q-card>
       <q-card-section>
+        <q-input
+          filled v-model="searchedRel" label="Enter a name"
+          @keydown.enter.prevent="searchRel(searchedRel)"
+          stack-label dense>
+          <template v-slot:append>
+            <q-btn @click="searchRel(searchedRel)">search</q-btn>
+          </template>
+        </q-input>
+      </q-card-section>
+      <stats-banner
+        :userId="userId"
+        :name="userId === $auth.user.id ? $auth.user.name : owningRel?.to.name"
+        :nWins="his.getUserMatchesHistory(userId)?.stats.wins"
+        :nLosses="his.getUserMatchesHistory(userId)?.stats.losses"
+        :nRatio="his.getUserMatchesHistory(userId)?.stats.ratio"
+      />
+  </q-card>
+  <q-tabs
+    v-model="tab" dense class="text-grey" active-color="primary"
+    indicator-color="primary" narrow-indicator
+  >
+    <q-tab name="history" label="history"/>
+    <q-tab name="achievements" label="achievements"/>
+    <q-tab name="ladder" label="ladder"/>
+  </q-tabs>
+  <q-tab-panels v-model="tab" animated>
+    <q-tab-panel name="history">
+      <q-card v-for="
+        match in his.getUserMatchesHistory(userId)?.matches"
+        :key="`${userId}-${match.id}`"
+      >
+        <q-card-section>
 
-        <q-card-section horizontal>
-          <match-card
-            :match="match"
-            @player-click="(name, userId) => togglePlayer(name, userId, match.id)"
-          />
-        </q-card-section>
+          <q-card-section horizontal>
+            <match-card
+              :match="match"
+              @player-click="(name, userId) => togglePlayer(name, userId, match.id)"
+            />
+          </q-card-section>
 
-        <q-card-section v-if="toggledMatchId === match.id"
-          horizontal class="column items-center"
-        >
-          <q-card-section v-if="playerClicked">
-            <q-card-section v-if="playerClicked === $auth.user.name">
-              <stats-card
-                @click="(userIdParam) => stats(userIdParam)"
-                :userId="$auth.user.id"
-                :name="$auth.user.name"
-                :nWins="playerClickedStats?.wins"
-                :nLosses="playerClickedStats?.losses"
-                :ratio="playerClickedStats?.ratio"
-                height="280px"
-              >
-                <social-button
-                  @click="stats($auth.user.id)"
-                  :tooltip="'stats'" :icon="'fa-solid fa-chart-line'"
+          <q-card-section v-if="toggledMatchId === match.id"
+            horizontal class="column items-center"
+          >
+            <q-card-section v-if="playerClicked">
+              <q-card-section v-if="playerClicked === $auth.user.name">
+                <stats-card
+                  @click="(userIdParam) => stats(userIdParam)"
+                  :userId="$auth.user.id"
+                  :name="$auth.user.name"
+                  :nWins="playerClickedStats?.wins"
+                  :nLosses="playerClickedStats?.losses"
+                  :ratio="playerClickedStats?.ratio"
+                  height="280px"
+                >
+                  <social-button
+                    @click="stats($auth.user.id)"
+                    :tooltip="'stats'" :icon="'fa-solid fa-chart-line'"
+                  />
+                </stats-card>
+              </q-card-section>
+              <q-card-section v-else-if="rel" horizontal>
+                <stats-card
+                  @click="(userIdParam) => stats(userIdParam)"
+                  :userId="rel.toId"
+                  :name="rel.to.name"
+                  :nWins="playerClickedStats?.wins"
+                  :nLosses="playerClickedStats?.losses"
+                  :ratio="playerClickedStats?.ratio"
+                  height="280px"
                 />
-              </stats-card>
-            </q-card-section>
-            <q-card-section v-else-if="rel" horizontal>
-              <stats-card
-                @click="(userIdParam) => stats(userIdParam)"
-                :userId="rel.toId"
-                :name="rel.to.name"
-                :nWins="playerClickedStats?.wins"
-                :nLosses="playerClickedStats?.losses"
-                :ratio="playerClickedStats?.ratio"
-                height="280px"
-              />
-              <q-separator vertical/>
-              <social-card :relname="rel.to.name"
-                @stats="(id) => stats(id)"
-                @invite-to-lobby="(id) => inviteToLobby(id)"
-                @message="(id) => message(id)"
-                @add-friend="(name) => addFriend(name)"
-                @unfriend="(name) => unfriend(name)"
-                @block="(name) => block(name)"
-                @unblock="(name) => unblock(name)"
-              />
+                <q-separator vertical/>
+                <social-card :relname="rel.to.name"
+                  @stats="(id) => stats(id)"
+                  @invite-to-lobby="(id) => inviteToLobby(id)"
+                  @message="(id) => message(id)"
+                  @add-friend="(name) => addFriend(name)"
+                  @unfriend="(name) => unfriend(name)"
+                  @block="(name) => block(name)"
+                  @unblock="(name) => unblock(name)"
+                />
+              </q-card-section>
             </q-card-section>
           </q-card-section>
-        </q-card-section>
 
-      </q-card-section>
-      <q-separator dark inset />
-    </q-card>
-  </div>
-</div>
-</q-tab-panel>
-<q-tab-panel name="achievements">
-  <achievements-card
-    :userId="userId"
-    :name="userId === $auth.user.id ? $auth.user.name : owningRel?.to.name"
-    :userMatches="his.getUserMatchesHistory(userId)"
-  />
-</q-tab-panel>
-<q-tab-panel name="ladder">
-  <ladder-board
-    @click="(userIdParam) => stats(userIdParam)"
-  />
-</q-tab-panel>
-</q-tab-panels>
-</div>
+        </q-card-section>
+        <q-separator dark inset />
+      </q-card>
+    </q-tab-panel>
+    <q-tab-panel name="achievements">
+      <achievements-card
+        :userId="userId"
+        :name="userId === $auth.user.id ? $auth.user.name : owningRel?.to.name"
+        :userMatches="his.getUserMatchesHistory(userId)"
+      />
+    </q-tab-panel>
+    <q-tab-panel name="ladder">
+      <ladder-board
+        @click="(userIdParam) => stats(userIdParam)"
+      />
+    </q-tab-panel>
+  </q-tab-panels>
 </template>
 
 <script lang="ts" setup>

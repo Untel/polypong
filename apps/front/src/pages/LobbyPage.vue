@@ -2,7 +2,6 @@
 <style>
   .user-list {
     display: grid;
-    /* grid-auto-flow: column; */
     grid-template-columns: repeat(2, minmax(200px, 1fr));
     flex-wrap: wrap;
     gap: 10px;
@@ -11,15 +10,7 @@
 </style>
 
 <template>
-<pre>
-  host : {{ $lobbies.getActiveLobby?.host.name }}
-  lobbyId : {{ $lobbies.getActiveLobby?.id }}
-</pre>
   <q-page padding>
-    <!--
-    Here we should config the lobby page and wait for peoples to connect
-    Id: {{ props.id }} {{ props }}
-    -->
     <q-card>
       <q-card-section>
         <q-btn
@@ -89,8 +80,6 @@
       </q-card-section>
     </q-card>
     <br/>
-
-    <!--<section class="user-list">-->
     <section class="row justify-center">
       <UserCard class="col-md-6"
         v-for="player in $lobbies.getActiveLobby?.players"
@@ -107,18 +96,18 @@
         }"
       >
         <template #exit>
-            <!-- leave lobby -->
-            <q-btn
-              v-if="player.user.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.leave()"
-            />
-            <!-- kick player (host only)-->
-            <q-btn
-              v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.kick(lobby.id, player.user.id)"
-            />
+          <!-- leave lobby -->
+          <q-btn
+            v-if="player.user.id === $auth.user.id"
+            round icon="fa-solid fa-xmark" size="s"
+            @click="async () => $lobbies.leave()"
+          />
+          <!-- kick player (host only)-->
+          <q-btn
+            v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
+            round icon="fa-solid fa-xmark" size="s"
+            @click="async () => $lobbies.kick(lobby.id, player.user.id)"
+          />
         </template>
       </UserCard>
       <UserCard class="col-md-6"
