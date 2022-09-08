@@ -80,12 +80,12 @@
           :fill="ball.color || 'yellow'" r="2"
           v-bind="formatCirclePosition(ball.position)"
         />
-        <line
+        <!-- <line
           :stroke="ball.color || 'red'"
           stroke-width="0.25px"
           stroke-dasharray="2"
           v-bind="formatBallTrajectoryPoints(ball)"
-        />
+        /> -->
         <circle
           v-if="ball.target"
           :fill="ball.color || 'yellow'" r=".5"

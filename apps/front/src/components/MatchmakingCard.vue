@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, PropType, ref } from 'vue';
+import { computed } from 'vue';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 
 const $lobbies = useLobbiesStore();
@@ -96,7 +96,4 @@ function click() {
   else emit('joinMatchmake');
 }
 
-const val = ref<boolean>(false);
-const showPassword = ref<boolean>(false);
-const password = ref<string>();
 </script>

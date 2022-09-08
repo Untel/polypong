@@ -20,7 +20,7 @@ export class Bot {
   constructor(datas: Partial<Bot | LobbyBot> = {}) {
     Object.assign(this, datas);
     this.maxSpeed = this.level + 1;
-    this.precision = 0.05;
+    this.precision = 0.1;
   }
   attachWall(wall: Wall) {
     this.wall = wall;
@@ -55,7 +55,7 @@ export class Bot {
       this.level1();
       return;
     }
-    const offset = this.wall.paddle.ratio > 0.5 ? -0.01 : +0.01;
+    const offset = this.wall.paddle.ratio > 0.5 ? -0.05 : +0.05;
     const ratio = this.wall.paddle.ratio;
     if (
       (offset > 0 && offset + ratio > 0.5) ||
@@ -72,7 +72,7 @@ export class Bot {
     }
     let focus: Point = [coords[0], coords[1]];
     if (!coords[0] && !coords[1]) focus = this.tasks[0].targetInfo.actualhit;
-
+    // console.log("bot focusing on ", focus)
     let dir = 0;
     const leftSideDist = lineLength([focus, this.wall.line[0]]);
     const totalDist = lineLength(this.wall.line);

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 13:53:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:08:06 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,14 @@ export default class GameTools {
   static wallBallCollision(w: Line, b: Ball, impact: Point) {
     return this.lineCircleCollision(w, b, impact);
   }
-
+  static angle180range(angle) {
+    let ret = angle % 360;
+    // force it to be the positive remainder, so that 0 <= angle < 360
+    ret = (ret + 360) % 360;
+    // force into the minimum absolute value residue class, so that -180 < angle <= 180
+    if (ret > 180) ret -= 360;
+    return ret;
+  }
   static lineCircleCollision(line: Line, c: Circle, closestP: Point = [0, 0]) {
     const x1: number = line[0][0];
     const y1: number = line[0][1];
@@ -160,9 +167,6 @@ export default class GameTools {
     const cx: number = c.position.x;
     const cy: number = c.position.y;
     const r: number = c.radius;
-    const inside1: boolean = this.pointCircle(x1, y1, cx, cy, r); // Need pointcircle
-    const inside2: boolean = this.pointCircle(x2, y2, cx, cy, r);
-    if (inside1 || inside2) return true;
 
     let distX: number = x1 - x2;
     let distY: number = y1 - y2;
@@ -173,6 +177,9 @@ export default class GameTools {
     const closestPt: Point = [x1 + dot * (x2 - x1), y1 + dot * (y2 - y1)];
     closestP[0] = closestPt[0];
     closestP[1] = closestPt[1];
+    const inside1: boolean = this.pointCircle(x1, y1, cx, cy, r); // Need pointcircle
+    const inside2: boolean = this.pointCircle(x2, y2, cx, cy, r);
+    if (inside1 || inside2) return true;
     const onSegment = this.linePoint(line, closestPt); //Need linepoint
     if (!onSegment) return false;
 

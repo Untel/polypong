@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 14:09:30 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 13:04:25 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,7 @@ export class Wall {
     this.bot = bot;
   }
   clearBall(target: Ball) {
-    if (this.bot) {
-      this.bot.popBall(target);
-    }
+    this.bot?.popBall(target);
   }
   addBall(target: Ball) {
     if (this.bot) {
