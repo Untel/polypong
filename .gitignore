@@ -12,3 +12,5 @@ node_modules
 **debug.log
 
 **/*.lock
+
+**/.DS_Store
