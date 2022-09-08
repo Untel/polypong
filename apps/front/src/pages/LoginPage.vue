@@ -70,7 +70,11 @@ const connectWithLocal = async (form: Event) => {
   const redirect = route.query.redirect
     ? JSON.parse((route.query.redirect as string))
     : { name: 'home' };
-  await auth.login(login.value, password.value);
+  try {
+    await auth.login(login.value, password.value);
+  } catch (e) {
+    // console.log(e);
+  }
   router.push(redirect);
 };
 
