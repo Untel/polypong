@@ -24,7 +24,7 @@
     />
     <q-fab-action v-if="props.linkedin" padding="5px" color="blue"
       icon="fab fa-linkedin"
-      :to="external(`https://profile.intra.42.fr/users/${props.linkedin}`)"
+      :to="external(`https://www.linkedin.com/in/${props.linkedin}`)"
     />
     <q-fab-action v-if="props.github" padding="5px"
       icon="fab fa-github" color="black"
