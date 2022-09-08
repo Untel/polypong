@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 08:54:01 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:08:06 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,16 @@ export default class GameTools {
   static wallBallCollision(w: Line, b: Ball, impact: Point) {
     return this.lineCircleCollision(w, b, impact);
   }
-
+  static angle180range(angle)
+  {
+    let ret =  angle % 360;
+    // force it to be the positive remainder, so that 0 <= angle < 360
+    ret = (ret + 360) % 360;
+    // force into the minimum absolute value residue class, so that -180 < angle <= 180
+    if (ret > 180)
+        ret -= 360;
+    return ret
+  }
   static lineCircleCollision(line: Line, c: Circle, closestP: Point = [0, 0]) {
     const x1: number = line[0][0];
     const y1: number = line[0][1];
