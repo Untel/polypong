@@ -29,7 +29,7 @@ const props = defineProps({
 });
 
 function onClick(): void {
-  console.log('click');
+//  console.log('click');
 }
 
 const emit = defineEmits(['avatarClick']);

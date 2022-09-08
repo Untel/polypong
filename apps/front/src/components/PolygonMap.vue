@@ -254,7 +254,7 @@ watch(() => props.map, (map, oldMap) => {
 }, { immediate: true });
 
 onMounted(() => {
-  console.log('to');
+//  console.log('to');
 });
 
 </script>

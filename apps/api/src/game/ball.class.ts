@@ -36,7 +36,7 @@ export class Ball extends Circle {
     hit: Point;
     wall: Wall;
   };
-  stopped : boolean = false;
+  stopped = false;
   color: string;
   targetInfo: any;
   adjacent: any;

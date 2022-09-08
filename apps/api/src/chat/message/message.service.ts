@@ -6,16 +6,17 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:55:09 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 18:40:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 20:54:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ID } from 'src/entities';
 import { SocketService } from 'src/socket/socket.service';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
-import { Thread } from '../thread';
+import { Thread, ThreadParticipant } from '../thread';
 // import { Thread } from '../thread/entities/thread.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -38,7 +39,7 @@ export class MessageService {
 
     participant.sawUntil = new Date();
     await message.sender.save();
-    this.notifyThread(thread, savedMessage);
+    this.notifyThread(thread.id, savedMessage);
     return savedMessage;
   }
 
@@ -48,15 +49,19 @@ export class MessageService {
       content,
     });
     const savedMessage = await message.save();
-    this.notifyThread(thread, savedMessage);
+    this.notifyThread(thread.id, savedMessage);
     return savedMessage;
   }
 
-  async notifyThread(thread: Thread, message: Message) {
-    thread.participants.forEach((p) => {
+  async notifyThread(threadId: ID, message: Message) {
+    const participants = await ThreadParticipant.createQueryBuilder('th')
+      .where('thread_id = :id', { id: threadId })
+      .leftJoinAndSelect('th.user', 'user')
+      .getMany();
+    participants.forEach((p) => {
       const sock = this.socketService.getUserSocket(p.user.id);
       if (sock) {
-        sock.emit('thread-message', thread, message);
+        sock.emit('thread-message', threadId, message);
       }
     });
     return message;

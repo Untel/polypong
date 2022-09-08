@@ -94,7 +94,6 @@ import PasswordInput from 'src/components/PasswordInput.vue';
 import { useRouter } from 'vue-router';
 import {
   onMounted,
-  onBeforeUnmount,
   ref,
   defineComponent,
 } from 'vue';
@@ -118,11 +117,11 @@ const router = useRouter();
 async function createLobby() {
   const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
-    console.log('New lobby is', newLobby, newLobby.id);
+    //    console.log('New lobby is', newLobby, newLobby.id);
     await $lobbies.fetchAndJoinLobby(newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
   } else {
-    console.log('Error lulz');
+    //    console.log('Error lulz');
   }
 }
 
@@ -135,11 +134,11 @@ async function leaveMatchmake() {
 
 onMounted(() => {
   socket.on('update_lobbies', (evt) => {
-    console.log('Refreshed lobbies', evt);
+    //    console.log('Refreshed lobbies', evt);
     $lobbies.lobbies = evt;
   });
   socket.on('matchmake_done', (lobbyid) => {
-    console.log('Matchmaking done !');
+    //    console.log('Matchmaking done !');
     $lobbies.matchmaking = false;
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
       router.push(`/lobby/${lobbyid}/game`);

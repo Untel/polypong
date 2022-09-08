@@ -7,6 +7,7 @@
 
 <template>
   <q-page class="row">
+    <!--
     <div class="wrapper">
       <UserBanner :userId="$auth.user.id"/>
     </div>
@@ -15,6 +16,7 @@
         {{ userMatchesHistory }}
       </pre>
     </q-card>
+    -->
   </q-page>
 </template>
 

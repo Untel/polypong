@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 15:13:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:27:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,41 +16,6 @@ import { useAuthStore } from './auth.store';
 import { BaseObject } from './thread.store';
 
 export const historyApi = mande('/api/match-history');
-
-// [
-//  {
-//    "createdAt": "2022-08-16T15:59:11.704Z",
-//    "updatedAt": "2022-08-16T15:59:19.844Z",
-//    "deletedAt": null,
-//    "id": 1,
-//    "totalPlayers": 2,
-//    "botCount": 0,
-//    "finishedAt": "2022-08-16T15:59:19.835Z",
-//    "name": "",
-//    "players": [
-//      {
-//        "createdAt": "2022-08-16T15:59:19.927Z",
-//        "updatedAt": "2022-08-16T15:59:19.927Z",
-//        "deletedAt": null,
-//        "id": 1,
-//        "rank": 2,
-//        "user": {
-//          "createdAt": "2022-08-16T15:52:54.362Z",
-//          "updatedAt": "2022-08-16T15:52:54.362Z",
-//          "deletedAt": null,
-//          "id": 1,
-//          "name": "lspiess",
-//          "email": "lspiess@student.42.us.org",
-//          "coalition": "order",
-//          "emailVerified": true,
-//          "socialChannel": "intra",
-//          "avatar": "https://cdn.intra.42.fr/users/lspiess.jpg"
-//        }
-//      }
-//    ]
-//  }
-// ]
-
 export interface Player {
   id: number, // for a given match, a given player unique ID
   rank: number,
@@ -62,14 +27,12 @@ export interface Player {
     avatar: string,
   }
 }
-
 export interface Match extends BaseObject {
   id: number; // the match's unique Id
   players: Player[];
   finishedAt?: string;
   totalPlayers: number;
 }
-
 export interface UserStats {
   wins: number;
   losses: number;
@@ -80,7 +43,6 @@ export interface UserMatchesHistory {
   matches: Match[];
   stats: UserStats;
 }
-
 interface UsersMatchesHistories{
   usersHis: UserMatchesHistory[];
 }
@@ -122,12 +84,6 @@ export const useMatchHistoryStore = defineStore('history', {
         userId = useAuthStore().getUser.id;
       }
       const matches = await historyApi.get<Match[]>(`user/${userId}`);
-      console.log(
-        'history store - fetchUserMatchesHistory - userId = ',
-        userId,
-        ', matches = ',
-        matches,
-      );
       const curHis = this.getUserMatchesHistory(userId);
       if (curHis) {
         curHis.matches = matches;
@@ -141,35 +97,23 @@ export const useMatchHistoryStore = defineStore('history', {
     },
 
     computeStats(userId: number, matches: Match[]): UserStats {
-      console.log(' matches = ', matches);
-      const res: UserStats = { wins: 0, losses: 0, ratio: 1 };
-      matches.forEach((m) => {
-        const nplayers = m.totalPlayers;
-        const winThreshold = nplayers / 2;
-        m.players.forEach((p) => {
-          if (p.user.id === userId) {
-            if (p.rank <= winThreshold) {
-              res.wins += 1;
-            }
-          }
-        });
-      });
-      const nPlayed = matches.length;
-      res.losses = nPlayed - res.wins;
-      if (nPlayed > 0) {
-        res.ratio = res.wins / nPlayed;
-      }
-      return res;
+      const stats = matches.reduce((acc, next) => {
+        const me = next.players.find((p) => p.user.id === userId);
+        if (me && me.rank <= (next.totalPlayers / 2)) acc.wins += 1;
+        else acc.losses += 1;
+        return acc;
+      }, { wins: 0, losses: 0 });
+      return { ...stats, ratio: stats.wins / matches.length };
     },
 
     async getAllMatches(): Promise<Match[] | undefined> {
-      console.log('history store - getAllMatches');
+      //      console.log('history store - getAllMatches');
       const allMatches = await historyApi.get<Match[]>('all');
-      console.log('history store - getAllMatches - matches = ', allMatches);
+      //      console.log('history store - getAllMatches - matches = ', allMatches);
       return allMatches;
     },
     async getPlayersUsersIds(): Promise<[any]> {
-      console.log('history store - getPlayersUsersIds');
+      //      console.log('history store - getPlayersUsersIds');
       return historyApi.get<[any]>('playersUsersIds');
     },
   },

@@ -112,7 +112,7 @@ defineProps({
 });
 const emit = defineEmits(['avatarClick']);
 function avatarClick(name: string) {
-  console.log('avatarClick - name = ', name);
+//  console.log('avatarClick - name = ', name);
   emit('avatarClick', name);
 }
 

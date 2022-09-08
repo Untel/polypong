@@ -50,13 +50,13 @@ const router = useRouter();
 const userAvailable = true;
 
 async function addFriend() {
-  console.log('addfriend');
+//  console.log('addfriend');
 }
 // async function message(id) {
 //   router.push(`/chat/${id}`);
 // }
 async function inviteToLobby() {
-  console.log('addfriend');
+//  console.log('addfriend');
 }
 
 </script>

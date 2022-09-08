@@ -83,7 +83,7 @@ const toggleWidth = ref('0');
 function toggleGutter(name: string) {
   showGutter.value = (showGutter.value === name ? '' : name);
   toggleWidth.value = showGutter.value ? '1' : '0';
-  console.log(`emitting toggleGutter event, name = ${showGutter.value}`);
+  //  console.log(`emitting toggleGutter event, name = ${showGutter.value}`);
   emit('toggleGutter', showGutter.value);
 }
 

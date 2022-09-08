@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/28 03:41:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 17:04:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ import { ChannelMember } from './channel-member.entity';
 
 export enum ChannelPrivacy {
   PUBLIC = 'public', // visible in channel list, joignable without password
-  PRIVATE = 'private', // invisible in channel list, joignable with link?? or invitation??, without?? password
+  PRIVATE = 'private', // invisible in channel list, joignable with invitation
   PROTECTED = 'protected', // visible in channel list, require password
 }
 
@@ -54,16 +54,13 @@ export class Channel extends RootEntity {
     return !!this.password;
   }
 
-  // This ?
-  // @Column({
-  //   type: 'enum',
-  //   enum: ChannelPrivacy,
-  //   default: ChannelPrivacy.PUBLIC,
-  // })
-  // privacy: ChannelPrivacy;
+  @Column({ nullable: true })
+  name: string;
 
-  // Or this?
-  @Column({ default: false }) isPrivate: boolean; // Display or not in channel list, if false can only join via link or invitation
-  // If invited via invitation: no need password
-  // If join by link: need password ?
+  @Column({
+    type: 'enum',
+    enum: ChannelPrivacy,
+    default: ChannelPrivacy.PUBLIC,
+  })
+  privacy: ChannelPrivacy;
 }

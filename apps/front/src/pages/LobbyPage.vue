@@ -1,7 +1,7 @@
+<!-- eslint-disable max-len -->
 <style>
   .user-list {
     display: grid;
-    /* grid-auto-flow: column; */
     grid-template-columns: repeat(2, minmax(200px, 1fr));
     flex-wrap: wrap;
     gap: 10px;
@@ -10,81 +10,76 @@
 </style>
 
 <template>
-<pre>
-  host : {{ $lobbies.getActiveLobby?.host.name }}
-  lobbyId : {{ $lobbies.getActiveLobby?.id }}
-</pre>
   <q-page padding>
-    Here we should config the lobby page and wait for peoples to connect
-    Id: {{ props.id }} {{ props }}
-    <q-card-section>
-      <q-btn
-        @click="$lobbies.startGame(+$route.params.id);"
-        class="full-width" outline bordered color="primary"
-      >
-        Start game
-      </q-btn>
-    </q-card-section>
-
-    <section>
-      <q-form ref="lobbyForm">
-        <q-field
-          label="Players max">
-          <q-slider
+    <q-card>
+      <q-card-section>
+        <q-btn
+          @click="$lobbies.startGame(+$route.params.id);"
+          class="full-width" outline bordered color="primary"
+        >
+          Start game
+        </q-btn>
+      </q-card-section>
+    </q-card>
+    <br/>
+    <q-card>
+      <q-card-section>
+        <q-form ref="lobbyForm">
+          <q-field>
+            <SearchUser
+              label="Find people to play with"
+              @select="(opt) => { inviteSearchedUserToLobby(opt) }"
+            />
+          </q-field>
+          <br/>
+          <q-field
+            label="Players max">
+            <q-slider
+              :disable="!canUpdate"
+              name="playersMax"
+              :model-value="$lobbies.activeLobby?.playersMax"
+              @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
+              :min="minPlayers"
+              :max="16"
+              snap
+              markers
+              label-always
+              label
+            />
+          </q-field>
+          <br/>
+          <q-field
+            label="Points to win (1v1)">
+            <q-slider
+              :disable="!canUpdate"
+              name="finalePoints"
+              :model-value="$lobbies.activeLobby?.finalePoints"
+              @change="(evt) => $lobbies.updateLobby(lobby.id, { finalePoints: evt })"
+              :min="1"
+              :max="11"
+              snap
+              markers
+              label-always
+              label
+            />
+          </q-field>
+          <br/>
+          <q-input
+            :model-value="$lobbies.getActiveLobby?.name"
+            label="Lobby name"
+            @change="(evt) => $lobbies.updateLobby(
+              $lobbies.getActiveLobby.id, { name: evt }
+            )"
             :disable="!canUpdate"
-            name="playersMax"
-            :model-value="$lobbies.activeLobby?.playersMax"
-            @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
-            :min="minPlayers"
-            :max="16"
-            snap
-            markers
-            label-always
-            label
+            name="name"
+            lazy-rules
+            :rules="[ (val: string | any[]) => val && val.length > 2
+              || 'Username should have at least 2 chars']"
           />
-        </q-field>
-        <q-field
-          label="Points to win (1v1)">
-          <q-slider
-            :disable="!canUpdate"
-            name="finalePoints"
-            :model-value="$lobbies.activeLobby?.finalePoints"
-            @change="(evt) => $lobbies.updateLobby(lobby.id, { finalePoints: evt })"
-            :min="2"
-            :max="11"
-            snap
-            markers
-            label-always
-            label
-          />
-        </q-field>
-        <q-input
-          :model-value="$lobbies.getActiveLobby?.name"
-          label="Lobby name"
-          @change="(evt) => $lobbies.updateLobby(
-            $lobbies.getActiveLobby.id, { name: evt }
-          )"
-          :disable="!canUpdate"
-          name="name"
-          lazy-rules
-          :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
-        />
-      </q-form>
-    </section>
-
-    <section v-if="rel" class="row justify-center">
-      <!-- SEARCH RESULTS -->
-      <social-card :relname="rel.to.name"
-        @message="(id) => message(id)"
-        @stats="(id) => stats(id)"
-        @add-friend="(name) => addFriend(name)"
-        @unfriend="(name) => unfriend(name)"
-        @block="(name) => block(name)"
-        @unblock="(name) => unblock(name)"
-      />
-    </section>
-
-    <!--<section class="user-list">-->
+        </q-form>
+      </q-card-section>
+    </q-card>
+    <br/>
     <section class="row justify-center">
       <UserCard class="col-md-6"
         v-for="player in $lobbies.getActiveLobby?.players"
@@ -101,18 +96,18 @@
         }"
       >
         <template #exit>
-            <!-- leave lobby -->
-            <q-btn
-              v-if="player.user.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.leave()"
-            />
-            <!-- kick player (host only)-->
-            <q-btn
-              v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
-              round icon="fa-solid fa-xmark" size="s"
-              @click="async () => $lobbies.kick(lobby.id, player.user.id)"
-            />
+          <!-- leave lobby -->
+          <q-btn
+            v-if="player.user.id === $auth.user.id"
+            round icon="fa-solid fa-xmark" size="s"
+            @click="async () => $lobbies.leave()"
+          />
+          <!-- kick player (host only)-->
+          <q-btn
+            v-if="player.user.id !== $auth.user.id && lobby.host.id === $auth.user.id"
+            round icon="fa-solid fa-xmark" size="s"
+            @click="async () => $lobbies.kick(lobby.id, player.user.id)"
+          />
         </template>
       </UserCard>
       <UserCard class="col-md-6"
@@ -123,7 +118,7 @@
         :name="bot.name"
         :canUpdate="canUpdate"
         @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: evt } })"
-        caption="Invite someone to replace this bot"
+        caption="bot"
       >
         <!--
         <q-btn>Invite</q-btn>
@@ -154,6 +149,7 @@ import { PreFetchOptions } from '@quasar/app-vite';
 import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { asyncComputed } from '@vueuse/core';
+import { Notify } from 'quasar';
 
 export default {
   async preFetch(ctx: PreFetchOptions<unknown>) {
@@ -179,6 +175,7 @@ import { useAuthStore } from 'src/stores/auth.store';
 import UserCard from 'src/components/UserCard.vue';
 import { useRoute, useRouter } from 'vue-router';
 import SocialCard from 'src/components/SocialCard.vue';
+import SearchUser from 'src/components/SearchUser.vue';
 
 const props = defineProps({
   id: {
@@ -257,6 +254,10 @@ async function addFriend(name: string) { await $soc.send_friendship(name); }
 async function unfriend(name: string) { await $soc.unsend_friendship(name); }
 async function block(name: string) { await $soc.send_block(name); }
 async function unblock(name: string) { await $soc.unsend_block(name); }
+
+async function inviteSearchedUserToLobby(opt: any) {
+  await $lobbies.inviteUserToLobby(opt.id);
+}
 
 // function isHost(id: number): boolean {
 //  if (!id) return false;

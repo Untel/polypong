@@ -10,6 +10,7 @@
       @selectThread="(t: Thread) => $router.push(`/inbox/${t.id}`)"
       @sendMessage="(m: string) => $thread.sendMessage(m)"
       @newChannel="() => $thread.newChannel()"
+      @channelUpdate="(evt) => $thread.updateChannel(evt)"
     >
       <router-view />
     </WhatsApp>
@@ -31,7 +32,11 @@ const $social = useSocialStore();
 
 watch(
   () => $route.params.id,
-  (id) => $thread.getThread(+id),
+  (id) => {
+    if ($route.path.includes('inbox')) {
+      $thread.getThread(+id);
+    }
+  },
   { immediate: true },
 );
 onUnmounted(() => {

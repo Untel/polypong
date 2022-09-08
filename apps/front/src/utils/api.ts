@@ -9,7 +9,7 @@ export const useApi = createFetch({
       //
       // const myToken = await getMyToken()
       // options.headers.Authorization = `Bearer ${myToken}`
-      console.log('Running fetch api', options);
+      //      console.log('Running fetch api', options);
       LoadingBar.start();
       return { options };
     },
@@ -22,7 +22,7 @@ export const useApi = createFetch({
       const { data, response, error } = ctx;
 
       if (response?.status === 401) {
-        console.log('Redirecting because unauth');
+        //        console.log('Redirecting because unauth');
         const router = useRouter();
         router.replace({ name: 'login' });
         return ctx;
@@ -32,7 +32,7 @@ export const useApi = createFetch({
         const err = JSON.parse(ctx.data);
         const messages = err?.message || [];
         if (messages.length) {
-          console.log('Messages', messages);
+          //          console.log('Messages', messages);
           Notify.create({
             type: 'negative',
             message: 'Oooops, something went wrong',

@@ -22,6 +22,10 @@
               {{ channel.name }}
             </q-item-label>
           </q-item-section>
+          <q-item-section side>
+            <q-icon v-if="channel.privacy === 'protected'" color="negative" name="lock" />
+            <q-icon v-else color="primary" name="public" />
+          </q-item-section>
         </q-item>
       </q-list>
     </q-infinite-scroll>

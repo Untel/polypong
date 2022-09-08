@@ -10,6 +10,8 @@ import {
   UnauthorizedException,
   Put,
   Req,
+  Patch,
+  Body,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { User } from 'src/user/user.entity';
@@ -21,15 +23,16 @@ import { RelationshipService } from 'src/relationship';
 import { ID } from 'src/entities';
 import { Thread, ThreadMemberStatus, ThreadParticipant } from './entities';
 import { Message, MessageService } from '../message';
-import { SocketService } from 'src/socket/socket.service';
 import moment from 'moment';
+import { ChannelPrivacy } from '../channel';
+import bcrypt from 'bcrypt';
 
 @UseGuards(JwtGuard)
 @Controller('thread')
 export class ThreadController {
   constructor(
     private readonly threadService: ThreadService,
-    private readonly userService: UserService, // private readonly channelService: ChannelService,
+    private readonly userService: UserService,
     private readonly relService: RelationshipService,
     private readonly messageService: MessageService,
   ) {}
@@ -44,7 +47,8 @@ export class ThreadController {
   @Get(':id')
   @UseGuards(ThreadGuard)
   async findOne(@CurrentUser() user: User, @Param('id') id: ID) {
-    this.logger.log('user = '); console.log(user);
+    this.logger.log('user = ');
+    console.log(user);
     const thread = await this.threadService.findThreadWithMessages(user, +id);
     await this.threadService.setThreadAsRead(thread, user);
     return thread;
@@ -78,25 +82,8 @@ export class ThreadController {
     if (!user)
       throw new UnprocessableEntityException('This user does not exist');
 
-    const me = thread.participants.find((e) => e.user.id === user.id);
-    if (me && me.deletedAt && me.isBanUntil) {
-      const m = moment(me.isBanUntil).diff(moment());
-      if (m > 0) {
-        const dur = moment.duration(m);
-        throw new UnauthorizedException(
-          `User is bannished from this thread for ${dur.humanize()} remaining`,
-        );
-      } else {
-        await me.remove();
-      }
-    }
+    this.threadService.inviteUser(thread, user);
 
-    const tp = ThreadParticipant.create({
-      user,
-      thread,
-      status: ThreadMemberStatus.MEMBER,
-    });
-    await ThreadParticipant.insert(tp);
     this.messageService.sendSystemMessage(
       thread,
       `${user.name} was invited by ${inviter.name}`,
@@ -129,10 +116,14 @@ export class ThreadController {
     target.isBanUntil = endDate.toDate();
     await target.save();
     await target.softRemove();
-    this.messageService.sendSystemMessage(
-      thread,
-      `${target.user.name} was kicked by ${user.name}`,
-    );
+    let message = `${target.user.name} was `;
+    if (duration === -1) message += 'unban';
+    else
+      (message += `ban for ${
+        !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
+      }`),
+        (message += ` by ${user.name}`);
+    this.messageService.sendSystemMessage(thread, message);
   }
 
   @Put(':id/promote')
@@ -167,12 +158,14 @@ export class ThreadController {
       : moment().add(duration, 'minutes');
     target.isMuteUntil = endDate.toDate();
     await target.save();
-    this.messageService.sendSystemMessage(
-      thread,
-      `${target.user.name} was mute for ${
+    let message = `${target.user.name} was `;
+    if (duration === -1) message += 'unmuted';
+    else
+      (message += `mute for ${
         !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
-      } by ${user.name}`,
-    );
+      }`),
+        (message += ` by ${user.name}`);
+    this.messageService.sendSystemMessage(thread, message);
   }
 
   @Put(':id/demote')
@@ -217,6 +210,52 @@ export class ThreadController {
       content: `${me.user.name} left`,
     }).save();
     await me.remove();
-    await this.messageService.notifyThread(thread, leaveMessage);
+    await this.messageService.notifyThread(thread.id, leaveMessage);
+  }
+
+  @ThreadRole(ThreadMemberStatus.OWNER)
+  @UseGuards(ThreadGuard)
+  @Patch(':id/channel')
+  async update(
+    @CurrentThread() thread,
+    @CurrentUser() user,
+    @Body()
+    body: {
+      privacy: ChannelPrivacy;
+      name: string;
+      password: string;
+    },
+  ) {
+    if (!thread.channel) throw new UnauthorizedException('Its not a channel');
+    const changed = [];
+    if (body.name && thread.channel.name !== body.name) {
+      thread.channel.name = body.name;
+      changed.push('name');
+    }
+    if (body.privacy && thread.channel.privacy !== body.privacy) {
+      thread.channel.privacy = body.privacy;
+      changed.push('privacy');
+    }
+    if (body.privacy === ChannelPrivacy.PROTECTED) {
+      if (!body.password || body.password.length < 3)
+        throw new UnprocessableEntityException('Password too short');
+      const pwd = bcrypt.hashSync(body.password, 4);
+      thread.channel.password = pwd;
+      changed.push('password');
+    }
+
+    if (changed.length) {
+      const saved = await thread.channel.save();
+      this.messageService.sendSystemMessage(
+        thread,
+        `
+        ${user.name} have change the settings ${changed.join(
+          ', ',
+        )} of the channel
+      `,
+      );
+      return saved;
+    }
+    return;
   }
 }

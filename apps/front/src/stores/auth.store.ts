@@ -111,10 +111,9 @@ export const useAuthStore = defineStore('auth', {
           });
         });
 
-        this.socket.on('thread-message', (thread, message) => {
-          console.log('New socket message', thread, message);
+        this.socket.on('thread-message', (threadId, message) => {
           const $thread = useThreadStore();
-          $thread.socketAddMessage(thread, message);
+          $thread.socketAddMessage(threadId, message);
         });
       });
     },
@@ -140,7 +139,7 @@ export const useAuthStore = defineStore('auth', {
       }
       defaults.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
       const res: User = await authApi.get('/user');
-      console.log('in whoamI, user = ', res);
+      //      console.log('in whoamI, user = ', res);
       this.user = res;
     },
 
@@ -185,7 +184,7 @@ export const useAuthStore = defineStore('auth', {
 
     async searchUsers(term: string) {
       const results = await userApi.get<User[]>('/search', { query: { term } });
-      console.log('Search results', results);
+      //      console.log('Search results', results);
       return results;
     },
   },
