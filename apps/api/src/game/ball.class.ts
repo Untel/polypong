@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 13:18:45 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:08:45 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,34 +201,15 @@ export class Ball extends Circle {
     this.findTarget();
   }
 
-  testfun(angle : number)
-  {
-    angle =  angle % 360; 
 
-// force it to be the positive remainder, so that 0 <= angle < 360  
-  angle = (angle + 360) % 360;  
-
-// force into the minimum absolute value residue class, so that -180 < angle <= 180  
-  if (angle > 180)  
-      angle -= 360;  
-  return angle
-    }
   bouncePaddle(paddle: Paddle, hitloc: number[]) {
-    
     // const ballR = this.angle;
     const ballD = angleToDegrees(this.angle);
 
     const paddleR = paddle.angle;
+    const nball = GameTools.angle180range(ballD);
+    const npad =  GameTools.angle180range(paddleR);
 
-    console.log("-----------------Hit Data-----------------");
-    // const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
-    // const surfaceAngleDeg = paddle.angle; //paddle.angle;
-    
-    // console.log("Deg ball:", ballD.toFixed(2),"/ paddle:", paddleR)
-    const nball = this.testfun(ballD);
-    const npad =  this.testfun(paddleR);
-
-    console.log("paddle angle:", npad);
 
   const lDist = lineLength([paddle.line[0],[hitloc[0],hitloc[1]]]);
 
@@ -236,65 +217,57 @@ export class Ball extends Circle {
 
   const leftratio = lDist / lineLength(paddle.line) - 0.5;
 
-  console.log("leftratio is ", leftratio)
+  // console.log("leftratio is ", leftratio)
   let out: number = leftratio * 90;
 
     let newDegree = angleReflect(nball, npad);
-    console.log("Reflected is ", newDegree);
-    console.log("adding deg ", out)
     newDegree = newDegree - out
-    console.log("New degree   is", newDegree)
-    let newDegn = newDegree//this.testfun(newDegree);
-    console.log("Final is", newDegn)
 
-   
-
-    let leftD = npad;
-    let rightD = this.testfun(npad + 180);    
-    console.log("ball angle:", nball);
-
-    let leftf = (leftD < 0) ? (leftD + 360) % 360 : leftD;
-    let rightF = (rightD < 0) ? (rightD + 360) % 360 : rightD;
-    let maxA = (leftf > rightF) ? leftf : rightF;
-    let minA = (maxA === leftf) ? rightF: leftf;
-
-    newDegn = (newDegn < 0) ? (newDegn + 360) % 360 : newDegn
-    console.log("Min:", minA, " Max: ",maxA);
-    console.log("left:", leftD, " right: ",rightD);
-    console.log("left360:", leftf, " right360: ",rightF);
-    console.log("degn:", newDegn);
+    let newDegn = GameTools.angle180range(newDegree);
 
 
-    if (minA < newDegn && newDegn < maxA)
+    let maxA = (npad > GameTools.angle180range(npad + 180)) ? npad : GameTools.angle180range(npad + 180);
+    let minA = (maxA === npad) ? GameTools.angle180range(npad + 180): npad;
+
+    // console.log("left:", leftD, " right: ",rightD);
+    // console.log("degn:", newDegn);
+
+    const dtmax = Math.abs(maxA - newDegn)
+    const dtmin = Math.abs(minA - newDegn)
+    if (minA < nball && nball < maxA) // It's coming from inside
     {
-      console.log('in bounds');
-      if (newDegn > maxA){
-        newDegn = maxA
-        console.log("reducing")
-      }
-      if (newDegn < minA){
-        newDegn = minA
-        console.log("uping")
+      console.log('ball is coming in range bounds');
+
+      if (minA < newDegn && newDegn < maxA)
+      {
+        console.log("nok")
+        if (dtmax > dtmin)
+          newDegn = minA - 10;
+        else
+          newDegn = maxA + 10;
+          console.log("Corrected ball")
       }
     }
-    else //It's outside
+    else //It's coming from outside
     {
-      console.log('out bounds');
-      if (newDegn < maxA && newDegn > minA){
-        newDegn = maxA
-        console.log("upping")
-      }
-      if (newDegn > minA && newDegn < maxA ){
-        newDegn = minA
-        console.log("reducing")
+      console.log('ball is coming out range bounds');
+
+      if  (!(minA < newDegn && newDegn < maxA))
+      {
+        if (dtmax > dtmin)
+          newDegn = minA + 10;
+        else
+          newDegn = maxA - 10;
+        console.log("Corrected ball")
       }
     }
+
     console.log("Final is", newDegn)
-    this.testfun(newDegn);
+    GameTools.angle180range(newDegn);
 
     this.lastHitten = paddle;
     this.color = paddle.color;
-    // this.setAngle(newAngle);
+
     //npad - 180 : right
     //npad + 180 : right
     //npad  : left
