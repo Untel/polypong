@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 18:30:45 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 19:38:35 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,6 +203,8 @@ export class Ball extends Circle {
 
   bouncePaddle(paddle: Paddle, hitloc: Point) {
     // const ballR = this.angle;
+    this.lastHitten = paddle;
+    this.color = paddle.color;
     paddle.bounceBall(this, hitloc);
   }
 
