@@ -132,9 +132,10 @@ onMounted(() => {
     $lobbies.lobbies = evt;
   });
   socket.on('matchmake_done', (lobbyid) => {
-    $lobbies.matchmaking = false;
+    console.log("Matchmake done sock");
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
       console.log('OOOOOOAAAA');
+      $lobbies.matchmaking = false;
       router.push(`/lobby/${lobbyid}/game`);
     });
   });

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.service.ts                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 18:34:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 00:00:32 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@ export class SocketService {
   }
 
   getUserSocket(userID) {
-    return this.sockets.find((el) => el.data.user.id === userID);
+    return  this.sockets.filter((el) => el.data.user.id === userID);
   }
+  // getUserSocket(userID) {
+  //   return this.sockets.find((el) => el.data.user.id === userID);
+  // }
 }
