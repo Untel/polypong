@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 12:56:21 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 13:18:45 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,10 +241,10 @@ export class Ball extends Circle {
 
     let newDegree = angleReflect(nball, npad);
     console.log("Reflected is ", newDegree);
-    // console.log("adding deg ", out)
+    console.log("adding deg ", out)
     newDegree = newDegree - out
     console.log("New degree   is", newDegree)
-    let newDegn = this.testfun(newDegree);
+    let newDegn = newDegree//this.testfun(newDegree);
     console.log("Final is", newDegn)
 
    
