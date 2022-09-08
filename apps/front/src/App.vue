@@ -28,6 +28,9 @@ watch(theme, (val) => {
 </script>
 
 <style lang="scss">
+  .bg-transp {
+    background-color: #10101010;
+  }
   body.body--dark {
     .bg-grey-4 {
       background-color: $grey-10 !important;
@@ -43,6 +46,10 @@ watch(theme, (val) => {
     }
     .text-black {
       color: $grey-1 !important;
+    }
+
+    .bg-transp {
+      background-color: #10101010;
     }
   }
 </style>
