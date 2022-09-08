@@ -44,7 +44,7 @@
   </q-input>
   <q-btn type="submit" size="large" color="primary" class="full-width">SIGN IN</q-btn>
   <q-separator size="2px" class="full-width" />
-  <!-- <pre>{{ `/api/auth/intra?redirect=${route.query.redirect}` }}</pre> -->
+  <!-- <h6>{{ `/api/auth/intra?redirect=${route.query.redirect}` }}</h6> -->
   <q-btn :href="`/api/auth/intra`" size="large" color="secondary" class="full-width">
     Connect with &nbsp;<q-icon name="img:src/assets/42_logo.svg"/>
   </q-btn>

@@ -5,7 +5,7 @@
 
 <template>
   <q-tab-panel class="online-panel" name="online">
-    <pre> users = {{ users }}</pre>
+    <h6> users = {{ users }}</h6>
     <!--
       <q-div v-for="user in users" :key="`user-${user.id}`">
         <q-div class="q-gutter-x-md">

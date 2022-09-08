@@ -1,6 +1,6 @@
 <template>
   <!--
-<pre>{{ soc.getRelationships }}</pre>
+<h6>{{ soc.getRelationships }}</h6>
   -->
 <q-tabs
   v-model="tab" dense class="text-grey" active-color="primary"
@@ -22,7 +22,7 @@
   <!-- SEARCH -->
   <q-tab-panel name="search">
     <q-card v-if="auth.getConnectedUsers.length > 1">
-      <pre>online users</pre>
+      <h6>online users</h6>
       <q-card-section horizontal>
         <div class="q-pa-md row items-start q-gutter-md"
           v-for="user in auth.getConnectedUsers" :key="`user-${user.id}`"
@@ -40,11 +40,11 @@
         </div>
       </q-card-section>
     </q-card>
-    <pre>find people</pre>
+    <h6>find people</h6>
     <rel-search-bar/>
     <!-- SEARCH RESULTS -->
     <q-card v-if="soc.getSearchedRel">
-      <pre>search results</pre>
+      <h6>search results</h6>
         <social-card :relname="soc.getSearchedRel.to.name"
           @toggle-gutter="(name) => toggleCard(name)"
           @invite-to-lobby="(id) => inviteToLobby(id)"
@@ -60,7 +60,7 @@
   <!-- FRIENDLIST -->
   <q-tab-panel name="friendlist">
 <!-- rels (TEMP, for debug purposes)
-    <pre>rels</pre>
+    <h6>rels</h6>
     <q-card>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
@@ -81,9 +81,9 @@
     </q-card>
 -->
     <!-- actual friends -->
-    <pre v-if="!soc.getFriendsRelationships.length">Your friends will be displayed here</pre>
+    <h6 v-if="!soc.getFriendsRelationships.length">Your friends will be displayed here</h6>
     <q-card v-if="soc.getFriendsRelationships.length" label="friends">
-      <pre>your friends</pre>
+      <h6>your friends</h6>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getFriendsRelationships" :key="`rel-${rel.id}`" horizontal
@@ -103,7 +103,7 @@
     </q-card>
     <!-- received friends invites -->
     <q-card v-if="soc.getReceivedFriendships.length" label="received">
-      <pre>friend requests received</pre>
+      <h6>friend requests received</h6>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getReceivedFriendships" :key="`rel-${rel.id}`" horizontal
@@ -123,7 +123,7 @@
     </q-card>
     <!-- sent friends invites -->
     <q-card v-if="soc.getSentFriendships.length" label="sent">
-      <pre>friend requests sent</pre>
+      <h6>friend requests sent</h6>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card-section
             v-for="rel in soc.getSentFriendships" :key="`rel-${rel.id}`" horizontal
@@ -145,7 +145,7 @@
 
   <!-- BLOCKLIST -->
   <q-tab-panel name="blocklist">
-    <pre v-if="!soc.getBlockSentRelations.length">people you blocked will be displayed here</pre>
+    <h6 v-if="!soc.getBlockSentRelations.length">people you blocked will be displayed here</h6>
     <q-card v-for="rel in soc.getBlockSentRelations" :key="`rel-${rel.id}`">
       <q-card-section>
         <div class="q-gutter-none">

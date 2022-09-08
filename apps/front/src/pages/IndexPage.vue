@@ -12,9 +12,9 @@
       <UserBanner :userId="$auth.user.id"/>
     </div>
     <q-card>
-      <pre>
+      <h6>
         {{ userMatchesHistory }}
-      </pre>
+      </h6>
     </q-card>
     -->
   </q-page>

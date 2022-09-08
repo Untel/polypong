@@ -1,7 +1,7 @@
 <template>
 <div v-if="!usersIds || usersIds.length === 0">
   <q-card class="column items-center">
-    <pre>ladder with be displayed here</pre>
+    <h6>ladder with be displayed here</h6>
   </q-card>
 </div>
 <div v-else>

@@ -12,11 +12,11 @@
         <q-card-section v-if="
           $auth.user.isTwoFactorAuthenticationEnabled === true
         ">
-          <pre> 2fa is required </pre>
+          <h6> 2fa is required </h6>
           <q-btn @click="turnOff2fa()">turn off 2fa</q-btn><br>
         </q-card-section>
         <q-card-section v-else>
-          <pre> 2fa is not required </pre>
+          <h6> 2fa is not required </h6>
           <q-btn @click="requestQrCode()">request QrCode</q-btn><br>
           <q-img :src=qrCode.imageBytes width="50%"></q-img><br>
           <q-input
@@ -33,7 +33,7 @@
 
     <q-card>
       <q-card-section class="column flex-center">
-        <pre class="self-start">current avatar :</pre>
+        <h6 class="self-start">current avatar :</h6>
         <q-img
           :src="$auth.user.avatar"
           style="max-width: 50%; max-height: 50%; border-radius: 15px;"

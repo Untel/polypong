@@ -1,8 +1,8 @@
 <template>
   <q-card> <!-- 2FA -->
     <q-card-section>
-      <pre> 2fa is required to proceed</pre>
-      <pre> Enter the code provided by the Google Authenticator App</pre>
+      <h6> 2fa is required to proceed</h6>
+      <h6> Enter the code provided by the Google Authenticator App</h6>
       <q-input
         label="6 digits code"
         v-model="code"
