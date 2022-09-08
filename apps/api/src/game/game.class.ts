@@ -243,7 +243,7 @@ export default class Game {
           impact,
         );
         if (test) {
-          wall.paddle.bounceBall(ball, impact)
+          wall.paddle.bounceBall(ball, impact);
         }
       }
       ball.move();

@@ -132,12 +132,10 @@ export class LobbyController {
   }
 
   @Get('game/restart')
-  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
-  }
+  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {}
   @Get('game/pause')
   //  @UseGuards(InLobbyGuard)
   pause(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
-
     if (lobby.game.isStopped) lobby.game.run();
     else if (!lobby.game.paused) lobby.game.stop();
     return lobby.game.isStopped;

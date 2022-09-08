@@ -151,15 +151,13 @@ export default class GameTools {
   static wallBallCollision(w: Line, b: Ball, impact: Point) {
     return this.lineCircleCollision(w, b, impact);
   }
-  static angle180range(angle)
-  {
-    let ret =  angle % 360;
+  static angle180range(angle) {
+    let ret = angle % 360;
     // force it to be the positive remainder, so that 0 <= angle < 360
     ret = (ret + 360) % 360;
     // force into the minimum absolute value residue class, so that -180 < angle <= 180
-    if (ret > 180)
-        ret -= 360;
-    return ret
+    if (ret > 180) ret -= 360;
+    return ret;
   }
   static lineCircleCollision(line: Line, c: Circle, closestP: Point = [0, 0]) {
     const x1: number = line[0][0];

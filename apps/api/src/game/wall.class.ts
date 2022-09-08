@@ -41,7 +41,7 @@ export class Wall {
     this.bot = bot;
   }
   clearBall(target: Ball) {
-      this.bot?.popBall(target);
+    this.bot?.popBall(target);
   }
   addBall(target: Ball) {
     if (this.bot) {

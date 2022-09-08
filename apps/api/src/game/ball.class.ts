@@ -201,10 +201,9 @@ export class Ball extends Circle {
     this.findTarget();
   }
 
-
   bouncePaddle(paddle: Paddle, hitloc: Point) {
     // const ballR = this.angle;
-    paddle.bounceBall(this, hitloc)
+    paddle.bounceBall(this, hitloc);
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {

@@ -77,36 +77,34 @@ export class Paddle {
     //Potential bug here
   }
 
-  bounceBall(ball : Ball, hitloc: Point)
-  {
-    if (!this.skill)
-    return ball.bounceTargetWall();
+  bounceBall(ball: Ball, hitloc: Point) {
+    if (!this.skill) return ball.bounceTargetWall();
     const npad = GameTools.angle180range(this.angle);
     const nball = GameTools.angle180range(angleToDegrees(ball.angle));
-    const out = ((lineLength([this.line[0],hitloc]) / lineLength(this.line)) - 0.5 )* 90;
+    const out =
+      (lineLength([this.line[0], hitloc]) / lineLength(this.line) - 0.5) * 90;
     let newDegree = angleReflect(nball, npad) - out;
     newDegree = GameTools.angle180range(newDegree);
-    const maxA = (npad > GameTools.angle180range(npad + 180)) ? npad : GameTools.angle180range(npad + 180);
-    const minA = (maxA === npad) ? GameTools.angle180range(npad + 180): npad;
-    const dtmax = Math.abs(maxA - newDegree)
+    const maxA =
+      npad > GameTools.angle180range(npad + 180)
+        ? npad
+        : GameTools.angle180range(npad + 180);
+    const minA = maxA === npad ? GameTools.angle180range(npad + 180) : npad;
+    const dtmax = Math.abs(maxA - newDegree);
     const dtmin = Math.abs(minA - newDegree);
 
-    if (minA < nball && nball < maxA){ // It's coming from inside
-      if (minA < newDegree && newDegree < maxA){
-        if (dtmax > dtmin)
-          newDegree = minA - 10;
-        else
-          newDegree = maxA + 10;
-        console.log("Corrected ball")
+    if (minA < nball && nball < maxA) {
+      // It's coming from inside
+      if (minA < newDegree && newDegree < maxA) {
+        if (dtmax > dtmin) newDegree = minA - 10;
+        else newDegree = maxA + 10;
+        console.log('Corrected ball');
       }
-    }
-    else{
-      if  (!(minA < newDegree && newDegree < maxA)){
-        if (dtmax > dtmin)
-          newDegree = minA + 10;
-        else
-          newDegree = maxA - 10;
-        console.log("Corrected ball")
+    } else {
+      if (!(minA < newDegree && newDegree < maxA)) {
+        if (dtmax > dtmin) newDegree = minA + 10;
+        else newDegree = maxA - 10;
+        console.log('Corrected ball');
       }
     }
     ball.setAngle(angleToRadians(newDegree));
