@@ -88,14 +88,29 @@ export const useLobbiesStore = defineStore('lobbies', {
       this.activeLobby = await lobbiesApi.get(`${lobbyId}/join`);
     },
     async fetchCurrentLobby(lobbyId: number | string) {
-      this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
+      try {
+        this.activeLobby = await lobbiesApi.get(`${lobbyId}`);
+      } catch (e) {
+        // console.log(e);
+      }
     },
     async leave() {
-      this.router.push('/lobbies');
-      if (this.activeLobby) {
-        await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+      if (this.getActiveLobby) {
+        try {
+          await this.fetchCurrentLobby(this.getActiveLobby.id);
+        } catch (e) {
+          // console.log(e);
+        }
+        if (this.getActiveLobby) {
+          try {
+            await lobbiesApi.post(`${this.activeLobby.id}/leave`);
+          } catch (e) {
+            // console.log(e);
+          }
+        }
         this.activeLobby = null;
       }
+      this.router.push('/lobbies');
     },
     async kick(lobbyId: number, userId: number) {
       if (this.activeLobby) {

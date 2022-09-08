@@ -34,10 +34,7 @@ export interface GameState {
 export const useGameStore = defineStore('game', {
   state: () => ({} as GameState),
   getters: {
-    getBalls: (state) =>
-    //      console.log('Get');
-      state.balls
-    ,
+    getBalls: (state) => state.balls,
   },
   actions: {
     async fetchCurrentGame(id: string) {

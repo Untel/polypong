@@ -54,9 +54,10 @@ import { usePageLeave } from '@vueuse/core';
 import EssentialLink from 'components/EssentialLink.vue';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { useAuthStore } from 'src/stores/auth.store';
-import { lobbiesApi, useLobbiesStore } from 'src/stores/lobbies.store';
+import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
+import { useMatchHistoryStore } from 'src/stores/history.store';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -73,6 +74,7 @@ const $auth = useAuthStore();
 const soc = useSocialStore();
 const $thread = useThreadStore();
 const $lobbies = useLobbiesStore();
+const $his = useMatchHistoryStore();
 const router = useRouter(); const route = useRoute();
 
 $auth.socket.on('friendship', () => { soc.fetchRelationships(); });
@@ -96,13 +98,13 @@ $auth.socket.on('lobbyInvite', (fromId: number, fromName: string, lobbyId: numbe
 
 $auth.socket.on('lobbyKick', async (fromId: number, fromName: string, lobbyId: number) => {
 //  console.log(`KICKED : ${fromName} has been kicked from the lobby ${lobbyId}`);
-  if ($lobbies.activeLobby) {
-    if ($lobbies.activeLobby.id === lobbyId) {
+  if ($lobbies.getActiveLobby) {
+    if ($lobbies.getActiveLobby.id === lobbyId) {
       if ($auth.user.id === fromId) {
         $lobbies.activeLobby = null;
         router.push('/lobbies');
       } else {
-        await $lobbies.fetchCurrentLobby($lobbies.activeLobby.id);
+        await $lobbies.fetchCurrentLobby($lobbies.getActiveLobby.id);
       }
     }
   }
@@ -158,13 +160,21 @@ $auth.socket.on('lobbyNewHost', async (lobbyId: number) => {
 
 $auth.socket.on('gameOver', async (lobbyId: number) => {
   // console.log(`GAMEOVER : ${lobbyId} has been closed`);
-  try {
-    await $lobbies.leave();
-  } catch (e) {
-    // console.log(e);
-  }
-  router.push('/lobbies');
+  const curId = $lobbies.getActiveLobby?.id;
   $lobbies.activeLobby = null;
+  if (curId === lobbyId) {
+    await $his.fetchUserMatchesHistory();
+    const matches = $his.getUserMatchesHistory($auth.user.id)?.matches;
+    if (matches) {
+      const matchId = matches[0].id;
+      router.push(`/profile?matchId=${matchId}`);
+    } else {
+      router.push('/profile');
+    }
+    $his.fetchUserMatchesHistory($auth.user.id);
+  } else {
+    router.push('/lobbies');
+  }
   await $lobbies.fetchLobbies(); await $auth.fetchConnectedUsers();
 });
 

@@ -21,6 +21,7 @@ import {
   Param,
   Logger,
   Post,
+  HttpCode,
 } from '@nestjs/common';
 import { CurrentLobby, CurrentUser } from 'src/decorators';
 import Lobby from 'src/game/lobby.class';
@@ -45,6 +46,7 @@ export class LobbyController {
   logger = new Logger('LobbyController');
 
   @Get()
+  @HttpCode(200)
   @UseGuards(InLobbyGuard)
   getLobby(@CurrentLobby() lobby): Lobby {
     return lobby;
@@ -61,6 +63,7 @@ export class LobbyController {
   }
 
   @Post('leave')
+  @HttpCode(200)
   // @UseGuards(SocketGuard)
   async leaveLobby(
     @CurrentUser() user,
