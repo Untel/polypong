@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 21:48:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 22:07:42 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ import {
   lineLength,
   lineMidpoint,
   Point,
-  angleToRadians,
 } from 'geometric';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
@@ -128,7 +127,6 @@ export default class Game {
     angle = GameTools.getRandomFloatArbitrary(0, Math.PI * 2),
   ) {
     const ball = new Ball(this, this.map.center.clone());
-    // ball.setAngle(angleToRadians(this.map.angles[1]));
     ball.setAngle(angle);
     ball.findTarget();
     if (hotBall) ball.unFreeze();

@@ -1,8 +1,9 @@
 import { MandeError } from 'src/libs/mande';
 import { Notify } from 'quasar';
 
-export function onError(e: MandeError<{ message: string, status: number }>) {
-  if (e.body.status < 466) {
+export function onError(e: MandeError<{ message: string, statusCode: number }>) {
+  console.log('Sending error');
+  if (e.body.statusCode < 466) {
     Notify.create({
       message: `${e.message}`,
       caption: `${e.body.message}`,
