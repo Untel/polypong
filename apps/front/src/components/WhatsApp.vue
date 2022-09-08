@@ -44,7 +44,7 @@
 </style>
 
 <template>
-  <div class="WAL position-relative bg-grey-4" :style="style">
+  <div class="WAL position-relative" :style="style">
     <q-layout view="lHh LpR lFr" class="WAL__layout shadow-3" container>
       <q-header elevated>
         <q-toolbar class="bg-grey-3 text-black">
