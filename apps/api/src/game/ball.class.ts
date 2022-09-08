@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 08:53:37 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:56:21 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,47 +224,82 @@ export class Ball extends Circle {
     // const incidenceAngleDeg = angleToDegrees(this.angle) % 360;
     // const surfaceAngleDeg = paddle.angle; //paddle.angle;
     
-    console.log("Deg ball:", ballD.toFixed(2),"/ paddle:", paddleR)
+    // console.log("Deg ball:", ballD.toFixed(2),"/ paddle:", paddleR)
     const nball = this.testfun(ballD);
     const npad =  this.testfun(paddleR);
 
-    console.log("alt norm ball:", nball);
-    console.log("alt norm paddle:", npad);
+    console.log("paddle angle:", npad);
 
-  const lDist = lineLength([paddle.line[0],[ hitloc[0],hitloc[1]]]);
+  const lDist = lineLength([paddle.line[0],[hitloc[0],hitloc[1]]]);
 
-  console.log("left dist", lDist)
+  // console.log("left dist", lDist)
 
-  const left = lDist / lineLength(paddle.line) - 0.5;
+  const leftratio = lDist / lineLength(paddle.line) - 0.5;
 
-  console.log("total dist", lineLength(paddle.line));
-  console.log("left ratio", left)
-
-  let out: number = left * 90;
-
-
+  console.log("leftratio is ", leftratio)
+  let out: number = leftratio * 90;
 
     let newDegree = angleReflect(nball, npad);
     console.log("Reflected is ", newDegree);
-    console.log("adding deg ", out )
+    // console.log("adding deg ", out)
     newDegree = newDegree - out
-    console.log("New degree is", newDegree)
+    console.log("New degree   is", newDegree)
+    let newDegn = this.testfun(newDegree);
+    console.log("Final is", newDegn)
 
-    if (newDegree < npad){
-      console.log("under limit!!!!!!!!!!!!!!!!!");
-      newDegree = npad;
+   
+
+    let leftD = npad;
+    let rightD = this.testfun(npad + 180);    
+    console.log("ball angle:", nball);
+
+    let leftf = (leftD < 0) ? (leftD + 360) % 360 : leftD;
+    let rightF = (rightD < 0) ? (rightD + 360) % 360 : rightD;
+    let maxA = (leftf > rightF) ? leftf : rightF;
+    let minA = (maxA === leftf) ? rightF: leftf;
+
+    newDegn = (newDegn < 0) ? (newDegn + 360) % 360 : newDegn
+    console.log("Min:", minA, " Max: ",maxA);
+    console.log("left:", leftD, " right: ",rightD);
+    console.log("left360:", leftf, " right360: ",rightF);
+    console.log("degn:", newDegn);
+
+
+    if (minA < newDegn && newDegn < maxA)
+    {
+      console.log('in bounds');
+      if (newDegn > maxA){
+        newDegn = maxA
+        console.log("reducing")
+      }
+      if (newDegn < minA){
+        newDegn = minA
+        console.log("uping")
+      }
     }
-    if (newDegree > npad + 180){
-      console.log("over limit!!!!!!!!!!!!!!!!!");
-      newDegree = npad + 180;
-
+    else //It's outside
+    {
+      console.log('out bounds');
+      if (newDegn < maxA && newDegn > minA){
+        newDegn = maxA
+        console.log("upping")
+      }
+      if (newDegn > minA && newDegn < maxA ){
+        newDegn = minA
+        console.log("reducing")
+      }
     }
-
+    console.log("Final is", newDegn)
+    this.testfun(newDegn);
 
     this.lastHitten = paddle;
     this.color = paddle.color;
     // this.setAngle(newAngle);
-    this.setAngle(angleToRadians(newDegree));
+    //npad - 180 : right
+    //npad + 180 : right
+    //npad  : left
+    console.log("Setting angle at ", newDegn);
+    this.setAngle(angleToRadians(newDegn));
     this.findTarget();
     console.log("------------------------------------------");
   }

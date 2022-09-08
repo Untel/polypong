@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 03:23:54 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:30:05 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,7 +225,7 @@ export default class Game {
           if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
-        this.reduce(ball.target.wall);
+        this.reduce(ball.target?.wall);
       }
       const wall = ball.target?.wall;
       if (wall?.paddle === null) {
