@@ -3,16 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 19:41:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 21:48:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
-import { Line, lineLength, lineMidpoint, Point } from 'geometric';
+import {
+  Line,
+  lineLength,
+  lineMidpoint,
+  Point,
+  angleToRadians,
+} from 'geometric';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
@@ -117,14 +123,16 @@ export default class Game {
 
   logger = new Logger('Game');
 
-  addBall(hotBall = false) {
+  addBall(
+    hotBall = false,
+    angle = GameTools.getRandomFloatArbitrary(0, Math.PI * 2),
+  ) {
     const ball = new Ball(this, this.map.center.clone());
     // ball.setAngle(angleToRadians(this.map.angles[1]));
-    this.balls.push(ball);
-    ball.setAngle(GameTools.getRandomFloatArbitrary(0, Math.PI * 2));
+    ball.setAngle(angle);
     ball.findTarget();
     if (hotBall) ball.unFreeze();
-    console.log(`new ball x:${ball.position.x} y:${ball.position.y}`);
+    this.balls.push(ball);
   }
 
   generateMap() {
@@ -149,7 +157,16 @@ export default class Game {
       }
       return new Wall(line, paddle);
     });
-    for (let i = 0; i < this.nPlayers / 2; i++) this.addBall(true);
+    this.bots.forEach((b) => (b.tasks = []));
+    const fragAngle = (Math.PI * 2) / this.nPlayers;
+    for (let i = 0; i < this.nPlayers; i++) {
+      // let ang = fragAngle * i + fragAngle / 2;
+      const ang = GameTools.getRandomFloatArbitrary(
+        fragAngle * i,
+        fragAngle * (i + 1),
+      );
+      this.addBall(true, ang);
+    }
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
     if (this.nPlayers === 2) this.socket.emit('score', this.scoreNetScheme);
