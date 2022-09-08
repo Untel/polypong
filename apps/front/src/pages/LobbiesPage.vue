@@ -134,8 +134,6 @@ onMounted(() => {
   socket.on('matchmake_done', (lobbyid) => {
     console.log("Matchmake done sock");
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
-      console.log('OOOOOOAAAA');
-      $lobbies.matchmaking = false;
       router.push(`/lobby/${lobbyid}/game`);
     });
   });

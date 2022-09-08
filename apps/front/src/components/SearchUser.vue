@@ -95,7 +95,7 @@ function filterFn(val: string, update: (callback: () => void) => void) {
       });
   } else {
     update(() => {
-      console.log('Not enough characters');
+      //      console.log('Not enough characters');
     });
   }
 }
