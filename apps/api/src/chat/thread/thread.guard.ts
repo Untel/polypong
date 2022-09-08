@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   thread.guard.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 19:22:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 21:43:26 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ export default class ThreadGuard implements CanActivate {
       } else if (thread.channel?.privacy === ChannelPrivacy.PROTECTED)
         throw new HttpException(
           {
-            status: 466,
+            statusCode: 466,
             error: 'Password required',
             message: 'This channel require a password',
           },

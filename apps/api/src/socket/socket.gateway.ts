@@ -77,7 +77,8 @@ export class SocketGateway
       return;
     }
     if (lobby?.game) {
-      if (!lobby.game.isStopped) lobby.game.updatePaddlePercent(user.id, percent);
+      if (!lobby.game.isStopped)
+        lobby.game.updatePaddlePercent(user.id, percent);
       // else console.log('Game found but paused', user.id);
     } else {
       console.log('Game not found', lobby.game);
