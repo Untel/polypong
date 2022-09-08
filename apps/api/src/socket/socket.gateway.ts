@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 20:55:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 20:57:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,8 @@ export class SocketGateway
       console.log('No game while paddle moving', lobby);
       return;
     }
-    const game = lobby.game;
-    if (game) {
-      if (!game.isStopped) game.updatePaddlePercent(user.id, percent);
+    if (lobby?.game) {
+      if (!lobby.game.isStopped) lobby.game.updatePaddlePercent(user.id, percent);
       // else console.log('Game found but paused', user.id);
     } else {
       console.log('Game not found', lobby.game);
