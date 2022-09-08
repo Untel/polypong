@@ -11,7 +11,6 @@
 
 <template>
   <q-page padding>
-    <!-- <pre>Response: {{ lobbies.getLobbies }}</pre> -->
     <div class="card-grid">
       <MatchmakingCard
         :id="0"
@@ -23,7 +22,7 @@
         @joinMatchmake="joinMatchmake"
         @leaveMatchmake="leaveMatchmake"
         >
-        Recent matches : {{$lobbies.madeMatches}} !
+        Recent matches : {{$lobbies.madeMatches}}
       </MatchmakingCard>
       <LobbyCard
         :id="-1"
@@ -33,8 +32,6 @@
         @joinLobby="createLobby"
       >
         <q-input label="Lobby name" dense filled v-model="lobbyName"/>
-        <q-toggle label="Private" v-model="isPrivate" />
-        <PasswordInput v-if="isPrivate" label="Password?" dense filled v-model="password"/>
       </LobbyCard>
       <LobbyCard
         v-for="lobby of $lobbies.getLobbies"
@@ -102,7 +99,6 @@ import MatchmakingCard from 'src/components/MatchmakingCard.vue';
 defineComponent({
   components: {
     LobbyCard,
-    PasswordInput,
   },
 });
 
@@ -110,18 +106,13 @@ const $lobbies = useLobbiesStore();
 const { socket } = useAuthStore();
 $lobbies.fetchLobbies();
 const lobbyName = ref('');
-const password = ref('');
-const isPrivate = ref(false);
 const router = useRouter();
 
 async function createLobby() {
   const newLobby = await $lobbies.createLobby(lobbyName.value);
   if (newLobby) {
-    //    console.log('New lobby is', newLobby, newLobby.id);
     await $lobbies.fetchAndJoinLobby(newLobby.id);
     router.push({ name: 'lobby', params: { id: newLobby.id } });
-  } else {
-    //    console.log('Error lulz');
   }
 }
 
@@ -134,22 +125,13 @@ async function leaveMatchmake() {
 
 onMounted(() => {
   socket.on('update_lobbies', (evt) => {
-    //    console.log('Refreshed lobbies', evt);
     $lobbies.lobbies = evt;
   });
   socket.on('matchmake_done', (lobbyid) => {
-    //    console.log('Matchmaking done !');
     $lobbies.matchmaking = false;
     $lobbies.fetchAndJoinLobby(lobbyid).then(() => {
       router.push(`/lobby/${lobbyid}/game`);
     });
   });
 });
-
-// onBeforeUnmount(() => {
-//   socket.off('refreshedLobbies', (args) => {
-//     console.log('Removing listeners', args);
-//   });
-// });
-
 </script>

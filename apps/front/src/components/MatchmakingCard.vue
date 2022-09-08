@@ -12,7 +12,7 @@
       <q-item>
         <q-item-section avatar>
           <q-avatar>
-            <img :src="avatar">
+            <q-icon color="accent" name="fas fa-shuttle-space"></q-icon>
           </q-avatar>
         </q-item-section>
 

@@ -8,11 +8,11 @@
 <template>
   <q-card flat bordered class="lobby-card" :color="'primary'">
     <q-form ref="form">
-
       <q-item>
         <q-item-section avatar>
           <q-avatar>
-            <img :src="avatar">
+            <img v-if="avatar" :src="avatar">
+            <q-icon color="yellow" name="fas fa-kiwi-bird"></q-icon>
           </q-avatar>
         </q-item-section>
 

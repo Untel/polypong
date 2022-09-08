@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:28:46 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 19:28:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:44:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
     this.logger.log(`validate - accessToken = ${accessToken}`);
     this.logger.log(`validate - redirect = ${redirect}`);
     const data = await this.getUserProfile(accessToken);
-    // this.logger.log(`data = ${data}`);
-    // this.logger.log(`email = ${data.email}`);
     const { email, first_name, last_name, image_url, login, id, cursus } = data;
-    // console.log("LOGIN DATA", Object.keys(data), data.patroned, data.patroning, data.roles);
-    // this.logger.log(JSON.stringify(data));
 
     const dataCoa = await this.getUserCoalition(+id, accessToken);
     const coalition = dataCoa.reduce(
@@ -84,8 +80,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       coalition,
       socialChannel: 'intra',
     });
-
-    // console.log("User is", user);
 
     return { ...user };
   }
