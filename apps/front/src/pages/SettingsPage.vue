@@ -1,22 +1,23 @@
 <template>
-  <!--
-  <span>{{authStore.user}}</span>
-  -->
+  <span>{{$auth.user}}</span>
   <q-page padding>
-    <q-card> <!-- NAME CHANGE -->
+    <q-card>
       <q-card-section>
-        <pre>current name : {{authStore.user.name}}</pre>
+        <pre>current name : {{$auth.user.name}}</pre>
         <q-input v-model="newName"></q-input>
         <q-btn @click="changeName(newName)">change name</q-btn>
       </q-card-section>
     </q-card><br>
 
-    <q-card> <!-- 2FA -->
+    <q-card>
       <q-card-section>
-        <q-div v-if="authStore.user.isTwoFactorAuthenticationEnabled === true">
+        <q-card-section v-if="
+          $auth.user.isTwoFactorAuthenticationEnabled === true
+        ">
           <pre> 2fa is required </pre>
           <q-btn @click="turnOff2fa()">turn off 2fa</q-btn><br>
-        </q-div><q-div v-else>
+        </q-card-section>
+        <q-card-section v-else>
           <pre> 2fa is not required </pre>
           <q-btn @click="requestQrCode()">request QrCode</q-btn><br>
           <q-img :src=qrCode.imageBytes width="50%"></q-img><br>
@@ -28,31 +29,32 @@
               <q-btn @click="activate2fa(qrCode.decoded)">activate 2FA</q-btn><br>
             </template>
           </q-input><br>
-        </q-div>
+        </q-card-section>
       </q-card-section>
     </q-card><br>
 
-    <q-card> <!-- AVATAR -->
+    <q-card>
       <q-card-section class="column flex-center">
         <pre class="self-start">current avatar :</pre>
         <q-img
-          :src="authStore.user.avatar"
+          :src="$auth.user.avatar"
           style="max-width: 50%; max-height: 50%; border-radius: 15px;"
         />
         <q-uploader
           dark accept="image/*" :factory="factoryFn" field-name="avatar"
-          @finish="authStore.fetchUser()"
+          @finish="$auth.fetchUser()"
         />
       </q-card-section>
     </q-card><br>
 
-    <q-card> <!-- LOGOUT -->
+    <q-card>
       <q-card-section class="column flex-center">
           <q-btn @click="logOut()" color="red">LOGOUT</q-btn><br>
       </q-card-section>
     </q-card><br>
 
   </q-page>
+
 </template>
 
 <script lang="ts" setup>
@@ -61,14 +63,14 @@ import { Notify } from 'quasar';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const authStore = useAuthStore();
+const $auth = useAuthStore();
 const router = useRouter();
 
 // name change
 const newName = ref('');
 const changeName = async (name) => {
   try {
-    await authStore.updateUser({ name });
+    await $auth.updateUser({ name });
   } catch ({ response, body }) {
     Notify.create({
       type: 'negative',
@@ -84,17 +86,17 @@ const qrCode = ref({
   decoded: '',
 });
 async function requestQrCode() {
-  const res: any = await authStore.requestQrCode();
+  const res: any = await $auth.requestQrCode();
   qrCode.value.requested = true;
   qrCode.value.imageBytes = res.qrAsDataUrl;
 }
 async function turnOff2fa() {
-  await authStore.updateUser({ isTwoFactorAuthenticationEnabled: false });
+  await $auth.updateUser({ isTwoFactorAuthenticationEnabled: false });
   qrCode.value.imageBytes = ''; qrCode.value.decoded = '';
 }
 async function activate2fa(value: any) {
   try {
-    await authStore.activate2fa(value);
+    await $auth.activate2fa(value);
     router.push({ name: '2fa' });
   } catch ({ response, body }) {
     Notify.create({
@@ -106,7 +108,7 @@ async function activate2fa(value: any) {
 
 // avatar change
 function factoryFn(file: any): Promise<any> {
-  console.log(`user before update = ${JSON.stringify(authStore.user)}`);
+  // console.log(`user before update = ${JSON.stringify($auth.user)}`);
   return new Promise((resolve, reject) => {
     // Retrieve JWT token from your store.
     resolve({
@@ -121,7 +123,7 @@ function factoryFn(file: any): Promise<any> {
 
 // logout
 function logOut(): void {
-  authStore.killws();
+  $auth.killws();
   localStorage.removeItem('token');
   router.push({ name: 'login' });
 }

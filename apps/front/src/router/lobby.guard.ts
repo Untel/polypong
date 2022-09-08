@@ -11,10 +11,10 @@ export default async (
     const lobbies = useLobbiesStore();
     const id = to.params.id as string;
     const response = await lobbies.fetchAndJoinLobby(id);
-    console.log('retrieved values', response);
+    //    console.log('retrieved values', response);
     next((vm) => vm.setData(response));
   } catch (error) {
-    console.log('Error', error);
+    //    console.log('Error', error);
     Notify.create({
       message: 'Requested lobby does not exist',
       type: 'negative',

@@ -62,7 +62,7 @@ export default {
     } = ctx;
     const $game = useGameStore();
     const id = currentRoute.params.id as string;
-    console.log('in GamePage prefetch, id = ', id);
+    //    console.log('in GamePage prefetch, id = ', id);
     try {
       await $game.fetchCurrentGame(id);
     } catch (err) {
@@ -121,7 +121,7 @@ onMounted(async () => {
     balls.value = b;
   });
   socket.on('object', (index, name, item) => {
-    console.log('index ', index, ' name ', name, ' item ', item);
+    // console.log('index ', index, ' name ', name, ' item ', item);
     switch (name) {
       case 'ball':
         balls.value[index] = item;

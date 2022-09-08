@@ -34,7 +34,7 @@ export default route((/* { store, ssrContext } */) => {
   });
 
   Router.beforeEach((to, from) => {
-    console.log('Navigating to', to, 'from', from);
+    //    console.log('Navigating to', to, 'from', from);
     if (from.name) LoadingBar.start();
   });
   Router.afterEach(() => LoadingBar.stop());

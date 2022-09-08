@@ -16,66 +16,79 @@
   lobbyId : {{ $lobbies.getActiveLobby?.id }}
 </pre>
   <q-page padding>
+    <!--
     Here we should config the lobby page and wait for peoples to connect
     Id: {{ props.id }} {{ props }}
-    <q-card-section>
-      <q-btn
-        @click="$lobbies.startGame(+$route.params.id);"
-        class="full-width" outline bordered color="primary"
-      >
-        Start game
-      </q-btn>
-    </q-card-section>
-
-    <section>
-      <q-form ref="lobbyForm">
-        <q-field>
-          <SearchUser @select="(opt) => { inviteSearchedUserToLobby(opt) }"/>
-        </q-field>
-        <q-field
-          label="Players max">
-          <q-slider
+    -->
+    <q-card>
+      <q-card-section>
+        <q-btn
+          @click="$lobbies.startGame(+$route.params.id);"
+          class="full-width" outline bordered color="primary"
+        >
+          Start game
+        </q-btn>
+      </q-card-section>
+    </q-card>
+    <br/>
+    <q-card>
+      <q-card-section>
+        <q-form ref="lobbyForm">
+          <q-field>
+            <SearchUser
+              label="Find people to play with"
+              @select="(opt) => { inviteSearchedUserToLobby(opt) }"
+            />
+          </q-field>
+          <br/>
+          <q-field
+            label="Players max">
+            <q-slider
+              :disable="!canUpdate"
+              name="playersMax"
+              :model-value="$lobbies.activeLobby?.playersMax"
+              @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
+              :min="minPlayers"
+              :max="16"
+              snap
+              markers
+              label-always
+              label
+            />
+          </q-field>
+          <br/>
+          <q-field
+            label="Points to win (1v1)">
+            <q-slider
+              :disable="!canUpdate"
+              name="finalePoints"
+              :model-value="$lobbies.activeLobby?.finalePoints"
+              @change="(evt) => $lobbies.updateLobby(lobby.id, { finalePoints: evt })"
+              :min="1"
+              :max="11"
+              snap
+              markers
+              label-always
+              label
+            />
+          </q-field>
+          <br/>
+          <q-input
+            :model-value="$lobbies.getActiveLobby?.name"
+            label="Lobby name"
+            @change="(evt) => $lobbies.updateLobby(
+              $lobbies.getActiveLobby.id, { name: evt }
+            )"
             :disable="!canUpdate"
-            name="playersMax"
-            :model-value="$lobbies.activeLobby?.playersMax"
-            @change="(evt) => $lobbies.updateLobby(lobby.id, { playersMax: evt })"
-            :min="minPlayers"
-            :max="16"
-            snap
-            markers
-            label-always
-            label
+            name="name"
+            lazy-rules
+            :rules="[ (val: string | any[]) => val && val.length > 2
+              || 'Username should have at least 2 chars']"
           />
-        </q-field>
-        <q-field
-          label="Points to win (1v1)">
-          <q-slider
-            :disable="!canUpdate"
-            name="finalePoints"
-            :model-value="$lobbies.activeLobby?.finalePoints"
-            @change="(evt) => $lobbies.updateLobby(lobby.id, { finalePoints: evt })"
-            :min="2"
-            :max="11"
-            snap
-            markers
-            label-always
-            label
-          />
-        </q-field>
-        <q-input
-          :model-value="$lobbies.getActiveLobby?.name"
-          label="Lobby name"
-          @change="(evt) => $lobbies.updateLobby(
-            $lobbies.getActiveLobby.id, { name: evt }
-          )"
-          :disable="!canUpdate"
-          name="name"
-          lazy-rules
-          :rules="[ (val: string | any[]) => val && val.length > 2
-            || 'Username should have at least 2 chars']"
-        />
-      </q-form>
-    </section>
+        </q-form>
+      </q-card-section>
+    </q-card>
+    <br/>
 
     <!--<section class="user-list">-->
     <section class="row justify-center">
@@ -116,7 +129,7 @@
         :name="bot.name"
         :canUpdate="canUpdate"
         @change="(evt) => $lobbies.updateLobby(lobby.id, { bots: { [index]: evt } })"
-        caption="Invite someone to replace this bot"
+        caption="bot"
       >
         <!--
         <q-btn>Invite</q-btn>

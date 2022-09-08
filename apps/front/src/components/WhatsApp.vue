@@ -418,12 +418,12 @@ interface Action {
 }
 
 const fn = (p: Participant) => {
-  console.log('Fn', p);
+//  console.log('Fn', p);
 };
 
 function actionable(target: Participant) : Action[] {
   const rel = $social.getRelByUserId(target.user.id);
-  console.log('rel = ', rel);
+  //  console.log('rel = ', rel);
   const actions: Action[] = [
     { label: 'Profile', icon: { name: 'fa-solid fa-chart-line' }, fn: (p) => $router.push(`/profile/${p.user.id}`) },
   ];
