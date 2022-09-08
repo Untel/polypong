@@ -11,9 +11,8 @@
         <q-btn v-if="$lobbies.activeLobby" color="purple"
           @click="() => {router.push(`/lobby/${$lobbies.activeLobby?.id}`)}"
         >
-          CURRENT LOBBY
+          CURRENT LOBBY <!--{{$lobbies.getActiveLobby?.id}}-->
         </q-btn>
-        <pre>[[{{$lobbies.getActiveLobby?.id}}]]</pre>
       </q-toolbar>
     </q-header>
 
@@ -32,8 +31,10 @@
       </div>
       <EssentialLink title="Home" caption="Sweet home" icon="fas fa-igloo" to="home"/>
       <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
+      <!--
       <EssentialLink title="Coalitions" caption="Mine's better"
         icon="fas fa-group-arrows-rotate" to="coalitions"/>
+      -->
       <EssentialLink title="Lobbies" caption="Game on !"
         icon="fab fa-forumbee" to="lobbies"/>
       <EssentialLink title="Community" caption="Out and about"
