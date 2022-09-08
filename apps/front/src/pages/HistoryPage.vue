@@ -104,7 +104,6 @@
       </q-tab-panel>
     </q-tab-panels>
   </q-card>
-
 </template>
 
 <script lang="ts" setup>
