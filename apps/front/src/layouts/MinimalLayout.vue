@@ -31,7 +31,7 @@
           name="Enzo Dal Cerro"
           login="edal--ce"
           github="endcerro"
-          linkedin="enzodalcerro"
+          linkedin="enzo-dal-cerro"
         />
         <BgSocial
           name="Guillaume Ozserttas"

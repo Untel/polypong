@@ -65,13 +65,17 @@ const password = ref<string>('');
 const showPassword = ref<boolean>(false);
 const router = useRouter();
 const route = useRoute();
-
+// const emit = defineEmits(['changeBackground']);
 const connectWithLocal = async (form: Event) => {
   const redirect = route.query.redirect
     ? JSON.parse((route.query.redirect as string))
     : { name: 'home' };
-  await auth.login(login.value, password.value);
-  router.push(redirect);
+  try {
+    await auth.login(login.value, password.value);
+    router.push(redirect);
+  } catch (e) {
+    // console.log("EXECPTION ", e);
+  }
 };
 
 </script>
