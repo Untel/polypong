@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 20:15:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 21:03:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ export interface Message extends BaseObject {
 
 export interface Channel extends BaseObject {
   name: string;
-  avatar: string;
   joined: boolean;
+  privacy: 'public' | 'private' | 'protected';
 }
 
 export interface BaseThread extends BaseObject {
@@ -66,14 +66,24 @@ export interface Thread extends BaseThread {
   unreadMessages: Message[];
 }
 
+export interface ChannelItem extends Channel {
+  thread: Thread;
+}
+
 export interface ActiveThread extends BaseThread {
   messages: Message[];
 }
 
+interface ChannelSettings {
+  name: string;
+  privacy: 'public' | 'private' | 'protected';
+  password: string;
+}
 interface ThreadState {
   _threads: Thread[];
-  _channels: Channel[];
+  _channels: ChannelItem[];
   _current: ActiveThread | null;
+  channelSettings: ChannelSettings;
 }
 
 export const useThreadStore = defineStore('thread', {
@@ -81,11 +91,22 @@ export const useThreadStore = defineStore('thread', {
     _threads: [],
     _channels: [],
     _current: null,
+    channelSettings: {
+      name: '',
+      privacy: 'public',
+      password: '',
+    },
   } as ThreadState),
   getters: {
-    channels(state): Channel[] {
+    channels(state): ChannelItem[] {
+      console.log('Channels', state._channels);
       return state._channels.map((c) => ({
         ...c,
+        name: c.name
+          || (c.thread as Thread).participants
+            .map((p) => p.user.name)
+            .join(', '),
+
       }));
     },
     threads(state) {
@@ -95,7 +116,9 @@ export const useThreadStore = defineStore('thread', {
         const mapped = {
           ...thread,
           recipient,
-          threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+          threadName: thread.channel
+            ? thread.channel.name || thread.participants.map((p) => p.user.name).join(', ')
+            : recipient?.name,
           avatar: !thread.channel
             ? recipient?.avatar
             : (thread.channel.avatar || 'group'),
@@ -105,6 +128,7 @@ export const useThreadStore = defineStore('thread', {
       });
       return threads;
     },
+
     totalUnread(state): number {
       return state._threads.reduce((acc, thread) => acc + thread.unreadMessages.length, 0);
     },
@@ -116,7 +140,9 @@ export const useThreadStore = defineStore('thread', {
       return {
         ...state._current,
         recipient,
-        threadName: thread.channel ? thread.participants.map((p) => p.user.name).join(', ') : recipient?.name,
+        threadName: thread.channel
+          ? thread.channel.name || thread.participants.map((p) => p.user.name).join(', ')
+          : recipient?.name,
         avatar: !thread.channel
           ? recipient?.avatar
           : (thread.channel.avatar || 'group'),
@@ -130,16 +156,41 @@ export const useThreadStore = defineStore('thread', {
     },
 
     async fetchChannels() {
-      this._channels = await channelApi.get<Channel[]>('');
+      this._channels = await channelApi.get<ChannelItem[]>('');
     },
 
-    async getThread(threadId: number | null | undefined) {
+    async getThread(threadId: number | null | undefined, password = null) {
       if (threadId) {
         try {
-          this._current = await threadApi.get<ActiveThread>(threadId);
-          this._threads.find((t) => t.id === threadId)?.unreadMessages.splice(0);
-        } catch (_e) {
-          this.router.push('/inbox');
+          const opts = password ? { query: { password } } : {};
+          this._current = await threadApi.get<ActiveThread>(threadId, opts);
+          const inThreadList = this._threads.find((t) => t.id === threadId);
+          if (inThreadList) inThreadList.unreadMessages.splice(0);
+          else this.fetchThreads();
+          this.channelSettings = {
+            name: this._current.channel?.name || '',
+            privacy: this._current.channel?.privacy || 'public',
+            password: '',
+          };
+        } catch (e: MandeError<{ message: string, status: number }>) {
+          if (e.body.status === 466) {
+            console.log('Thread join error', e, e.body);
+            Dialog.create({
+              title: 'Password required',
+              message: 'This thread require a password, please fill it',
+              prompt: {
+                model: 'password',
+                type: 'password',
+              },
+              cancel: true,
+            }).onOk(async (data) => {
+              this.getThread(threadId, data);
+            }).onCancel(() => {
+              this.router.push('/inbox');
+            });
+          } else {
+            this.router.push('/inbox');
+          }
         }
       } else {
         this._current = null;
@@ -170,14 +221,19 @@ export const useThreadStore = defineStore('thread', {
       this.router.push({ name: 'thread', params: { id: channel.thread.id } });
     },
 
+    async updateChannel(settings: ChannelSettings) {
+      const id = this._current?.id;
+      const patched = await threadApi.patch(`${id}/channel`, settings);
+    },
+
     async getChannels() {
       const channels = await channelApi.get<Channel[]>('');
       return channels;
     },
 
-    async socketAddMessage(thread: Thread, message: Message) {
-      if (this._current && this._current.id === thread.id) {
-        this.getThread(thread.id);
+    async socketAddMessage(threadId: number, message: Message) {
+      if (this._current && this._current.id === threadId) {
+        this.getThread(threadId);
       }
       this.fetchThreads();
     },
@@ -274,6 +330,7 @@ export const useThreadStore = defineStore('thread', {
           model: 'duration',
           type: 'radio',
           items: [
+            { label: 'Unmute', value: -1 },
             { label: '10 mins', value: 10 },
             { label: '1 hour', value: 60, color: 'accent' },
             { label: 'Forever', value: null, color: 'negative' },
@@ -297,6 +354,7 @@ export const useThreadStore = defineStore('thread', {
           model: 'duration',
           type: 'radio',
           items: [
+            { label: 'Unban', value: -1 },
             { label: '10 mins', value: 10 },
             { label: '1 hour', value: 60, color: 'accent' },
             { label: 'Forever', value: null, color: 'negative' },
@@ -311,5 +369,6 @@ export const useThreadStore = defineStore('thread', {
         });
       });
     },
+
   },
 });

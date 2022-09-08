@@ -6,20 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 18:44:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 20:43:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Global, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ID, TS } from 'src/entities/root.entity';
 import { RelationshipService } from 'src/relationship';
 import { UserService } from 'src/user';
 import { User } from 'src/user/user.entity';
-import { In, IsNull, Not, Repository } from 'typeorm';
 import { Message } from '../message/entities/message.entity';
 import { UpdateThreadDto } from './dto/update-thread.dto';
-import { Thread, ThreadParticipant } from './entities';
+import { Thread, ThreadMemberStatus, ThreadParticipant } from './entities';
+import moment from 'moment';
 
 @Injectable()
 export class ThreadService {
@@ -69,6 +68,28 @@ export class ThreadService {
       .leftJoinAndSelect('lastMessage.sender', 'sender')
       .getMany();
     return threads;
+  }
+
+  async inviteUser(thread: Thread, user: User) {
+    const me = thread.participants.find((e) => e.user.id === user.id);
+    if (me && me.deletedAt && me.isBanUntil) {
+      const m = moment(me.isBanUntil).diff(moment());
+      if (m > 0) {
+        const dur = moment.duration(m);
+        throw new UnauthorizedException(
+          `User is bannished from this thread for ${dur.humanize()} remaining`,
+        );
+      } else {
+        await me.remove();
+      }
+    }
+
+    const tp = ThreadParticipant.create({
+      user,
+      thread,
+      status: ThreadMemberStatus.MEMBER,
+    });
+    await ThreadParticipant.insert(tp);
   }
 
   async findThreadWithMessages(user: User, id: ID) {

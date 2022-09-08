@@ -75,7 +75,7 @@ const $route = useRoute();
 const settings = useSettingsStore();
 
 const disabled = computed(() => {
-  const dis = $route.name === 'inbox' && $q.screen.lt.md;
+  const dis = $route.path.includes('inbox') && $q.screen.lt.md;
   return dis;
 });
 

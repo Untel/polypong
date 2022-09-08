@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:34:13 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/30 01:58:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 19:22:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,18 @@ import {
   Injectable,
   createParamDecorator,
   UnauthorizedException,
-  UnprocessableEntityException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
-import { Thread } from 'src/chat/thread/entities/thread.entity';
-
+import moment from 'moment';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ThreadMemberStatus } from './entities/thread-participant.entity';
+import { Thread } from 'src/chat/thread/entities/thread.entity';
+import { ThreadMemberStatus, ThreadParticipant } from './entities/thread-participant.entity';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
-import moment from 'moment';
+import { ChannelPrivacy } from '../channel';
+import { Message } from '../message';
+import bcrypt from 'bcrypt';
 
 export const ThreadRole = (...roles: ThreadMemberStatus[]) =>
   SetMetadata('roles', roles);
@@ -36,27 +39,17 @@ export default class ThreadGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req: RequestWithUser = context.switchToHttp().getRequest();
     const params = req.params;
+    const user = req.user;
     const threadId = +params.id;
-    const userId = req.user['id'];
     const thread = await Thread.createQueryBuilder('thread')
       .withDeleted()
-      .innerJoinAndSelect(
-        'thread.participants',
-        'me',
-        'me.user_id = :userId AND me.thread_id = :threadId',
-        {
-          userId,
-          threadId,
-        },
-      )
+      .where({ id: threadId })
       .leftJoinAndSelect('thread.participants', 'participants')
       .leftJoinAndSelect('thread.channel', 'channel')
       .leftJoinAndSelect('participants.user', 'user')
       .getOne();
     if (!thread) {
-      throw new UnauthorizedException(
-        'You are not allowed to access this thread',
-      );
+      throw new UnauthorizedException('This thread does not exist');
     }
     Object.assign(req, { thread });
 
@@ -64,9 +57,31 @@ export default class ThreadGuard implements CanActivate {
       'roles',
       context.getHandler(),
     );
-
-    const me = thread.participants.find((e) => e.user.id === req.user.id);
-    if (me.deletedAt && me.isBanUntil) {
+    let me = thread.participants.find((e) => e.user.id === req.user.id);
+    if (!me) {
+      const pwd = req.query['password'] as string;
+      if (
+        thread.channel?.privacy === ChannelPrivacy.PUBLIC ||
+        thread.channel?.privacy === ChannelPrivacy.PRIVATE ||
+        (thread.channel?.privacy === ChannelPrivacy.PROTECTED &&
+          pwd &&
+          bcrypt.compareSync(pwd, thread.channel.password))
+      ) {
+        me = await ThreadParticipant.create({ thread, user }).save();
+        await Message.create({
+          thread,
+          content: `${user.name} joined the channel`,
+        }).save();
+      } else if (thread.channel?.privacy === ChannelPrivacy.PROTECTED)
+        throw new HttpException(
+          {
+            status: 466,
+            error: 'Password required',
+            message: 'This channel require a password',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+    } else if (me.deletedAt && me.isBanUntil) {
       const m = moment(me.isBanUntil).diff(moment());
       if (m > 0) {
         const dur = moment.duration(m);
@@ -77,7 +92,6 @@ export default class ThreadGuard implements CanActivate {
         await me.remove();
       }
     }
-    if (!me) throw new UnprocessableEntityException('something went wrong');
     Object.assign(req, { me });
 
     if (!roles) return true;
@@ -87,7 +101,7 @@ export default class ThreadGuard implements CanActivate {
     if (req.method === 'PUT' && req.body.targetId) {
       const targetId = +req.body.targetId;
       console.log('TARGET ID', targetId);
-      if (targetId === userId) {
+      if (targetId === user.id) {
         throw new UnauthorizedException('You can t do this action on yourself');
       }
       const target = thread.participants.find((e) => e.user.id === targetId);

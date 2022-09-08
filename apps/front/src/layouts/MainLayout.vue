@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout full-height view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
         <q-avatar>
@@ -9,7 +9,7 @@
           {{ $auth.user.name }}
         </q-toolbar-title>
         <q-btn v-if="$lobbies.activeLobby" color="purple"
-          @click="() => {router.push(`/lobby/${$lobbies.activeLobby.id}`)}"
+          @click="() => {router.push(`/lobby/${$lobbies.activeLobby?.id}`)}"
         >
           CURRENT LOBBY
         </q-btn>
@@ -36,18 +36,36 @@
       <EssentialLink title="Community" caption="Out and about"
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
       <EssentialLink title="Inbox" caption="bla bla"
-        icon="fa-solid fa-comments" to="inbox" :notif="$thread.totalUnread"/>
+        icon="fa-solid fa-comments" to="channels" :notif="$thread.totalUnread"/>
       <EssentialLink title="Profile" caption="Stats, check em"
         icon="fa-solid fa-chart-line" to="profile" />
       <EssentialLink title="Settings" caption="Account settings"
         icon="fa-solid fa-gear" to="settings" />
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container full-height :class="['bg-triangle', $auth.user.coalition]">
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
+
+<style lang="scss" scoped>
+  .bg-triangle {
+    min-height: inherit;
+  }
+  .alliance {
+    background-image: url('/src/assets/alliance_background.jpg');
+  }
+  .federation {
+    background-image: url('/src/assets/federation_background.jpg');
+  }
+  .assembly {
+    background-image: url('/src/assets/assembly_background.jpg');
+  }
+  .order {
+    background-image: url('/src/assets/order_background.jpg');
+  }
+</style>
 
 <script lang="ts" setup>
 import { usePageLeave } from '@vueuse/core';
@@ -58,6 +76,7 @@ import { useLobbiesStore } from 'src/stores/lobbies.store';
 import { useSocialStore } from 'src/stores/social.store';
 import { useThreadStore } from 'src/stores/thread.store';
 import { useMatchHistoryStore } from 'src/stores/history.store';
+import FssFallback from 'src/components/FssFallback.vue';
 import { defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
