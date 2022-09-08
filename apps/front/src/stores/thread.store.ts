@@ -99,7 +99,7 @@ export const useThreadStore = defineStore('thread', {
   } as ThreadState),
   getters: {
     channels(state): ChannelItem[] {
-      console.log('Channels', state._channels);
+      //      console.log('Channels', state._channels);
       return state._channels.map((c) => ({
         ...c,
         name: c.name

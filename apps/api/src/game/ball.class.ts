@@ -25,9 +25,10 @@ import Triangle from 'triangle-solver';
 import { Wall } from './wall.class';
 import { Paddle } from './paddle.class';
 import Game from './game.class';
+import { FRAME_RATE } from './game.class';
 export class Ball extends Circle {
   _speed = 1;
-  maxSpeed = 5;
+  maxSpeed = 3;
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
@@ -158,8 +159,8 @@ export class Ball extends Circle {
   }
   move() {
     if (this.unFreeze(1)) return;
-    this.position.x = this.position.x + this.direction.x;
-    this.position.y = this.position.y + this.direction.y;
+    this.position.x = this.position.x + this.direction.x * (30 / FRAME_RATE);
+    this.position.y = this.position.y + this.direction.y * (30 / FRAME_RATE);
   }
 
   reset(position: Vector = new Vector(0, 0)) {
@@ -197,6 +198,7 @@ export class Ball extends Circle {
     const surfaceAngleDeg = lineAngle(this.target.wall.line); //paddle.angle;
     const newDegree = angleReflect(incidenceAngleDeg, surfaceAngleDeg);
     const newAngle = angleToRadians(newDegree);
+    this.increaseSpeed();
     this.setAngle(newAngle);
     this.findTarget();
   }
@@ -205,8 +207,8 @@ export class Ball extends Circle {
     // const ballR = this.angle;
     this.lastHitten = paddle;
     this.color = paddle.color;
-    paddle.bounceBall(this, hitloc);
     this.increaseSpeed();
+    paddle.bounceBall(this, hitloc);
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {
