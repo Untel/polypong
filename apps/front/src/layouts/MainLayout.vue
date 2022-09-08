@@ -11,9 +11,8 @@
         <q-btn v-if="$lobbies.activeLobby" color="purple"
           @click="() => {router.push(`/lobby/${$lobbies.activeLobby?.id}`)}"
         >
-          CURRENT LOBBY
+          CURRENT LOBBY <!--{{$lobbies.getActiveLobby?.id}}-->
         </q-btn>
-        <pre>[[{{$lobbies.getActiveLobby?.id}}]]</pre>
       </q-toolbar>
     </q-header>
 
@@ -32,8 +31,10 @@
       </div>
       <EssentialLink title="Home" caption="Sweet home" icon="fas fa-igloo" to="home"/>
       <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
+      <!--
       <EssentialLink title="Coalitions" caption="Mine's better"
         icon="fas fa-group-arrows-rotate" to="coalitions"/>
+      -->
       <EssentialLink title="Lobbies" caption="Game on !"
         icon="fab fa-forumbee" to="lobbies"/>
       <EssentialLink title="Community" caption="Out and about"
@@ -115,7 +116,8 @@ $thread.fetchThreads();
 
 async function isActiveIn(lobbyId: number): boolean {
   await $lobbies.fetchLobbies();
-  console.log('isActiveIn - lobbyId = ', lobbyId, 'activelobby?.id :', $lobbies.getActiveLobby?.id);
+  // eslint-disable-next-line max-len
+  // console.log('isActiveIn - lobbyId = ', lobbyId, 'activelobby?.id :', $lobbies.getActiveLobby?.id);
   if ($lobbies.getActiveLobby) {
     if ($lobbies.getActiveLobby.id === lobbyId) return true;
   }
@@ -152,9 +154,9 @@ $auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId:
 });
 
 $auth.socket.on('userJoinedLobby', async (userId: number, lobbyId: number) => {
-  console.log(`USERJOIN : ${userId} has joined the lobby ${lobbyId}`);
+//  console.log(`USERJOIN : ${userId} has joined the lobby ${lobbyId}`);
   if (await isActiveIn(lobbyId)) {
-    console.log('HAHA');
+    // console.log('HAHA');
     try { $lobbies.fetchCurrentLobby(lobbyId); } catch (e) { /* e */ }
   }
   try { await $lobbies.fetchLobbies(); } catch (e) { /* e */ }
@@ -197,13 +199,13 @@ $auth.socket.on('gameOver', async (lobbyId: number) => {
     await $his.fetchUserMatchesHistory();
     const matches = $his.getUserMatchesHistory($auth.user.id)?.matches;
     if (matches) {
-      console.log('matches = ', matches);
+      // console.log('matches = ', matches);
       const matchId = matches[0]?.id;
-      console.log('matchId = ', matchId);
-      router.push(`/profile?matchId=${matchId}`);
-    } else {
-      router.push('/profile');
-    }
+      // console.log('matchId = ', matchId);
+      if (matchId) {
+        router.push(`/profile?matchId=${matchId}`);
+      } else { router.push('/profile'); }
+    } else { router.push('/profile'); }
     $his.fetchUserMatchesHistory($auth.user.id);
   } else {
     router.push('/lobbies');
@@ -217,7 +219,7 @@ $auth.socket.on('other_game_over', async (lobbyId: number) => {
 });
 
 $auth.socket.on('start', async (lobbyId: number) => {
-  console.log(`GAMESTART : your game in ${lobbyId} has started`);
+  // console.log(`GAMESTART : your game in ${lobbyId} has started`);
   if (await isActiveIn(lobbyId)) {
     router.push(`/lobby/${lobbyId}/game`);
   }

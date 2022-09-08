@@ -1,7 +1,7 @@
 <style lang="sass" scoped>
 .my-card
   width: 100%
-  max-width: 320px
+  max-width: 520px
   min-width: 320px
 </style>
 
