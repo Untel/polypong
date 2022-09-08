@@ -74,7 +74,7 @@ export const useLobbiesStore = defineStore('lobbies', {
       try {
         this.lobbies = await lobbiesApi.get('');
       } catch (err) {
-        console.log('err', err);
+        //        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while fetching lobbies',
@@ -144,7 +144,7 @@ export const useLobbiesStore = defineStore('lobbies', {
         try {
           await lobbiesApi.post(`${this.activeLobby.id}/leave`);
         } catch (e) {
-          console.log(e);
+          //          console.log(e);
         }
         this.activeLobby = null;
       }
@@ -166,7 +166,7 @@ export const useLobbiesStore = defineStore('lobbies', {
         const newLobby: Lobby = await lobbiesApi.put(`/${lobbyId}`, lobby);
         return newLobby;
       } catch (err) {
-        console.log('err', err);
+        //        console.log('err', err);
         Notify.create({
           type: 'negative',
           message: 'Error while updating lobby',

@@ -23,7 +23,8 @@ import AuthGuard from './auth.guard';
 const authRoutes: RouteRecordRaw[] = [{
   name: 'home',
   path: '',
-  component: () => import('pages/IndexPage.vue'),
+  component: () => import('pages/LobbiesPage.vue'),
+  // component: () => import('pages/IndexPage.vue'),
 }, {
   name: 'coalitions',
   path: 'coalitions',
@@ -82,7 +83,7 @@ const authRoutes: RouteRecordRaw[] = [{
   component: () => import('pages/InboxPage.vue'),
   async beforeEnter(to, from, next) {
     const { userId } = to.params;
-    console.log('in guard, userId = ', userId);
+    //    console.log('in guard, userId = ', userId);
     const $thread = useThreadStore();
     try {
       const res = await $thread.getDmThreadByUserId(+userId);

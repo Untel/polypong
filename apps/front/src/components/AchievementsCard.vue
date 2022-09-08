@@ -77,7 +77,7 @@ const achievements: ComputedRef<Achievement[]> = computed(() => {
   return arr;
 });
 
-console.log('achievements = ', achievements);
+// console.log('achievements = ', achievements);
 
 const emit = defineEmits(['click']);
 

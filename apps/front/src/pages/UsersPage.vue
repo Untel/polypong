@@ -44,7 +44,6 @@
     <rel-search-bar/>
     <!-- SEARCH RESULTS -->
     <q-card v-if="soc.getSearchedRel">
-      {{ soc.getSearchedRel }}
       <pre>search results</pre>
         <social-card :relname="soc.getSearchedRel.to.name"
           @toggle-gutter="(name) => toggleCard(name)"

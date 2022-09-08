@@ -34,14 +34,14 @@ export interface GameState {
 export const useGameStore = defineStore('game', {
   state: () => ({} as GameState),
   getters: {
-    getBalls: (state) => {
-      console.log('Get');
-      return state.balls;
-    },
+    getBalls: (state) =>
+    //      console.log('Get');
+      state.balls
+    ,
   },
   actions: {
     async fetchCurrentGame(id: string) {
-      console.log('in fetchCurrentGame, id = ', id);
+      //      console.log('in fetchCurrentGame, id = ', id);
       this.id = id;
       const gameInfos = await gameApi.get<GameState>(`/${id}/game`);
       this.map = gameInfos.map;

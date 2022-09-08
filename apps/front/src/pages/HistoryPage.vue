@@ -134,10 +134,12 @@ import StatsBanner from 'src/components/StatsBanner.vue';
 import SocialButton from 'src/components/SocialButton.vue';
 import LadderBoard from 'src/components/LadderBoard.vue';
 import AchievementsCard from 'src/components/AchievementsCard.vue';
+import { lobbiesApi, useLobbiesStore } from 'src/stores/lobbies.store';
 
 const auth = useAuthStore(); auth.fetchConnectedUsers();
 const soc = useSocialStore();
 const $route = useRoute(); const router = useRouter();
+const $lobbies = useLobbiesStore();
 
 onMounted(async () => {
   await soc.fetchRelationships();
@@ -157,6 +159,7 @@ const isSelf: ComputedRef<boolean> = computed(() => userId.value === auth.user.i
 
 const owningRel = asyncComputed(async () => {
   if (isSelf.value) { return undefined; }
+  await soc.fetchRelationships();
   const ret = soc.getRelByUserId(userId.value);
   if (ret) { return ret; }
   try {
@@ -235,8 +238,10 @@ const usersIds = asyncComputed(async () => {
 });
 
 async function inviteToLobby(id: number) {
-  console.log(`invite to lobby ${id}`);
+//  console.log(`invite to lobby ${id}`);
+  await $lobbies.inviteUserToLobby(id);
 }
+
 async function message(id: number) {
   router.push(`/chat/${id}`);
 }

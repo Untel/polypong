@@ -34,7 +34,7 @@ export default async (
    * Si un token est passe en params query, alors on tente de s'auto connect via se token
    */
   const autoToken: string = to.query.token as string;
-  console.log(`authguard - parsed token from URI : ${autoToken}`);
+  //  console.log(`authguard - parsed token from URI : ${autoToken}`);
   if (autoToken) {
     localStorage.setItem('token', autoToken);
     delete to.query.token;
