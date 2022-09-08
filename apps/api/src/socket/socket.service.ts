@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/11 01:16:23 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/24 07:29:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/08 18:34:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ export class SocketService {
     @Inject(forwardRef(() => LobbyService))
     private readonly lobbyService: LobbyService,
   ) {
-    setInterval(async () => {
-      console.log(
-        'Connected users',
-        (await this.connectedUsers()).map((u) => u.id),
-        [...this.socketio.sockets.sockets.values()].length,
-      );
-    }, 5000);
+    // setInterval(async () => {
+    //   console.log(
+    //     'Connected users',
+    //     (await this.connectedUsers()).map((u) => u.id),
+    //     [...this.socketio.sockets.sockets.values()].length,
+    //   );
+    // }, 5000);
   }
 
   public get socketio() {

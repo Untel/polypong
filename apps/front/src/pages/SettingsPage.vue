@@ -1,10 +1,8 @@
 <template>
-  <span>{{$auth.user}}</span>
   <q-page padding>
     <q-card>
       <q-card-section>
-        <pre>current name : {{$auth.user.name}}</pre>
-        <q-input v-model="newName"></q-input>
+        <q-input label="Change your username" v-model="newName"></q-input>
         <q-btn @click="changeName(newName)">change name</q-btn>
       </q-card-section>
     </q-card><br>
@@ -106,9 +104,7 @@ async function activate2fa(value: any) {
   }
 }
 
-// avatar change
 function factoryFn(file: any): Promise<any> {
-  // console.log(`user before update = ${JSON.stringify($auth.user)}`);
   return new Promise((resolve, reject) => {
     // Retrieve JWT token from your store.
     resolve({

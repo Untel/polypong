@@ -225,7 +225,7 @@ export default class Game {
           if (e !== ball) e.stop();
         });
       } else if (dtc >= 70) {
-        this.reduce(ball.target.wall);
+        this.reduce(ball.target?.wall);
       }
       const wall = ball.target?.wall;
       if (!wall?.paddle || TEST_MODE) {
@@ -243,8 +243,7 @@ export default class Game {
           impact,
         );
         if (test) {
-          ball.bouncePaddle(wall.paddle, impact);
-          ball.closestP = impact;
+          wall.paddle.bounceBall(ball, impact);
         }
       }
       ball.move();

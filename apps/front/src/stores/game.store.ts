@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.store.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/06 21:28:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/07 06:17:00 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,7 @@ export const useGameStore = defineStore('game', {
       this.scores = gameInfos.scores;
     },
     async pauseGame() {
-      gameApi.get<GameState>(`/${this.id}/game`);
-      await gameApi.get('pause');
+      await gameApi.get(`/${this.id}/game/pause`);
     },
     async restart() {
       gameApi.get<GameState>(`/${this.id}/game`);

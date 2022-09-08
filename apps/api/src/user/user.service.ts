@@ -87,7 +87,7 @@ export class UserService {
    * @param user : the user interface
    * @returns : the newly created user entity
    */
-  async createUser(user: UserInterface): Promise<User> {
+  async createUser(user: Partial<User>): Promise<User> {
     const {
       name,
       email,
