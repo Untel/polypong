@@ -1,11 +1,15 @@
 CMP		        = docker-compose -f compose.yml
 COMPOSE       = ${CMP} -f compose.tools.yml
+COMPOSE_PROD  = ${COMPOSE} -f compose.prod.yml
 
 # c = Container name; change it when calling enter/rerun
 c			        = api
 
 all:
 	$(COMPOSE) up
+
+prod:
+	$(COMPOSE_PROD) up --build
 
 config:
 	$(COMPOSE) config
