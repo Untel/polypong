@@ -61,8 +61,10 @@ const isSelf = computed(() => (props.userId === auth.user.id));
 
 const rel = asyncComputed(async () => {
   if (isSelf.value) { return undefined; }
+  let res = soc.getRelByUserId(props.userId);
+  if (res) { return res; }
   await soc.fetchRelationships();
-  const res = soc.getRelByUserId(props.userId);
+  res = soc.getRelByUserId(props.userId);
   if (res) { return res; }
   await soc.addRelByUserId(props.userId);
   return soc.getRelByUserId(props.userId);

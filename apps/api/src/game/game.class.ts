@@ -28,7 +28,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { Logger } from '@nestjs/common';
 
 const FRAME_RATE = 30;
-const TEST_MODE = false;
+const TEST_MODE = true;
 
 export enum MODE {
   Coalition = 'coalition',

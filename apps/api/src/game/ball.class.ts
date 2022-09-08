@@ -27,7 +27,7 @@ import { Paddle } from './paddle.class';
 import Game from './game.class';
 export class Ball extends Circle {
   _speed = 1;
-  maxSpeed = 1.5;
+  maxSpeed = 5;
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
@@ -206,6 +206,7 @@ export class Ball extends Circle {
     this.lastHitten = paddle;
     this.color = paddle.color;
     paddle.bounceBall(this, hitloc);
+    this.increaseSpeed();
   }
 
   increaseSpeed(ratio = this.speed * 0.1) {
