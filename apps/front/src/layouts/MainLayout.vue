@@ -154,7 +154,7 @@ $auth.socket.on('lobbyLeaver', async (fromId: number, fromName: string, lobbyId:
 });
 
 $auth.socket.on('userJoinedLobby', async (userId: number, lobbyId: number) => {
-  console.log(`USERJOIN : ${userId} has joined the lobby ${lobbyId}`);
+//  console.log(`USERJOIN : ${userId} has joined the lobby ${lobbyId}`);
   if (await isActiveIn(lobbyId)) {
     // console.log('HAHA');
     try { $lobbies.fetchCurrentLobby(lobbyId); } catch (e) { /* e */ }
@@ -202,10 +202,10 @@ $auth.socket.on('gameOver', async (lobbyId: number) => {
       // console.log('matches = ', matches);
       const matchId = matches[0]?.id;
       // console.log('matchId = ', matchId);
-      router.push(`/profile?matchId=${matchId}`);
-    } else {
-      router.push('/profile');
-    }
+      if (matchId) {
+        router.push(`/profile?matchId=${matchId}`);
+      } else { router.push('/profile'); }
+    } else { router.push('/profile'); }
     $his.fetchUserMatchesHistory($auth.user.id);
   } else {
     router.push('/lobbies');
