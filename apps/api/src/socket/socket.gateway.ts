@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.gateway.ts                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:37 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 13:20:04 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/08 20:57:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,8 @@ export class SocketGateway
       console.log('No game while paddle moving', lobby);
       return;
     }
-    const game = lobby.game;
-    if (game) {
-      if (!game.isStopped) game.updatePaddlePercent(user.id, percent);
+    if (lobby?.game) {
+      if (!lobby.game.isStopped) lobby.game.updatePaddlePercent(user.id, percent);
       // else console.log('Game found but paused', user.id);
     } else {
       console.log('Game not found', lobby.game);
@@ -100,23 +99,23 @@ export class SocketGateway
 
     if (lobby) {
       if (lobby.game) {
-        const player = lobby.game.players.get(user.id); // user is still alive
-        if (player) {
-          lobby.game.stop();
-          player.setAfk(
-            (timer) => {
-              lobby.say(
-                `${user.name} is disconnected. ${timer} before being kicked.`,
-              );
-            },
-            () => {
-              lobby.say(`${user.name} has been removed. Resuming.`);
-              lobby.game.players.delete(user.id);
-              lobby.game.newRound();
-            },
-          );
-          return lobby.game.stop();
-        }
+        // const player = lobby.game.players.get(user.id); // user is still alive
+        // if (player) {
+        //   lobby.game.stop();
+        //   player.setAfk(
+        //     (timer) => {
+        //       lobby.say(
+        //         `${user.name} is disconnected. ${timer} before being kicked.`,
+        //       );
+        //     },
+        //     () => {
+        //       lobby.say(`${user.name} has been removed. Resuming.`);
+        //       lobby.game.players.delete(user.id);
+        //       lobby.game.newRound();
+        //     },
+        //   );
+        //   return lobby.game.stop();
+        // }
       } else {
         this.lobbyService.removePlayer(lobby.id, user);
         if (lobby.players.size === 0) {

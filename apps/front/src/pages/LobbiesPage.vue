@@ -1,11 +1,15 @@
-<style>
+<style lang="scss">
   .card-grid {
-    display: grid;
-    /* grid-auto-flow: column; */
-    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    display: flex;
     flex-wrap: wrap;
+    flex-grow: 1;
     gap: 10px;
-    margin-bottom: 20px
+    margin-bottom: 20px;
+
+    > * {
+      justify-content: center;
+      flex-grow: 1;
+    }
   }
 </style>
 
