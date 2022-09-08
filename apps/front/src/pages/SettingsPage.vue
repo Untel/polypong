@@ -70,10 +70,10 @@ const changeName = async (name) => {
   try {
     await $auth.updateUser({ name });
   } catch ({ response, body }) {
-    Notify.create({
-      type: 'negative',
-      message: (body as any).message,
-    });
+    // Notify.create({
+    //  type: 'negative',
+    //  message: (body as any).message,
+    // });
   }
 };
 
@@ -97,10 +97,10 @@ async function activate2fa(value: any) {
     await $auth.activate2fa(value);
     router.push({ name: '2fa' });
   } catch ({ response, body }) {
-    Notify.create({
-      type: 'negative',
-      message: (body as any).message,
-    });
+    // Notify.create({
+    //  type: 'negative',
+    //  message: (body as any).message,
+    // });
   }
 }
 

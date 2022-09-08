@@ -30,13 +30,13 @@
         <FourtyTwoLogo :size="miniState && '2rem' || '5rem'" />
       </div>
       <EssentialLink title="Home" caption="Sweet home" icon="fas fa-igloo" to="home"/>
-      <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
       <!--
+      <EssentialLink title="Login" caption="Login" icon="fab fa-connectdevelop" to="login"/>
       <EssentialLink title="Coalitions" caption="Mine's better"
         icon="fas fa-group-arrows-rotate" to="coalitions"/>
-      -->
       <EssentialLink title="Lobbies" caption="Game on !"
         icon="fab fa-forumbee" to="lobbies"/>
+      -->
       <EssentialLink title="Community" caption="Out and about"
         icon="fa-solid fa-users" to="users" :notif="soc.getNotifCount" />
       <EssentialLink title="Inbox" caption="bla bla"
