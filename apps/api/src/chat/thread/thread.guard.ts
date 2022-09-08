@@ -23,7 +23,10 @@ import moment from 'moment';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Thread } from 'src/chat/thread/entities/thread.entity';
-import { ThreadMemberStatus, ThreadParticipant } from './entities/thread-participant.entity';
+import {
+  ThreadMemberStatus,
+  ThreadParticipant,
+} from './entities/thread-participant.entity';
 import RequestWithUser from 'src/auth/interfaces/requestWithUser.interface';
 import { ChannelPrivacy } from '../channel';
 import { Message } from '../message';

@@ -208,7 +208,8 @@ export default class Game {
   }
 
   runPhysics() {
-    this.balls.forEach((ball) => { if (ball.stopped) return;
+    this.balls.forEach((ball) => {
+      if (ball.stopped) return;
       const dtc = lineLength([
         [ball.position.x, ball.position.y],
         [this.map.center.x, this.map.center.y],
@@ -290,7 +291,9 @@ export default class Game {
       `AFTER players.delete, players.size = ${this.players.size}`,
     );
     this.logger.log(`AFTER players.delete, nPlayers = ${this.nPlayers}`);
-    this.lobby.createPlayerRank(Object.assign({}, player), this.nPlayers).then();
+    this.lobby
+      .createPlayerRank(Object.assign({}, player), this.nPlayers)
+      .then();
   }
 
   registerFinalists() {

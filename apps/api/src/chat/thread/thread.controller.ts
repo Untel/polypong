@@ -47,7 +47,8 @@ export class ThreadController {
   @Get(':id')
   @UseGuards(ThreadGuard)
   async findOne(@CurrentUser() user: User, @Param('id') id: ID) {
-    this.logger.log('user = '); console.log(user);
+    this.logger.log('user = ');
+    console.log(user);
     const thread = await this.threadService.findThreadWithMessages(user, +id);
     await this.threadService.setThreadAsRead(thread, user);
     return thread;
@@ -115,15 +116,14 @@ export class ThreadController {
     target.isBanUntil = endDate.toDate();
     await target.save();
     await target.softRemove();
-    let message =  `${target.user.name} was `;
+    let message = `${target.user.name} was `;
     if (duration === -1) message += 'unban';
-    else message += `ban for ${
-      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()}`,
-    message += ` by ${user.name}`;
-    this.messageService.sendSystemMessage(
-      thread,
-      message,
-    );
+    else
+      (message += `ban for ${
+        !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
+      }`),
+        (message += ` by ${user.name}`);
+    this.messageService.sendSystemMessage(thread, message);
   }
 
   @Put(':id/promote')
@@ -158,15 +158,14 @@ export class ThreadController {
       : moment().add(duration, 'minutes');
     target.isMuteUntil = endDate.toDate();
     await target.save();
-    let message =  `${target.user.name} was `;
+    let message = `${target.user.name} was `;
     if (duration === -1) message += 'unmuted';
-    else message += `mute for ${
-      !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()}`,
-    message += ` by ${user.name}`;
-    this.messageService.sendSystemMessage(
-      thread,
-      message,
-    );
+    else
+      (message += `mute for ${
+        !duration ? 'ever' : moment.duration(duration, 'minutes').humanize()
+      }`),
+        (message += ` by ${user.name}`);
+    this.messageService.sendSystemMessage(thread, message);
   }
 
   @Put(':id/demote')
@@ -214,20 +213,20 @@ export class ThreadController {
     await this.messageService.notifyThread(thread.id, leaveMessage);
   }
 
-
   @ThreadRole(ThreadMemberStatus.OWNER)
   @UseGuards(ThreadGuard)
   @Patch(':id/channel')
   async update(
     @CurrentThread() thread,
     @CurrentUser() user,
-    @Body() body: {
-      privacy: ChannelPrivacy,
-      name: string,
-      password: string
-    }) {
-    if (!thread.channel)
-      throw new UnauthorizedException('Its not a channel');
+    @Body()
+    body: {
+      privacy: ChannelPrivacy;
+      name: string;
+      password: string;
+    },
+  ) {
+    if (!thread.channel) throw new UnauthorizedException('Its not a channel');
     const changed = [];
     if (body.name && thread.channel.name !== body.name) {
       thread.channel.name = body.name;
@@ -247,11 +246,16 @@ export class ThreadController {
 
     if (changed.length) {
       const saved = await thread.channel.save();
-      this.messageService.sendSystemMessage(thread, `
-        ${user.name} have change the settings ${changed.join(', ')} of the channel
-      `)
+      this.messageService.sendSystemMessage(
+        thread,
+        `
+        ${user.name} have change the settings ${changed.join(
+          ', ',
+        )} of the channel
+      `,
+      );
       return saved;
     }
-    return ;
+    return;
   }
 }

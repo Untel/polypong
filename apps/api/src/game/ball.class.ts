@@ -36,7 +36,7 @@ export class Ball extends Circle {
     hit: Point;
     wall: Wall;
   };
-  stopped : boolean = false;
+  stopped = false;
   color: string;
   targetInfo: any;
   adjacent: any;
@@ -215,7 +215,7 @@ export class Ball extends Circle {
     // On calcul le pourcentage de hit sur le paddle -0.5 pour avoir un % compris entre -.5 et .5
     // Comme ca taper au millieu devrait etre 0 et ne pas rajouter d'angle
     // x2 pour aller de -1 a x1;
-    const percent = (hitLen / lineLength(paddle.line) * 2);
+    const percent = (hitLen / lineLength(paddle.line)) * 2;
     // const maxAngle = Math.abs((surfaceAngleDeg - incidenceAngleDeg) / 2);
     // console.log('Hit percent', percent);
     const maxAngle = 25;

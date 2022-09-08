@@ -10,7 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-import { Global, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  Global,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ID, TS } from 'src/entities/root.entity';
 import { RelationshipService } from 'src/relationship';
 import { UserService } from 'src/user';
