@@ -40,7 +40,9 @@ export class ChannelService {
     return await channel.save();
   }
 
-  update(id: number, updateChannelDto: UpdateChannelDto) {}
+  update(id: number, updateChannelDto: UpdateChannelDto) {
+    console.log('bjr');
+  }
 
   async findAll() {
     const chans = await Channel.find({

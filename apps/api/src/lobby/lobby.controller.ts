@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.controller.ts                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/09 02:11:15 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/09 05:16:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,9 @@ export class LobbyController {
         lobby.game.resume();
       });
     }
-    this.socketService.getUserSocket(user.id)?.join(lobby.roomId);
+    this.socketService
+      .getUserSocket(user.id)
+      .forEach((e) => e.join(lobby.roomId));
     return lobby.game.netScheme;
   }
 
