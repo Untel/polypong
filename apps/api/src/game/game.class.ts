@@ -151,7 +151,7 @@ export default class Game {
       return new Wall(line, paddle);
     });
     this.bots.forEach((b) => (b.tasks = []));
-    let fragAngle = (Math.PI * 2) / this.nPlayers;
+    const fragAngle = (Math.PI * 2) / this.nPlayers;
     if (this.nPlayers > 2)
       for (let i = 0; i < this.nPlayers; i++) {
         // let ang = fragAngle * i + fragAngle / 2;

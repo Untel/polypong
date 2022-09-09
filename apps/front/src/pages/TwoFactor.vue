@@ -19,6 +19,7 @@ import { Notify } from 'quasar';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+const emit = defineEmits(['changeBackground']);
 const authStore = useAuthStore();
 const router = useRouter();
 
