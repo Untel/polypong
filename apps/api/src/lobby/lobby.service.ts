@@ -107,7 +107,7 @@ export class LobbyService {
     lobby.removePlayer(user);
     const leaverSocket = this.socketService.getUserSocket(user.id);
     if (leaverSocket) {
-      leaverSocket.forEach((s) => s.leave(lobby.roomId));//.leave(lobby.roomId);
+      leaverSocket.forEach((s) => s.leave(lobby.roomId)); //.leave(lobby.roomId);
       leaverSocket.forEach((s) => s.send(`You left lobby ${lobby.roomId}`));
     }
   }
@@ -141,9 +141,9 @@ export class LobbyService {
     lobby.addPlayer(new Player(user));
     socketOfJoiner.forEach((s) => {
       s.join(lobby.roomId);
-      s.data.lobby = lobby
+      s.data.lobby = lobby;
       s.send(`Welcome in lobby ${lobby.name}, ${user.name}`);
-    })
+    });
     // socketOfJoiner.join(lobby.roomId);
     // socketOfJoiner.data.lobby = lobby;
     // socketOfJoiner.send(`Welcome in lobby ${lobby.name}, ${user.name}`);
@@ -167,7 +167,7 @@ export class LobbyService {
     const socketOfLeaver = this.socketService.getUserSocket(user.id);
     if (lobby.players.has(user.id)) {
       this.removePlayer(lobby.id, user);
-      socketOfLeaver.forEach((s) => s.leave(lobby.roomId)) ;
+      socketOfLeaver.forEach((s) => s.leave(lobby.roomId));
       this.logger.warn(
         `User ${user.id} already is in this lobby ${lobby.roomId}, rejoining the socket`,
       );
@@ -219,7 +219,9 @@ export class LobbyService {
 
   inviteUserToLobby(lobby: Lobby, from: User, invitee: User) {
     const socketOfInvitee = this.socketService.getUserSocket(invitee.id);
-    socketOfInvitee?.forEach((s) => s.emit('lobbyInvite', from.id, from.name, lobby.id));
+    socketOfInvitee?.forEach((s) =>
+      s.emit('lobbyInvite', from.id, from.name, lobby.id),
+    );
   }
 
   clearLobbies() {

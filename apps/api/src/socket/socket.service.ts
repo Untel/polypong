@@ -72,7 +72,7 @@ export class SocketService {
   }
 
   getUserSocket(userID) {
-    return  this.sockets.filter((el) => el.data.user.id === userID);
+    return this.sockets.filter((el) => el.data.user.id === userID);
   }
   // getUserSocket(userID) {
   //   return this.sockets.find((el) => el.data.user.id === userID);
