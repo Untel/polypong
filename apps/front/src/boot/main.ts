@@ -2,8 +2,8 @@ import { boot } from 'quasar/wrappers';
 import 'src/libs/fss';
 
 export default boot(({ app }) => {
-  // eslint:disable-next-line
-  app.config.globalProperties.$env = process?.env || {};
+
+  app.config.globalProperties.$env = {};
 
   const originalFetch = fetch;
   window.fetch = function (url, init?) {
