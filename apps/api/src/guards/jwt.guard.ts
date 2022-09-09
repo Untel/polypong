@@ -15,6 +15,7 @@ import {
   ExecutionContext,
   Injectable,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { HttpArgumentsHost, WsArgumentsHost } from '@nestjs/common/interfaces';
 import { AuthGuard } from '@nestjs/passport';
@@ -52,7 +53,7 @@ export default class JwtGuard extends AuthGuard('jwt') implements CanActivate {
 
   handleRequest(err, user) {
     if (err || !user) {
-      throw err || new Error();
+      throw err || new UnauthorizedException('token invalid');
     }
     return user;
   }

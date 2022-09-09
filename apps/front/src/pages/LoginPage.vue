@@ -49,7 +49,7 @@
   <q-separator size="2px" class="full-width" />
   <!-- <h6>{{ `/api/auth/intra?redirect=${route.query.redirect}` }}</h6> -->
   <q-btn :href="`/api/auth/intra`" size="large" color="secondary" class="full-width">
-    Connect with &nbsp;<q-icon name="img:src/assets/42_logo.svg"/>
+    Connect with &nbsp;<q-icon name="img:src/42_logo.svg"/>
   </q-btn>
 </q-form>
 </template>
