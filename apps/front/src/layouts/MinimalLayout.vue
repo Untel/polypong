@@ -20,7 +20,8 @@
           login="adda-sil"
           linkedin="adrienfernandes"
           website="http://fernandes.bzh"
-          github="untel" />
+          github="untel"
+        />
         <BgSocial
           name="Lambert Spiess"
           login="lspiess"
@@ -35,6 +36,8 @@
         />
         <BgSocial
           name="Guillaume Ozserttas"
+          github="GuillaumeOz"
+          linkedin="guillaume-ozserttas"
           login="gozsertt"
         />
 

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/09 13:33:58 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/15 14:25:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 14:50:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ import {
 
 import { PassportModule } from '@nestjs/passport';
 
-import { RedisModule } from '@liaoliaots/nestjs-redis';
+// import { RedisModule } from '@liaoliaots/nestjs-redis';
 import * as configs from 'src/config';
 import { SocketModule } from './socket';
 import { RelationshipModule } from './relationship/relationship.module';
@@ -38,14 +38,14 @@ import { asyncConfig } from './utils/config';
       isGlobal: true,
       load: [...Object.values(configs)],
     }),
-    RedisModule.forRootAsync(asyncConfig('redis')),
+    // RedisModule.forRootAsync(asyncConfig('redis')),
     TypeOrmModule.forRootAsync(asyncConfig('typeorm')),
     PassportModule.registerAsync(asyncConfig('passport')),
     forwardRef(() => UserModule),
     forwardRef(() => MailModule),
     forwardRef(() => AuthModule),
     forwardRef(() => SocketModule),
-    forwardRef(() => PongModule),
+    // forwardRef(() => PongModule),
     forwardRef(() => LobbyModule),
     forwardRef(() => RelationshipModule),
     forwardRef(() => ChatModule),

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/14 00:55:29 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/14 00:55:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 14:52:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ import { PasswordService } from './services/password-auth.service';
 import { TwoFactorAuthenticationController } from './controllers/two-factor-authentication.controller';
 import { TwoFactorAuthenticationService } from './services/twoFactorAuthentication.service';
 import { ConfigService } from '@nestjs/config';
-import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import Redis from 'ioredis';
+// import { InjectRedis } from '@liaoliaots/nestjs-redis';
+// import Redis from 'ioredis';
 
 @Module({
   providers: [
@@ -79,7 +79,7 @@ import Redis from 'ioredis';
 })
 export class AuthModule implements NestModule {
   constructor(
-    @InjectRedis() private readonly client: Redis,
+    // @InjectRedis() private readonly client: Redis,
     private readonly configService: ConfigService,
   ) {}
   configure(consumer: MiddlewareConsumer) {

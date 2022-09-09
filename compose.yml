@@ -67,9 +67,9 @@ services:
     entrypoint: yarn start
     networks:
       - database
-      - redis
       - proxy
       - mailer
+      # - redis
     depends_on:
       postgres:
         condition: service_healthy
@@ -100,16 +100,16 @@ services:
       driver: none
 
   # Hot data (passport session, pong game state, caching) database
-  redis:
-    container_name: redis
-    image: redis
-    restart: always
-    expose:
-      - 6379
-    networks:
-      - redis
-    volumes: [ 'redis:/data' ]
-    stop_signal: SIGINT
+  # redis:
+  #   container_name: redis
+  #   image: redis
+  #   restart: always
+  #   expose:
+  #     - 6379
+  #   networks:
+  #     - redis
+  #   volumes: [ 'redis:/data' ]
+  #   stop_signal: SIGINT
 
   # Smtp with UI, to see all emails sent across our stack
   mailhog:
@@ -128,8 +128,8 @@ networks:
   database:
   proxy:
   mailer:
-  redis:
+  # redis:
 
 volumes:
   database:
-  redis:
+  # redis:

@@ -1,8 +1,9 @@
 {
   "name": "@polypong/api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Polygong, our implementation of the last 42's project: ft_transcendance",
+  "productName": "Polypong",
+  "author": "Adrien Fernandes <adrien@fernandes.bzh>",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -14,7 +15,7 @@
     "format": "prettier --write \"src/**/*.ts\" ",
     "start": "nest start --watch --tsc --preserveWatchOutput",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "nest build && node dist/main",
     "docker:dev": "yarn && nest start --watch"
   },
   "strict-peer-dependencies": false,
@@ -58,7 +59,6 @@
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1",
     "pg": "^8.7.3",
-    "polygon": "^1.0.2",
     "qrcode": "^1.5.1",
     "redis": "^3",
     "redis-json": "^6.0.3",
