@@ -12,5 +12,4 @@ services:
       - NODE_ENV=PROD
       - PROD=true
       - DEBUG=0
-    # working_dir: /app/dist/ssr
     entrypoint: yarn start:prod

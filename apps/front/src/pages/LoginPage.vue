@@ -21,6 +21,8 @@
     class="full-width"
     filled
     label="Email"
+    aria-autocomplete="username"
+    autocomplete="username"
     lazy-rules
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   />
@@ -32,6 +34,7 @@
     label="Password"
     :type="showPassword ? 'text' : 'password'"
     lazy-rules
+    autocomplete="current-password"
     :rules="[ val => val && val.length > 0 || 'Please type something']"
   >
     <template v-slot:append>

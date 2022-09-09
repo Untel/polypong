@@ -12,12 +12,7 @@
 
 import Lobby from './lobby.class';
 import { Bot } from '.';
-import {
-  Line,
-  lineLength,
-  lineMidpoint,
-  Point,
-} from 'geometric';
+import { Line, lineLength, lineMidpoint, Point } from 'geometric';
 import PolygonMap from './polygon.class';
 import { Power, PowerList } from './power.class';
 import { Ball, Wall, Paddle } from '.';
