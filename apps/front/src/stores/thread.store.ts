@@ -6,15 +6,15 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 21:03:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 13:43:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /* eslint-disable no-underscore-dangle */
 
 import { defineStore } from 'pinia';
-import { mande, MandeError } from 'src/libs/mande';
 import { Dialog, Notify } from 'quasar';
+import { mande, MandeError } from 'src/libs/mande';
 import { User } from 'src/types/user';
 import { onError } from 'src/utils/mande-error';
 import { useAuthStore } from './auth.store';
@@ -354,7 +354,7 @@ export const useThreadStore = defineStore('thread', {
           model: 'duration',
           type: 'radio',
           items: [
-            { label: 'Unban', value: -1 },
+            // { label: 'Unban', value: -1 },
             { label: '10 mins', value: 10 },
             { label: '1 hour', value: 60, color: 'accent' },
             { label: 'Forever', value: null, color: 'negative' },
