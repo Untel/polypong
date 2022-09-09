@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/09 04:04:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 05:49:09 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,13 +97,13 @@ export class Paddle {
     if (minA < nball && nball < maxA) {
       // It's coming from inside
       if (minA < newDegree && newDegree < maxA) {
-        if (dtmax > dtmin) newDegree = minA - 10;
+        if (dtmax >= dtmin) newDegree = minA - 10;
         else newDegree = maxA + 10;
         console.log('Corrected ball');
       }
     } else {
       if (!(minA < newDegree && newDegree < maxA)) {
-        if (dtmax > dtmin) newDegree = minA + 10;
+        if (dtmax >= dtmin) newDegree = minA + 10;
         else newDegree = maxA - 10;
         console.log('Corrected ball');
       }
