@@ -103,9 +103,9 @@
       />
     </svg>
     <slot />
-    <pre v-if="paddles[myWallIdx]?.see">
+    <!-- <pre v-if="paddles[myWallIdx]?.see">
       I SEEE
-    </pre>
+    </pre> -->
   </div>
 </template>
 
