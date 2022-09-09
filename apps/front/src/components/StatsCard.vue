@@ -7,7 +7,7 @@
 
 <template>
 <q-card class="my-card" @click="emit('click', userId)">
-  <q-img :src=coaBackground :height=height>
+  <q-img :src="coaBackground" :height=height>
     <div class="absolute-full flex flex-center">
       {{ name }} | W: {{ nWins }} | L: {{ nLosses }} | {{ ratio * 100 }}%
     </div>
@@ -76,7 +76,7 @@ const coalition: ComputedRef<CoalitionChoice> = computed(() => {
   return CoalitionChoice.FEDERATION;
 });
 
-const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`);
+const coaBackground = computed(() => `/${coalition.value}_background.jpg`);
 
 // const history = asyncComputed(() => his.fetchUserMatchesHistory(props.userId));
 //
@@ -136,7 +136,7 @@ const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`)
 //  return CoalitionChoice.FEDERATION;
 // });
 //
-// const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`);
+// const coaBackground = computed(() => `/${coalition.value}_background.jpg`);
 //
 // const ratio = computed(() => {
 //  if (nPlayed.value === 0) {

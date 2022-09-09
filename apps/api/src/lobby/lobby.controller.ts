@@ -132,8 +132,8 @@ export class LobbyController {
   }
 
   @Get('game/restart')
-  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) { 
-    console.log("lol");
+  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {
+    console.log('lol');
   }
   @Get('game/pause')
   //  @UseGuards(InLobbyGuard)

@@ -11,7 +11,7 @@
       align="center"
     >
       <q-avatar>
-        <img :src="`/src/assets/${achievement.image}`"/>
+        <img :src="`/${achievement.image}`"/>
       </q-avatar>
       <h6>"{{achievement.title}}"<br/>{{achievement.body}}</h6>
     </q-card-section>
