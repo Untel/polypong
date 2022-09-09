@@ -5,10 +5,12 @@ services:
       - NODE_ENV=PROD
       - DEBUG=0
   front:
+    build:
+      context: apps/front
+      target: build
     environment:
       - NODE_ENV=PROD
+      - PROD=true
       - DEBUG=0
-  api:
-    environment:
-      - NODE_ENV=PROD
-      - DEBUG=0
+    # working_dir: /app/dist/ssr
+    entrypoint: yarn start:prod

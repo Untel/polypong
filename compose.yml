@@ -31,12 +31,11 @@ services:
   front:
     build:
       context: apps/front
+      target: build
     image: polypong/front
     container_name: front
     expose:
       - 9000
-    ports:
-      - "9000:9000"
     volumes:
       - ./apps/front:/app/
       - "/app/node_modules"
