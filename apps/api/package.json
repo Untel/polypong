@@ -14,7 +14,7 @@
     "format": "prettier --write \"src/**/*.ts\" ",
     "start": "nest start --watch --tsc --preserveWatchOutput",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "nest build && node dist/main",
     "docker:dev": "yarn && nest start --watch"
   },
   "strict-peer-dependencies": false,
