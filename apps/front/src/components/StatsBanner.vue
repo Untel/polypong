@@ -71,6 +71,6 @@ const coalition: ComputedRef<CoalitionChoice> = computed(() => {
   return CoalitionChoice.FEDERATION;
 });
 
-const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`);
+const coaBackground = computed(() => `/${coalition.value}_background.jpg`);
 
 </script>

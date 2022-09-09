@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 18:27:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 02:32:09 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ export const useMatchHistoryStore = defineStore('history', {
         else acc.losses += 1;
         return acc;
       }, { wins: 0, losses: 0 });
-      return { ...stats, ratio: stats.wins / matches.length };
+      return { ...stats, ratio: (stats.wins / matches.length) || 0 };
     },
 
     async getAllMatches(): Promise<Match[] | undefined> {

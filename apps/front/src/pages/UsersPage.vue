@@ -228,5 +228,3 @@ async function searchRel(name: string) {
     height: 300px;
   }
 </style>
-
-<i class="fa-solid fa-user-group"></i>
