@@ -37,6 +37,8 @@
     class="full-width"
     filled
     label="Username"
+    aria-autocomplete="username"
+    autocomplete="username"
     lazy-rules
     :rules="[ val => val && val.length > 2 || 'Username should have at least 2 chars']"
   />
@@ -44,6 +46,8 @@
     v-model="password"
     class="full-width"
     dense
+    aria-autocomplete="new-password"
+    autocomplete="new-password"
     filled
     label="password"
   />
