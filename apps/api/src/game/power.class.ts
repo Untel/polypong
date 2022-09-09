@@ -108,9 +108,13 @@ export class SeeTrajectories extends Power {
     this.timeout = 15000;
   }
 
-  fade(paddle: Paddle) {}
+  fade(paddle: Paddle) {
+    return;
+  }
 
-  effect(ball: Ball) {}
+  effect(ball: Ball) {
+    return;
+  }
 }
 
 export class SadiSlap extends Power {

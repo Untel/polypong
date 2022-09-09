@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   intra-oauth.controller.ts                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
+/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 19:27:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/01 19:29:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 03:25:31 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ export class IntraOAuthController {
 
   @Get()
   @UseGuards(IntraOAuthGuard)
-  async intraAuth(@Req() req) {}
+  intraAuth(@Req() req) {
+    return true;
+  }
 
   @Get('callback')
   @UseGuards(IntraOAuthGuard)
