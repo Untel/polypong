@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   paddle.class.ts                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:00:15 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 18:32:20 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/09 04:04:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ export class Paddle {
   maxAngle: number;
   index: number;
   ratio: number;
+  see = false;
   skill = true;
   interpolationStart: LineInterpolator;
   interpolationEnd: LineInterpolator;
@@ -139,7 +140,8 @@ export class Paddle {
     return {
       line: this.line,
       color: this.color,
-      effects: this.effects,
+      see: this.see,
+      // effects: this.effects,
     };
   }
 }

@@ -88,7 +88,7 @@
         :name="player.user.name"
         :caption="player.user.email"
         :color="player.color"
-        :canUpdate="canUpdate"
+        :canUpdate="canUpdate || player.user.id === $auth.user.id"
         :isHost="player.user.id === $lobbies.getActiveLobby.host.id"
         @change="(evt) => $lobbies.updateLobby(lobby.id, { players: { [player.user.id]: evt } })"
         @avatarClick="(name) => {

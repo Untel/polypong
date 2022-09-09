@@ -9,6 +9,7 @@ export type Line = Array<Array<number>>;
 export interface Paddle {
   line: Line;
   color: string;
+  see: boolean;
 }
 
 export interface Wall {

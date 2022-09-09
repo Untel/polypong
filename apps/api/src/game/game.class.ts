@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   game.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 22:07:42 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/09 04:11:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,15 +151,21 @@ export default class Game {
       return new Wall(line, paddle);
     });
     this.bots.forEach((b) => (b.tasks = []));
-    const fragAngle = (Math.PI * 2) / this.nPlayers;
-    for (let i = 0; i < this.nPlayers; i++) {
-      // let ang = fragAngle * i + fragAngle / 2;
-      const ang = GameTools.getRandomFloatArbitrary(
-        fragAngle * i,
-        fragAngle * (i + 1),
+    let fragAngle = (Math.PI * 2) / this.nPlayers;
+    if (this.nPlayers > 2)
+      for (let i = 0; i < this.nPlayers; i++) {
+        // let ang = fragAngle * i + fragAngle / 2;
+        const ang = GameTools.getRandomFloatArbitrary(
+          fragAngle * i,
+          fragAngle * (i + 1),
+        );
+        this.addBall(true, ang);
+      }
+    else
+      this.addBall(
+        true,
+        GameTools.getRandomFloatArbitrary(fragAngle, fragAngle + Math.PI / 4),
       );
-      this.addBall(true, ang);
-    }
     this.socket.emit('mapChange', this.mapNetScheme);
     this.socket.emit('gameUpdate', this.networkState);
     if (this.nPlayers === 2) this.socket.emit('score', this.scoreNetScheme);

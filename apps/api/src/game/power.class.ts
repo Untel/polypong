@@ -35,7 +35,7 @@ export abstract class Power extends Circle {
 
 export class AddBallPower extends Power {
   name: 'add-ball';
-  timeout: 0;
+  timeout = 0;
 
   constructor(game: Game, position: Vector = new Vector(0, 0), radius = 2) {
     super(game, position, radius);
@@ -48,7 +48,7 @@ export class AddBallPower extends Power {
 
 export class ReduceAllOtherPaddlesPower extends Power {
   name: 'reduce-enemies';
-  timeout: 6000;
+  timeout = 6000;
 
   constructor(game: Game, position: Vector = new Vector(0, 0), radius = 2) {
     super(game, position, radius);
@@ -74,7 +74,7 @@ export class ReduceAllOtherPaddlesPower extends Power {
 
 export class AugmentPaddlePower extends Power {
   name: 'upsize-allies';
-  timeout: 6000;
+  timeout = 6000;
 
   constructor(game: Game, position: Vector = new Vector(0, 0), radius = 2) {
     super(game, position, radius);
@@ -100,17 +100,28 @@ export class AugmentPaddlePower extends Power {
 
 export class SeeTrajectories extends Power {
   name: 'see-trajectories';
-  timeout: 15000;
+  timeout = 6000;
 
   constructor(game: Game, position: Vector = new Vector(0, 0), radius = 2) {
     super(game, position, radius);
     this.name = 'see-trajectories';
-    this.timeout = 15000;
+    this.timeout = 6000;
   }
 
-  fade(paddle: Paddle) {}
+  fade(paddle: Paddle) {
+    paddle.see = false;
+    this.game.socket.emit('gameUpdate', this.game.networkState);
+  }
 
-  effect(ball: Ball) {}
+  effect(ball: Ball) {
+    this.game.paddles.forEach((paddle) => {
+      if (paddle.color === ball.lastHitten?.color) {
+        paddle.see = true;
+        paddle.affectPower(this);
+      }
+    });
+    this.game.socket.emit('gameUpdate', this.game.networkState);
+  }
 }
 
 export class SadiSlap extends Power {
@@ -134,4 +145,5 @@ export const PowerList = [
   SadiSlap,
   ReduceAllOtherPaddlesPower,
   AugmentPaddlePower,
+  SeeTrajectories,
 ];

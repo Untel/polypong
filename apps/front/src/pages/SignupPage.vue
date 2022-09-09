@@ -90,7 +90,7 @@ const email = ref<string>('');
 const name = ref<string>('');
 const password = ref<string>('');
 const repeatPassword = ref<string>('');
-const coalition = ref<CoalitionChoice>();
+const coalition = ref<CoalitionChoice>(CoalitionChoice.ALLIANCE);
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
@@ -108,10 +108,7 @@ const onSignUp = async (form: Event): Promise<void> => {
       : { name: 'home' };
     router.push(redirect);
   } catch ({ response, body }) {
-    Notify.create({
-      type: 'negative',
-      message: (body as any).message,
-    });
+    console.log('Failed sign up');
   }
 };
 

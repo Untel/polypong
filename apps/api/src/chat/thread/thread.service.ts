@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 21:54:53 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 20:43:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/09 05:07:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,7 @@ export class ThreadService {
     const th = await Thread.findOneBy({ key });
     if (th) return th;
 
+    if (user.id === to.id) return this.create([to], { key });
     return this.create([user, to], { key });
   }
 

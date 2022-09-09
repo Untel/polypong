@@ -16,7 +16,7 @@ const path = require('path');
 
 module.exports = configure((/* ctx */) => ({
   eslint: {
-    // fix: true,
+    fix: true,
     // include = [],
     // exclude = [],
     // rawOptions = {},

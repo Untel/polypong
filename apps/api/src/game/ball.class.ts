@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ball.class.ts                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 16:59:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/08 19:38:35 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/09 04:13:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ import Game from './game.class';
 import { FRAME_RATE } from './game.class';
 export class Ball extends Circle {
   _speed = 1;
-  maxSpeed = 3;
+  maxSpeed = 2;
   direction: Vector;
   angle: number;
   lastHitten?: Paddle;
@@ -150,12 +150,7 @@ export class Ball extends Circle {
         break;
       }
     }
-    this.game.socket.emit(
-      'object',
-      this.game.balls.findIndex((b) => b === this),
-      'ball',
-      this.netScheme,
-    );
+    this.game.socket.emit('gameUpdate', this.game.networkState);
   }
   move() {
     if (this.unFreeze(1)) return;

@@ -65,38 +65,8 @@
   </q-card>
 </template>
 
-<!--
-      <q-card-section>
-        <div class="row items-center no-wrap">
-          <div class="col">
-            <div class="text-h6">Our Planet</div>
-            <div class="text-subtitle2">by John Doe</div>
-          </div>
-
-          <div class="col-auto">
-            <q-btn color="grey-7" round flat icon="more_vert">
-              <q-menu cover auto-close>
-                <q-list>
-                  <q-item clickable>
-                    <q-item-section>Remove Card</q-item-section>
-                  </q-item>
-                  <q-item clickable>
-                    <q-item-section>Send Feedback</q-item-section>
-                  </q-item>
-                  <q-item clickable>
-                    <q-item-section>Share</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </div>
-        </div>
-      </q-card-section>
--->
-
 <script lang="ts" setup>
-import { User } from 'src/types/user';
-import { defineComponent, PropType } from 'vue';
+import { defineComponent } from 'vue';
 import SocialAvatar from './SocialAvatar.vue';
 
 defineComponent({});
@@ -110,9 +80,8 @@ defineProps({
     type: Boolean, default: false,
   },
 });
-const emit = defineEmits(['avatarClick']);
+const emit = defineEmits(['avatarClick', 'change']);
 function avatarClick(name: string) {
-//  console.log('avatarClick - name = ', name);
   emit('avatarClick', name);
 }
 

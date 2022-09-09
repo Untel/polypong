@@ -23,9 +23,9 @@
       class="login-background"
       v-bind="backgroundParams"
     >
-      <div class="form-container">
-        <FourtyTwoLogo size="100px" style="justify-self: center;" />
-        <q-tabs>
+      <div class="form-container text-white">
+        <FourtyTwoLogo size="100px" style="justify-self: center; color: white;" />
+        <q-tabs style="color: white">
           <q-route-tab
             to="/auth"
             exact
@@ -45,8 +45,8 @@
 
 <script lang="ts" setup>
 import FssFallback from 'src/components/FssFallback.vue';
-import { useLoginShaders, defaultLoginLight } from 'src/utils/shaders';
-import { CoalitionChoice, coalitionsShadersMap, coalitions } from 'src/types';
+import { useLoginShaders } from 'src/utils/shaders';
+import { CoalitionChoice, coalitions, ShaderConfig } from 'src/types';
 import FourtyTwoLogo from 'src/components/FourtyTwoLogo.vue';
 import { ref } from 'vue';
 
@@ -54,7 +54,10 @@ const defaultBackgroundParams = {
   fssSettings: useLoginShaders(),
   fallbackUrl: '/background_login.jpg',
 };
-const backgroundParams = ref(defaultBackgroundParams);
+const backgroundParams = ref<{
+  fssSettings: ShaderConfig;
+  fallbackUrl: string
+} | null>(defaultBackgroundParams);
 
 const changeBackground = (coalition: CoalitionChoice) => {
   if (!coalition) { backgroundParams.value = null; } else {

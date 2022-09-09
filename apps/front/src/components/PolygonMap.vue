@@ -80,17 +80,20 @@
           :fill="ball.color || 'yellow'" r="2"
           v-bind="formatCirclePosition(ball.position)"
         />
-        <!-- <line
-          :stroke="ball.color || 'red'"
-          stroke-width="0.25px"
-          stroke-dasharray="2"
-          v-bind="formatBallTrajectoryPoints(ball)"
-        /> -->
-        <circle
-          v-if="ball.target"
-          :fill="ball.color || 'yellow'" r=".5"
-          v-bind="formatCirclePosition(ball.target)"
-        />
+        <template
+          v-if="paddles[myWallIdx]?.see">
+          <line
+            :stroke="ball.color || 'red'"
+            stroke-width="0.25px"
+            stroke-dasharray="2"
+            v-bind="formatBallTrajectoryPoints(ball)"
+          />
+          <circle
+            v-if="ball.target"
+            :fill="ball.color || 'yellow'" r=".5"
+            v-bind="formatCirclePosition(ball.target)"
+          />
+        </template>
       </g>
       <circle
         v-for="(power, idx) in powers"
@@ -100,6 +103,9 @@
       />
     </svg>
     <slot />
+    <pre v-if="paddles[myWallIdx]?.see">
+      I SEEE
+    </pre>
   </div>
 </template>
 
@@ -156,9 +162,9 @@ const scaleRatio = computed(() => {
 function formatBallTrajectoryPoints(ball: Ball) {
   return {
     x1: ball.position.x,
-    x2: ball.target.x,
+    x2: ball.target?.x,
     y1: ball.position.y,
-    y2: ball.target.y,
+    y2: ball.target?.y,
   };
 }
 function formatPoint(x : number, y : number) {
