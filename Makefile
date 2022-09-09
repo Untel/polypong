@@ -38,9 +38,13 @@ precommit:
 	yarn --cwd ./apps/api format &
 	yarn --cwd ./apps/api lint &
 	yarn --cwd ./apps/front lint &
-# yarn --cwd ./apps/api precommit
+
 run:
 	$(COMPOSE) up --build $(c)
+
+hostinstall:
+	yarn --cwd ./apps/api &
+	yarn --cwd ./apps/front &
 
 
 .PHONY: all build clear down run log config precommit
