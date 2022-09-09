@@ -24,10 +24,10 @@ export const coalitionsShadersMap = {
 };
 
 export const coalitionsFallbackMap = {
-  [CoalitionChoice.ALLIANCE]: '/src/assets/alliance_background.jpg',
-  [CoalitionChoice.ASSEMBLY]: '/src/assets/assembly_background.jpg',
-  [CoalitionChoice.FEDERATION]: '/src/assets/federation_background.jpg',
-  [CoalitionChoice.ORDER]: '/src/assets/order_background.jpg',
+  [CoalitionChoice.ALLIANCE]: 'assets/alliance_background.jpg',
+  [CoalitionChoice.ASSEMBLY]: 'assets/assembly_background.jpg',
+  [CoalitionChoice.FEDERATION]: 'assets/federation_background.jpg',
+  [CoalitionChoice.ORDER]: 'assets/order_background.jpg',
 };
 
 export const coalitions = {

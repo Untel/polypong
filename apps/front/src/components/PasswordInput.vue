@@ -6,9 +6,6 @@
       (val: string) => !!val || 'Password cannot be empty',
       (val: string) => val.length > 6 || 'Password must be stronger',
     ]"
-    aria-autocomplete="list"
-    autocomplete="current-password"
-    model-value="string"
     v-bind="$attrs"
     >
     <template v-slot:append>

@@ -6,7 +6,7 @@
 /*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 02:59:56 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/07 06:17:36 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/09 02:11:15 by edal--ce         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,9 @@ export class LobbyController {
   }
 
   @Get('game/restart')
-  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {}
+  restart(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) { 
+    console.log("lol");
+  }
   @Get('game/pause')
   //  @UseGuards(InLobbyGuard)
   pause(@CurrentLobby() lobby: Lobby, @CurrentUser() user: User) {

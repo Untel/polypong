@@ -76,7 +76,7 @@ const coalition: ComputedRef<CoalitionChoice> = computed(() => {
   return CoalitionChoice.FEDERATION;
 });
 
-const coaBackground = computed(() => `/src/assets/${coalition.value}_background.jpg`);
+const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`);
 
 // const history = asyncComputed(() => his.fetchUserMatchesHistory(props.userId));
 //
@@ -136,7 +136,7 @@ const coaBackground = computed(() => `/src/assets/${coalition.value}_background.
 //  return CoalitionChoice.FEDERATION;
 // });
 //
-// const coaBackground = computed(() => `/src/assets/${coalition.value}_background.jpg`);
+// const coaBackground = computed(() => `assets/${coalition.value}_background.jpg`);
 //
 // const ratio = computed(() => {
 //  if (nPlayed.value === 0) {

@@ -313,7 +313,7 @@
         <q-toolbar class="bg-grey-3 row text-black">
           <DiscordPicker
             @emoji="message += $event"
-            :api-key="$env.TENOR_API_KEY || ''"
+            :api-key="$env?.TENOR_API_KEY || ''"
           />
           <q-input
             rounded

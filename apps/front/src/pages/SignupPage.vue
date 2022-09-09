@@ -53,6 +53,8 @@
     dense
     filled
     label="Repeat password"
+    aria-autocomplete="new-password"
+    autocomplete="new-password"
     :rules="[ (val: string) => val === password || 'The password dont match']"
   />
 

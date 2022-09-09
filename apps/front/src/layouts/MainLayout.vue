@@ -64,16 +64,16 @@
     background-size: cover;
   }
   .alliance {
-    background-image: url('/src/assets/alliance_background.jpg');
+    background-image: url('assets/alliance_background.jpg');
   }
   .federation {
-    background-image: url('/src/assets/federation_background.jpg');
+    background-image: url('assets/federation_background.jpg');
   }
   .assembly {
-    background-image: url('/src/assets/assembly_background.jpg');
+    background-image: url('assets/assembly_background.jpg');
   }
   .order {
-    background-image: url('/src/assets/order_background.jpg');
+    background-image: url('assets/order_background.jpg');
   }
 </style>
 
