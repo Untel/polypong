@@ -61,7 +61,7 @@ export class MessageService {
     participants.forEach((p) => {
       const sock = this.socketService.getUserSocket(p.user.id);
       if (sock) {
-        sock.forEach((s)=> s.emit('thread-message', threadId, message));
+        sock.forEach((s) => s.emit('thread-message', threadId, message));
       }
     });
     return message;
