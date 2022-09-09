@@ -4,6 +4,7 @@ services:
     environment:
       - NODE_ENV=PROD
       - DEBUG=0
+    entrypoint: yarn start:prod
   front:
     build:
       context: apps/front
