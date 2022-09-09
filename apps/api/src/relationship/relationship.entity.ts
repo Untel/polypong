@@ -13,18 +13,18 @@ export class Relationship {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ name: 'fromId' })
+  @PrimaryColumn()
   fromId: number;
 
   @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'fromId' })
+  @JoinColumn({ name: 'from_id' })
   from: User;
 
-  @PrimaryColumn({ name: 'toId' })
+  @PrimaryColumn()
   toId: number;
 
   @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'toId' })
+  @JoinColumn({ name: 'to_id' })
   to: User;
 
   @Column({ default: false })

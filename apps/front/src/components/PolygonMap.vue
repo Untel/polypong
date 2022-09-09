@@ -100,10 +100,6 @@
       />
     </svg>
     <slot />
-    <h6>
-      Ratio: {{ ratio }}
-      Gamma: {{ gammaRatio }} - {{ gamma }}
-    </h6>
   </div>
 </template>
 
