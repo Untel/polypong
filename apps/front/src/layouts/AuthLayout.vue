@@ -52,7 +52,7 @@ import { ref } from 'vue';
 
 const defaultBackgroundParams = {
   fssSettings: useLoginShaders(),
-  fallbackUrl: '/src/assets/background_login.jpg',
+  fallbackUrl: 'assets/background_login.jpg',
 };
 const backgroundParams = ref(defaultBackgroundParams);
 
