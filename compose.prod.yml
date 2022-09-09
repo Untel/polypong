@@ -10,5 +10,6 @@ services:
       - DEBUG=0
   api:
     environment:
-      - NODE_ENV=PROD
+      - NODE_ENV=production
       - DEBUG=0
+    entrypoint: yarn start:prod

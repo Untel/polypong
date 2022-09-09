@@ -19,6 +19,7 @@ export class UserService {
   ) {}
 
   logger = new Logger('UserService');
+
   connectedUsers = new Map<number, string>();
 
   setUserAsConnected(id: number, socketId: string) {
