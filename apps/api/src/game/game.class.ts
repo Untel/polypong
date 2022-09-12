@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:00 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/09 04:11:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 09:33:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,8 @@ export default class Game {
     this.stop();
     // this.generateMap(this.nPlayers);
     this.interval = setInterval(() => this.tick(), 1000 / FRAME_RATE);
-    this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
+    if (this.lobby.hasPower)
+      this.intervalPowers = setInterval(() => this.addRandomPower(), 5000);
   }
   stop() {
     clearInterval(this.interval);

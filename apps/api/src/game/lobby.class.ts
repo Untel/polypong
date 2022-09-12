@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lobby.class.ts                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: edal--ce <edal--ce@student.42.fr>          +#+  +:+       +#+        */
+/*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/03 00:18:12 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/03 14:07:15 by edal--ce         ###   ########.fr       */
+/*   Updated: 2022/09/12 09:32:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ export default class Lobby implements ILobby, ILobbyConfig {
   playersMax: number;
   finalePoints: number;
   logger = new Logger('Lobby');
+  hasPower = false;
 
   @Exclude()
   @Type(() => Match)
@@ -159,6 +160,9 @@ export default class Lobby implements ILobby, ILobbyConfig {
     if (opts.playersMax) {
       this.playersMax = opts.playersMax;
       this.fillBots();
+    }
+    if (opts.hasPower !== undefined) {
+      this.hasPower = !!opts.hasPower;
     }
     //this.sock.emit('lobby_change', this.id);
     this.socketServer.sockets.emit('lobby_change', this.id);

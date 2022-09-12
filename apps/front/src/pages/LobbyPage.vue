@@ -77,6 +77,14 @@
               || 'Username should have at least 2 chars']"
           />
         </q-form>
+        <q-toggle
+          label="Powers"
+          :disable="!canUpdate"
+          @update:model-value="(evt) => $lobbies.updateLobby($lobbies.getActiveLobby.id, {
+            hasPower: evt
+          })"
+          :model-value="$lobbies.getActiveLobby?.hasPower"
+        />
       </q-card-section>
     </q-card>
     <br/>

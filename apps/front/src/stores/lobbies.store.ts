@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/09 03:30:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 09:55:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ export interface Lobby {
   description: string;
   isPrivate?: boolean;
   isStarted: boolean;
-  host: User
+  host: User;
+  hasPower: boolean;
   finalePoints: number;
 }
 
