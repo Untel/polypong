@@ -203,8 +203,7 @@ export class ThreadController {
       } else {
         // Si personne n'est eligible, on ferme le thread
         this.logger.log(`Thread ${thread.id} => Closing thread`);
-        if (thread.channel)
-          await thread.channel.remove();
+        if (thread.channel) await thread.channel.remove();
         return await thread.remove();
       }
     }

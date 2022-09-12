@@ -48,7 +48,10 @@ export class Thread extends RootEntity {
     return !this.channel;
   }
 
-  @OneToOne(() => Channel, (c) => c.thread, { nullable: true, onDelete: 'CASCADE' })
+  @OneToOne(() => Channel, (c) => c.thread, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   public channel: Channel;
 
   @Column({ nullable: true })
