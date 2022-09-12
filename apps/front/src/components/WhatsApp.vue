@@ -540,15 +540,10 @@ function actionable(target: Participant) : Action[] {
         },
       );
     }
-  } else {
+  } else if (props.currentThread?.channel) {
     actions.push(
-      { label: 'Cut notifications', icon: { name: 'fas fa-bell-slash' }, fn },
+      { label: 'Leave', icon: { name: 'fas fa-door-open' }, fn: $thread.leave },
     );
-    if (props.currentThread?.channel) {
-      actions.push(
-        { label: 'Leave', icon: { name: 'fas fa-door-open' }, fn: $thread.leave },
-      );
-    }
   }
   return actions;
 }

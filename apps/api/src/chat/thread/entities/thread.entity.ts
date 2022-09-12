@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/27 21:27:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 10:58:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ export class Thread extends RootEntity {
     return !this.channel;
   }
 
-  @OneToOne(() => Channel, (c) => c.thread, { nullable: true })
+  @OneToOne(() => Channel, (c) => c.thread, { nullable: true, onDelete: 'CASCADE' })
   public channel: Channel;
 
   @Column({ nullable: true })

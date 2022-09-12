@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 03:00:06 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/09/09 13:43:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 10:44:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ export const useThreadStore = defineStore('thread', {
             password: '',
           };
         } catch (e: MandeError<{ message: string, status: number }>) {
-          if (e.body.status === 466) {
+          if (e.body.statusCode === 466) {
             console.log('Thread join error', e, e.body);
             Dialog.create({
               title: 'Password required',

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 19:46:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 10:57:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ export class Message extends RootEntity {
   @ManyToOne(() => User) // Bind to User or ThreadParticipant ?
   public sender: User;
 
-  @ManyToOne(() => Thread, (thread) => thread.messages) // Is it needed if thread participant as sender??
+  @ManyToOne(() => Thread, (thread) => thread.messages, { onDelete: 'CASCADE' }) // Is it needed if thread participant as sender??
   public thread: Thread;
 
   // We don't need it if the Thread contain the entire list of participant ?

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/12 19:15:02 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/08/29 18:51:47 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/09/12 10:55:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ export enum ThreadMemberStatus {
 @Entity({ orderBy: { status: 'ASC' } })
 @Index(['user', 'thread'], { unique: true })
 export class ThreadParticipant extends RootEntity {
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: true, cascade: false })
   public user: User;
 
-  @ManyToOne(() => Thread)
+  @ManyToOne(() => Thread, { onDelete: 'CASCADE' })
   public thread: Thread;
 
   @CreateDateColumn({ type: 'timestamp' })

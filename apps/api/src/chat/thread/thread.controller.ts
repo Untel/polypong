@@ -188,7 +188,9 @@ export class ThreadController {
     // Si l'owner leave, on transfert le status d'owner
     if (me.status === ThreadMemberStatus.OWNER) {
       // Les participants sont auto sort by status, donc les admins seront eligible en premier
-      const others = thread.participants.filter((p) => p.user.id !== user.id);
+      const others = thread.participants
+        .filter((p) => p.user.id !== user.id)
+        .sort((a, b) => b.status - a.status);
       if (others[0]) {
         others[0].status = ThreadMemberStatus.OWNER;
         const content = `${me.user.name} gave the ownership to ${others[0].user.name}`;
@@ -201,6 +203,8 @@ export class ThreadController {
       } else {
         // Si personne n'est eligible, on ferme le thread
         this.logger.log(`Thread ${thread.id} => Closing thread`);
+        if (thread.channel)
+          await thread.channel.remove();
         return await thread.remove();
       }
     }
