@@ -41,12 +41,12 @@
       </PolygonMap>
     </FssFallback>
 
-    <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
+    <!-- <q-btn @click="$game.pauseGame()" :icon="$game.isPaused ? 'play_arrow' : 'pause'">
       {{ $game.isPaused ? 'Play' : 'Pause' }}
     </q-btn>
     <q-btn @click="$game.restart()" icon="fas fa-arrows-rotate">
       restart
-    </q-btn>
+    </q-btn> -->
   </q-page>
 </template>
 <script lang="ts">
