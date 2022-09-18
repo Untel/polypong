@@ -11,8 +11,11 @@ Fill the .env file from .env.example
 
 ## Description
 Last project of 42 Cursus
-Make a pong game, with social features (chat, profile, friendship)
+
+A pong game, with social features (chat, profile, friendship)
+
 It's a Battle royal Pong game, each player have to defend his side. Once a player die, the polygon reduce until becoming the regular 1v1 pong game
+
 Built with:
   - Back: NestJS, TypeOrm, Swagger, Passort: Jwt + Oauth 42/Google
   - Data: PostgresSQL, Redis,
