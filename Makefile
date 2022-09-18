@@ -25,7 +25,6 @@ down:
 
 clear:
 	$(COMPOSE) down -v
-	docker system -f prune
 
 enter:
 	$(COMPOSE) exec $(c) /bin/sh
