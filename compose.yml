@@ -6,7 +6,7 @@ services:
   nginx:
     image: nginx
     # build: ./compose/nginx
-    container_name: nginx
+    container_name: polypong_nginx
     volumes:
       - "./compose/nginx/templates/nginx.conf:/etc/nginx/templates/default.conf.template"
       - "./compose/nginx/entrypoint/:/docker-entrypoint.d/${DOMAIN_NAME:-localhost}"
@@ -31,7 +31,7 @@ services:
       context: apps/front
       target: build
     image: polypong/front
-    container_name: front
+    container_name: polypong_front
     expose:
       - 9000
     volumes:
@@ -50,7 +50,7 @@ services:
     build:
       context: apps/api
     image: polypong/api
-    container_name: api
+    container_name: polypong_api
     volumes:
       - ./apps/api:/app/
       - "/app/uploads"
@@ -75,7 +75,7 @@ services:
 
   # Cold data (user infos, accounts etc) database
   postgres:
-    container_name: database
+    container_name: polypong_database
     image: postgres
     restart: always
     environment:
@@ -111,12 +111,12 @@ services:
 
   # Smtp with UI, to see all emails sent across our stack
   mailhog:
+    container_name: polypong_mailhog
     image: mailhog/mailhog
     networks:
       - mailer
     expose:
       - 1025
-    container_name: mailhog
     restart: always
     stop_signal: SIGINT
     logging:
