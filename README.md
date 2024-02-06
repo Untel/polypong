@@ -23,4 +23,4 @@ Built with:
 ## Demo
 ![login](./polypong_login.gif)
 ![inbox](./polypong_inbox.png)
-./example_game.mp4
+https://github.com/Untel/polypong/assets/15136981/22731f79-4d13-400e-a8d6-14a776b8788d
