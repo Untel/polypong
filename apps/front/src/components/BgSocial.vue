@@ -14,7 +14,7 @@
     @update="emit('update:open', $event)"
     class="social-fab"
     label-position="left"
-    :icon="`img:https://cdn.intra.42.fr/users/${login}.jpg`"
+    :icon="`img:${image}`"
     direction="up"
     padding="0"
   >
@@ -48,6 +48,7 @@ const props = defineProps({
   github: String,
   website: String,
   linkedin: String,
+  image: String,
   login: String,
   open: Boolean,
 });

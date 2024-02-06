@@ -20,12 +20,14 @@
           login="adda-sil"
           linkedin="adrienfernandes"
           website="http://fernandes.bzh"
+          image="https://cdn.intra.42.fr/users/bbe3a4ac809728a21b15436c6d7aa474/adda-sil.jpg"
           github="untel"
         />
         <BgSocial
           name="Lambert Spiess"
           login="lspiess"
           github="lambertspiess"
+          image="https://cdn.intra.42.fr/users/ad7c03cb383dfeadf5fad9657ac241ad/lspiess.jpg"
           linkedin="lambert-spiess-34493b173"
         />
         <BgSocial
@@ -33,11 +35,14 @@
           login="edal--ce"
           github="endcerro"
           linkedin="enzo-dal-cerro"
+          image="https://cdn.intra.42.fr/users/bd729e0cbee8e29db82040e32aa4c052/edal--ce.jpg"
+
         />
         <BgSocial
           name="Guillaume Ozserttas"
           github="GuillaumeOz"
           linkedin="guillaume-ozserttas"
+          image="https://cdn.intra.42.fr/users/bd0526feb9f6bc508a2219f6bdbf8dc7/gozsertt.jpg"
           login="gozsertt"
         />
 

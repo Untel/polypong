@@ -153,7 +153,7 @@ export default class Game {
     this.bots.forEach((b) => (b.tasks = []));
     const fragAngle = (Math.PI * 2) / this.nPlayers;
     if (this.nPlayers > 2)
-      for (let i = 0; i < this.nPlayers; i++) {
+      for (let i = 0; i < 1; i++) {
         // let ang = fragAngle * i + fragAngle / 2;
         const ang = GameTools.getRandomFloatArbitrary(
           fragAngle * i,
