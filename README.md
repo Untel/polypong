@@ -12,6 +12,7 @@ Fill the .env file from .env.example
 ## Description
 Last project of 42 Cursus
 Battleroyal pong game, with social features (chat, profile, friendship)
+To control your paddle, use mouse on desktop and gyroscope on mobile
 
 Built with:
   - Back: NestJS, TypeOrm, Swagger, Passport (Oauth 42+Google)
