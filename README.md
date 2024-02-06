@@ -23,4 +23,4 @@ Built with:
 ## Demo
 ![login](./polypong_login.gif)
 ![inbox](./polypong_inbox.png)
-[![game](./polypong_game.gif)](./example_game.mp4)
+./example_game.mp4
