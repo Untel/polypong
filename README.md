@@ -29,6 +29,11 @@ To control your paddle, use mouse on desktop and gyroscope on mobile
 - see-trajectories (yellow) - Players in your coalition where a wall will hit next
 - sadi-slap (pink) - Nicolas Sadirac will slap the ball, change randomly the trajectory
 
+## Todo
+[] Coalition mode (you can't slay paddles from your coalition)
+[] Coalition ladder
+[] Rework engine for netcode optimizations
+
 ---
 ## Demo
 ![login](./polypong_login.gif)
