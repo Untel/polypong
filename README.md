@@ -23,11 +23,11 @@ To control your paddle, use mouse on desktop and gyroscope on mobile
   - Other: Docker, Docker Compose, Nginx as reverse proxy, Mailhog, Geometric.js, Collider2d, Flat Surface Shaders, Socket.io
 
 ## Powers:
-add-ball (blue) - Add a new ball in the game
-reduce-enemies (red) - Reduce the size of all paddles other than those in your coalition
-upsize-allies (green) - Increase the size of all paddles in your coalition
-see-trajectories (yellow) - Players in your coalition where a wall will hit next
-sadi-slap (pink) - Nicolas Sadirac will slap the ball, change randomly the trajectory
+- add-ball (blue) - Add a new ball in the game
+- reduce-enemies (red) - Reduce the size of all paddles other than those in your coalition
+- upsize-allies (green) - Increase the size of all paddles in your coalition
+- see-trajectories (yellow) - Players in your coalition where a wall will hit next
+- sadi-slap (pink) - Nicolas Sadirac will slap the ball, change randomly the trajectory
 
 ---
 ## Demo
