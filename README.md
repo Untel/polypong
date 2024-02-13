@@ -26,7 +26,7 @@ To control your paddle, use mouse on desktop and gyroscope on mobile
 - add-ball (blue) - Add a new ball in the game
 - reduce-enemies (red) - Reduce the size of all paddles other than those in your coalition
 - upsize-allies (green) - Increase the size of all paddles in your coalition
-- see-trajectories (yellow) - Players in your coalition where a wall will hit next
+- see-trajectories (yellow) - Players in your coalition where balls will hit next
 - sadi-slap (pink) - Nicolas Sadirac will slap the ball, change randomly the trajectory
 
 ## Todo
